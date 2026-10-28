@@ -15,36 +15,140 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_60jwvb{-webkit-flex:auto;-ms-flex:auto;flex:auto;}"];
-  [@css "._a_60c6td{-webkit-flex:initial;-ms-flex:initial;flex:initial;}"];
-  [@css "._a_603p27{-webkit-flex:none;-ms-flex:none;flex:none;}"];
-  [@css "._a_60fr2u{-webkit-flex:2;-ms-flex:2;flex:2;}"];
-  [@css "._a_60wv0x{-webkit-flex:10em;-ms-flex:10em;flex:10em;}"];
-  [@css "._a_60vgg1{-webkit-flex:30%;-ms-flex:30%;flex:30%;}"];
   [@css
-    "._a_60aax7{-webkit-flex:min-content;-ms-flex:min-content;flex:min-content;}"
+    (
+      "._a_60jwvb{-webkit-flex:auto;-ms-flex:auto;flex:auto;}",
+      "_a_60jwvb",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
   ];
-  [@css "._a_60thbz{-webkit-flex:1 30px;-ms-flex:1 30px;flex:1 30px;}"];
-  [@css "._a_60x0uu{-webkit-flex:2 2;-ms-flex:2 2;flex:2 2;}"];
-  [@css "._a_608a55{-webkit-flex:2 2 10%;-ms-flex:2 2 10%;flex:2 2 10%;}"];
-  [@css "._a_605q0r{-webkit-flex:2 2 10em;-ms-flex:2 2 10em;flex:2 2 10em;}"];
   [@css
-    "._a_600jqd{-webkit-flex:2 2 min-content;-ms-flex:2 2 min-content;flex:2 2 min-content;}"
+    (
+      "._a_60c6td{-webkit-flex:initial;-ms-flex:initial;flex:initial;}",
+      "_a_60c6td",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_603p27{-webkit-flex:none;-ms-flex:none;flex:none;}",
+      "_a_603p27",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_60fr2u{-webkit-flex:2;-ms-flex:2;flex:2;}",
+      "_a_60fr2u",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_60wv0x{-webkit-flex:10em;-ms-flex:10em;flex:10em;}",
+      "_a_60wv0x",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_60vgg1{-webkit-flex:30%;-ms-flex:30%;flex:30%;}",
+      "_a_60vgg1",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_60aax7{-webkit-flex:min-content;-ms-flex:min-content;flex:min-content;}",
+      "_a_60aax7",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_60thbz{-webkit-flex:1 30px;-ms-flex:1 30px;flex:1 30px;}",
+      "_a_60thbz",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_60x0uu{-webkit-flex:2 2;-ms-flex:2 2;flex:2 2;}",
+      "_a_60x0uu",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_608a55{-webkit-flex:2 2 10%;-ms-flex:2 2 10%;flex:2 2 10%;}",
+      "_a_608a55",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_605q0r{-webkit-flex:2 2 10em;-ms-flex:2 2 10em;flex:2 2 10em;}",
+      "_a_605q0r",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_600jqd{-webkit-flex:2 2 min-content;-ms-flex:2 2 min-content;flex:2 2 min-content;}",
+      "_a_600jqd",
+      "0,1,0 own",
+      "216",
+      7,
+      false,
+    )
   ];
   [@css.blocks
     [
-      (2, "_a_60jwvb"),
-      (3, "_a_60c6td"),
-      (4, "_a_603p27"),
-      (8, "_a_60fr2u"),
-      (11, "_a_60wv0x"),
-      (12, "_a_60vgg1"),
-      (13, "_a_60aax7"),
-      (16, "_a_60thbz"),
-      (19, "_a_60x0uu"),
-      (22, "_a_608a55"),
-      (23, "_a_605q0r"),
-      (24, "_a_600jqd"),
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (8, "", [3]),
+      (11, "", [4]),
+      (12, "", [5]),
+      (13, "", [6]),
+      (16, "", [7]),
+      (19, "", [8]),
+      (22, "", [9]),
+      (23, "", [10]),
+      (24, "", [11]),
     ]
   ];
   

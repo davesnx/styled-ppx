@@ -12,11 +12,13 @@ The post-PPX `n.ml` shows only the cross-module ref as a sentinel — the
 same-module `localFlag` is already resolved to its class.
 
   $ cat n.ml
-  [@@@css "._a_1y9xg4efapt._id_1plmrn9.\000M.marker\000{color:blue;}"]
+  [@@@css
+    ("._a_1y9xg4efapt._id_1plmrn9.\000M.marker\000{color:blue;}",
+      "_a_1y9xg4efapt", "0,3,0 own", "158", 1, false)]
   [@@@css.bindings
     [("N.localFlag", "_id_1plmrn9", "");
     ("N.container", "_id_1npqc5e", "_a_1y9xg4efapt")]]
-  [@@@css.blocks [(1, "_id_1plmrn9"); (3, "_id_1npqc5e _a_1y9xg4efapt")]]
+  [@@@css.blocks [(1, "_id_1plmrn9", []); (3, "_id_1npqc5e", [0])]]
   [@@@css.refs [("M.marker", "n.ml", 4, 19, 27)]]
   let _ = M.marker
   let localFlag = CSS.make "label:localFlag _id_1plmrn9" []

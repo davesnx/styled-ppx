@@ -18,17 +18,21 @@ the two blocks no longer collide and each keeps its own author order.
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css
-    "@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}"]
-  [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
+    ("@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}",
+      "_a_izob04e6zo5", "0,1,0 own", "158", 1, false)]
   [@@@css
-    "@media (min-width: 900px) and (not (min-width: 600px)){._a_mp5mk4exhzt{color:blue;}}"]
-  [@@@css "@media (min-width: 600px) {._a_izob04e698n{color:red;}}"]
+    ("@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}",
+      "_a_mp5mk4et4n8", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("@media (min-width: 900px) and (not (min-width: 600px)){._a_mp5mk4exhzt{color:blue;}}",
+      "_a_mp5mk4exhzt", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("@media (min-width: 600px) {._a_izob04e698n{color:red;}}",
+      "_a_izob04e698n", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings
     [("Output.blockA", "_id_79p0dv", "_a_izob04e6zo5 _a_mp5mk4et4n8");
     ("Output.blockB", "_id_64a5lb", "_a_mp5mk4exhzt _a_izob04e698n")]]
-  [@@@css.blocks
-    [(3, "_id_79p0dv _a_izob04e6zo5 _a_mp5mk4et4n8");
-    (9, "_id_64a5lb _a_mp5mk4exhzt _a_izob04e698n")]]
+  [@@@css.blocks [(3, "_id_79p0dv", [0; 1]); (9, "_id_64a5lb", [2; 3])]]
   let blockA =
     CSS.make "label:blockA _id_79p0dv _a_izob04e6zo5 _a_mp5mk4et4n8" []
   let blockB =

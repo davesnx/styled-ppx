@@ -3,9 +3,29 @@
   $ refmt --parse ml --print re output.ml
   [@css "@property --var-17zksex{syntax:\"*\";inherits:false;}"];
   [@css "@property --id-1s0m1fr{syntax:\"*\";inherits:false;}"];
-  [@css "._a_4e7bjx{color:var(--var-17zksex);}"];
-  [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_390004g7ti{background-color:var(--id-1s0m1fr);}"];
+  [@css
+    (
+      "._a_4e7bjx{color:var(--var-17zksex);}",
+      "_a_4e7bjx",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_390004g7ti{background-color:var(--id-1s0m1fr);}",
+      "_a_390004g7ti",
+      "0,1,0 own",
+      "117",
+      4,
+      false,
+    )
+  ];
   [@css.bindings
     [
       (
@@ -15,7 +35,7 @@
       ),
     ]
   ];
-  [@css.blocks [(5, "_id_1sfnaz9 _a_4e7bjx _a_5r08qs _a_390004g7ti")]];
+  [@css.blocks [(5, "_id_1sfnaz9", [2, 3, 4])]];
   module DynamicComponent = {
     [@deriving abstract]
     [@warning "-69"]

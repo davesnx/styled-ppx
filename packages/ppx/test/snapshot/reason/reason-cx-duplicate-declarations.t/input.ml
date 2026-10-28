@@ -18,11 +18,9 @@ let fallback = [%css "display: -webkit-box; display: flex"]
    the LAST color's position; margin stays its own atom. *)
 let interleaved = [%css "color: blue; margin: 0; color: red"]
 
-(* Last-occurrence anchoring: an equal-specificity rule written BETWEEN
-   the duplicates must stay before the group, or it would beat the final
-   duplicate. Authored cascade when the media matches: blue, green, red
-   -> red wins. (First-occurrence anchoring hoisted {blue;red} above the
-   media rule, letting green win.) *)
+(* Emotion order: the block's declarations, then its nested rules. The
+   color group {blue;red} comes before the media rule, so when the media
+   matches, green wins, as emotion prints this block. *)
 let mediaInterleaved =
   [%css "color: blue; @media (min-width: 600px) { color: green; } color: red"]
 

@@ -14,9 +14,18 @@ only indexes [%css] class handles.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_cb08j4eamhw.external-marker{color:blue;}"];
+  [@css
+    (
+      "._a_cb08j4eamhw.external-marker{color:blue;}",
+      "_a_cb08j4eamhw",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings [("Input.wrapper", "_id_cuy74s", "_a_cb08j4eamhw")]];
-  [@css.blocks [(5, "_id_cuy74s _a_cb08j4eamhw")]];
+  [@css.blocks [(5, "_id_cuy74s", [0])]];
   module Css = {
     let marker = "external-marker";
   };

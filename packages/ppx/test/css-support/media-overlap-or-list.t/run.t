@@ -6,11 +6,14 @@ the negation into every branch of the `or` list independently.
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css
-    "@media (min-width: 600px) and (not (min-width: 900px)), (min-width: 1200px) and (orientation: landscape) and (not (min-width: 900px)){._a_k5ij04epdat{color:red;}}"]
-  [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
+    ("@media (min-width: 600px) and (not (min-width: 900px)), (min-width: 1200px) and (orientation: landscape) and (not (min-width: 900px)){._a_k5ij04epdat{color:red;}}",
+      "_a_k5ij04epdat", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}",
+      "_a_mp5mk4et4n8", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings
     [("Output.block", "_id_1n4allv", "_a_k5ij04epdat _a_mp5mk4et4n8")]]
-  [@@@css.blocks [(3, "_id_1n4allv _a_k5ij04epdat _a_mp5mk4et4n8")]]
+  [@@@css.blocks [(3, "_id_1n4allv", [0; 1])]]
   let block =
     CSS.make "label:block _id_1n4allv _a_k5ij04epdat _a_mp5mk4et4n8" []
   let _ = block

@@ -9,11 +9,15 @@ last, sorts last and wins when both apply, as in plain CSS.
 
   $ ../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "._a_0lub34ebzcl:focus{color:blue;}"]
-  [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
+  [@@@css
+    ("._a_0lub34ebzcl:focus{color:blue;}", "_a_0lub34ebzcl", "0,2,0 own",
+      "158", 1, false)]
+  [@@@css
+    ("._a_qyw7u4ego80:hover{color:red;}", "_a_qyw7u4ego80", "0,2,0 own", "158",
+      1, false)]
   [@@@css.bindings
     [("Input.danger", "_id_1156lfl", "_a_0lub34ebzcl _a_qyw7u4ego80")]]
-  [@@@css.blocks [(2, "_id_1156lfl _a_0lub34ebzcl _a_qyw7u4ego80")]]
+  [@@@css.blocks [(2, "_id_1156lfl", [0; 1])]]
   let danger =
     CSS.make "label:danger _id_1156lfl _a_0lub34ebzcl _a_qyw7u4ego80" []
   let _ = danger

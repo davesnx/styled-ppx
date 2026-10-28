@@ -3,10 +3,17 @@
   $ refmt --parse ml --print re output.ml
   [@css "@keyframes _k_m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
   [@css
-    "._a_2z001s0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
+    (
+      "._a_2z001s0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}",
+      "_a_2z001s0iev",
+      "0,1,0 own",
+      "107",
+      64,
+      false,
+    )
   ];
   [@css.bindings [("Output.FadeIn", "_id_mj8pqn", "_a_2z001s0iev")]];
-  [@css.blocks [(5, "_id_mj8pqn _a_2z001s0iev")]];
+  [@css.blocks [(5, "_id_mj8pqn", [1])]];
   let animation = CSS.Types.AnimationName.make("_k_m6pt8e");
   module FadeIn = {
     [@deriving abstract]

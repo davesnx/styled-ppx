@@ -4,28 +4,38 @@ a block's own source order.
 `CSS.merge(header, headerWithBanner)`: both blocks set `padding`, in the base
 context and under an `@media`. An unrelated block, `tableCell`, defined
 first, sets `padding-right` under `@media (max-width: 1279px)`, the same
-context as `headerWithBanner`'s media rule. Nothing orders `tableCell`
-against the two others, so definition order keeps `headerWithBanner`'s
-rules last and they win the merge:
+context as `headerWithBanner`'s media rule. The merge (in
+`[@@@css.merges]`) puts `header`'s competing rules before
+`headerWithBanner`'s; nothing orders `tableCell` against the two others, so
+`headerWithBanner`'s rules come last and win the merge:
 
   $ refmt --parse re --print ml header.re > header.ml
   $ ../../standalone.exe --impl header.ml -o header_out.ml
   $ cat header_out.ml
   [@@@css
-    "@media (max-width: 1279px) {._a_9yyk8940004gbj3{padding-right:16px;}}"]
-  [@@@css "._a_94rgou{padding:32px 40px 0;}"]
+    ("@media (max-width: 1279px) {._a_9yyk8940004gbj3{padding-right:16px;}}",
+      "_a_9yyk8940004gbj3", "0,1,0 own", "328", 4, false)]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._a_5kutk94alsw{padding:16px 24px 0;}}"]
-  [@@@css "._a_94ffde{padding:24px 40px 0;}"]
-  [@@@css "@media (max-width: 1279px) {._a_9yyk894ee58{padding:24px 16px 0;}}"]
+    ("._a_94rgou{padding:32px 40px 0;}", "_a_94rgou", "0,1,0 own", "328", 15,
+      false)]
+  [@@@css
+    ("@media (min-width: 768px) and (max-width: 1279px) {._a_5kutk94alsw{padding:16px 24px 0;}}",
+      "_a_5kutk94alsw", "0,1,0 own", "328", 15, false)]
+  [@@@css
+    ("._a_94ffde{padding:24px 40px 0;}", "_a_94ffde", "0,1,0 own", "328", 15,
+      false)]
+  [@@@css
+    ("@media (max-width: 1279px) {._a_9yyk894ee58{padding:24px 16px 0;}}",
+      "_a_9yyk894ee58", "0,1,0 own", "328", 15, false)]
   [@@@css.bindings
     [("Header.tableCell", "_id_1v9j9bt", "_a_9yyk8940004gbj3");
     ("Header.header", "_id_1qmbnko", "_a_94rgou _a_5kutk94alsw");
     ("Header.headerWithBanner", "_id_3zqqw3", "_a_94ffde _a_9yyk894ee58")]]
   [@@@css.blocks
-    [(2, "_id_1v9j9bt _a_9yyk8940004gbj3");
-    (7, "_id_1qmbnko _a_94rgou _a_5kutk94alsw");
-    (13, "_id_3zqqw3 _a_94ffde _a_9yyk894ee58")]]
+    [(2, "_id_1v9j9bt", [0]);
+    (7, "_id_1qmbnko", [1; 2]);
+    (13, "_id_3zqqw3", [3; 4])]]
+  [@@@css.merges [(17, [1; 2])]]
   let tableCell = CSS.make "label:tableCell _id_1v9j9bt _a_9yyk8940004gbj3" []
   let header = CSS.make "label:header _id_1qmbnko _a_94rgou _a_5kutk94alsw" []
   let headerWithBanner =
@@ -48,14 +58,15 @@ base rule, though `narrowGap` defined the shared `gap` atom first:
   $ refmt --parse re --print ml gap.re > gap.ml
   $ ../../standalone.exe --impl gap.ml -o gap_out.ml
   $ cat gap_out.ml
-  [@@@css "@media (max-width: 767px) {._a_tlkns6fb9rt{gap:16px;}}"]
-  [@@@css "._a_6f5vlj{grid-gap:40px;}"]
+  [@@@css
+    ("@media (max-width: 767px) {._a_tlkns6fb9rt{gap:16px;}}",
+      "_a_tlkns6fb9rt", "0,1,0 own", "231", 3, false)]
+  [@@@css
+    ("._a_6f5vlj{grid-gap:40px;}", "_a_6f5vlj", "0,1,0 own", "231", 3, false)]
   [@@@css.bindings
     [("Gap.narrowGap", "_id_cx513f", "_a_tlkns6fb9rt");
     ("Gap.container", "_id_x8xmjd", "_a_6f5vlj _a_tlkns6fb9rt")]]
-  [@@@css.blocks
-    [(1, "_id_cx513f _a_tlkns6fb9rt");
-    (3, "_id_x8xmjd _a_6f5vlj _a_tlkns6fb9rt")]]
+  [@@@css.blocks [(1, "_id_cx513f", [0]); (3, "_id_x8xmjd", [1; 0])]]
   let narrowGap = CSS.make "label:narrowGap _id_cx513f _a_tlkns6fb9rt" []
   let container =
     CSS.make "label:container _id_x8xmjd _a_6f5vlj _a_tlkns6fb9rt" []

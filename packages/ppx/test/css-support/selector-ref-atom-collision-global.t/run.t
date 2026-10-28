@@ -13,9 +13,10 @@ rather than being silently merged into one.
 
   $ cat a.ml
   [@@@css "._id_wd60kt{cursor:pointer;}"]
-  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css
+    ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings [("A.row", "_id_wd60kt", "_a_4ekvmb")]]
-  [@@@css.blocks [(1, "_id_wd60kt _a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_wd60kt", [1])]]
   let row = CSS.make "label:row _id_wd60kt _a_4ekvmb" []
   module Globals =
     struct
@@ -26,9 +27,10 @@ rather than being silently merged into one.
 
   $ cat b.ml
   [@@@css "._id_grd1wa{cursor:pointer;}"]
-  [@@@css "._a_4esm7b{color:blue;}"]
+  [@@@css
+    ("._a_4esm7b{color:blue;}", "_a_4esm7b", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings [("B.row", "_id_grd1wa", "_a_4esm7b")]]
-  [@@@css.blocks [(1, "_id_grd1wa _a_4esm7b")]]
+  [@@@css.blocks [(1, "_id_grd1wa", [1])]]
   let row = CSS.make "label:row _id_grd1wa _a_4esm7b" []
   module Globals =
     struct

@@ -15,16 +15,18 @@ pseudo-class rank decided this order; that rank is gone.)
 
   $ ../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "._a_78s4s4esck0:hover ._id_kfnh2l{color:red;}"]
-  [@@@css "._a_6diiq4e3si2:link{color:blue;}"]
+  [@@@css
+    ("._a_78s4s4esck0:hover ._id_kfnh2l{color:red;}", "_a_78s4s4esck0",
+      "0,3,0 &:hover ._id_kfnh2l", "158", 1, false)]
+  [@@@css
+    ("._a_6diiq4e3si2:link{color:blue;}", "_a_6diiq4e3si2", "0,2,0 own", "158",
+      1, false)]
   [@@@css.bindings
     [("Input.child", "_id_kfnh2l", "");
     ("Input.hoverParent", "_id_1lsockk", "_a_78s4s4esck0");
     ("Input.linkOther", "_id_1qo8psm", "_a_6diiq4e3si2")]]
   [@@@css.blocks
-    [(1, "_id_kfnh2l");
-    (2, "_id_1lsockk _a_78s4s4esck0");
-    (5, "_id_1qo8psm _a_6diiq4e3si2")]]
+    [(1, "_id_kfnh2l", []); (2, "_id_1lsockk", [0]); (5, "_id_1qo8psm", [1])]]
   let child = CSS.make "label:child _id_kfnh2l" []
   let hoverParent = CSS.make "label:hoverParent _id_1lsockk _a_78s4s4esck0" []
   let linkOther = CSS.make "label:linkOther _id_1qo8psm _a_6diiq4e3si2" []

@@ -11,13 +11,33 @@ The PPX records two distinct cross-module refs and one synthetic dep per
 distinct longident.
 
   $ refmt --parse ml --print re n.ml
-  [@css "._a_5rfx7x{display:none;}"];
-  [@css "._a_bti1z5rn55o.\000M.isOpen\000{display:block;}"];
-  [@css "._a_pkso639fi5u.\000M.isHovered\000{background:rgba(0, 0, 0, 0.1);}"];
+  [@css
+    ("._a_5rfx7x{display:none;}", "_a_5rfx7x", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_bti1z5rn55o.\000M.isOpen\000{display:block;}",
+      "_a_bti1z5rn55o",
+      "0,2,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_pkso639fi5u.\000M.isHovered\000{background:rgba(0, 0, 0, 0.1);}",
+      "_a_pkso639fi5u",
+      "0,2,0 own",
+      "117",
+      511,
+      false,
+    )
+  ];
   [@css.bindings
     [("N.modal", "_id_3zjwzb", "_a_5rfx7x _a_bti1z5rn55o _a_pkso639fi5u")]
   ];
-  [@css.blocks [(3, "_id_3zjwzb _a_5rfx7x _a_bti1z5rn55o _a_pkso639fi5u")]];
+  [@css.blocks [(3, "_id_3zjwzb", [0, 1, 2])]];
   [@css.refs
     [("M.isOpen", "n.ml", 6, 6, 14), ("M.isHovered", "n.ml", 7, 6, 17)]
   ];

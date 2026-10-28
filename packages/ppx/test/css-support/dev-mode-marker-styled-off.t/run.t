@@ -15,15 +15,24 @@ Dev markers are on by default; `--env production` turns them off for
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css.config [("env", "production")]];
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_4esjgz{color:var(--color-1a279q8);}",
+      "_a_4esjgz",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input.Box", "_id_bdphdf", "_a_4ekvmb"),
       ("Input.Button", "_id_15sg62n", "_a_4esjgz"),
     ]
   ];
-  [@css.blocks [(5, "_id_bdphdf _a_4ekvmb"), (8, "_id_15sg62n _a_4esjgz")]];
+  [@css.blocks [(5, "_id_bdphdf", [1]), (8, "_id_15sg62n", [2])]];
   
   module Box = {
     [@deriving abstract]

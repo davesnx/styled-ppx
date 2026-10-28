@@ -17,18 +17,42 @@ rejecting nothing where a comma isn't present at all.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_4e8w5r{color:var(--x);}"];
-  [@css "._a_4e0bz1{color:var(--x,);}"];
-  [@css "._a_4exf5k{color:var(--x, );}"];
-  [@css "._a_7pcyrh{margin:var(--m, 1px 2px);}"];
-  [@css "._a_4eens4{color:var(--x, var(--y,));}"];
+  [@css
+    ("._a_4e8w5r{color:var(--x);}", "_a_4e8w5r", "0,1,0 own", "158", 1, false)
+  ];
+  [@css
+    ("._a_4e0bz1{color:var(--x,);}", "_a_4e0bz1", "0,1,0 own", "158", 1, false)
+  ];
+  [@css
+    ("._a_4exf5k{color:var(--x, );}", "_a_4exf5k", "0,1,0 own", "158", 1, false)
+  ];
+  [@css
+    (
+      "._a_7pcyrh{margin:var(--m, 1px 2px);}",
+      "_a_7pcyrh",
+      "0,1,0 own",
+      "277",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4eens4{color:var(--x, var(--y,));}",
+      "_a_4eens4",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (3, "_a_4e8w5r"),
-      (4, "_a_4e0bz1"),
-      (5, "_a_4exf5k"),
-      (6, "_a_7pcyrh"),
-      (7, "_a_4eens4"),
+      (3, "", [0]),
+      (4, "", [1]),
+      (5, "", [2]),
+      (6, "", [3]),
+      (7, "", [4]),
     ]
   ];
   

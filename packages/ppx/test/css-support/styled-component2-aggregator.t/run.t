@@ -20,12 +20,50 @@ through the static extraction pipeline. They also register selector bindings so
   $ refmt --parse ml --print re output.ml
   [@css "@property --tone-1ucf2mt{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_qyw7u4ed9vx:hover{color:var(--tone-1ucf2mt);}"];
-  [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
-  [@css "._a_94gf8j{padding:8px;}"];
-  [@css "._a_g6r0l7prjrl ._id_8rwzqt{margin:0;}"];
-  [@css "._a_2n9qd5rdz6e ._id_sdlike{display:block;}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_qyw7u4ed9vx:hover{color:var(--tone-1ucf2mt);}",
+      "_a_qyw7u4ed9vx",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4esjgz{color:var(--color-1a279q8);}",
+      "_a_4esjgz",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_94gf8j{padding:8px;}", "_a_94gf8j", "0,1,0 own", "328", 15, false)
+  ];
+  [@css
+    (
+      "._a_g6r0l7prjrl ._id_8rwzqt{margin:0;}",
+      "_a_g6r0l7prjrl",
+      "0,2,0 & ._id_8rwzqt",
+      "277",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_2n9qd5rdz6e ._id_sdlike{display:block;}",
+      "_a_2n9qd5rdz6e",
+      "0,2,0 & ._id_sdlike",
+      "207",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Output.Box", "_id_8rwzqt", "_a_4ekvmb _a_qyw7u4ed9vx"),
@@ -35,9 +73,9 @@ through the static extraction pipeline. They also register selector bindings so
   ];
   [@css.blocks
     [
-      (2, "_id_8rwzqt _a_4ekvmb _a_qyw7u4ed9vx"),
-      (11, "_id_sdlike _a_4esjgz _a_94gf8j"),
-      (16, "_id_cr5zkq _a_g6r0l7prjrl _a_2n9qd5rdz6e"),
+      (2, "_id_8rwzqt", [2, 3]),
+      (11, "_id_sdlike", [4, 5]),
+      (16, "_id_cr5zkq", [6, 7]),
     ]
   ];
   let tone = CSS.red;

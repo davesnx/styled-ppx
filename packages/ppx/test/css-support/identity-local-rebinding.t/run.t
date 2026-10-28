@@ -18,14 +18,14 @@ byte-identical CSS (same atoms, same atomized class).
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_4ekvmb{color:red;}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
   [@css.bindings
     [
       ("Input.f", "_id_1yaoh1v", "_a_4ekvmb"),
       ("Input.g", "_id_1fhj0s1", "_a_4ekvmb"),
     ]
   ];
-  [@css.blocks [(2, "_id_1yaoh1v _a_4ekvmb"), (7, "_id_1fhj0s1 _a_4ekvmb")]];
+  [@css.blocks [(2, "_id_1yaoh1v", [0]), (7, "_id_1fhj0s1", [0])]];
   let f = () => {
     let a = CSS.make("label:a _id_1yaoh1v _a_4ekvmb", []);
     a;

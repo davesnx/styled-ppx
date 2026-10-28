@@ -3,7 +3,7 @@ prefixed with `styled-ppx:`. The --debug flag is a shorthand for --log debug
 and additionally dumps the generated stylesheet.
 
   $ cat > a.ml <<EOF
-  > [@@@css "._a_widget{color:red;}"]
+  > [@@@css ("._a_widget{color:red;}", "_a_widget", "0,1,0 own", "color", 1, false)]
   > EOF
 
 By default (--log warning), nothing is logged here: there are no errors
@@ -70,5 +70,5 @@ Errors are always printed, whatever the level.
   > EOF
 
   $ styled-ppx.generate --log error broken.ml
-  styled-ppx: broken.ml: malformed [@@@css]: expected [@@@css] payload to be a string literal
+  styled-ppx: broken.ml: malformed [@@@css]: expected [@@@css] payload to be a string literal or a (text, class, scope, family, mask, descendant) tuple
   [1]

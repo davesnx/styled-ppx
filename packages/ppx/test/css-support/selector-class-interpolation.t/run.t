@@ -15,15 +15,56 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_y2fu14etqme._id_eealdg{color:blue;}"];
-  [@css "._a_3900740mg9{background-size:1rem 1rem;}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
   [@css
-    "._a_2z00083gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
+    (
+      "._a_y2fu14etqme._id_eealdg{color:blue;}",
+      "_a_y2fu14etqme",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
   ];
-  [@css "._a_390004xk9e{background-color:blue;}"];
   [@css
-    "._a_rj4gd390004z2n1:disabled:not(._a_rj4gd390004z2n1._id_1v23wvr){background-color:gray;}"
+    (
+      "._a_3900740mg9{background-size:1rem 1rem;}",
+      "_a_3900740mg9",
+      "0,1,0 own",
+      "117",
+      256,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_2z00083gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}",
+      "_a_2z00083gnv",
+      "0,1,0 own",
+      "107",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_390004xk9e{background-color:blue;}",
+      "_a_390004xk9e",
+      "0,1,0 own",
+      "117",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_rj4gd390004z2n1:disabled:not(._a_rj4gd390004z2n1._id_1v23wvr){background-color:gray;}",
+      "_a_rj4gd390004z2n1",
+      "0,4,0 own",
+      "117",
+      4,
+      false,
+    )
   ];
   [@css.bindings
     [
@@ -39,10 +80,10 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   ];
   [@css.blocks
     [
-      (7, "_id_eealdg _a_4ekvmb"),
-      (9, "_id_1wtvg3d _a_y2fu14etqme"),
-      (15, "_id_1v23wvr _a_3900740mg9 _a_2z00083gnv"),
-      (22, "_id_1ljmqgf _a_390004xk9e _a_rj4gd390004z2n1"),
+      (7, "_id_eealdg", [0]),
+      (9, "_id_1wtvg3d", [1]),
+      (15, "_id_1v23wvr", [2, 3]),
+      (22, "_id_1ljmqgf", [4, 5]),
     ]
   ];
   

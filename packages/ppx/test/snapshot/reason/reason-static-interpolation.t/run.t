@@ -4,10 +4,39 @@
   [@css "@property --var-1ee0jdu{syntax:\"*\";inherits:false;}"];
   [@css "@property --black-98dcqh{syntax:\"*\";inherits:false;}"];
   [@css "@property --black-1o7s4tf{syntax:\"*\";inherits:false;}"];
-  [@css "._a_4e9vey{color:var(--var-1ee0jdu);}"];
-  [@css "._a_390004n5y8{background-color:var(--black-98dcqh);}"];
-  [@css "._a_3h0ef5gxfp{border-color:var(--black-1o7s4tf);}"];
-  [@css "._a_5r7eu2{display:block;}"];
+  [@css
+    (
+      "._a_4e9vey{color:var(--var-1ee0jdu);}",
+      "_a_4e9vey",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_390004n5y8{background-color:var(--black-98dcqh);}",
+      "_a_390004n5y8",
+      "0,1,0 own",
+      "117",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h0ef5gxfp{border-color:var(--black-1o7s4tf);}",
+      "_a_3h0ef5gxfp",
+      "0,1,0 own",
+      "125",
+      18689,
+      false,
+    )
+  ];
+  [@css
+    ("._a_5r7eu2{display:block;}", "_a_5r7eu2", "0,1,0 own", "207", 1, false)
+  ];
   [@css.bindings
     [
       (
@@ -17,9 +46,7 @@
       ),
     ]
   ];
-  [@css.blocks
-    [(9, "_id_1pw1xoe _a_4e9vey _a_390004n5y8 _a_3h0ef5gxfp _a_5r7eu2")]
-  ];
+  [@css.blocks [(9, "_id_1pw1xoe", [3, 4, 5, 6])]];
   module Theme = {
     let var = CSS.hex("333333");
     module Border = {

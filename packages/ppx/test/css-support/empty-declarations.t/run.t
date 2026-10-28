@@ -29,16 +29,16 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   [@css.bindings [("Input._a", "_id_r89ft7", "")]];
   [@css.blocks
     [
-      (1, ""),
-      (2, ""),
-      (3, ""),
-      (6, ""),
-      (11, "_id_1235v4k"),
-      (12, "_id_se5qro"),
-      (13, "_id_qaab8t"),
-      (15, "_id_18cz83j"),
-      (19, "_id_1xwq9hp"),
-      (23, "_id_r89ft7"),
+      (1, "", []),
+      (2, "", []),
+      (3, "", []),
+      (6, "", []),
+      (11, "_id_1235v4k", []),
+      (12, "_id_se5qro", []),
+      (13, "_id_qaab8t", []),
+      (15, "_id_18cz83j", []),
+      (19, "_id_1xwq9hp", []),
+      (23, "_id_r89ft7", []),
     ]
   ];
   CSS.make("", []);

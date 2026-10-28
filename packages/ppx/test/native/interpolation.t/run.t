@@ -51,85 +51,343 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   [@css "@property --state-1yj1w6c{syntax:\"*\";inherits:false;}"];
   [@css "@property --px30-cc29mn{syntax:\"*\";inherits:false;}"];
   [@css "@property --red-w69rb9{syntax:\"*\";inherits:false;}"];
-  [@css "._a_4enh4f{color:var(--mono100-mn2jt5);}"];
-  [@css "._a_7pitjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}"];
-  [@css "._a_94pp3j{padding:var(--small-1d5k27v) 0px;}"];
-  [@css "._a_3h97be{border:1px solid var(--alpha-vlpuld);}"];
-  [@css "._a_8pyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
-  [@css "._a_3h0007w55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
-  [@css "._a_eckyy8{width:var(--width-18c1xss);}"];
-  [@css "._a_88nebp{max-width:var(--max-1yrxnfd);}"];
-  [@css "._a_6lvooa{height:var(--height-1n9troi);}"];
-  [@css "._a_3nd0d4{border-radius:var(--border-8yt3ey);}"];
-  [@css "._a_65000wu0qi{font-size:var(--font-10lt5gt);}"];
-  [@css "._a_650001szir{font-family:var(--mono-e5legw);}"];
-  [@css "._a_65b8jkfd7x{line-height:var(--lh-uai7u3);}"];
-  [@css "._a_ekfgx3{z-index:var(--zLevel-vut76j);}"];
-  [@css "._a_710002egw0{left:var(--left-1s2hr3z);}"];
-  [@css "._a_cf00018kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
-  [@css "._a_390008o5gx{background-image:var(--wat-tevp0f);}"];
   [@css
-    "._a_7y0074nm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
+    (
+      "._a_4enh4f{color:var(--mono100-mn2jt5);}",
+      "_a_4enh4f",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
   ];
   [@css
-    "._a_cy50p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}"
-  ];
-  [@css "._a_4e2giy{color:var(--blue-uz6p3q);}"];
-  [@css
-    "._a_40ihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw);}"
-  ];
-  [@css
-    "._a_40s4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}"
-  ];
-  [@css "._a_40l5g5{box-shadow:var(--elevation-jhhehb);}"];
-  [@css "._a_40keqi{box-shadow:none;}"];
-  [@css "._a_cwbaal{text-overflow:var(--clip-1go0jdu);}"];
-  [@css "._a_dm00048edy{transition-duration:500ms;}"];
-  [@css "._a_dm00046hu1{transition-duration:var(--duration-i5tvzn);}"];
-  [@css
-    "._a_2z003ken0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
+    (
+      "._a_7pitjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}",
+      "_a_7pitjj",
+      "0,1,0 own",
+      "277",
+      15,
+      false,
+    )
   ];
   [@css
-    "._a_2z003kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    (
+      "._a_94pp3j{padding:var(--small-1d5k27v) 0px;}",
+      "_a_94pp3j",
+      "0,1,0 own",
+      "328",
+      15,
+      false,
+    )
   ];
   [@css
-    "._a_6f0001nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
+    (
+      "._a_3h97be{border:1px solid var(--alpha-vlpuld);}",
+      "_a_3h97be",
+      "0,1,0 own",
+      "125",
+      131071,
+      false,
+    )
   ];
-  [@css "._a_2k9yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
+  [@css
+    (
+      "._a_8pyj1z{outline:1px solid var(--alpha-1ftvcb4);}",
+      "_a_8pyj1z",
+      "0,1,0 own",
+      "313",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h0007w55u{border-bottom:0px solid var(--alpha-1y5ijmp);}",
+      "_a_3h0007w55u",
+      "0,1,0 own",
+      "125",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_eckyy8{width:var(--width-18c1xss);}",
+      "_a_eckyy8",
+      "0,1,0 own",
+      "516",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_88nebp{max-width:var(--max-1yrxnfd);}",
+      "_a_88nebp",
+      "0,1,0 own",
+      "296",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6lvooa{height:var(--height-1n9troi);}",
+      "_a_6lvooa",
+      "0,1,0 own",
+      "237",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3nd0d4{border-radius:var(--border-8yt3ey);}",
+      "_a_3nd0d4",
+      "0,1,0 own",
+      "131",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_65000wu0qi{font-size:var(--font-10lt5gt);}",
+      "_a_65000wu0qi",
+      "0,1,0 own",
+      "221",
+      32,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_650001szir{font-family:var(--mono-e5legw);}",
+      "_a_650001szir",
+      "0,1,0 own",
+      "221",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_65b8jkfd7x{line-height:var(--lh-uai7u3);}",
+      "_a_65b8jkfd7x",
+      "0,1,0 own",
+      "221",
+      524288,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ekfgx3{z-index:var(--zLevel-vut76j);}",
+      "_a_ekfgx3",
+      "0,1,0 own",
+      "524",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_710002egw0{left:var(--left-1s2hr3z);}",
+      "_a_710002egw0",
+      "0,1,0 own",
+      "253",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_cf00018kmj{text-decoration-color:var(--decorationColor-seqvqc);}",
+      "_a_cf00018kmj",
+      "0,1,0 own",
+      "447",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_390008o5gx{background-image:var(--wat-tevp0f);}",
+      "_a_390008o5gx",
+      "0,1,0 own",
+      "117",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7y0074nm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}",
+      "_a_7y0074nm6u",
+      "0,1,0 own",
+      "286",
+      256,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_cy50p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}",
+      "_a_cy50p4",
+      "0,1,0 own",
+      "466",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4e2giy{color:var(--blue-uz6p3q);}",
+      "_a_4e2giy",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_40ihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw);}",
+      "_a_40ihb6",
+      "0,1,0 own",
+      "144",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_40s4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}",
+      "_a_40s4zv",
+      "0,1,0 own",
+      "144",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_40l5g5{box-shadow:var(--elevation-jhhehb);}",
+      "_a_40l5g5",
+      "0,1,0 own",
+      "144",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_40keqi{box-shadow:none;}", "_a_40keqi", "0,1,0 own", "144", 1, false)
+  ];
+  [@css
+    (
+      "._a_cwbaal{text-overflow:var(--clip-1go0jdu);}",
+      "_a_cwbaal",
+      "0,1,0 own",
+      "464",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dm00048edy{transition-duration:500ms;}",
+      "_a_dm00048edy",
+      "0,1,0 own",
+      "490",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dm00046hu1{transition-duration:var(--duration-i5tvzn);}",
+      "_a_dm00046hu1",
+      "0,1,0 own",
+      "490",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_2z003ken0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}",
+      "_a_2z003ken0s",
+      "0,1,0 own",
+      "107",
+      128,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_2z003kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}",
+      "_a_2z003kbnre",
+      "0,1,0 own",
+      "107",
+      128,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6f0001nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}",
+      "_a_6f0001nyl9",
+      "0,1,0 own",
+      "231",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_2k9yln{-webkit-text-fill-color:var(--red-w69rb9);}",
+      "_a_2k9yln",
+      "0,1,0 own",
+      "92",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (52, "_a_4enh4f"),
-      (53, "_a_7pitjj"),
-      (54, "_a_4enh4f"),
-      (55, "_a_94pp3j"),
-      (56, "_a_3h97be"),
-      (57, "_a_8pyj1z"),
-      (58, "_a_3h0007w55u"),
-      (59, "_a_eckyy8"),
-      (60, "_a_88nebp"),
-      (61, "_a_6lvooa"),
-      (62, "_a_3nd0d4"),
-      (63, "_a_65000wu0qi"),
-      (64, "_a_650001szir"),
-      (65, "_a_65b8jkfd7x"),
-      (66, "_a_ekfgx3"),
-      (67, "_a_710002egw0"),
-      (68, "_a_cf00018kmj"),
-      (69, "_a_390008o5gx"),
-      (70, "_a_7y0074nm6u"),
-      (71, "_a_cy50p4"),
-      (72, "_a_4e2giy"),
-      (73, "_a_40ihb6"),
-      (74, "_a_40s4zv"),
-      (75, "_a_40l5g5"),
-      (76, "_a_40keqi"),
-      (77, "_a_cwbaal"),
-      (78, "_a_dm00048edy"),
-      (79, "_a_dm00046hu1"),
-      (80, "_a_2z003ken0s"),
-      (81, "_a_2z003kbnre"),
-      (82, "_a_6f0001nyl9"),
-      (83, "_a_2k9yln"),
+      (52, "", [37]),
+      (53, "", [38]),
+      (54, "", [37]),
+      (55, "", [39]),
+      (56, "", [40]),
+      (57, "", [41]),
+      (58, "", [42]),
+      (59, "", [43]),
+      (60, "", [44]),
+      (61, "", [45]),
+      (62, "", [46]),
+      (63, "", [47]),
+      (64, "", [48]),
+      (65, "", [49]),
+      (66, "", [50]),
+      (67, "", [51]),
+      (68, "", [52]),
+      (69, "", [53]),
+      (70, "", [54]),
+      (71, "", [55]),
+      (72, "", [56]),
+      (73, "", [57]),
+      (74, "", [58]),
+      (75, "", [59]),
+      (76, "", [60]),
+      (77, "", [61]),
+      (78, "", [62]),
+      (79, "", [63]),
+      (80, "", [64]),
+      (81, "", [65]),
+      (82, "", [66]),
+      (83, "", [67]),
     ]
   ];
   module Size = {

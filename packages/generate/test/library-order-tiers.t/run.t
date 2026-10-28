@@ -9,15 +9,15 @@ dependency order.
 
   $ cat > z_base/z_base.ml <<EOF
   > [@@@css.config [("library-name", "z_base")]]
-  > [@@@css "._a_zbase{color:red;}"]
-  > [@@@css "._a_zbasehover:hover{color:darkred;}"]
+  > [@@@css ("._a_zbase{color:red;}", "_a_zbase", "0,1,0 own", "color", 1, false)]
+  > [@@@css ("._a_zbasehover:hover{color:darkred;}", "_a_zbasehover", "0,2,0 own", "color", 1, false)]
   > let widget () = ()
   > EOF
 
   $ cat > a_app/main.ml <<EOF
   > [@@@css.config [("library-name", "a_app")]]
-  > [@@@css "._a_aapp{color:blue;}"]
-  > [@@@css "._a_aapphover:hover{color:darkblue;}"]
+  > [@@@css ("._a_aapp{color:blue;}", "_a_aapp", "0,1,0 own", "color", 1, false)]
+  > [@@@css ("._a_aapphover:hover{color:darkblue;}", "_a_aapphover", "0,2,0 own", "color", 1, false)]
   > let _ = Z_base.widget
   > EOF
 

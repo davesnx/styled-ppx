@@ -25,6 +25,22 @@ let resolve_local_module_path:
   (~file: string, ~scope: list(string), list(string)) =>
   option(list(string));
 
+/** What a `$(path)` or merge argument names: a class registered earlier in
+    this file, or a binding of another module (its longident, aliases
+    expanded). [None] when [path] names neither. Records nothing. */
+type class_ref =
+  | Local(string)
+  | Cross_module(string);
+
+let resolve_class_ref:
+  (
+    ~file: string,
+    ~scope: list(string),
+    ~opens: list(list(string)),
+    string
+  ) =>
+  option(class_ref);
+
 let resolve_selector_class_ref:
   (
     ~file: string,

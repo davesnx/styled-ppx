@@ -50,36 +50,140 @@ prefixed its Firefox variant as `-moz-fill-available` instead of the real
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_7y00e8dp5t{mask-mode:alpha;}"];
-  [@css "._a_7y003k57xj{mask-composite:exclude;}"];
-  [@css "._a_6j000cozaa{grid-row:1 / 3;}"];
-  [@css "._a_6j0003zjvj{grid-column:2;}"];
-  [@css "._a_ap8bwf{scroll-snap-type:y mandatory;}"];
-  [@css "._a_7r0002bip2{-webkit-margin-start:10px;margin-inline-start:10px;}"];
-  [@css "._a_7r0001lgiv{-webkit-margin-end:10px;margin-inline-end:10px;}"];
-  [@css "._a_960002js84{-webkit-padding-start:10px;padding-inline-start:10px;}"];
-  [@css "._a_960001ob79{-webkit-padding-end:10px;padding-inline-end:10px;}"];
   [@css
-    "._a_ehrbdf{-webkit-writing-mode:vertical-rl;writing-mode:vertical-rl;}"
+    (
+      "._a_7y00e8dp5t{mask-mode:alpha;}",
+      "_a_7y00e8dp5t",
+      "0,1,0 own",
+      "286",
+      512,
+      false,
+    )
   ];
-  [@css "._a_8creoz{min-width:-moz-min-content;min-width:min-content;}"];
   [@css
-    "._a_8ch21t{min-width:-webkit-fill-available;min-width:-moz-available;min-width:fill-available;}"
+    (
+      "._a_7y003k57xj{mask-composite:exclude;}",
+      "_a_7y003k57xj",
+      "0,1,0 own",
+      "286",
+      128,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6j000cozaa{grid-row:1 / 3;}",
+      "_a_6j000cozaa",
+      "0,1,0 own",
+      "235",
+      12,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6j0003zjvj{grid-column:2;}",
+      "_a_6j0003zjvj",
+      "0,1,0 own",
+      "235",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ap8bwf{scroll-snap-type:y mandatory;}",
+      "_a_ap8bwf",
+      "0,1,0 own",
+      "385",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7r0002bip2{-webkit-margin-start:10px;margin-inline-start:10px;}",
+      "_a_7r0002bip2",
+      "0,1,0 own",
+      "279",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7r0001lgiv{-webkit-margin-end:10px;margin-inline-end:10px;}",
+      "_a_7r0001lgiv",
+      "0,1,0 own",
+      "279",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_960002js84{-webkit-padding-start:10px;padding-inline-start:10px;}",
+      "_a_960002js84",
+      "0,1,0 own",
+      "330",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_960001ob79{-webkit-padding-end:10px;padding-inline-end:10px;}",
+      "_a_960001ob79",
+      "0,1,0 own",
+      "330",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ehrbdf{-webkit-writing-mode:vertical-rl;writing-mode:vertical-rl;}",
+      "_a_ehrbdf",
+      "0,1,0 own",
+      "521",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8creoz{min-width:-moz-min-content;min-width:min-content;}",
+      "_a_8creoz",
+      "0,1,0 own",
+      "300",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8ch21t{min-width:-webkit-fill-available;min-width:-moz-available;min-width:fill-available;}",
+      "_a_8ch21t",
+      "0,1,0 own",
+      "300",
+      1,
+      false,
+    )
   ];
   [@css.blocks
     [
-      (1, "_a_7y00e8dp5t"),
-      (2, "_a_7y003k57xj"),
-      (3, "_a_6j000cozaa"),
-      (4, "_a_6j0003zjvj"),
-      (5, "_a_ap8bwf"),
-      (6, "_a_7r0002bip2"),
-      (7, "_a_7r0001lgiv"),
-      (8, "_a_960002js84"),
-      (9, "_a_960001ob79"),
-      (10, "_a_ehrbdf"),
-      (11, "_a_8creoz"),
-      (12, "_a_8ch21t"),
+      (1, "", [0]),
+      (2, "", [1]),
+      (3, "", [2]),
+      (4, "", [3]),
+      (5, "", [4]),
+      (6, "", [5]),
+      (7, "", [6]),
+      (8, "", [7]),
+      (9, "", [8]),
+      (10, "", [9]),
+      (11, "", [10]),
+      (12, "", [11]),
     ]
   ];
   CSS.make("_a_7y00e8dp5t", []);

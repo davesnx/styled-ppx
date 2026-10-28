@@ -17,9 +17,18 @@ the binary AST) follows a `\r` byte, which can happen by chance in the
 marshalled AST; `tr` keeps the output stable:
 
   $ dune describe pp ./input.re | tr -d '\r' | sed '1,/^];$/d'
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_4esm7b{color:blue;}"];
-  [@css "._a_a6upz655m9sbqr7._id_1tr6yta{font-weight:bold;}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css ("._a_4esm7b{color:blue;}", "_a_4esm7b", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_a6upz655m9sbqr7._id_1tr6yta{font-weight:bold;}",
+      "_a_a6upz655m9sbqr7",
+      "0,2,0 own",
+      "221",
+      262144,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input.foo", "_id_1tr6yta", "_a_4esm7b"),
@@ -28,9 +37,9 @@ marshalled AST; `tr` keeps the output stable:
   ];
   [@css.blocks
     [
-      (5, "_id_eealdg _a_4ekvmb"),
-      (8, "_id_1tr6yta _a_4esm7b"),
-      (10, "_id_1wtvg3d _a_a6upz655m9sbqr7"),
+      (5, "_id_eealdg", [0]),
+      (8, "_id_1tr6yta", [1]),
+      (10, "_id_1wtvg3d", [2]),
     ]
   ];
   

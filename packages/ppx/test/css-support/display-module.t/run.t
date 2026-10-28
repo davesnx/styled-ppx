@@ -15,10 +15,23 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_5r3jk8{display:run-in;}"];
-  [@css "._a_5rlerk{display:flow;}"];
-  [@css "._a_5rposs{display:flow-root;}"];
-  [@css.blocks [(2, "_a_5r3jk8"), (3, "_a_5rlerk"), (4, "_a_5rposs")]];
+  [@css
+    ("._a_5r3jk8{display:run-in;}", "_a_5r3jk8", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    ("._a_5rlerk{display:flow;}", "_a_5rlerk", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_5rposs{display:flow-root;}",
+      "_a_5rposs",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks [(2, "", [0]), (3, "", [1]), (4, "", [2])]];
   
   CSS.make("_a_5r3jk8", []);
   CSS.make("_a_5rlerk", []);

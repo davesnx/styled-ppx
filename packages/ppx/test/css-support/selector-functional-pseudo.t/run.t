@@ -19,10 +19,46 @@ had no branch for the `of` keyword.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_5r7jx4en809::part(foo){color:red;}"];
-  [@css "._a_wmvcz4ee6d9::slotted(.bar){color:blue;}"];
-  [@css "._a_da0h14e51rt:nth-child(2n+1 of .x){color:green;}"];
-  [@css "._a_kj3e34es5ty:nth-last-child(odd of .a,.b){color:yellow;}"];
+  [@css
+    (
+      "._a_5r7jx4en809::part(foo){color:red;}",
+      "_a_5r7jx4en809",
+      "0,1,1 own::part(foo)",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_wmvcz4ee6d9::slotted(.bar){color:blue;}",
+      "_a_wmvcz4ee6d9",
+      "0,1,1 own::slotted(.bar)",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_da0h14e51rt:nth-child(2n+1 of .x){color:green;}",
+      "_a_da0h14e51rt",
+      "0,3,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_kj3e34es5ty:nth-last-child(odd of .a,.b){color:yellow;}",
+      "_a_kj3e34es5ty",
+      "0,3,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input._part", "_id_1munzu", "_a_5r7jx4en809"),
@@ -33,10 +69,10 @@ had no branch for the `of` keyword.
   ];
   [@css.blocks
     [
-      (7, "_id_1munzu _a_5r7jx4en809"),
-      (13, "_id_2rmphz _a_wmvcz4ee6d9"),
-      (19, "_id_yct85k _a_da0h14e51rt"),
-      (25, "_id_xd3wqi _a_kj3e34es5ty"),
+      (7, "_id_1munzu", [0]),
+      (13, "_id_2rmphz", [1]),
+      (19, "_id_yct85k", [2]),
+      (25, "_id_xd3wqi", [3]),
     ]
   ];
   

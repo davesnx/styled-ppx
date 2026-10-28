@@ -26,14 +26,86 @@ deep nesting, and mixed compound/descendant inner chains.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_d3qow4emold:hover .child{color:red;}"];
-  [@css "._a_dwogj4e74wv:hover span{color:blue;}"];
-  [@css "._a_d3qow4edg3s:hover .child{color:green;}"];
-  [@css "._a_rv9hg4ej0cc:hover:focus{color:yellow;}"];
-  [@css "._a_4ii3y4ehiyt:hover::after{color:orange;}"];
-  [@css "._a_yj7sa4e1xle:hover .child .grandchild{color:purple;}"];
-  [@css "._a_h0ece4e19o0:hover .a .b .c .d{color:pink;}"];
-  [@css "._a_t7s414escwj:hover .a:focus .b{color:brown;}"];
+  [@css
+    (
+      "._a_d3qow4emold:hover .child{color:red;}",
+      "_a_d3qow4emold",
+      "0,3,0 &:hover .child",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dwogj4e74wv:hover span{color:blue;}",
+      "_a_dwogj4e74wv",
+      "0,2,1 &:hover span",
+      "158",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "._a_d3qow4edg3s:hover .child{color:green;}",
+      "_a_d3qow4edg3s",
+      "0,3,0 &:hover .child",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_rv9hg4ej0cc:hover:focus{color:yellow;}",
+      "_a_rv9hg4ej0cc",
+      "0,3,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4ii3y4ehiyt:hover::after{color:orange;}",
+      "_a_4ii3y4ehiyt",
+      "0,2,1 own::after",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_yj7sa4e1xle:hover .child .grandchild{color:purple;}",
+      "_a_yj7sa4e1xle",
+      "0,4,0 &:hover .child .grandchild",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_h0ece4e19o0:hover .a .b .c .d{color:pink;}",
+      "_a_h0ece4e19o0",
+      "0,6,0 &:hover .a .b .c .d",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_t7s414escwj:hover .a:focus .b{color:brown;}",
+      "_a_t7s414escwj",
+      "0,5,0 &:hover .a:focus .b",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       (
@@ -68,14 +140,14 @@ deep nesting, and mixed compound/descendant inner chains.
   ];
   [@css.blocks
     [
-      (14, "_id_13yqvqg _a_d3qow4emold"),
-      (22, "_id_1abpwbm _a_dwogj4e74wv"),
-      (30, "_id_1xlwa1g _a_d3qow4edg3s"),
-      (38, "_id_10mqg8n _a_rv9hg4ej0cc"),
-      (46, "_id_cg6d97 _a_4ii3y4ehiyt"),
-      (59, "_id_1j6ilit _a_yj7sa4e1xle"),
-      (69, "_id_1qajsxv _a_h0ece4e19o0"),
-      (84, "_id_10tx4fm _a_t7s414escwj"),
+      (14, "_id_13yqvqg", [0]),
+      (22, "_id_1abpwbm", [1]),
+      (30, "_id_1xlwa1g", [2]),
+      (38, "_id_10mqg8n", [3]),
+      (46, "_id_cg6d97", [4]),
+      (59, "_id_1j6ilit", [5]),
+      (69, "_id_1qajsxv", [6]),
+      (84, "_id_10tx4fm", [7]),
     ]
   ];
   

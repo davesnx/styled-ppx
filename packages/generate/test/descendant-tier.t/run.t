@@ -1,8 +1,8 @@
 The separate `styled-ppx.descendant`
 tier is gone. It sat below `styled-ppx.base` unconditionally, so an ancestor's
-descendant-shaped rule (see `is_descendant_shape` - a combinator reaching for
-an unclassed subject: a bare element type, `*`, or a pseudo-class chain with
-no class of its own) always lost to a child's own atom regardless of
+descendant-shaped rule (the `descendant` field of the rule's key, which the
+ppx computes: a combinator reaching for an unclassed subject: a bare element
+type, `*`, or a pseudo-class chain with no class of its own) always lost to a child's own atom regardless of
 specificity - fixing the one real tie (the ancestor-wildcard case below) by breaking five
 more patterns where the ancestor's rule is genuinely MORE specific and should
 win, same as it did before tiers existed. There are no tiers now: every atom
@@ -24,8 +24,8 @@ own class both contribute nothing beyond the one class), so without
 something to break the tie the browser applies whichever is textually LAST.
 
   $ cat > gbp.ml <<EOF
-  > [@@@css "._a_4esjgz{color:black;}"]
-  > [@@@css "._in_j8vuse * {color:white;}"]
+  > [@@@css ("._a_4esjgz{color:black;}", "_a_4esjgz", "0,1,0 own", "color", 1, false)]
+  > [@@@css ("._in_j8vuse * {color:white;}", "_in_j8vuse", "0,1,0 & *", "color", 1, true)]
   > EOF
 
   $ styled-ppx.generate gbp.ml
@@ -42,11 +42,10 @@ wins - restoring "an element's own class beats an ancestor's blind reach for
 A subject WITH its own class - `.tiptap` here, or an `.id-...` class a
 `$(binding)` reference would resolve to - is not this shape: it targets a
 specific, identified element, not "whatever happens to be under here", so it
-is not reordered and stays wherever the shorthand-sort (or plain source
-order) would otherwise put it.
+is not reordered and stays at its definition position.
 
   $ cat > classed_descendant.ml <<EOF
-  > [@@@css "._a_wrap9k .tiptap{color:navy;}"]
+  > [@@@css ("._a_wrap9k .tiptap{color:navy;}", "_a_wrap9k", "0,2,0 & .tiptap", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate classed_descendant.ml
@@ -61,8 +60,8 @@ regardless of which one the sort emits first (unlike the tied
 ancestor-wildcard case above).
 
   $ cat > list_li.ml <<EOF
-  > [@@@css "._a_listwrap li{display:grid;}"]
-  > [@@@css "._a_liblock{display:block;}"]
+  > [@@@css ("._a_listwrap li{display:grid;}", "_a_listwrap", "0,1,1 & li", "display", 1, true)]
+  > [@@@css ("._a_liblock{display:block;}", "_a_liblock", "0,1,0 own", "display", 1, false)]
   > EOF
 
   $ styled-ppx.generate list_li.ml
@@ -76,8 +75,8 @@ The `.field input { font-size: 16px }` pattern. Same shape as
 `base`.
 
   $ cat > field_input.ml <<EOF
-  > [@@@css "._a_fieldwrap input{font-size:16px;}"]
-  > [@@@css "._a_inputfs{font-size:14px;}"]
+  > [@@@css ("._a_fieldwrap input{font-size:16px;}", "_a_fieldwrap", "0,1,1 & input", "font", 64, true)]
+  > [@@@css ("._a_inputfs{font-size:14px;}", "_a_inputfs", "0,1,0 own", "font", 64, false)]
   > EOF
 
   $ styled-ppx.generate field_input.ml
@@ -98,8 +97,8 @@ ordered sheet puts the descendant-shaped rule first (see "Ordered sheet" in
 specificity alone already decides this pair.
 
   $ cat > media_menu.ml <<EOF
-  > [@@@css "@media (min-width:1280px){._a_menuwrap > :last-child{margin-right:0;}}"]
-  > [@@@css "._a_marginright{margin-right:24px;}"]
+  > [@@@css ("@media (min-width:1280px){._a_menuwrap > :last-child{margin-right:0;}}", "_a_menuwrap", "0,2,0 & > :last-child", "margin", 4, true)]
+  > [@@@css ("._a_marginright{margin-right:24px;}", "_a_marginright", "0,1,0 own", "margin", 4, false)]
   > EOF
 
   $ styled-ppx.generate media_menu.ml
@@ -116,8 +115,8 @@ pseudo-class-equivalents: specificity (0,3,0). The badge's own atom
 both unconditional, both classified `base`.
 
   $ cat > same_line_badge.ml <<EOF
-  > [@@@css "._a_badgewrap > :first-child:not(:last-child){display:inline;}"]
-  > [@@@css "._a_displaydesktop{display:block;}"]
+  > [@@@css ("._a_badgewrap > :first-child:not(:last-child){display:inline;}", "_a_badgewrap", "0,3,0 & > :first-child:not(:last-child)", "display", 1, true)]
+  > [@@@css ("._a_displaydesktop{display:block;}", "_a_displaydesktop", "0,1,0 own", "display", 1, false)]
   > EOF
 
   $ styled-ppx.generate same_line_badge.ml
@@ -136,8 +135,8 @@ specificity decides between them, exactly like the
 from `media_menu.ml` is which SIDE is more specific.
 
   $ cat > same_line_badge_media.ml <<EOF
-  > [@@@css "._a_ancestor > :first-child:not(:last-child){display:inline;}"]
-  > [@@@css "@media (max-width:1000px){._a_badgeblock{display:block;}}"]
+  > [@@@css ("._a_ancestor > :first-child:not(:last-child){display:inline;}", "_a_ancestor", "0,3,0 & > :first-child:not(:last-child)", "display", 1, true)]
+  > [@@@css ("@media (max-width:1000px){._a_badgeblock{display:block;}}", "_a_badgeblock", "0,1,0 own", "display", 1, false)]
   > EOF
 
   $ styled-ppx.generate same_line_badge_media.ml

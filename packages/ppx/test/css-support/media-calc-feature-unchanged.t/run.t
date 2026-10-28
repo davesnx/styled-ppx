@@ -18,12 +18,15 @@ instead.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
-  [@@@css "@media (min-width: calc(2px + 1px)) {._a_aveay4e5m2e{color:red;}}"]
   [@@@css
-    "@media (min-width: calc(1000px - 2%)) {._a_h4c6e4el0w0{color:red;}}"]
+    ("@media (min-width: calc(2px + 1px)) {._a_aveay4e5m2e{color:red;}}",
+      "_a_aveay4e5m2e", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("@media (min-width: calc(1000px - 2%)) {._a_h4c6e4el0w0{color:red;}}",
+      "_a_h4c6e4el0w0", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings
     [("Output.block", "_id_1n4allv", "_a_aveay4e5m2e _a_h4c6e4el0w0")]]
-  [@@@css.blocks [(3, "_id_1n4allv _a_aveay4e5m2e _a_h4c6e4el0w0")]]
+  [@@@css.blocks [(3, "_id_1n4allv", [0; 1])]]
   let block =
     CSS.make "label:block _id_1n4allv _a_aveay4e5m2e _a_h4c6e4el0w0" []
   let _ = block

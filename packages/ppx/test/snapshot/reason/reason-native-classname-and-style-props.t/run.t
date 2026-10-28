@@ -1,9 +1,9 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "._a_4ekvmb{color:red;}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
   [@css.bindings [("Output.Box", "_id_8rwzqt", "_a_4ekvmb")]];
-  [@css.blocks [(1, "_id_8rwzqt _a_4ekvmb")]];
+  [@css.blocks [(1, "_id_8rwzqt", [0])]];
   module Box: {
     type makeProps;
     let make: makeProps => React.element;

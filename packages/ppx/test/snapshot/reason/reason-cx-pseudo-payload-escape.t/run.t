@@ -25,9 +25,11 @@ subject is outside `&`'s subtree — slipped through and shipped a dead
   [1]
   $ ../../../standalone.exe --impl input_is_ok.ml -o output.ml
   $ cat output.ml
-  [@@@css ":is(._a_276yq4ejfl7 div){color:var(--c-qdrabr);}"]
+  [@@@css
+    (":is(._a_276yq4ejfl7 div){color:var(--c-qdrabr);}", "_a_276yq4ejfl7",
+      "0,1,1 :is(& div)", "158", 1, false)]
   [@@@css.bindings [("Input_is_ok.ok", "_id_yca3yq", "_a_276yq4ejfl7")]]
-  [@@@css.blocks [(4, "_id_yca3yq _a_276yq4ejfl7")]]
+  [@@@css.blocks [(4, "_id_yca3yq", [0])]]
   let c = "red"
   let ok =
     CSS.make "label:ok _id_yca3yq _a_276yq4ejfl7"

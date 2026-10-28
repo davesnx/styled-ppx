@@ -62,9 +62,18 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --grid-1sb4gse{syntax:\"*\";inherits:false;}"];
-  [@css "._a_5rak65{display:var(--grid-1sb4gse);}"];
+  [@css
+    (
+      "._a_5rak65{display:var(--grid-1sb4gse);}",
+      "_a_5rak65",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
   [@css.bindings [("Input.a", "_id_1yaoh1v", "_a_5rak65")]];
-  [@css.blocks [(2, "_id_1yaoh1v _a_5rak65")]];
+  [@css.blocks [(2, "_id_1yaoh1v", [1])]];
   let grid = `gri;
   let a =
     CSS.make(

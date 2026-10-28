@@ -20,34 +20,230 @@ Comprehensive test for cx2 interpolation with various property types
   [@css "@property --spacingVar-15s0ecx{syntax:\"*\";inherits:false;}"];
   [@css "@property --spacingVar-1m50b62{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
-  [@css "._in_b8f0pi{width:var(--lengthVar-1fwod6p);}"];
-  [@css "._in_b8f0pi{height:var(--lengthVar-5g6bk9);}"];
-  [@css "._in_b8f0pi{min-width:var(--lengthVar-1qqvx43);}"];
-  [@css "._in_b8f0pi{max-width:var(--lengthVar-11faw47);}"];
-  [@css "._in_1swajk7{margin-top:var(--lengthVar-oy21bt);}"];
-  [@css "._in_1swajk7{margin-bottom:var(--lengthVar-oy21bt);}"];
-  [@css "._in_1swajk7{padding-left:var(--lengthVar-1lpa833);}"];
-  [@css "._in_1swajk7{padding-right:var(--lengthVar-1lpa833);}"];
   [@css
-    "._a_6fvyy6{gap:var(--lengthVar-vh1osb);row-gap:var(--lengthVar-vh1osb);-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
+    (
+      "._in_b8f0pi{width:var(--lengthVar-1fwod6p);}",
+      "_in_b8f0pi",
+      "0,1,0 own",
+      "516",
+      1,
+      false,
+    )
   ];
-  [@css "._in_1vzwmoy{color:var(--colorVar-14sye4i);}"];
-  [@css "._in_1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
-  [@css "._in_1vzwmoy{border-top-color:var(--colorVar-14sye4i);}"];
-  [@css "._a_600001pa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
-  [@css "._in_1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}"];
-  [@css "._in_1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}"];
-  [@css "._in_1d6x35p{top:var(--topVar-1iqysbe);}"];
-  [@css "._in_1d6x35p{bottom:var(--topVar-10dkp5m);}"];
-  [@css "._a_ekxgpr{z-index:var(--zIndexVar-osv02l);}"];
   [@css
-    "._a_3h1lokzkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
+    (
+      "._in_b8f0pi{height:var(--lengthVar-5g6bk9);}",
+      "_in_b8f0pi",
+      "0,1,0 own",
+      "237",
+      1,
+      false,
+    )
   ];
-  [@css "._in_zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
-  [@css "._in_zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
-  [@css "._a_eckyy8{width:var(--width-18c1xss);}"];
-  [@css "._a_6lnay0{height:100px;}"];
-  [@css "._a_4ekvmb{color:red;}"];
+  [@css
+    (
+      "._in_b8f0pi{min-width:var(--lengthVar-1qqvx43);}",
+      "_in_b8f0pi",
+      "0,1,0 own",
+      "300",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_b8f0pi{max-width:var(--lengthVar-11faw47);}",
+      "_in_b8f0pi",
+      "0,1,0 own",
+      "296",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1swajk7{margin-top:var(--lengthVar-oy21bt);}",
+      "_in_1swajk7",
+      "0,1,0 own",
+      "277",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1swajk7{margin-bottom:var(--lengthVar-oy21bt);}",
+      "_in_1swajk7",
+      "0,1,0 own",
+      "277",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1swajk7{padding-left:var(--lengthVar-1lpa833);}",
+      "_in_1swajk7",
+      "0,1,0 own",
+      "328",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1swajk7{padding-right:var(--lengthVar-1lpa833);}",
+      "_in_1swajk7",
+      "0,1,0 own",
+      "328",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6fvyy6{gap:var(--lengthVar-vh1osb);row-gap:var(--lengthVar-vh1osb);-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}",
+      "_a_6fvyy6",
+      "0,1,0 own",
+      "231",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1vzwmoy{color:var(--colorVar-14sye4i);}",
+      "_in_1vzwmoy",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1vzwmoy{background-color:var(--colorVar-14sye4i);}",
+      "_in_1vzwmoy",
+      "0,1,0 own",
+      "117",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1vzwmoy{border-top-color:var(--colorVar-14sye4i);}",
+      "_in_1vzwmoy",
+      "0,1,0 own",
+      "125",
+      16384,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_600001pa9s{flex-basis:var(--flexBasisVar-16vl5bp);}",
+      "_a_600001pa9s",
+      "0,1,0 own",
+      "216",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}",
+      "_in_1knt7y9",
+      "0,1,0 own",
+      "235",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}",
+      "_in_1knt7y9",
+      "0,1,0 own",
+      "235",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1d6x35p{top:var(--topVar-1iqysbe);}",
+      "_in_1d6x35p",
+      "0,1,0 own",
+      "253",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1d6x35p{bottom:var(--topVar-10dkp5m);}",
+      "_in_1d6x35p",
+      "0,1,0 own",
+      "253",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ekxgpr{z-index:var(--zIndexVar-osv02l);}",
+      "_a_ekxgpr",
+      "0,1,0 own",
+      "524",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h1lokzkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}",
+      "_a_3h1lokzkxi",
+      "0,1,0 own",
+      "125",
+      74756,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}",
+      "_in_zoi7e9",
+      "0,1,0 own",
+      "270",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_zoi7e9{word-spacing:var(--spacingVar-1m50b62);}",
+      "_in_zoi7e9",
+      "0,1,0 own",
+      "520",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_eckyy8{width:var(--width-18c1xss);}",
+      "_a_eckyy8",
+      "0,1,0 own",
+      "516",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_6lnay0{height:100px;}", "_a_6lnay0", "0,1,0 own", "237", 1, false)
+  ];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
   [@css.bindings
     [
       ("Output.test1", "_id_v2u9l", "_in_b8f0pi"),
@@ -65,17 +261,17 @@ Comprehensive test for cx2 interpolation with various property types
   ];
   [@css.blocks
     [
-      (7, "_id_v2u9l _in_b8f0pi"),
-      (15, "_id_nrr9j _in_1swajk7"),
-      (23, "_id_2r01nv _a_6fvyy6"),
-      (30, "_id_1j4dp7o _in_1vzwmoy"),
-      (36, "_id_sz77bn _a_600001pa9s"),
-      (42, "_id_uiyng3 _in_1knt7y9"),
-      (47, "_id_s2zlt2 _in_1d6x35p"),
-      (52, "_id_okdsc1 _a_ekxgpr"),
-      (58, "_id_1p3lcp2 _a_3h1lokzkxi"),
-      (65, "_id_bjx2e8 _in_zoi7e9"),
-      (70, "_id_9502q _a_eckyy8 _a_6lnay0 _a_4ekvmb"),
+      (7, "_id_v2u9l", [18, 19, 20, 21]),
+      (15, "_id_nrr9j", [22, 23, 24, 25]),
+      (23, "_id_2r01nv", [26]),
+      (30, "_id_1j4dp7o", [27, 28, 29]),
+      (36, "_id_sz77bn", [30]),
+      (42, "_id_uiyng3", [31, 32]),
+      (47, "_id_s2zlt2", [33, 34]),
+      (52, "_id_okdsc1", [35]),
+      (58, "_id_1p3lcp2", [36]),
+      (65, "_id_bjx2e8", [37, 38]),
+      (70, "_id_9502q", [39, 40, 41]),
     ]
   ];
   let lengthVar = CSS.px(10);

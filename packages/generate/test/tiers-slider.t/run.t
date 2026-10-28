@@ -11,18 +11,17 @@ whichever rule is textually LAST among the two that currently match - at a
 >=1280px viewport BOTH rules match, and if the base rule is later it
 incorrectly wins: the desktop 120px override never applies.
 
-The binding's own class list (its `[@@@css.blocks]` entry, which the ppx
-writes) puts the
-bundle first and the media atom second. The two rules compete (same
+The binding's own rule list (its `[@@@css.blocks]` entry, which the ppx
+writes) puts the bundle's rules first and the media atom last. The two rules compete (same
 specificity, same element, both set `padding-left`/`padding-right`), so
 generate adds a block edge "bundle before media atom" and emits them in that
 order, whatever the definition order of the rules is:
 
   $ cat > slider.ml <<EOF
-  > [@@@css "@media (min-width:1280px){._a_desktop120{padding:0 120px;}}"]
-  > [@@@css "._in_c09yqu{padding:0 24px;}"]
-  > [@@@css "._in_c09yqu{margin-left:8px;}"]
-  > [@@@css.blocks [(4, "_in_c09yqu _a_desktop120")]]
+  > [@@@css ("@media (min-width:1280px){._a_desktop120{padding:0 120px;}}", "_a_desktop120", "0,1,0 own", "padding", 15, false)]
+  > [@@@css ("._in_c09yqu{padding:0 24px;}", "_in_c09yqu", "0,1,0 own", "padding", 15, false)]
+  > [@@@css ("._in_c09yqu{margin-left:8px;}", "_in_c09yqu", "0,1,0 own", "margin", 8, false)]
+  > [@@@css.blocks [(4, "", [1; 2; 0])]]
   > EOF
 
   $ styled-ppx.generate slider.ml
@@ -32,14 +31,14 @@ order, whatever the definition order of the rules is:
   ._in_c09yqu{margin-left:8px;}
 
 At a >=1280px viewport the media atom now follows the base padding and wins, as
-the block's source order says. Without the class list (no block reads these
+the block's source order says. Without the rule list (no block reads these
 rules together), definition order decides, and here the media rule is
 defined first:
 
   $ cat > slider_no_block.ml <<EOF
-  > [@@@css "@media (min-width:1280px){._a_desktop120{padding:0 120px;}}"]
-  > [@@@css "._in_c09yqu{padding:0 24px;}"]
-  > [@@@css "._in_c09yqu{margin-left:8px;}"]
+  > [@@@css ("@media (min-width:1280px){._a_desktop120{padding:0 120px;}}", "_a_desktop120", "0,1,0 own", "padding", 15, false)]
+  > [@@@css ("._in_c09yqu{padding:0 24px;}", "_in_c09yqu", "0,1,0 own", "padding", 15, false)]
+  > [@@@css ("._in_c09yqu{margin-left:8px;}", "_in_c09yqu", "0,1,0 own", "margin", 8, false)]
   > EOF
 
   $ styled-ppx.generate slider_no_block.ml

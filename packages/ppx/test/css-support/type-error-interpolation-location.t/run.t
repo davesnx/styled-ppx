@@ -34,15 +34,36 @@ If this test fail means that the module is not in sync with the ppx
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --cosas-112i897{syntax:\"*\";inherits:false;}"];
   [@css
-    "._a_ecanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
+    (
+      "._a_ecanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}",
+      "_a_ecanqs",
+      "0,1,0 own",
+      "516",
+      1,
+      false,
+    )
   ];
   [@css
-    "._a_6i000gkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
+    (
+      "._a_6i000gkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}",
+      "_a_6i000gkbxn",
+      "0,1,0 own",
+      "234",
+      16,
+      false,
+    )
   ];
   [@css
-    "._a_cfdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
+    (
+      "._a_cfdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}",
+      "_a_cfdqmz",
+      "0,1,0 own",
+      "447",
+      15,
+      false,
+    )
   ];
-  [@css.blocks [(4, "_a_ecanqs _a_6i000gkbxn"), (10, "_a_cfdqmz")]];
+  [@css.blocks [(4, "", [1, 2]), (10, "", [3])]];
   let cosas = `bold;
   
   CSS.make("_a_ecanqs _a_6i000gkbxn", []);

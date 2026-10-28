@@ -7,20 +7,126 @@ disjoint leaves, so they still get separate atoms.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "._a_7pow79{margin:10px;margin-top:0;}"];
-  [@css "._a_7p8lih{margin-top:0;margin:10px;}"];
-  [@css "._a_7pp6yp{margin:10px;margin-top:0;margin-left:5px;}"];
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_7p0008n4zf{margin-top:0;}"];
-  [@css "._a_940008cand{padding-top:0;}"];
-  [@css "._a_qyw7u7po9vs:hover{margin:10px;margin-top:0;}"];
-  [@css "._a_940002yq1t{padding-left:0;}"];
-  [@css "._a_9400048fgp{padding-right:0;}"];
-  [@css "._a_3h2ghsmzmu{border-top:1px solid red;}"];
-  [@css "._a_3h00sgpy0o{border-left-width:2px;}"];
-  [@css "._a_3hu7ex{border:1px solid blue;border-left-width:2px;}"];
   [@css
-    "._a_3htdra{border-top:1px solid red;border:2px dashed blue;border-left-width:3px;}"
+    (
+      "._a_7pow79{margin:10px;margin-top:0;}",
+      "_a_7pow79",
+      "0,1,0 own",
+      "277",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7p8lih{margin-top:0;margin:10px;}",
+      "_a_7p8lih",
+      "0,1,0 own",
+      "277",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7pp6yp{margin:10px;margin-top:0;margin-left:5px;}",
+      "_a_7pp6yp",
+      "0,1,0 own",
+      "277",
+      15,
+      false,
+    )
+  ];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_7p0008n4zf{margin-top:0;}",
+      "_a_7p0008n4zf",
+      "0,1,0 own",
+      "277",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_940008cand{padding-top:0;}",
+      "_a_940008cand",
+      "0,1,0 own",
+      "328",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_qyw7u7po9vs:hover{margin:10px;margin-top:0;}",
+      "_a_qyw7u7po9vs",
+      "0,2,0 own",
+      "277",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_940002yq1t{padding-left:0;}",
+      "_a_940002yq1t",
+      "0,1,0 own",
+      "328",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9400048fgp{padding-right:0;}",
+      "_a_9400048fgp",
+      "0,1,0 own",
+      "328",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h2ghsmzmu{border-top:1px solid red;}",
+      "_a_3h2ghsmzmu",
+      "0,1,0 own",
+      "125",
+      114688,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h00sgpy0o{border-left-width:2px;}",
+      "_a_3h00sgpy0o",
+      "0,1,0 own",
+      "125",
+      1024,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3hu7ex{border:1px solid blue;border-left-width:2px;}",
+      "_a_3hu7ex",
+      "0,1,0 own",
+      "125",
+      131071,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3htdra{border-top:1px solid red;border:2px dashed blue;border-left-width:3px;}",
+      "_a_3htdra",
+      "0,1,0 own",
+      "125",
+      131071,
+      false,
+    )
   ];
   [@css.bindings
     [
@@ -50,16 +156,16 @@ disjoint leaves, so they still get separate atoms.
   ];
   [@css.blocks
     [
-      (1, "_id_1qpv0jm _a_7pow79"),
-      (5, "_id_uil9rv _a_7p8lih"),
-      (10, "_id_5lj0i7 _a_7pp6yp"),
-      (15, "_id_6fb8it _a_4ekvmb _a_7p0008n4zf"),
-      (19, "_id_4irwce _a_7p0008n4zf _a_940008cand"),
-      (24, "_id_t76kqk _a_qyw7u7po9vs"),
-      (31, "_id_1jum1rn _a_940002yq1t _a_9400048fgp"),
-      (36, "_id_1vbhcey _a_3h2ghsmzmu _a_3h00sgpy0o"),
-      (41, "_id_3jg85a _a_3hu7ex"),
-      (47, "_id_bhbjc9 _a_3htdra"),
+      (1, "_id_1qpv0jm", [0]),
+      (5, "_id_uil9rv", [1]),
+      (10, "_id_5lj0i7", [2]),
+      (15, "_id_6fb8it", [3, 4]),
+      (19, "_id_4irwce", [4, 5]),
+      (24, "_id_t76kqk", [6]),
+      (31, "_id_1jum1rn", [7, 8]),
+      (36, "_id_1vbhcey", [9, 10]),
+      (41, "_id_3jg85a", [11]),
+      (47, "_id_bhbjc9", [12]),
     ]
   ];
   let shorthandThenLonghand =

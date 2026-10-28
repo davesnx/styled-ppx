@@ -24,28 +24,83 @@ the property.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_fsgd04{float-reference:inline;}"];
-  [@css "._a_fsfd3q{float-reference:column;}"];
-  [@css "._a_fsrpyx{float-reference:region;}"];
-  [@css "._a_fsssig{float-reference:page;}"];
-  [@css "._a_fqk6ea{float-defer:none;}"];
-  [@css "._a_fqeb1u{float-defer:last;}"];
-  [@css "._a_fqr3fc{float-defer:2;}"];
-  [@css "._a_frh37k{float-offset:0;}"];
-  [@css "._a_frwu5a{float-offset:10px;}"];
-  [@css "._a_fr5tyx{float-offset:10%;}"];
+  [@css
+    (
+      "._a_fsgd04{float-reference:inline;}",
+      "_a_fsgd04",
+      "0,1,0 own",
+      "568",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fsfd3q{float-reference:column;}",
+      "_a_fsfd3q",
+      "0,1,0 own",
+      "568",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fsrpyx{float-reference:region;}",
+      "_a_fsrpyx",
+      "0,1,0 own",
+      "568",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fsssig{float-reference:page;}",
+      "_a_fsssig",
+      "0,1,0 own",
+      "568",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_fqk6ea{float-defer:none;}", "_a_fqk6ea", "0,1,0 own", "566", 1, false)
+  ];
+  [@css
+    ("._a_fqeb1u{float-defer:last;}", "_a_fqeb1u", "0,1,0 own", "566", 1, false)
+  ];
+  [@css
+    ("._a_fqr3fc{float-defer:2;}", "_a_fqr3fc", "0,1,0 own", "566", 1, false)
+  ];
+  [@css
+    ("._a_frh37k{float-offset:0;}", "_a_frh37k", "0,1,0 own", "567", 1, false)
+  ];
+  [@css
+    (
+      "._a_frwu5a{float-offset:10px;}",
+      "_a_frwu5a",
+      "0,1,0 own",
+      "567",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_fr5tyx{float-offset:10%;}", "_a_fr5tyx", "0,1,0 own", "567", 1, false)
+  ];
   [@css.blocks
     [
-      (3, "_a_fsgd04"),
-      (4, "_a_fsfd3q"),
-      (5, "_a_fsrpyx"),
-      (6, "_a_fsssig"),
-      (7, "_a_fqk6ea"),
-      (8, "_a_fqeb1u"),
-      (9, "_a_fqr3fc"),
-      (10, "_a_frh37k"),
-      (11, "_a_frwu5a"),
-      (12, "_a_fr5tyx"),
+      (3, "", [0]),
+      (4, "", [1]),
+      (5, "", [2]),
+      (6, "", [3]),
+      (7, "", [4]),
+      (8, "", [5]),
+      (9, "", [6]),
+      (10, "", [7]),
+      (11, "", [8]),
+      (12, "", [9]),
     ]
   ];
   

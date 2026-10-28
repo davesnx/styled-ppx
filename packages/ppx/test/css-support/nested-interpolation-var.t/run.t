@@ -19,9 +19,36 @@ top-level interpolation does. If the inline list is empty `[]` for the
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
   [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
-  [@css "._a_4exvk3{color:var(--c-dq4mhq);}"];
-  [@css "._a_qyw7u4eh0hp:hover{color:var(--c-11hlefi);}"];
-  [@css "._a_wu9h64eac4l::placeholder{color:var(--c-gzgct8);}"];
+  [@css
+    (
+      "._a_4exvk3{color:var(--c-dq4mhq);}",
+      "_a_4exvk3",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_qyw7u4eh0hp:hover{color:var(--c-11hlefi);}",
+      "_a_qyw7u4eh0hp",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_wu9h64eac4l::placeholder{color:var(--c-gzgct8);}",
+      "_a_wu9h64eac4l",
+      "0,1,1 own::placeholder",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input.topLevel", "_id_1777i86", "_a_4exvk3"),
@@ -31,9 +58,9 @@ top-level interpolation does. If the inline list is empty `[]` for the
   ];
   [@css.blocks
     [
-      (14, "_id_1777i86 _a_4exvk3"),
-      (17, "_id_15yirr8 _a_qyw7u4eh0hp"),
-      (20, "_id_19g790e _a_wu9h64eac4l"),
+      (14, "_id_1777i86", [2]),
+      (17, "_id_15yirr8", [3]),
+      (20, "_id_19g790e", [4]),
     ]
   ];
   

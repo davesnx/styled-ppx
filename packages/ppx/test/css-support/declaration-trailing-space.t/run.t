@@ -20,20 +20,49 @@ with no trailing space.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_7rw2m8a3txl > *{min-height:0;}"];
-  [@css "@media (min-width: 100px) {._a_6pdot5r5e8m{display:flex;}}"];
-  [@css "._a_5lba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_7rw2m8a3txl > *{min-height:0;}",
+      "_a_7rw2m8a3txl",
+      "0,1,0 & > *",
+      "298",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "@media (min-width: 100px) {._a_6pdot5r5e8m{display:flex;}}",
+      "_a_6pdot5r5e8m",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_5lba41{cursor:-webkit-grab;cursor:grab;}",
+      "_a_5lba41",
+      "0,1,0 own",
+      "201",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (3, "_a_5r08qs"),
-      (7, "_a_5r08qs"),
-      (11, "_a_7rw2m8a3txl"),
-      (12, "_a_7rw2m8a3txl"),
-      (15, "_a_6pdot5r5e8m"),
-      (16, "_a_6pdot5r5e8m"),
-      (20, "_a_5lba41"),
-      (21, "_a_5lba41"),
+      (3, "", [0]),
+      (7, "", [0]),
+      (11, "", [1]),
+      (12, "", [1]),
+      (15, "", [2]),
+      (16, "", [2]),
+      (20, "", [3]),
+      (21, "", [3]),
     ]
   ];
   

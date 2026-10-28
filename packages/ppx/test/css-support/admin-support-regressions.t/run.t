@@ -18,11 +18,56 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
     "@property --deprecated__elevation1-1jpikyl{syntax:\"*\";inherits:false;}"
   ];
   [@css "@property --topMenuHeight-10ob2p1{syntax:\"*\";inherits:false;}"];
-  [@css "._a_3h2ghs9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css "._a_3h0007kb5g{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}"];
-  [@css "._a_3h01ds4w3j{border-left:1px solid var(--lineAlpha-k1tpqj);}"];
-  [@css "._a_400dz6{box-shadow:var(--deprecated__elevation1-1jpikyl);}"];
-  [@css "._a_6lttxg{height:calc(100vh + var(--topMenuHeight-10ob2p1));}"];
+  [@css
+    (
+      "._a_3h2ghs9vd4{border-top:1px solid var(--line-17j5in5);}",
+      "_a_3h2ghs9vd4",
+      "0,1,0 own",
+      "125",
+      114688,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h0007kb5g{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}",
+      "_a_3h0007kb5g",
+      "0,1,0 own",
+      "125",
+      7,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3h01ds4w3j{border-left:1px solid var(--lineAlpha-k1tpqj);}",
+      "_a_3h01ds4w3j",
+      "0,1,0 own",
+      "125",
+      1792,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_400dz6{box-shadow:var(--deprecated__elevation1-1jpikyl);}",
+      "_a_400dz6",
+      "0,1,0 own",
+      "144",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6lttxg{height:calc(100vh + var(--topMenuHeight-10ob2p1));}",
+      "_a_6lttxg",
+      "0,1,0 own",
+      "237",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input._borderTop", "_id_yiidb9", "_a_3h2ghs9vd4"),
@@ -34,11 +79,11 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
   ];
   [@css.blocks
     [
-      (35, "_id_yiidb9 _a_3h2ghs9vd4"),
-      (37, "_id_ugi43t _a_3h0007kb5g"),
-      (39, "_id_1wdp7tf _a_3h01ds4w3j"),
-      (41, "_id_1eo8o80 _a_400dz6"),
-      (43, "_id_1ul2fc1 _a_6lttxg"),
+      (35, "_id_yiidb9", [5]),
+      (37, "_id_ugi43t", [6]),
+      (39, "_id_1wdp7tf", [7]),
+      (41, "_id_1eo8o80", [8]),
+      (43, "_id_1ul2fc1", [9]),
     ]
   ];
   module Alias = {

@@ -13,11 +13,15 @@ string in `[@@@css ...]`, plus a `[@@@css.refs ...]` attribute with the
 location and a synthetic dep-tracking `let`.
 
   $ cat n.ml
-  [@@@css "._a_393u2l{background:red;}"]
-  [@@@css "._a_gnp5r39ddnj.\000M.marker\000{background:blue;}"]
+  [@@@css
+    ("._a_393u2l{background:red;}", "_a_393u2l", "0,1,0 own", "117", 511,
+      false)]
+  [@@@css
+    ("._a_gnp5r39ddnj.\000M.marker\000{background:blue;}", "_a_gnp5r39ddnj",
+      "0,2,0 own", "117", 511, false)]
   [@@@css.bindings
     [("N.container", "_id_1npqc5e", "_a_393u2l _a_gnp5r39ddnj")]]
-  [@@@css.blocks [(3, "_id_1npqc5e _a_393u2l _a_gnp5r39ddnj")]]
+  [@@@css.blocks [(3, "_id_1npqc5e", [0; 1])]]
   [@@@css.refs [("M.marker", "n.ml", 6, 6, 14)]]
   let _ = M.marker
   let container =

@@ -7,13 +7,17 @@ at the cost of extra bytes.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
-  [@@@css "._a_7prbkv{margin:4px;}"]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) and (not (min-width: 1280px)){._a_5kutk7pogdr{margin:8px;}}"]
-  [@@@css "@media (min-width: 1280px) {._a_xyxs57p8n8o{margin:16px;}}"]
+    ("._a_7prbkv{margin:4px;}", "_a_7prbkv", "0,1,0 own", "277", 15, false)]
+  [@@@css
+    ("@media (min-width: 768px) and (max-width: 1279px) and (not (min-width: 1280px)){._a_5kutk7pogdr{margin:8px;}}",
+      "_a_5kutk7pogdr", "0,1,0 own", "277", 15, false)]
+  [@@@css
+    ("@media (min-width: 1280px) {._a_xyxs57p8n8o{margin:16px;}}",
+      "_a_xyxs57p8n8o", "0,1,0 own", "277", 15, false)]
   [@@@css.bindings
     [("Output.block", "_id_1n4allv", "_a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
-  [@@@css.blocks [(3, "_id_1n4allv _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
+  [@@@css.blocks [(3, "_id_1n4allv", [0; 1; 2])]]
   let block =
     CSS.make "label:block _id_1n4allv _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o"
       []

@@ -8,9 +8,11 @@ can resolve it against M's exported [@@@css.bindings].
   $ ../../standalone.exe --impl n.ml -o n.ml
 
   $ cat n.ml
-  [@@@css "._a_mgr994ev1t1.\000M.Css.marker\000{color:blue;}"]
+  [@@@css
+    ("._a_mgr994ev1t1.\000M.Css.marker\000{color:blue;}", "_a_mgr994ev1t1",
+      "0,2,0 own", "158", 1, false)]
   [@@@css.bindings [("N.wrapper", "_id_1hd82p8", "_a_mgr994ev1t1")]]
-  [@@@css.blocks [(2, "_id_1hd82p8 _a_mgr994ev1t1")]]
+  [@@@css.blocks [(2, "_id_1hd82p8", [0])]]
   [@@@css.refs [("M.Css.marker", "n.ml", 3, 6, 19)]]
   let _ = M.Css.marker
   module Styles = M.Css

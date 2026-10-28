@@ -7,7 +7,7 @@ two plain, unlayered rules.
 
   $ cat > box_sizing.ml <<EOF
   > [@@@css "*{box-sizing:inherit;}"]
-  > [@@@css "._a_box9k{box-sizing:content-box;}"]
+  > [@@@css ("._a_box9k{box-sizing:content-box;}", "_a_box9k", "0,1,0 own", "box-sizing", 1, false)]
   > EOF
 
   $ styled-ppx.generate box_sizing.ml
@@ -26,7 +26,7 @@ before position, and position only ever breaks a specificity tie.
 
   $ cat > specificity.ml <<EOF
   > [@@@css ".theme-dark .card{color:green;}"]
-  > [@@@css "._a_cardown{color:blue;}"]
+  > [@@@css ("._a_cardown{color:blue;}", "_a_cardown", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate specificity.ml
@@ -48,7 +48,7 @@ before specificity ever enters into it.
 
   $ cat > important_global.ml <<EOF
   > [@@@css "*{box-sizing:inherit !important;}"]
-  > [@@@css "._a_box9k2{box-sizing:content-box;}"]
+  > [@@@css ("._a_box9k2{box-sizing:content-box;}", "_a_box9k2", "0,1,0 own", "box-sizing", 1, false)]
   > EOF
 
   $ styled-ppx.generate important_global.ml
@@ -67,7 +67,7 @@ specificity again, same as two plain ones would.
 
   $ cat > important_both.ml <<EOF
   > [@@@css "*{box-sizing:inherit !important;}"]
-  > [@@@css "._a_box9k3{box-sizing:content-box !important;}"]
+  > [@@@css ("._a_box9k3{box-sizing:content-box !important;}", "_a_box9k3", "!0,1,0 own", "box-sizing", 1, false)]
   > EOF
 
   $ styled-ppx.generate important_both.ml
@@ -88,7 +88,7 @@ take no part in tiering at all, so they are unchanged by any of this.
   > [@@@css "@property --brand{syntax:\"<color>\";inherits:false;initial-value:red;}"]
   > [@@@css "@keyframes spin{to{transform:rotate(360deg);}}"]
   > [@@@css "@font-face{font-family:\"Body\";src:url(\"body.woff2\");}"]
-  > [@@@css "._a_registered{color:blue;}"]
+  > [@@@css ("._a_registered{color:blue;}", "_a_registered", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate registration.ml

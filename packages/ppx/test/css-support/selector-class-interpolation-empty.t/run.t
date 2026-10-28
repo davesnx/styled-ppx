@@ -27,13 +27,55 @@ rule is emitted for it. The consumer `container`'s nested rule keeps a
 is actually present on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_393u2l{background:red;}"];
-  [@css "._a_dp7m3390ev8._id_djcvv9{background:blue;}"];
-  [@css "._a_94fqw0{padding:1rem;}"];
-  [@css "._a_kbodp3h0ef5hi8t._id_1nlj7be{border-color:blue;}"];
-  [@css "._a_r1su339tl93._id_79qigv{background:yellow;}"];
-  [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_gmy164etpbt ._id_g2b8cb{color:black;}"];
+  [@css
+    ("._a_393u2l{background:red;}", "_a_393u2l", "0,1,0 own", "117", 511, false)
+  ];
+  [@css
+    (
+      "._a_dp7m3390ev8._id_djcvv9{background:blue;}",
+      "_a_dp7m3390ev8",
+      "0,2,0 own",
+      "117",
+      511,
+      false,
+    )
+  ];
+  [@css
+    ("._a_94fqw0{padding:1rem;}", "_a_94fqw0", "0,1,0 own", "328", 15, false)
+  ];
+  [@css
+    (
+      "._a_kbodp3h0ef5hi8t._id_1nlj7be{border-color:blue;}",
+      "_a_kbodp3h0ef5hi8t",
+      "0,2,0 own",
+      "125",
+      18689,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_r1su339tl93._id_79qigv{background:yellow;}",
+      "_a_r1su339tl93",
+      "0,2,0 own",
+      "117",
+      511,
+      false,
+    )
+  ];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_gmy164etpbt ._id_g2b8cb{color:black;}",
+      "_a_gmy164etpbt",
+      "0,2,0 & ._id_g2b8cb",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input.active", "_id_djcvv9", ""),
@@ -51,13 +93,13 @@ is actually present on the element.
   ];
   [@css.blocks
     [
-      (15, "_id_djcvv9"),
-      (18, "_id_ls0dio _a_393u2l _a_dp7m3390ev8"),
-      (31, "_id_1nlj7be"),
-      (32, "_id_79qigv"),
-      (35, "_id_10ieij6 _a_94fqw0 _a_kbodp3h0ef5hi8t _a_r1su339tl93"),
-      (51, "_id_g2b8cb"),
-      (54, "_id_1w26e1r _a_5r08qs _a_gmy164etpbt"),
+      (15, "_id_djcvv9", []),
+      (18, "_id_ls0dio", [0, 1]),
+      (31, "_id_1nlj7be", []),
+      (32, "_id_79qigv", []),
+      (35, "_id_10ieij6", [2, 3, 4]),
+      (51, "_id_g2b8cb", []),
+      (54, "_id_1w26e1r", [5, 6]),
     ]
   ];
   

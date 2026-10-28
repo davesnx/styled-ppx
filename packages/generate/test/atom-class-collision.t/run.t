@@ -6,11 +6,11 @@ be a hard build error, the same way two different `_id_` identities
 colliding on the same hash already are (see identity-collision.t).
 
   $ cat > a.ml <<EOF
-  > [@@@css "._a_abchgt{color:red;}"]
+  > [@@@css ("._a_abchgt{color:red;}", "_a_abchgt", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ cat > b.ml <<EOF
-  > [@@@css "._a_abchgt{color:blue;}"]
+  > [@@@css ("._a_abchgt{color:blue;}", "_a_abchgt", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate a.ml b.ml
@@ -22,11 +22,11 @@ native + melange `copy_files`, vendoring) is not a collision: it dedups to
 one rule like any other, same as today.
 
   $ cat > e.ml <<EOF
-  > [@@@css "._a_same{color:green;}"]
+  > [@@@css ("._a_same{color:green;}", "_a_same", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ cat > f.ml <<EOF
-  > [@@@css "._a_same{color:green;}"]
+  > [@@@css ("._a_same{color:green;}", "_a_same", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate e.ml f.ml
@@ -34,8 +34,8 @@ one rule like any other, same as today.
   ._a_same{color:green;}
 
 A `_id_` (identity class) collision is a different, pre-existing check
-(identity-collision.t) - this one only looks at `_a_` atom classes, so a
-`_id_` clash alone doesn't trip it.
+(identity-collision.t) - this one only looks at the class of an atom rule's
+key, so a `_id_` clash in rules without a key doesn't trip it.
 
   $ cat > g.ml <<EOF
   > [@@@css "._id_shared{color:red;}"]
@@ -60,11 +60,11 @@ unconditional version of this check broke them). The collision check must
 recognize the `_in_` prefix and skip it entirely, in both directions.
 
   $ cat > i.ml <<EOF
-  > [@@@css "._in_bundled{margin:var(--mySize-1);}"]
+  > [@@@css ("._in_bundled{margin:var(--mySize-1);}", "_in_bundled", "0,1,0 own", "margin", 15, false)]
   > EOF
 
   $ cat > j.ml <<EOF
-  > [@@@css "._in_bundled{padding:var(--mySize-2);}"]
+  > [@@@css ("._in_bundled{padding:var(--mySize-2);}", "_in_bundled", "0,1,0 own", "padding", 15, false)]
   > EOF
 
   $ styled-ppx.generate i.ml j.ml

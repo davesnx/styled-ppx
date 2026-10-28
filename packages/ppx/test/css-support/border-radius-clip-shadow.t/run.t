@@ -26,74 +26,364 @@ keyword, whose error names the property.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_3n000cl1tb{border-top-radius:10px;}"];
-  [@css "._a_3n000c0ay0{border-top-radius:10px 5px / 2px 1px;}"];
-  [@css "._a_3n000avogz{border-right-radius:4px;}"];
-  [@css "._a_3n00033qjb{border-bottom-radius:4px;}"];
-  [@css "._a_3n0005n019{border-left-radius:4px;}"];
-  [@css "._a_h1g86n{border-block-start-radius:4px;}"];
-  [@css "._a_f7b3em{border-block-end-radius:4px;}"];
-  [@css "._a_h3hyd2{border-inline-start-radius:4px;}"];
-  [@css "._a_h2dz7t{border-inline-end-radius:4px;}"];
-  [@css "._a_fbpvas{border-limit:all;}"];
-  [@css "._a_fbqqxc{border-limit:sides 50%;}"];
-  [@css "._a_fbjp28{border-limit:corners;}"];
-  [@css "._a_fbue5t{border-limit:corners 10px;}"];
-  [@css "._a_fbbzmt{border-limit:left 4em;}"];
-  [@css "._a_f90008az3q{border-top-clip:10px 1fr 10px;}"];
-  [@css "._a_f90004yn5u{border-right-clip:none;}"];
-  [@css "._a_f900019q3s{border-bottom-clip:0 10px 1fr 10px;}"];
-  [@css "._a_f90002emob{border-left-clip:5px;}"];
-  [@css "._a_f600021ui5{border-block-start-clip:10px;}"];
-  [@css "._a_f60001l7yx{border-block-end-clip:10px;}"];
-  [@css "._a_fa0002ufja{border-inline-start-clip:10px;}"];
-  [@css "._a_fa0001u3cc{border-inline-end-clip:10px;}"];
-  [@css "._a_f6ysgj{border-block-clip:10px 1fr;}"];
-  [@css "._a_favz6k{border-inline-clip:10px 1fr;}"];
-  [@css "._a_f9e3gi{border-clip:0 1fr;}"];
-  [@css "._a_fduw20{box-shadow-color:red;}"];
-  [@css "._a_fd3mmo{box-shadow-color:red, blue;}"];
-  [@css "._a_fejo2u{box-shadow-offset:4px 4px;}"];
-  [@css "._a_fetafk{box-shadow-offset:none, 4px 4px;}"];
-  [@css "._a_fcxgmz{box-shadow-blur:12px;}"];
-  [@css "._a_fgpgkn{box-shadow-spread:40px;}"];
-  [@css "._a_ffw7at{box-shadow-position:inset;}"];
-  [@css "._a_ffp1t5{box-shadow-position:outset, inset;}"];
+  [@css
+    (
+      "._a_3n000cl1tb{border-top-radius:10px;}",
+      "_a_3n000cl1tb",
+      "0,1,0 own",
+      "131",
+      12,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3n000c0ay0{border-top-radius:10px 5px / 2px 1px;}",
+      "_a_3n000c0ay0",
+      "0,1,0 own",
+      "131",
+      12,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3n000avogz{border-right-radius:4px;}",
+      "_a_3n000avogz",
+      "0,1,0 own",
+      "131",
+      10,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3n00033qjb{border-bottom-radius:4px;}",
+      "_a_3n00033qjb",
+      "0,1,0 own",
+      "131",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3n0005n019{border-left-radius:4px;}",
+      "_a_3n0005n019",
+      "0,1,0 own",
+      "131",
+      5,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_h1g86n{border-block-start-radius:4px;}",
+      "_a_h1g86n",
+      "0,1,0 own",
+      "613",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f7b3em{border-block-end-radius:4px;}",
+      "_a_f7b3em",
+      "0,1,0 own",
+      "547",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_h3hyd2{border-inline-start-radius:4px;}",
+      "_a_h3hyd2",
+      "0,1,0 own",
+      "615",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_h2dz7t{border-inline-end-radius:4px;}",
+      "_a_h2dz7t",
+      "0,1,0 own",
+      "614",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_fbpvas{border-limit:all;}", "_a_fbpvas", "0,1,0 own", "551", 1, false)
+  ];
+  [@css
+    (
+      "._a_fbqqxc{border-limit:sides 50%;}",
+      "_a_fbqqxc",
+      "0,1,0 own",
+      "551",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fbjp28{border-limit:corners;}",
+      "_a_fbjp28",
+      "0,1,0 own",
+      "551",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fbue5t{border-limit:corners 10px;}",
+      "_a_fbue5t",
+      "0,1,0 own",
+      "551",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fbbzmt{border-limit:left 4em;}",
+      "_a_fbbzmt",
+      "0,1,0 own",
+      "551",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f90008az3q{border-top-clip:10px 1fr 10px;}",
+      "_a_f90008az3q",
+      "0,1,0 own",
+      "549",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f90004yn5u{border-right-clip:none;}",
+      "_a_f90004yn5u",
+      "0,1,0 own",
+      "549",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f900019q3s{border-bottom-clip:0 10px 1fr 10px;}",
+      "_a_f900019q3s",
+      "0,1,0 own",
+      "549",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f90002emob{border-left-clip:5px;}",
+      "_a_f90002emob",
+      "0,1,0 own",
+      "549",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f600021ui5{border-block-start-clip:10px;}",
+      "_a_f600021ui5",
+      "0,1,0 own",
+      "546",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f60001l7yx{border-block-end-clip:10px;}",
+      "_a_f60001l7yx",
+      "0,1,0 own",
+      "546",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fa0002ufja{border-inline-start-clip:10px;}",
+      "_a_fa0002ufja",
+      "0,1,0 own",
+      "550",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fa0001u3cc{border-inline-end-clip:10px;}",
+      "_a_fa0001u3cc",
+      "0,1,0 own",
+      "550",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f6ysgj{border-block-clip:10px 1fr;}",
+      "_a_f6ysgj",
+      "0,1,0 own",
+      "546",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_favz6k{border-inline-clip:10px 1fr;}",
+      "_a_favz6k",
+      "0,1,0 own",
+      "550",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f9e3gi{border-clip:0 1fr;}",
+      "_a_f9e3gi",
+      "0,1,0 own",
+      "549",
+      15,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fduw20{box-shadow-color:red;}",
+      "_a_fduw20",
+      "0,1,0 own",
+      "553",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fd3mmo{box-shadow-color:red, blue;}",
+      "_a_fd3mmo",
+      "0,1,0 own",
+      "553",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fejo2u{box-shadow-offset:4px 4px;}",
+      "_a_fejo2u",
+      "0,1,0 own",
+      "554",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fetafk{box-shadow-offset:none, 4px 4px;}",
+      "_a_fetafk",
+      "0,1,0 own",
+      "554",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fcxgmz{box-shadow-blur:12px;}",
+      "_a_fcxgmz",
+      "0,1,0 own",
+      "552",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fgpgkn{box-shadow-spread:40px;}",
+      "_a_fgpgkn",
+      "0,1,0 own",
+      "556",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ffw7at{box-shadow-position:inset;}",
+      "_a_ffw7at",
+      "0,1,0 own",
+      "555",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ffp1t5{box-shadow-position:outset, inset;}",
+      "_a_ffp1t5",
+      "0,1,0 own",
+      "555",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (4, "_a_3n000cl1tb"),
-      (5, "_a_3n000c0ay0"),
-      (6, "_a_3n000avogz"),
-      (7, "_a_3n00033qjb"),
-      (8, "_a_3n0005n019"),
-      (9, "_a_h1g86n"),
-      (10, "_a_f7b3em"),
-      (11, "_a_h3hyd2"),
-      (12, "_a_h2dz7t"),
-      (15, "_a_fbpvas"),
-      (16, "_a_fbqqxc"),
-      (17, "_a_fbjp28"),
-      (18, "_a_fbue5t"),
-      (19, "_a_fbbzmt"),
-      (22, "_a_f90008az3q"),
-      (23, "_a_f90004yn5u"),
-      (24, "_a_f900019q3s"),
-      (25, "_a_f90002emob"),
-      (26, "_a_f600021ui5"),
-      (27, "_a_f60001l7yx"),
-      (28, "_a_fa0002ufja"),
-      (29, "_a_fa0001u3cc"),
-      (30, "_a_f6ysgj"),
-      (31, "_a_favz6k"),
-      (32, "_a_f9e3gi"),
-      (35, "_a_fduw20"),
-      (36, "_a_fd3mmo"),
-      (37, "_a_fejo2u"),
-      (38, "_a_fetafk"),
-      (39, "_a_fcxgmz"),
-      (40, "_a_fgpgkn"),
-      (41, "_a_ffw7at"),
-      (42, "_a_ffp1t5"),
+      (4, "", [0]),
+      (5, "", [1]),
+      (6, "", [2]),
+      (7, "", [3]),
+      (8, "", [4]),
+      (9, "", [5]),
+      (10, "", [6]),
+      (11, "", [7]),
+      (12, "", [8]),
+      (15, "", [9]),
+      (16, "", [10]),
+      (17, "", [11]),
+      (18, "", [12]),
+      (19, "", [13]),
+      (22, "", [14]),
+      (23, "", [15]),
+      (24, "", [16]),
+      (25, "", [17]),
+      (26, "", [18]),
+      (27, "", [19]),
+      (28, "", [20]),
+      (29, "", [21]),
+      (30, "", [22]),
+      (31, "", [23]),
+      (32, "", [24]),
+      (35, "", [25]),
+      (36, "", [26]),
+      (37, "", [27]),
+      (38, "", [28]),
+      (39, "", [29]),
+      (40, "", [30]),
+      (41, "", [31]),
+      (42, "", [32]),
     ]
   ];
   

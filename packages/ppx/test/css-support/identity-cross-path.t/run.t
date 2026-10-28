@@ -21,14 +21,16 @@ file. The identity is namespaced on the compilation-unit module name
 Both paths mint the same identity:
 
   $ cat native/Marker.ml
-  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css
+    ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings [("Marker.marker", "_id_8letx", "_a_4ekvmb")]]
-  [@@@css.blocks [(1, "_id_8letx _a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_8letx", [0])]]
   let marker = CSS.make "label:marker _id_8letx _a_4ekvmb" []
   let _ = marker
   $ cat js/Marker.ml
-  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css
+    ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings [("Marker.marker", "_id_8letx", "_a_4ekvmb")]]
-  [@@@css.blocks [(1, "_id_8letx _a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_8letx", [0])]]
   let marker = CSS.make "label:marker _id_8letx _a_4ekvmb" []
   let _ = marker

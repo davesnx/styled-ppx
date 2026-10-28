@@ -17,29 +17,90 @@ Each pair below must render and hash to the same atom.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_hfkiz4e0lf8 .parent > .child{color:red;}"];
-  [@css "._a_oicak4emckf .parent + .sibling{color:red;}"];
-  [@css "._a_ehmrb4ewq26 .parent ~ .sibling{color:red;}"];
-  [@css "._a_f8a2u4eqd0b .parent > .a.b:hover{color:red;}"];
-  [@css "._a_ew2o54eviu8 .parent > .a{color:red;}"];
-  [@css "._a_ornrm4e0uum .parent + .b{color:red;}"];
   [@css
-    "@media (min-width: 1px) {._a_7gls64e9ouy .parent > .child{color:red;}}"
+    (
+      "._a_hfkiz4e0lf8 .parent > .child{color:red;}",
+      "_a_hfkiz4e0lf8",
+      "0,3,0 & .parent > .child",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_oicak4emckf .parent + .sibling{color:red;}",
+      "_a_oicak4emckf",
+      "0,3,0 & .parent + .sibling",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ehmrb4ewq26 .parent ~ .sibling{color:red;}",
+      "_a_ehmrb4ewq26",
+      "0,3,0 & .parent ~ .sibling",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_f8a2u4eqd0b .parent > .a.b:hover{color:red;}",
+      "_a_f8a2u4eqd0b",
+      "0,5,0 & .parent > .a.b:hover",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ew2o54eviu8 .parent > .a{color:red;}",
+      "_a_ew2o54eviu8",
+      "0,3,0 & .parent > .a",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ornrm4e0uum .parent + .b{color:red;}",
+      "_a_ornrm4e0uum",
+      "0,3,0 & .parent + .b",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "@media (min-width: 1px) {._a_7gls64e9ouy .parent > .child{color:red;}}",
+      "_a_7gls64e9ouy",
+      "0,3,0 & .parent > .child",
+      "158",
+      1,
+      false,
+    )
   ];
   [@css.blocks
     [
-      (7, "_a_hfkiz4e0lf8"),
-      (8, "_a_hfkiz4e0lf8"),
-      (10, "_a_oicak4emckf"),
-      (11, "_a_oicak4emckf"),
-      (13, "_a_ehmrb4ewq26"),
-      (14, "_a_ehmrb4ewq26"),
-      (17, "_a_f8a2u4eqd0b"),
-      (18, "_a_f8a2u4eqd0b"),
-      (21, "_a_ew2o54eviu8 _a_ornrm4e0uum"),
-      (22, "_a_ew2o54eviu8 _a_ornrm4e0uum"),
-      (25, "_a_7gls64e9ouy"),
-      (26, "_a_7gls64e9ouy"),
+      (7, "", [0]),
+      (8, "", [0]),
+      (10, "", [1]),
+      (11, "", [1]),
+      (13, "", [2]),
+      (14, "", [2]),
+      (17, "", [3]),
+      (18, "", [3]),
+      (21, "", [4, 5]),
+      (22, "", [4, 5]),
+      (25, "", [6]),
+      (26, "", [6]),
     ]
   ];
   

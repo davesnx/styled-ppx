@@ -19,18 +19,110 @@ mints its own real, slot-keyed `_a_` class instead.
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
   [@css "@property --accent-1gxhmqu{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css "._in_1kbzua4{color:var(--color-3f9mj1);}"];
-  [@css "._in_1kbzua4:hover{color:var(--color-3f9mj1);}"];
-  [@css "@media (max-width: 768px) {._in_1kbzua4{color:var(--color-3f9mj1);}}"];
-  [@css "._a_5r08qs{display:flex;}"];
-  [@css "._in_1upqar2{color:var(--color-13vjntp);}"];
-  [@css "._in_1upqar2:hover{color:var(--color-13vjntp);}"];
-  [@css "._in_e286e6{width:var(--width-1v9ua);}"];
-  [@css "._in_e286e6:hover{height:var(--width-c62vcf);}"];
-  [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
-  [@css "._a_39000412gx{background-color:var(--accent-1gxhmqu);}"];
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
+  [@css
+    (
+      "._in_1kbzua4{color:var(--color-3f9mj1);}",
+      "_in_1kbzua4",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1kbzua4:hover{color:var(--color-3f9mj1);}",
+      "_in_1kbzua4",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "@media (max-width: 768px) {._in_1kbzua4{color:var(--color-3f9mj1);}}",
+      "_in_1kbzua4",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._in_1upqar2{color:var(--color-13vjntp);}",
+      "_in_1upqar2",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1upqar2:hover{color:var(--color-13vjntp);}",
+      "_in_1upqar2",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_e286e6{width:var(--width-1v9ua);}",
+      "_in_e286e6",
+      "0,1,0 own",
+      "516",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_e286e6:hover{height:var(--width-c62vcf);}",
+      "_in_e286e6",
+      "0,2,0 own",
+      "237",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4esjgz{color:var(--color-1a279q8);}",
+      "_a_4esjgz",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_39000412gx{background-color:var(--accent-1gxhmqu);}",
+      "_a_39000412gx",
+      "0,1,0 own",
+      "117",
+      4,
+      false,
+    )
+  ];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}",
+      "_a_qyw7u4ebwy0",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Output.multiVariant", "_id_8hlpz9", "_in_1kbzua4"),
@@ -42,13 +134,13 @@ mints its own real, slot-keyed `_a_` class instead.
   ];
   [@css.blocks
     [
-      (6, "_id_8hlpz9 _in_1kbzua4"),
-      (17, "_id_1i6efdo _a_5r08qs _in_1upqar2"),
-      (25, "_id_ero4cc _in_e286e6"),
-      (32, "_id_1vavuos _a_4esjgz _a_39000412gx"),
-      (38, "_id_xgnn3y _in_1upqar2 _a_39000412gx"),
-      (45, "_a_4ekvmb _a_qyw7u4ebwy0"),
-      (51, "_a_5r08qs _a_qyw7u4ebwy0"),
+      (6, "_id_8hlpz9", [7, 8, 9]),
+      (17, "_id_1i6efdo", [10, 11, 12]),
+      (25, "_id_ero4cc", [13, 14]),
+      (32, "_id_1vavuos", [15, 16]),
+      (38, "_id_xgnn3y", [11, 16, 12]),
+      (45, "", [17, 18]),
+      (51, "", [10, 18]),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));

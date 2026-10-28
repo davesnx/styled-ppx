@@ -7,13 +7,13 @@ one file with two rules).
 
   $ cat > z_base/z_base.ml <<EOF
   > [@@@css.config [("library-name", "z_base"); ("env", "production")]]
-  > [@@@css "._a_basewidget{color:red;}"]
+  > [@@@css ("._a_basewidget{color:red;}", "_a_basewidget", "0,1,0 own", "color", 1, false)]
   > let widget () = ()
   > EOF
 
   $ cat > a_app/main.ml <<EOF
   > [@@@css.config [("library-name", "a_app"); ("env", "production")]]
-  > [@@@css "._a_appmain{color:blue;}"]
+  > [@@@css ("._a_appmain{color:blue;}", "_a_appmain", "0,1,0 own", "color", 1, false)]
   > let _ = Z_base.widget
   > EOF
 

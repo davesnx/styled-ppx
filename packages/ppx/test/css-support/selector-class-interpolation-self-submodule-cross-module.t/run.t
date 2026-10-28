@@ -14,17 +14,24 @@ as an external path unless another enclosing `Css` module exists.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_ye3jo4ed103.\000Css.marker\000{color:blue;}"];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_ye3jo4ed103.\000Css.marker\000{color:blue;}",
+      "_a_ye3jo4ed103",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Input.Css.marker", "_id_gfnxs2", "_a_4ekvmb"),
       ("Input.Css.wrapper", "_id_1q350bi", "_a_ye3jo4ed103"),
     ]
   ];
-  [@css.blocks
-    [(2, "_id_gfnxs2 _a_4ekvmb"), (4, "_id_1q350bi _a_ye3jo4ed103")]
-  ];
+  [@css.blocks [(2, "_id_gfnxs2", [0]), (4, "_id_1q350bi", [1])]];
   [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
   let _ = Css.marker;

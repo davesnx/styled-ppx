@@ -16,23 +16,35 @@ mixed or other types untouched), and a `not`-prefixed type.
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css
-    "@media screen and (max-width: 992px) and (not (max-width: 480px)){._a_eod994eqxej{color:red;}}"]
+    ("@media screen and (max-width: 992px) and (not (max-width: 480px)){._a_eod994eqxej{color:red;}}",
+      "_a_eod994eqxej", "0,1,0 own", "158", 1, false)]
   [@@@css
-    "@media screen and (max-width: 480px) {._a_41qk84ejnqp{color:blue;}}"]
+    ("@media screen and (max-width: 480px) {._a_41qk84ejnqp{color:blue;}}",
+      "_a_41qk84ejnqp", "0,1,0 own", "158", 1, false)]
   [@@@css
-    "@media only screen and (max-width: 992px) and (not (max-width: 480px)){._a_hi5p165000waktn{font-size:14px;}}"]
+    ("@media only screen and (max-width: 992px) and (not (max-width: 480px)){._a_hi5p165000waktn{font-size:14px;}}",
+      "_a_hi5p165000waktn", "0,1,0 own", "221", 32, false)]
   [@@@css
-    "@media only screen and (max-width: 480px) {._a_vgp3865000wjlif{font-size:12px;}}"]
+    ("@media only screen and (max-width: 480px) {._a_vgp3865000wjlif{font-size:12px;}}",
+      "_a_vgp3865000wjlif", "0,1,0 own", "221", 32, false)]
   [@@@css
-    "@media not screen and (max-width: 992px) {._a_2qk2neczkzc{width:1px;}}"]
+    ("@media not screen and (max-width: 992px) {._a_2qk2neczkzc{width:1px;}}",
+      "_a_2qk2neczkzc", "0,1,0 own", "516", 1, false)]
   [@@@css
-    "@media not screen and (max-width: 480px) {._a_wd785ecogb2{width:2px;}}"]
-  [@@@css "@media screen, (min-width: 600px) {._a_mxhpf6luuex{height:1px;}}"]
-  [@@@css "@media (min-width: 900px) {._a_mp5mk6l2v22{height:2px;}}"]
+    ("@media not screen and (max-width: 480px) {._a_wd785ecogb2{width:2px;}}",
+      "_a_wd785ecogb2", "0,1,0 own", "516", 1, false)]
   [@@@css
-    "@media screen and (max-width: 992px) {._a_eod993h1lokug7y{border-width:1px;}}"]
+    ("@media screen, (min-width: 600px) {._a_mxhpf6luuex{height:1px;}}",
+      "_a_mxhpf6luuex", "0,1,0 own", "237", 1, false)]
   [@@@css
-    "@media print and (max-width: 480px) {._a_iy5ye3h1lokcoyl{border-width:2px;}}"]
+    ("@media (min-width: 900px) {._a_mp5mk6l2v22{height:2px;}}",
+      "_a_mp5mk6l2v22", "0,1,0 own", "237", 1, false)]
+  [@@@css
+    ("@media screen and (max-width: 992px) {._a_eod993h1lokug7y{border-width:1px;}}",
+      "_a_eod993h1lokug7y", "0,1,0 own", "125", 74756, false)]
+  [@@@css
+    ("@media print and (max-width: 480px) {._a_iy5ye3h1lokcoyl{border-width:2px;}}",
+      "_a_iy5ye3h1lokcoyl", "0,1,0 own", "125", 74756, false)]
   [@@@css.bindings
     [("Output.screenPair", "_id_1d7qz0s", "_a_eod994eqxej _a_41qk84ejnqp");
     ("Output.onlyPair", "_id_1mm6qhp", "_a_hi5p165000waktn _a_vgp3865000wjlif");
@@ -41,11 +53,11 @@ mixed or other types untouched), and a `not`-prefixed type.
     ("Output.differentTypesPair", "_id_zggsu4",
       "_a_eod993h1lokug7y _a_iy5ye3h1lokcoyl")]]
   [@@@css.blocks
-    [(3, "_id_1d7qz0s _a_eod994eqxej _a_41qk84ejnqp");
-    (9, "_id_1mm6qhp _a_hi5p165000waktn _a_vgp3865000wjlif");
-    (15, "_id_69ev7p _a_2qk2neczkzc _a_wd785ecogb2");
-    (21, "_id_wokrvf _a_mxhpf6luuex _a_mp5mk6l2v22");
-    (27, "_id_zggsu4 _a_eod993h1lokug7y _a_iy5ye3h1lokcoyl")]]
+    [(3, "_id_1d7qz0s", [0; 1]);
+    (9, "_id_1mm6qhp", [2; 3]);
+    (15, "_id_69ev7p", [4; 5]);
+    (21, "_id_wokrvf", [6; 7]);
+    (27, "_id_zggsu4", [8; 9])]]
   let screenPair =
     CSS.make "label:screenPair _id_1d7qz0s _a_eod994eqxej _a_41qk84ejnqp" []
   let onlyPair =

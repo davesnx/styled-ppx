@@ -15,28 +15,118 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_9k0k8p{pointer-events:auto;}"];
-  [@css "._a_9k73s1{pointer-events:visiblePainted;}"];
-  [@css "._a_9kle2q{pointer-events:visibleFill;}"];
-  [@css "._a_9k4ebn{pointer-events:visibleStroke;}"];
-  [@css "._a_9ksh4e{pointer-events:visible;}"];
-  [@css "._a_9k29yp{pointer-events:painted;}"];
-  [@css "._a_9kh5dc{pointer-events:fill;}"];
-  [@css "._a_9kii8d{pointer-events:stroke;}"];
-  [@css "._a_9k7k7s{pointer-events:all;}"];
-  [@css "._a_9kbp0l{pointer-events:none;}"];
+  [@css
+    (
+      "._a_9k0k8p{pointer-events:auto;}",
+      "_a_9k0k8p",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9k73s1{pointer-events:visiblePainted;}",
+      "_a_9k73s1",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9kle2q{pointer-events:visibleFill;}",
+      "_a_9kle2q",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9k4ebn{pointer-events:visibleStroke;}",
+      "_a_9k4ebn",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9ksh4e{pointer-events:visible;}",
+      "_a_9ksh4e",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9k29yp{pointer-events:painted;}",
+      "_a_9k29yp",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9kh5dc{pointer-events:fill;}",
+      "_a_9kh5dc",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9kii8d{pointer-events:stroke;}",
+      "_a_9kii8d",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9k7k7s{pointer-events:all;}",
+      "_a_9k7k7s",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_9kbp0l{pointer-events:none;}",
+      "_a_9kbp0l",
+      "0,1,0 own",
+      "344",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (67, "_a_9k0k8p"),
-      (69, "_a_9k73s1"),
-      (70, "_a_9kle2q"),
-      (71, "_a_9k4ebn"),
-      (72, "_a_9ksh4e"),
-      (73, "_a_9k29yp"),
-      (74, "_a_9kh5dc"),
-      (75, "_a_9kii8d"),
-      (76, "_a_9k7k7s"),
-      (77, "_a_9kbp0l"),
+      (67, "", [0]),
+      (69, "", [1]),
+      (70, "", [2]),
+      (71, "", [3]),
+      (72, "", [4]),
+      (73, "", [5]),
+      (74, "", [6]),
+      (75, "", [7]),
+      (76, "", [8]),
+      (77, "", [9]),
     ]
   ];
   

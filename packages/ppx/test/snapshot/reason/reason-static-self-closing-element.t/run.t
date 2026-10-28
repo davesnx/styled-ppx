@@ -2,7 +2,7 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css.bindings [("Output.SelfClosingElement", "_id_1r15l57", "")]];
-  [@css.blocks [(1, "_id_1r15l57")]];
+  [@css.blocks [(1, "_id_1r15l57", [])]];
   module SelfClosingElement = {
     [@deriving abstract]
     [@warning "-69"]

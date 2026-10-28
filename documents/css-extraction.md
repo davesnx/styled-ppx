@@ -51,9 +51,10 @@ PPX expansion (per compilation unit)
   ▼
 PPX impl transformer (end of CU)
   ─ production mode           → emit [@@@css.config [...]]     (environment marker)
-  ─ drain Css_file.Buffer     → emit [@@@css "..."]            (one per rule)
+  ─ drain Css_file.Buffer     → emit [@@@css ...]              (one per rule; an atom rule carries its sort key)
   ─ drain Css_bindings        → emit [@@@css.bindings [...]]   (binding exports)
-  ─ drain Css_blocks          → emit [@@@css.blocks [...]]     (block class lists)
+  ─ drain Css_file.Blocks     → emit [@@@css.blocks [...]]     (block rule lists)
+                              → emit [@@@css.merges [...]]     (resolved CSS.merge / +++ calls)
   ─ drain Cross_module_refs   → emit [@@@css.refs [...]]       (cross-module refs)
                               → emit `let _ = M.x` synthetic deps
   │
@@ -66,35 +67,54 @@ dune builds the library normally (.cmi, .cmx, executables)
   ▼
 styled-ppx.generate (post-build aggregator)
   ─ walk every .ml / .pp.ml in the library
-  ─ extract [@@@css ...], [@@@css.bindings ...], [@@@css.blocks ...], [@@@css.refs ...], [@@@css.config ...]
+  ─ extract [@@@css ...], [@@@css.bindings ...], [@@@css.blocks ...], [@@@css.merges ...], [@@@css.refs ...], [@@@css.config ...]
   ─ resolve NUL-delimited cross-module sentinels against the bindings index
-  ─ deduplicate rules, emit final stylesheet (minified when the configs say production)
+  ─ deduplicate rules, order atom rules by their keys, blocks and merges
+  ─ emit final stylesheet (minified when the configs say production)
   │
   ▼
 styles.css
 ```
 
-## Wire protocol: five attributes
+## Wire protocol: six attributes
 
-Everything the aggregator needs to know is conveyed by five top-level
+Everything the aggregator needs to know is conveyed by six top-level
 floating attributes that the PPX appends to the post-PPX file. They are
 the entire interface between PPX expansion and the aggregator — the
-aggregator never re-parses `CSS.make` calls or infers facts from filenames,
-and it takes no mode flags: the build environment travels in-band.
+aggregator never re-parses `CSS.make` calls, never reads facts out of a
+rendered rule's text, and never infers facts from filenames; it takes no
+mode flags either: the build environment travels in-band.
 
-### `[@@@css "..."]` — extracted CSS rule
+### `[@@@css ...]` — extracted CSS rule
 
-A single CSS rule string. One attribute per atomized rule, per global
-rule, or per `@keyframes` block.
+One attribute per atomized rule, per global rule, per `@keyframes` block
+and per `@property` registration. An atom rule is a tuple of the rule text
+and its sort key; any other rule is the bare rule text.
 
 ```ocaml
-[@@@css "._a_tokvmb{color:red;}"]
-[@@@css "._a_1ru12dh:hover{opacity:0.8;}"]
-[@@@css "@media (min-width:768px){._a_fmb91l{padding:2rem;}}"]
+[@@@css ("._a_tokvmb{color:red;}", "_a_tokvmb", "0,1,0 own", "158", 1, false)]
+[@@@css ("._a_1ru12dh:hover{opacity:0.8;}", "_a_1ru12dh", "0,2,0 own", "310", 1, false)]
+[@@@css ("._a_9k2 .tiptap{color:navy;}", "_a_9k2", "0,2,0 & .tiptap", "158", 1, false)]
 [@@@css "@keyframes _k_jw9oix{from{opacity:0;}to{opacity:1;}}"]
 ```
 
-The string may contain NUL-delimited cross-module sentinels
+The key (`Css_extraction.atom_key`, computed by `Sort_key.of_rule` from the
+rule's AST before the autoprefixer runs) is:
+
+- the atom's own `_a_`/`_in_` class;
+- the scope: `!` when important, the specificity (Selectors 4:
+  `:where()` counts 0, `:is()`/`:not()`/`:has()` count their most specific
+  argument), then the element the rule styles: `own` plus its
+  pseudo-elements, or the whole selector with the atom class written `&`
+  when a combinator reaches another element;
+- the family and mask of the longhands the declarations set, on the
+  canonical property name (an alias such as `grid-gap` counts as `gap`; a
+  `-webkit-` copy never counts). The family is `*` for `all`, and starts
+  with `-` when `all` does not reset the property;
+- whether the rule is descendant-shaped: a combinator to an element whose
+  compound has no class (`.x *`, `.list li`).
+
+The text may contain NUL-delimited cross-module sentinels
 (`\x00LONGIDENT\x00`) when the PPX could not resolve a `$(M.binding)`
 selector reference at PPX time. The aggregator substitutes those at
 resolve time (see "Resolve" below; the sentinel constants live in
@@ -129,27 +149,46 @@ filename-to-module inference.
 Anonymous bindings (`let _ = [%css ...]`) are not exported because they
 cannot be referenced from another module.
 
-### `[@@@css.blocks [(line, class_string); ...]]` — block class lists
+### `[@@@css.blocks [(line, identity, [rule; ...]); ...]]` — block rule lists
 
 One attribute per CU, listing every block the CU rendered: every `[%css]`
 and `[%styled.<tag>]` expansion, named or anonymous. The line is the source
 line of the block's CSS string (the file is the one that carries the
-attribute); the class string is what `CSS.make`
-receives without the dev label: the identity class (named blocks only),
-then the atom classes in source order. Identical entries appear once.
+attribute); the identity is the block's `_id_` class (`""` when anonymous);
+the rules are indices into the file's `[@@@css ...]` list, one per rule, in
+emotion order: the block's own declarations first, then its nested rules
+(pseudo-classes, `@media`, selectors), each in source order, and the same
+inside every nested rule. A rule that a bundle shares with other rules of
+the block keeps its own position. Identical entries appear once.
 
 ```ocaml
-[@@@css.blocks
-  [(1, "_id_zu568x _a_qyw7u4ego80"); (5, "_a_0lub34ebzcl _a_qyw7u4ego80")]]
+[@@@css.blocks [(1, "_id_zu568x", [0]); (5, "", [1; 0])]]
 ```
 
-The PPX records an entry in exactly one place,
-`Css_to_runtime.render_make_call` (buffer `Css_blocks`). The aggregator
-reads the source order of competing atoms from it (see "Sheet order"); it
-names a block by the longident of its `_id_` class (from the bindings
-index), else by `file:line` (the input file, `.pp.ml` suffix removed). Like the other attributes, it is a floating
-attribute: the compiler drops it, so it reaches neither the native nor the
-JS output.
+The PPX records an entry in exactly one place, `Css_file.push` (buffer
+`Css_file.Blocks`). The aggregator reads the order of competing rules from
+it (see "Sheet order"); it names a block by the longident of its identity
+(from the bindings index), else by `file:line` (the input file, `.pp.ml`
+suffix removed). Like the other attributes, it is a floating attribute: the
+compiler drops it, so it reaches neither the native nor the JS output.
+
+### `[@@@css.merges [(line, [operand; ...]); ...]]` — merge calls
+
+One attribute per CU, listing every `CSS.merge(a, b)` and `a +++ b` whose
+arguments the PPX resolves, with its arguments in call order
+(`merge(merge(a, b), c)` and `a +++ b +++ c` list `a`, `b`, `c`). An operand
+is an integer, the index of a block of the same file (a `[%css]` binding
+resolved through `Local_selector_environment`, or an inline `[%css]`), or a
+string, the longident of another module's binding. An argument the PPX can
+not resolve (a function call, a parameter) is left out; the attribute lists
+only calls with two or more resolved arguments.
+
+```ocaml
+[@@@css.merges [(6, [1; 2]); (12, ["Theme.base"; 3])]]
+```
+
+The aggregator adds a merge edge from each competing rule of an argument to
+each rule of a later argument (see "Sheet order").
 
 ### `[@@@css.refs [(longident, file, line, scol, ecol); ...]]` — cross-module references
 
@@ -207,17 +246,18 @@ and everything downstream follows.
 
 ## PPX-side state
 
-Three module-level mutable buffers, all per-CU, all drained by the impl
+Four module-level mutable buffers, all per-CU, all drained by the impl
 transformer at end-of-CU:
 
 | Buffer                              | Source                         | Sink                              |
 | ----------------------------------- | ------------------------------ | --------------------------------- |
 | `Css_file.Buffer`                   | atomized rules during expansion | `[@@@css "..."]` attributes       |
 | `Css_bindings`                      | each named `[%css]` / `[%styled.<tag>]` expansion | `[@@@css.bindings ...]` attribute |
+| `Css_file.Blocks`                   | each `[%css]` / `[%styled.<tag>]` expansion, each resolved `CSS.merge` / `+++` | `[@@@css.blocks ...]` and `[@@@css.merges ...]` attributes |
 | `Cross_module_refs`                 | each unresolved `$(M.x)` in selector position | `[@@@css.refs ...]` attribute + synthetic `let _ = M.x` |
 
-`Local_selector_environment` is a fourth piece of state, distinct from the
-three above: it serves same-file selector interpolation before cross-module
+`Local_selector_environment` is a fifth piece of state, distinct from the
+buffers above: it serves same-file selector interpolation before cross-module
 fallback. It is keyed by `(file, lexical_path)` and never escapes the CU.
 It tracks named `[%css]` bindings and `[%styled.<tag>]` components, same-file
 module aliases, same-file opens/includes, and earlier string literals.
@@ -238,10 +278,11 @@ on the atom's own class/namespace - resolved only after atomizing.
 
 ### `Css_file.Buffer`
 
-A list ref of `(className, cssText)` pairs. Atomization produces one
-entry per declaration (each declaration becomes its own class). Cleared
-at end-of-CU when `Css_file.get()` returns the rules to the impl
-transformer.
+A list of rules (`Css_extraction.rule`: the text, and the sort key for an
+atom rule), deduplicated by class name (by text for a bundle rule), with
+each rule's position, so a block can name its rules by index. Cleared at
+end-of-CU when `Css_file.get()` returns the rules, blocks and merges to the
+impl transformer.
 
 `[%styled.global]` writes through `Buffer.add_global_rule`; the global
 rules are kept separate so they always sort before per-class rules in
@@ -326,12 +367,13 @@ parse args → extract_each_file → order_inputs → resolve_sentinels → dedu
 ### Extract
 
 For each input file, walk its top-level structure once and dispatch on
-the six attribute shapes:
+the seven attribute shapes:
 
 ```ocaml
-[@@@css "..."]            → push rule string
+[@@@css ...]              → push rule (text, and key for an atom rule)
 [@@@css.bindings [...]]   → fold (longident, identity, class_string) into Index
-[@@@css.blocks [...]]     → push (line, class_string) into per-file blocks
+[@@@css.blocks [...]]     → push (line, identity, rule indices) into per-file blocks
+[@@@css.merges [...]]     → push (line, operands) into per-file merges
 [@@@css.refs [...]]       → push (longident, location) into per-file refs
 [@@@css.config [...]]     → record the file's declared environment
 _                         → ignore
@@ -479,11 +521,10 @@ layer's priority is fixed by its name's FIRST occurrence across the whole
 page, so relocating a user's own `@layer` statement could silently change
 which layer it introduces first there - a hazard independent of whether
 this aggregator wraps anything in a layer of its own. It carries no atom
-class of its own, so cascade tiers (below) treat it exactly like a
-registration: it takes no part in tiering, staying in whatever relative
-position dedup/ordering already gave it among the other rules that also
-sit outside the tiers — a normal and supported way to declare layers from
-user-written CSS.
+key, so the sheet order (below) treats it exactly like a registration: it
+takes no part in ordering, staying in whatever relative position dedup
+already gave it among the other registrations — a normal and supported way
+to declare layers from user-written CSS.
 `@charset` is dropped instead of hoisted: the generated file always opens
 with its own leading comment, so `@charset` can never be the literal
 first bytes of the stylesheet, and the file is written as UTF-8 regardless
@@ -498,36 +539,46 @@ protocol section above); there is no CLI flag for this.
 ### Sheet order: the ordered sheet (always on)
 
 Every deduplicated STYLE rule this generator emits is either a
-`[%styled.global]` rule (no atom class, but a real, cascading rule -
+`[%styled.global]` rule (no atom key, but a real, cascading rule -
 `html{...}`, `*{...}`, an author's own global selector) or an atom rule
-(`_a_`/`_in_` class). Globals come first, in sort order of
-`sort_by_shorthand_first` (descendant-shaped first, then shorthand depth).
-All atom rules follow in ONE topological order (`order_atom_rules` in
-`packages/generate/generate.ml`, "Ordered sheet"). No CSS layer wraps any of
-it: specificity decides first, emission position is only the tie-break.
+(it carries an atom key). Globals come first, in source and dependency
+order: hand-written CSS keeps its own order, so a later `h1{padding:0}`
+still wins over an earlier `h1{padding-top:10px}`
+(`packages/generate/test/global-source-order.t`). All atom rules follow in
+ONE topological order (`order_atom_rules` in `packages/generate/generate.ml`,
+"Ordered sheet"). No CSS layer wraps any of it: specificity decides first,
+emission position is only the tie-break. The generator reads every fact it
+orders by from the payload; it never parses a rule's text.
 
 **Competing rules.** Sheet position matters only between two rules the
-cascade can not separate otherwise: equal `!important`, equal specificity
-(computed from the rule's selector text, Selectors 4: `:where()` counts 0,
-`:is()`/`:not()`/`:has()` count their most specific argument), the same
-subject element and pseudo-element (a rule whose selector reaches another
-element through a combinator after the atom class only competes with a rule
-of the same selector), and at least one shared longhand
-(`Slot_key.leaves_of`; `all` overlaps every property it resets). A legacy
-alias that css-grammar registers (`grid-gap`, `grid-row-gap`,
+cascade can not separate otherwise: the same scope (equal `!important`,
+equal specificity, the same subject element and pseudo-element - a rule
+whose selector reaches another element through a combinator only competes
+with a rule of the same selector) and at least one shared longhand (equal
+family, masks that share a bit; `all` overlaps every property it resets).
+A legacy alias that css-grammar registers (`grid-gap`, `grid-row-gap`,
 `grid-column-gap`, `word-wrap`, `font-width`) counts as its canonical
-property (`Slot_key.resolve_alias`), so `grid-gap: 40px` and a later
-`gap: 16px` compete.
+property, so `grid-gap: 40px` and a later `gap: 16px` compete.
 
 **Order keys**, in priority:
 
-1. Descendant-shaped rules first (`is_descendant_shape`: a combinator to an
-   unclassed subject, `.x *`, `.list li`), so a child's own atom wins a
+1. Descendant-shaped rules first (the key's `descendant`: a combinator to
+   an unclassed subject, `.x *`, `.list li`), so a child's own atom wins a
    specificity tie against an ancestor's blind reach.
-2. Block edges. The generator reads every block's class list from
-   `[@@@css.blocks ...]` (every `[%css]`/`[%styled.<tag>]` block, named or
-   anonymous). Inside one block, an earlier competing rule must come
-   before a later one.
+2. Edges.
+   - Block edges: inside one block (`[@@@css.blocks ...]`, emotion order),
+     an earlier competing rule comes before a later one. So
+     `@media (max-width: 600px) { color: pink } color: black` gives pink
+     under the media query, as emotion prints the block
+     (`packages/ppx/test/css-support/ordered-sheet-emotion-order.t`).
+   - Merge edges: in a resolved `CSS.merge(a, b)` or `a +++ b`
+     (`[@@@css.merges ...]`), each competing rule of `a` comes before each
+     rule of `b`, whichever block defined each atom first
+     (`packages/ppx/test/css-support/ordered-sheet-merge-edges.t`). A rule
+     whose class a later argument drops at run time (`Merge_key.removes`,
+     the source `generate` copies from the runtime) takes no part, so
+     `merge(a, b)` and `merge(b, a)` only conflict when both keep both
+     classes (`ordered-sheet-merge-both-orders.t`).
 3. Definition order (first occurrence in the deduplicated, dependency-ordered
    rule list) for every pair the edges leave open.
 
@@ -546,18 +597,19 @@ placed, the latest by definition order is placed next. A rule therefore
 stays at its definition position unless an edge pulls it ahead of a rule it
 must precede.
 
-**Conflicts and cycles.** Two blocks that order the same two rules in
-opposite directions: a warning names both blocks (the binding's longident
-from `[@@@css.bindings]`, or `file:line` of an anonymous class list), both
-edges are dropped, and the pair keeps definition order
-(`tiers-condition-tie-pseudo-class.t`). A longer cycle is cut at the rule
-that waits on the fewest edges, with a warning naming the blocks whose
-order it drops (`ordered-sheet-cycle.t`).
+**Conflicts and cycles.** Two blocks or merges that order the same two
+rules in opposite directions: a warning names both (`block <longident>` or
+`block <file:line>`, `merge at <file:line>`), both edges are dropped, and
+the pair keeps definition order (`tiers-condition-tie-pseudo-class.t`). A
+longer cycle is cut at the rule that waits on the fewest edges, with a
+warning naming the blocks and merges whose order it drops
+(`ordered-sheet-cycle.t`).
 
 **Not used, by measurement (2026-10-20).** #616's base-before-conditional
 tier, shorthand depth as a global key, and the fixed at-rule and
-pseudo-class rank tables (StyleX's numbers). Block edges plus definition
-order decide those ties; a fixed rank overrode a block's own source order.
+pseudo-class rank tables (StyleX's numbers). Block and merge edges plus
+definition order decide those ties; a fixed rank overrode a block's own
+source order.
 
 **Accepted limit: two separate stylesheets have no guaranteed relative
 order between their rules, when they share a class.** Class hashes take no
@@ -607,7 +659,11 @@ a third declaration `border-top: 1px solid;` (which shares no leaf with
 block is its own one-member group, which is exactly "one atom per
 property" for everything this doesn't otherwise merge. Grouping in
 `Css_file.re`'s `group_declarations_by_family` reuses
-`Slot_key.leaves_of` directly (not a reimplementation).
+`Slot_key.leaves_of` directly (not a reimplementation). A group sits at its
+last member's position among the block's declarations, and the block's
+nested rules come after all of its declarations (emotion order), so
+`padding: 8px; @media (min-width: 768px) { padding: 16px; } padding-top: 0;`
+gives `padding: 16px` at 768px and wider.
 
 Class names follow the `_a_<context?><family><mask?><value>` format: a
 fixed-width, base36-encoded context hash (present only under a real
@@ -628,9 +684,9 @@ production. Minting lives in `packages/ppx/src/Hash_class.ml`
 (`Class_format.slot_class`); the `(context, family, mask)` triple comes
 from `packages/ppx/slot_key`.
 An alias (`grid-row-gap` for `row-gap`, one of two legs of `gap`) resolves
-to its canonical name before its mask is computed too, the same redirect
-`Slot_key.depth_of` already does for sort order (see "Sheet order"
-above): it
+to its canonical name before its mask is computed, and before
+declarations are grouped (so `row-gap: 2px; grid-row-gap: 1px;` is one
+atom, `packages/ppx/test/css-support/ordered-sheet-alias-grouping.t`): it
 names the exact same computed property, so it must get the exact same
 mask its canonical name would - never a mask computed against the
 alias's own, unresolved name, which `Slot_key.Family`'s union-find (built
@@ -828,9 +884,9 @@ full mask is always a superset of any lone longhand's mask.
 
 `merge`'s remaining gap here, and the one it can never close for a bundle
 (two atoms hidden behind the SAME opaque `_in_` class), is left to sheet
-position - see "Sheet order" above: one block's source order, then
-definition order. When the narrow binding is defined after the wide one,
-or both are written in one block, the narrow rule comes later and wins.
+position - see "Sheet order" above: a merge the PPX resolves puts the
+narrow argument's rules after the wide one's; otherwise one block's source
+order, then definition order decide.
 
 **Known limit, pinned by `packages/runtime/test/test_merge_key.ml`**:
 `Merge_key.parse_atom` (and its ppx-side mirror, `Slot_key.of_atom`'s

@@ -12,9 +12,18 @@ A selector ref can resolve to an earlier string literal binding.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d;/^$/d'
-  [@css "._a_c5f084ekx8h.css-foo{color:red;}"];
+  [@css
+    (
+      "._a_c5f084ekx8h.css-foo{color:red;}",
+      "_a_c5f084ekx8h",
+      "0,2,0 own",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings [("Input.bad", "_id_10cubqv", "_a_c5f084ekx8h")]];
-  [@css.blocks [(5, "_id_10cubqv _a_c5f084ekx8h")]];
+  [@css.blocks [(5, "_id_10cubqv", [0])]];
   let undefined = "css-foo";
   let bad = CSS.make("label:bad _id_10cubqv _a_c5f084ekx8h", []);
   let _ = (undefined, bad);

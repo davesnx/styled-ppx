@@ -15,44 +15,192 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_5u2ddt{empty-cells:show;}"];
-  [@css "._a_5uav7h{empty-cells:hide;}"];
-  [@css "._a_5vzhlp{field-sizing:content;}"];
-  [@css "._a_5vat5c{field-sizing:fixed;}"];
-  [@css "._a_797wts{interpolate-size:numeric-only;}"];
-  [@css "._a_794lek{interpolate-size:allow-keywords;}"];
-  [@css "._a_6xo2dy{initial-letter:normal;}"];
-  [@css "._a_6xwub8{initial-letter:1.5;}"];
-  [@css "._a_6x0l7m{initial-letter:1.5 2;}"];
-  [@css "._a_6ybm9f{initial-letter-align:auto;}"];
-  [@css "._a_6ynpsj{initial-letter-align:alphabetic;}"];
-  [@css "._a_6ywje6{initial-letter-align:hanging;}"];
-  [@css "._a_6ytz0y{initial-letter-align:ideographic;}"];
-  [@css "._a_6uqonx{image-resolution:from-image;}"];
-  [@css "._a_6u4m46{image-resolution:96dpi;}"];
-  [@css "._a_6ubtb7{image-resolution:2dppx;}"];
-  [@css "._a_6uwnyr{image-resolution:from-image snap;}"];
-  [@css "._a_6uehnm{image-resolution:96dpi snap;}"];
+  [@css
+    ("._a_5u2ddt{empty-cells:show;}", "_a_5u2ddt", "0,1,0 own", "210", 1, false)
+  ];
+  [@css
+    ("._a_5uav7h{empty-cells:hide;}", "_a_5uav7h", "0,1,0 own", "210", 1, false)
+  ];
+  [@css
+    (
+      "._a_5vzhlp{field-sizing:content;}",
+      "_a_5vzhlp",
+      "0,1,0 own",
+      "211",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_5vat5c{field-sizing:fixed;}",
+      "_a_5vat5c",
+      "0,1,0 own",
+      "211",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_797wts{interpolate-size:numeric-only;}",
+      "_a_797wts",
+      "0,1,0 own",
+      "261",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_794lek{interpolate-size:allow-keywords;}",
+      "_a_794lek",
+      "0,1,0 own",
+      "261",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6xo2dy{initial-letter:normal;}",
+      "_a_6xo2dy",
+      "0,1,0 own",
+      "249",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6xwub8{initial-letter:1.5;}",
+      "_a_6xwub8",
+      "0,1,0 own",
+      "249",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6x0l7m{initial-letter:1.5 2;}",
+      "_a_6x0l7m",
+      "0,1,0 own",
+      "249",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ybm9f{initial-letter-align:auto;}",
+      "_a_6ybm9f",
+      "0,1,0 own",
+      "250",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ynpsj{initial-letter-align:alphabetic;}",
+      "_a_6ynpsj",
+      "0,1,0 own",
+      "250",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ywje6{initial-letter-align:hanging;}",
+      "_a_6ywje6",
+      "0,1,0 own",
+      "250",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ytz0y{initial-letter-align:ideographic;}",
+      "_a_6ytz0y",
+      "0,1,0 own",
+      "250",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6uqonx{image-resolution:from-image;}",
+      "_a_6uqonx",
+      "0,1,0 own",
+      "246",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6u4m46{image-resolution:96dpi;}",
+      "_a_6u4m46",
+      "0,1,0 own",
+      "246",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ubtb7{image-resolution:2dppx;}",
+      "_a_6ubtb7",
+      "0,1,0 own",
+      "246",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6uwnyr{image-resolution:from-image snap;}",
+      "_a_6uwnyr",
+      "0,1,0 own",
+      "246",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6uehnm{image-resolution:96dpi snap;}",
+      "_a_6uehnm",
+      "0,1,0 own",
+      "246",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (2, "_a_5u2ddt"),
-      (3, "_a_5uav7h"),
-      (4, "_a_5vzhlp"),
-      (5, "_a_5vat5c"),
-      (6, "_a_797wts"),
-      (7, "_a_794lek"),
-      (8, "_a_6xo2dy"),
-      (9, "_a_6xwub8"),
-      (10, "_a_6x0l7m"),
-      (11, "_a_6ybm9f"),
-      (12, "_a_6ynpsj"),
-      (13, "_a_6ywje6"),
-      (14, "_a_6ytz0y"),
-      (15, "_a_6uqonx"),
-      (16, "_a_6u4m46"),
-      (17, "_a_6ubtb7"),
-      (18, "_a_6uwnyr"),
-      (19, "_a_6uehnm"),
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
+      (10, "", [8]),
+      (11, "", [9]),
+      (12, "", [10]),
+      (13, "", [11]),
+      (14, "", [12]),
+      (15, "", [13]),
+      (16, "", [14]),
+      (17, "", [15]),
+      (18, "", [16]),
+      (19, "", [17]),
     ]
   ];
   

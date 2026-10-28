@@ -6,10 +6,28 @@ CSS runtime types. See input.re for the full rationale.
   $ refmt --parse ml --print re output.ml
   [@css "@property --lengthVar-12br693{syntax:\"*\";inherits:false;}"];
   [@css "@property --lengthVar-8edltm{syntax:\"*\";inherits:false;}"];
-  [@css "._in_1mfmiq8{margin-left:var(--lengthVar-12br693);}"];
-  [@css "._in_1mfmiq8{padding-left:var(--lengthVar-8edltm);}"];
+  [@css
+    (
+      "._in_1mfmiq8{margin-left:var(--lengthVar-12br693);}",
+      "_in_1mfmiq8",
+      "0,1,0 own",
+      "277",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._in_1mfmiq8{padding-left:var(--lengthVar-8edltm);}",
+      "_in_1mfmiq8",
+      "0,1,0 own",
+      "328",
+      2,
+      false,
+    )
+  ];
   [@css.bindings [("Output.layout", "_id_98qkg2", "_in_1mfmiq8")]];
-  [@css.blocks [(3, "_id_98qkg2 _in_1mfmiq8")]];
+  [@css.blocks [(3, "_id_98qkg2", [2, 3])]];
   let lengthVar = CSS.px(10);
   let layout =
     CSS.make(

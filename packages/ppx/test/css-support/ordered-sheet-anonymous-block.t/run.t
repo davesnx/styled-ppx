@@ -9,15 +9,17 @@ of the CSS string, classes in source order) next to the named blocks:
 
   $ ../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
-  [@@@css "._a_0lub34ebzcl:focus{color:blue;}"]
+  [@@@css
+    ("._a_qyw7u4ego80:hover{color:red;}", "_a_qyw7u4ego80", "0,2,0 own", "158",
+      1, false)]
+  [@@@css
+    ("._a_0lub34ebzcl:focus{color:blue;}", "_a_0lub34ebzcl", "0,2,0 own",
+      "158", 1, false)]
   [@@@css.bindings
     [("Input.hover", "_id_15yirr8", "_a_qyw7u4ego80");
     ("Input.focus", "_id_npabso", "_a_0lub34ebzcl")]]
   [@@@css.blocks
-    [(1, "_id_15yirr8 _a_qyw7u4ego80");
-    (2, "_id_npabso _a_0lub34ebzcl");
-    (5, "_a_0lub34ebzcl _a_qyw7u4ego80")]]
+    [(1, "_id_15yirr8", [0]); (2, "_id_npabso", [1]); (5, "", [1; 0])]]
   let hover = CSS.make "label:hover _id_15yirr8 _a_qyw7u4ego80" []
   let focus = CSS.make "label:focus _id_npabso _a_0lub34ebzcl" []
   let _ = CSS.className (CSS.make "_a_0lub34ebzcl _a_qyw7u4ego80" [])

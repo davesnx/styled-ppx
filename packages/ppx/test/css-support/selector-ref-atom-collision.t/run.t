@@ -12,28 +12,36 @@ the literal `$(row)` marker, which is identical in both files.
   $ ../../standalone.exe --impl b.ml -o b.ml
 
   $ cat a.ml
-  [@@@css "._a_4ekvmb{color:red;}"]
-  [@@@css "._a_8kn7a5rlmg1 > div:not(:last-child)._id_wd60kt{display:flex;}"]
-  [@@@css "._a_o0qcm5l819t._id_wd60kt{cursor:pointer;}"]
+  [@@@css
+    ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("._a_8kn7a5rlmg1 > div:not(:last-child)._id_wd60kt{display:flex;}",
+      "_a_8kn7a5rlmg1", "0,3,1 & > div:not(:last-child)._id_wd60kt", "207", 1,
+      false)]
+  [@@@css
+    ("._a_o0qcm5l819t._id_wd60kt{cursor:pointer;}", "_a_o0qcm5l819t",
+      "0,2,0 own", "201", 1, false)]
   [@@@css.bindings
     [("A.row", "_id_wd60kt", "_a_4ekvmb");
     ("A.list", "_id_vd0unr", "_a_8kn7a5rlmg1 _a_o0qcm5l819t")]]
-  [@@@css.blocks
-    [(1, "_id_wd60kt _a_4ekvmb");
-    (4, "_id_vd0unr _a_8kn7a5rlmg1 _a_o0qcm5l819t")]]
+  [@@@css.blocks [(1, "_id_wd60kt", [0]); (4, "_id_vd0unr", [1; 2])]]
   let row = CSS.make "label:row _id_wd60kt _a_4ekvmb" []
   let list = CSS.make "label:list _id_vd0unr _a_8kn7a5rlmg1 _a_o0qcm5l819t" []
 
   $ cat b.ml
-  [@@@css "._a_4esm7b{color:blue;}"]
-  [@@@css "._a_4z3g25rhqy8 > div:not(:last-child)._id_grd1wa{display:flex;}"]
-  [@@@css "._a_66rux5le39a._id_grd1wa{cursor:pointer;}"]
+  [@@@css
+    ("._a_4esm7b{color:blue;}", "_a_4esm7b", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("._a_4z3g25rhqy8 > div:not(:last-child)._id_grd1wa{display:flex;}",
+      "_a_4z3g25rhqy8", "0,3,1 & > div:not(:last-child)._id_grd1wa", "207", 1,
+      false)]
+  [@@@css
+    ("._a_66rux5le39a._id_grd1wa{cursor:pointer;}", "_a_66rux5le39a",
+      "0,2,0 own", "201", 1, false)]
   [@@@css.bindings
     [("B.row", "_id_grd1wa", "_a_4esm7b");
     ("B.list", "_id_t1h3hz", "_a_4z3g25rhqy8 _a_66rux5le39a")]]
-  [@@@css.blocks
-    [(1, "_id_grd1wa _a_4esm7b");
-    (4, "_id_t1h3hz _a_4z3g25rhqy8 _a_66rux5le39a")]]
+  [@@@css.blocks [(1, "_id_grd1wa", [0]); (4, "_id_t1h3hz", [1; 2])]]
   let row = CSS.make "label:row _id_grd1wa _a_4esm7b" []
   let list = CSS.make "label:list _id_t1h3hz _a_4z3g25rhqy8 _a_66rux5le39a" []
 

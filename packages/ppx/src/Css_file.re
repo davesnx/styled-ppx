@@ -24,44 +24,122 @@ let render_prefixed_rule = Css_autoprefixer.render_rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
 module Buffer = {
-  type rule = (string, string);
-  /* Rules are deduped by className on insert. [seen] mirrors the
-     classNames present in [rules] so membership is amortized O(1)
-     instead of an O(n) [List.exists] scan per call, which made rule
-     accumulation quadratic in the number of [%css] atoms per file. */
+  /* Rules are deduped by key on insert; [index] maps a key to its rule's
+     position, so a block can name its rules by position. */
   type target = {
-    mutable rules: list(rule),
-    seen: Hashtbl.t(string, unit),
+    mutable rules: list(Css_extraction.rule),
+    mutable count: int,
+    index: Hashtbl.t(string, int),
   };
-  let accumulated_rules: target = {
+  let make_target = size => {
     rules: [],
-    seen: Hashtbl.create(256),
+    count: 0,
+    index: Hashtbl.create(size),
   };
-  let global_rules: target = {
-    rules: [],
-    seen: Hashtbl.create(64),
-  };
+  let accumulated_rules: target = make_target(256);
+  let global_rules: target = make_target(64);
 
-  let add_to = (target, className, cssText) =>
-    if (!Hashtbl.mem(target.seen, className)) {
-      Hashtbl.add(target.seen, className, ());
-      target.rules = [(className, cssText), ...target.rules];
+  let add_to = (target, key, rule) =>
+    switch (Hashtbl.find_opt(target.index, key)) {
+    | Some(position) => position
+    | None =>
+      let position = target.count;
+      Hashtbl.add(target.index, key, position);
+      target.rules = [rule, ...target.rules];
+      target.count = position + 1;
+      position;
     };
 
   let add_rule = add_to(accumulated_rules);
-  let add_global_rule = add_to(global_rules);
+  let add_global_rule = (key, text) =>
+    ignore(
+      add_to(
+        global_rules,
+        key,
+        {
+          Css_extraction.text,
+          key: None,
+        },
+      ),
+    );
 
-  let get_rules = () => {
-    let dump = target =>
-      List.rev_map(((_, cssText)) => cssText, target.rules);
-    dump(global_rules) @ dump(accumulated_rules);
-  };
+  /* Global rules come first in the file, so an accumulated rule's index in
+     the file is its position plus this offset. */
+  let accumulated_offset = () => global_rules.count;
+
+  let get_rules = () =>
+    List.rev(global_rules.rules) @ List.rev(accumulated_rules.rules);
 
   let clear = () => {
-    accumulated_rules.rules = [];
-    global_rules.rules = [];
-    Hashtbl.reset(accumulated_rules.seen);
-    Hashtbl.reset(global_rules.seen);
+    List.iter(
+      target => {
+        target.rules = [];
+        target.count = 0;
+        Hashtbl.reset(target.index);
+      },
+      [accumulated_rules, global_rules],
+    );
+  };
+};
+
+/* Every block and merge of the compilation unit, for [[@@@css.blocks]] and
+   [[@@@css.merges]]. A block's rules are positions in
+   [Buffer.accumulated_rules] until [get] shifts them past the global
+   rules. */
+module Blocks = {
+  type pending = {
+    line: int,
+    identity: option(string),
+    classes: string,
+    rules: list(int),
+  };
+  let blocks: ref(list(pending)) = ref([]);
+  let count = ref(0);
+  let merges: ref(list(Css_extraction.merge)) = ref([]);
+
+  let find = predicate => {
+    let rec go = (index, blocks) =>
+      switch (blocks) {
+      | [] => None
+      | [block, ...rest] =>
+        predicate(block) ? Some(index) : go(index - 1, rest)
+      };
+    go(count^ - 1, blocks^);
+  };
+
+  let record = block =>
+    switch (find(existing => existing == block)) {
+    | Some(index) => index
+    | None =>
+      blocks := [block, ...blocks^];
+      incr(count);
+      count^ - 1;
+    };
+
+  let of_identity = identity =>
+    find(block => block.identity == Some(identity));
+  let of_classes = classes => find(block => block.classes == classes);
+
+  let record_merge = (~line, operands) =>
+    merges := [Css_extraction.merge(~line, ~operands), ...merges^];
+
+  let drain = () => {
+    let offset = Buffer.accumulated_offset();
+    let out =
+      List.rev_map(
+        ({ line, identity, rules, _ }) =>
+          Css_extraction.block(
+            ~line,
+            ~identity,
+            ~rules=List.map(index => index + offset, rules),
+          ),
+        blocks^,
+      );
+    let merges_out = List.rev(merges^);
+    blocks := [];
+    count := 0;
+    merges := [];
+    (out, merges_out);
   };
 };
 
@@ -847,10 +925,13 @@ module Css_transform = {
      together (border's full leaf set includes border-left-width), but
      `border-top: 1px solid; border-left-width: 2px;` do NOT (border-top's
      three leaves are all on the top side, none of them is
-     border-left-width). Groups anchor at the LAST occurrence (a group
-     cascades like its last member; first-anchoring would hoist earlier
-     members past intervening rules). Singleton, single-declaration groups
-     keep the historical atom shape and hash. */
+     border-left-width). An alias (`grid-row-gap`) counts as its canonical
+     property (`row-gap`). Groups anchor at the LAST occurrence among the
+     block's declarations (a group cascades like its last member). The
+     block's nested rules follow its declarations (emotion order: a
+     declaration written after a nested rule still comes before it).
+     Singleton, single-declaration groups keep the historical atom shape
+     and hash. */
   type block_item =
     | Declaration_group(list(declaration))
     | Nested_rule(rule);
@@ -862,7 +943,9 @@ module Css_transform = {
      a shorthand member, so `leaves_of` returns it unchanged and two
      differently-cased custom properties correctly never overlap. */
   let declaration_leaves = ({ name: (name, _), _ }: declaration) =>
-    Slot_key.leaves_of(Slot_key.normalize_property(name));
+    Slot_key.leaves_of(
+      Slot_key.resolve_alias(Slot_key.normalize_property(name)),
+    );
 
   let leaf_sets_overlap = (a: list(string), b: list(string)) =>
     List.exists(leaf => List.mem(leaf, b), a);
@@ -933,24 +1016,33 @@ module Css_transform = {
       decls,
     );
 
-    /* Emit each group at its last member's position, same anchoring rule
-       as before, now keyed by union-find root instead of a literal key. */
-    List.mapi(
-      (index, rule) =>
-        switch (rule) {
-        | Declaration(_) =>
-          let root = Hashtbl.find(root_by_block_index, index);
-          if (Hashtbl.find(last_index_by_root, root) == index) {
-            let group = Hashtbl.find(members_by_root, root);
-            [Declaration_group(List.rev(group^))];
-          } else {
-            [];
-          };
-        | rule => [Nested_rule(rule)]
-        },
-      rules,
-    )
-    |> List.concat;
+    /* Emotion order: each group at its last member's position among the
+       block's declarations, then the nested rules in source order. */
+    let groups =
+      List.mapi(
+        (index, rule) =>
+          switch (rule) {
+          | Declaration(_) =>
+            let root = Hashtbl.find(root_by_block_index, index);
+            if (Hashtbl.find(last_index_by_root, root) == index) {
+              let group = Hashtbl.find(members_by_root, root);
+              [Declaration_group(List.rev(group^))];
+            } else {
+              [];
+            };
+          | _ => []
+          },
+        rules,
+      )
+      |> List.concat;
+    let nested =
+      List.filter_map(
+        fun
+        | Declaration(_) => None
+        | rule => Some(Nested_rule(rule)),
+        rules,
+      );
+    groups @ nested;
   };
 
   /* Media condition ordering (StyleX's `lastMediaQueryWinsTransform`).
@@ -2124,7 +2216,13 @@ module Css_transform = {
                  ~loc,
                  rule,
                )
-               |> List.map(r => (dedup_key, r));
+               |> List.map(r =>
+                    (
+                      dedup_key,
+                      r,
+                      Sort_key.of_rule(~class_name=effective_class, r),
+                    )
+                  );
 
              let classes_acc =
                List.mem(effective_class, classes_acc)
@@ -2136,7 +2234,7 @@ module Css_transform = {
              let atom_local = atom_is_ampersand_local(rule);
              let referenced =
                processed
-               |> List.concat_map(((_key, r)) =>
+               |> List.concat_map(((_key, r, _sort_key)) =>
                     custom_property_names_in_text(render_rule(r))
                   );
 
@@ -2215,6 +2313,12 @@ let identity_of_name = (~main_module, ~scope, ~name: option(string)) =>
   | _ => None
   };
 
+let classes_with_identity = (~identity, atomClasses) =>
+  switch (identity) {
+  | Some(cid) => [cid, ...atomClasses]
+  | None => atomClasses
+  };
+
 let push =
     (
       ~file,
@@ -2238,18 +2342,25 @@ let push =
      and content are 1:1). Bundle rules carry `None` and key by rendered content,
      since many share one bundle class and class-name keying would drop all but
      the first. */
-  List.iter(
-    ((dedup_key, rule)) => {
-      let rendered_css = render_prefixed_rule(rule);
-      let key =
-        switch (dedup_key) {
-        | Some(className) => className
-        | None => rendered_css
-        };
-      Buffer.add_rule(key, rendered_css);
-    },
-    shipped_rules,
-  );
+  let rule_positions =
+    List.map(
+      ((dedup_key, rule, sort_key)) => {
+        let rendered_css = render_prefixed_rule(rule);
+        let key =
+          switch (dedup_key) {
+          | Some(className) => className
+          | None => rendered_css
+          };
+        Buffer.add_rule(
+          key,
+          {
+            Css_extraction.text: rendered_css,
+            key: sort_key,
+          },
+        );
+      },
+      shipped_rules,
+    );
 
   /* Register each `&`-local var with @property{inherits:false} so a value change
      invalidates only the element, not its subtree. `syntax:"*"` accepts any
@@ -2267,14 +2378,21 @@ let push =
 
   let identity = identity_of_name(~main_module, ~scope, ~name);
 
+  ignore(
+    Blocks.record({
+      Blocks.line: source_position_start.pos_lnum,
+      identity,
+      classes:
+        String.concat(
+          " ",
+          classes_with_identity(~identity, binding_classes),
+        ),
+      rules: rule_positions,
+    }),
+  );
+
   (identity, binding_classes, dynamic_vars);
 };
-
-let classes_with_identity = (~identity, atomClasses) =>
-  switch (identity) {
-  | Some(cid) => [cid, ...atomClasses]
-  | None => atomClasses
-  };
 
 let push_keyframe =
     (
@@ -2325,7 +2443,15 @@ let push_keyframe =
 
   let rendered_keyframe = render_prefixed_rule(At_rule(at_rule));
 
-  Buffer.add_rule(keyframe_name, rendered_keyframe);
+  ignore(
+    Buffer.add_rule(
+      keyframe_name,
+      {
+        Css_extraction.text: rendered_keyframe,
+        key: None,
+      },
+    ),
+  );
 
   (keyframe_name, List.rev(ctx.dynamic_vars^));
 };
@@ -2432,10 +2558,56 @@ let push_global =
   List.rev(ctx.dynamic_vars^);
 };
 
+/* A merge argument, resolved to a block of this file or to another module's
+   binding: a [%css] binding name, or an inline [%css] already lowered to
+   `CSS.make("<classes>", ...)`. */
+let merge_operand = (~file, ~scope, ~opens, expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_ident({ txt: lid, _ }) =>
+    switch (
+      Local_selector_environment.resolve_class_ref(
+        ~file,
+        ~scope,
+        ~opens,
+        String.concat(".", Ppxlib.Longident.flatten_exn(lid)),
+      )
+    ) {
+    | Some(Local_selector_environment.Local(class_name)) =>
+      Blocks.of_identity(class_name)
+      |> Option.map(index => Css_extraction.Block(index))
+    | Some(Local_selector_environment.Cross_module(longident)) =>
+      Some(Css_extraction.Binding(longident))
+    | None => None
+    }
+  | Pexp_apply(
+      { pexp_desc: Pexp_ident({ txt: Ldot(Lident("CSS"), "make"), _ }), _ },
+      [
+        (
+          Nolabel,
+          { pexp_desc: Pexp_constant(Pconst_string(classes, _, _)), _ },
+        ),
+        ..._,
+      ],
+    ) =>
+    String.split_on_char(' ', classes)
+    |> List.filter(token => !String.starts_with(~prefix="label:", token))
+    |> String.concat(" ")
+    |> Blocks.of_classes
+    |> Option.map(index => Css_extraction.Block(index))
+  | _ => None
+  };
+
+let record_merge = (~line, ~file, ~scope, ~opens, arguments) =>
+  switch (List.filter_map(merge_operand(~file, ~scope, ~opens), arguments)) {
+  | [_, _, ..._] as operands => Blocks.record_merge(~line, operands)
+  | _ => ()
+  };
+
 let get = () => {
   let rules = Buffer.get_rules();
+  let (blocks, merges) = Blocks.drain();
   Buffer.clear();
   Local_selector_environment.clear();
   Hashtbl.clear(identity_occurrences);
-  rules;
+  (rules, blocks, merges);
 };

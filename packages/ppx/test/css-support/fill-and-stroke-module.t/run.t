@@ -26,56 +26,237 @@ names the property.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_fj56cl{fill-break:slice;}"];
-  [@css "._a_fjev2u{fill-break:clone;}"];
-  [@css "._a_fke35e{fill-color:red;}"];
-  [@css "._a_fll8sq{fill-image:none;}"];
-  [@css "._a_flgv4m{fill-image:none, none;}"];
-  [@css "._a_fmya6b{fill-origin:match-parent;}"];
-  [@css "._a_fm29sd{fill-origin:fill-box;}"];
-  [@css "._a_fnlyrj{fill-position:center;}"];
-  [@css "._a_fnkrpk{fill-position:center, top left;}"];
-  [@css "._a_fov7hi{fill-repeat:repeat-x;}"];
-  [@css "._a_fo6jli{fill-repeat:repeat-x, space;}"];
-  [@css "._a_fp0opq{fill-size:cover;}"];
-  [@css "._a_fpgmie{fill-size:cover, 10px 20px;}"];
-  [@css "._a_gkxdk3{stroke-align:inset;}"];
-  [@css "._a_gl0rrf{stroke-break:bounding-box;}"];
-  [@css "._a_gmvg6s{stroke-dash-corner:none;}"];
-  [@css "._a_gmty9s{stroke-dash-corner:5px;}"];
-  [@css "._a_gnokf8{stroke-dash-justify:none;}"];
-  [@css "._a_gn7mdb{stroke-dash-justify:stretch dashes;}"];
-  [@css "._a_gomj20{stroke-image:none;}"];
-  [@css "._a_gpym2d{stroke-origin:stroke-box;}"];
-  [@css "._a_gqpijn{stroke-position:50% 50%;}"];
-  [@css "._a_grl4q4{stroke-repeat:round;}"];
-  [@css "._a_gsg9ov{stroke-size:contain;}"];
+  [@css
+    ("._a_fj56cl{fill-break:slice;}", "_a_fj56cl", "0,1,0 own", "559", 1, false)
+  ];
+  [@css
+    ("._a_fjev2u{fill-break:clone;}", "_a_fjev2u", "0,1,0 own", "559", 1, false)
+  ];
+  [@css
+    ("._a_fke35e{fill-color:red;}", "_a_fke35e", "0,1,0 own", "560", 1, false)
+  ];
+  [@css
+    ("._a_fll8sq{fill-image:none;}", "_a_fll8sq", "0,1,0 own", "561", 1, false)
+  ];
+  [@css
+    (
+      "._a_flgv4m{fill-image:none, none;}",
+      "_a_flgv4m",
+      "0,1,0 own",
+      "561",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fmya6b{fill-origin:match-parent;}",
+      "_a_fmya6b",
+      "0,1,0 own",
+      "562",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fm29sd{fill-origin:fill-box;}",
+      "_a_fm29sd",
+      "0,1,0 own",
+      "562",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fnlyrj{fill-position:center;}",
+      "_a_fnlyrj",
+      "0,1,0 own",
+      "563",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fnkrpk{fill-position:center, top left;}",
+      "_a_fnkrpk",
+      "0,1,0 own",
+      "563",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fov7hi{fill-repeat:repeat-x;}",
+      "_a_fov7hi",
+      "0,1,0 own",
+      "564",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fo6jli{fill-repeat:repeat-x, space;}",
+      "_a_fo6jli",
+      "0,1,0 own",
+      "564",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_fp0opq{fill-size:cover;}", "_a_fp0opq", "0,1,0 own", "565", 1, false)
+  ];
+  [@css
+    (
+      "._a_fpgmie{fill-size:cover, 10px 20px;}",
+      "_a_fpgmie",
+      "0,1,0 own",
+      "565",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gkxdk3{stroke-align:inset;}",
+      "_a_gkxdk3",
+      "0,1,0 own",
+      "596",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gl0rrf{stroke-break:bounding-box;}",
+      "_a_gl0rrf",
+      "0,1,0 own",
+      "597",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gmvg6s{stroke-dash-corner:none;}",
+      "_a_gmvg6s",
+      "0,1,0 own",
+      "598",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gmty9s{stroke-dash-corner:5px;}",
+      "_a_gmty9s",
+      "0,1,0 own",
+      "598",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gnokf8{stroke-dash-justify:none;}",
+      "_a_gnokf8",
+      "0,1,0 own",
+      "599",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gn7mdb{stroke-dash-justify:stretch dashes;}",
+      "_a_gn7mdb",
+      "0,1,0 own",
+      "599",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gomj20{stroke-image:none;}",
+      "_a_gomj20",
+      "0,1,0 own",
+      "600",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gpym2d{stroke-origin:stroke-box;}",
+      "_a_gpym2d",
+      "0,1,0 own",
+      "601",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gqpijn{stroke-position:50% 50%;}",
+      "_a_gqpijn",
+      "0,1,0 own",
+      "602",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_grl4q4{stroke-repeat:round;}",
+      "_a_grl4q4",
+      "0,1,0 own",
+      "603",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gsg9ov{stroke-size:contain;}",
+      "_a_gsg9ov",
+      "0,1,0 own",
+      "604",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (5, "_a_fj56cl"),
-      (6, "_a_fjev2u"),
-      (7, "_a_fke35e"),
-      (8, "_a_fll8sq"),
-      (9, "_a_flgv4m"),
-      (10, "_a_fmya6b"),
-      (11, "_a_fm29sd"),
-      (12, "_a_fnlyrj"),
-      (13, "_a_fnkrpk"),
-      (14, "_a_fov7hi"),
-      (15, "_a_fo6jli"),
-      (16, "_a_fp0opq"),
-      (17, "_a_fpgmie"),
-      (18, "_a_gkxdk3"),
-      (19, "_a_gl0rrf"),
-      (20, "_a_gmvg6s"),
-      (21, "_a_gmty9s"),
-      (22, "_a_gnokf8"),
-      (23, "_a_gn7mdb"),
-      (24, "_a_gomj20"),
-      (25, "_a_gpym2d"),
-      (26, "_a_gqpijn"),
-      (27, "_a_grl4q4"),
-      (28, "_a_gsg9ov"),
+      (5, "", [0]),
+      (6, "", [1]),
+      (7, "", [2]),
+      (8, "", [3]),
+      (9, "", [4]),
+      (10, "", [5]),
+      (11, "", [6]),
+      (12, "", [7]),
+      (13, "", [8]),
+      (14, "", [9]),
+      (15, "", [10]),
+      (16, "", [11]),
+      (17, "", [12]),
+      (18, "", [13]),
+      (19, "", [14]),
+      (20, "", [15]),
+      (21, "", [16]),
+      (22, "", [17]),
+      (23, "", [18]),
+      (24, "", [19]),
+      (25, "", [20]),
+      (26, "", [21]),
+      (27, "", [22]),
+      (28, "", [23]),
     ]
   ];
   

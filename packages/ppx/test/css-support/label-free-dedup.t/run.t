@@ -7,11 +7,16 @@ atom class. The aggregated stylesheet dedups the same way, down to one rule.
   $ refmt --parse re --print ml input.re > input.ml
 
   $ ../../standalone.exe --impl input.ml -o output.ml
-  $ grep -c '@@@css "' output.ml
-  1
-  $ grep 'CSS.make' output.ml
+  $ cat output.ml
+  [@@@css
+    ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)]
+  [@@@css.bindings
+    [("Input.a", "_id_1yaoh1v", "_a_4ekvmb");
+    ("Input.b", "_id_10vd5uv", "_a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_1yaoh1v", [0]); (2, "_id_10vd5uv", [0])]]
   let a = CSS.make "label:a _id_1yaoh1v _a_4ekvmb" []
   let b = CSS.make "label:b _id_10vd5uv _a_4ekvmb" []
+  let _ = (a, b)
 
   $ styled-ppx.generate output.ml > styles.css
   $ cat styles.css

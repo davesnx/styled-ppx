@@ -21,10 +21,12 @@ its className carries only atoms.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_4ekvmb{color:red;}"];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
   [@css.bindings [("Input.layout", "_id_1xb8ads", "_a_5r08qs")]];
-  [@css.blocks [(1, "_id_1xb8ads _a_5r08qs"), (3, "_a_4ekvmb")]];
+  [@css.blocks [(1, "_id_1xb8ads", [0]), (3, "", [1])]];
   let layout = CSS.make("label:layout _id_1xb8ads _a_5r08qs", []);
   
   let _ = CSS.make("_a_4ekvmb", []);

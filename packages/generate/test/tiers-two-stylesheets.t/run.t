@@ -23,8 +23,8 @@ The static sheet: its own `overflow-x: auto` plus its own narrowing
 override.
 
   $ cat > static.ml <<EOF
-  > [@@@css "._a_8r001shjd{overflow-x:auto;}"]
-  > [@@@css "@media (min-width:1280px){._a_9xoverfl{overflow-x:initial;}}"]
+  > [@@@css ("._a_8r001shjd{overflow-x:auto;}", "_a_8r001shjd", "0,1,0 own", "overflow-x", 1, false)]
+  > [@@@css ("@media (min-width:1280px){._a_9xoverfl{overflow-x:initial;}}", "_a_9xoverfl", "0,1,0 own", "overflow-x", 1, false)]
   > EOF
 
   $ styled-ppx.generate static.ml
@@ -37,7 +37,7 @@ property, same context, same value - by a different library), no
 override of its own.
 
   $ cat > toolkit.ml <<EOF
-  > [@@@css "._a_8r001shjd{overflow-x:auto;}"]
+  > [@@@css ("._a_8r001shjd{overflow-x:auto;}", "_a_8r001shjd", "0,1,0 own", "overflow-x", 1, false)]
   > EOF
 
   $ styled-ppx.generate toolkit.ml

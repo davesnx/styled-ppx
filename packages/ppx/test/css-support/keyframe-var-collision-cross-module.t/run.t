@@ -35,10 +35,12 @@ class pointing at a missing variable.
   [@@@css
     "@keyframes _k_1h1i3op{0%{height:var(--h0-9tm5yy);}100%{height:var(--h1-mjt56l);}}"]
   [@@@css
-    "._a_2z001sjjsz{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
-  [@@@css "._a_5r08qs{display:flex;}"]
+    ("._a_2z001sjjsz{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}",
+      "_a_2z001sjjsz", "0,1,0 own", "107", 64, false)]
+  [@@@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)]
   [@@@css.bindings [("A.box", "_id_1x0rrx8", "_a_2z001sjjsz _a_5r08qs")]]
-  [@@@css.blocks [(4, "_id_1x0rrx8 _a_2z001sjjsz _a_5r08qs")]]
+  [@@@css.blocks [(4, "_id_1x0rrx8", [1; 2])]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =
@@ -52,10 +54,12 @@ class pointing at a missing variable.
   [@@@css
     "@keyframes _k_1arknxa{0%{height:var(--h0-yrpn7p);}100%{height:var(--h1-1oxv8aa);}}"]
   [@@@css
-    "._a_2z001sjjsz{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
-  [@@@css "._a_94gf8j{padding:8px;}"]
+    ("._a_2z001sjjsz{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}",
+      "_a_2z001sjjsz", "0,1,0 own", "107", 64, false)]
+  [@@@css
+    ("._a_94gf8j{padding:8px;}", "_a_94gf8j", "0,1,0 own", "328", 15, false)]
   [@@@css.bindings [("B.box", "_id_1edqghm", "_a_2z001sjjsz _a_94gf8j")]]
-  [@@@css.blocks [(4, "_id_1edqghm _a_2z001sjjsz _a_94gf8j")]]
+  [@@@css.blocks [(4, "_id_1edqghm", [1; 2])]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =

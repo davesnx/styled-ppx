@@ -219,6 +219,39 @@ let ref_matches_local_module = (~file, ~scope, ~opens, path_str) => {
   };
 };
 
+type class_ref =
+  | Local(string)
+  | Cross_module(string);
+
+let resolve_class_ref =
+    (
+      ~file: string,
+      ~scope: list(string),
+      ~opens: list(list(string)),
+      path_str: string,
+    ) =>
+  switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
+  | Some(className) => Some(Local(className))
+  | None
+      when
+        String.contains(path_str, '.')
+        && !ref_matches_local_module(~file, ~scope, ~opens, path_str) =>
+    let segments = path_segments(path_str);
+    switch (module_path_of_ref(segments), List.rev(segments)) {
+    | (Some(module_path), [binding, ..._]) =>
+      Some(
+        Cross_module(
+          String.concat(
+            ".",
+            expand_alias(~file, ~path=module_path) @ [binding],
+          ),
+        ),
+      )
+    | _ => Some(Cross_module(path_str))
+    };
+  | None => None
+  };
+
 let resolve_selector_class_ref =
     (
       ~file: string,
@@ -227,22 +260,9 @@ let resolve_selector_class_ref =
       ~loc,
       path_str: string,
     ) => {
-  switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
-  | Some(className) => className
-  | None
-      when
-        String.contains(path_str, '.')
-        && !ref_matches_local_module(~file, ~scope, ~opens, path_str) =>
-    let segments = path_segments(path_str);
-    let longident =
-      switch (module_path_of_ref(segments), List.rev(segments)) {
-      | (Some(module_path), [binding, ..._]) =>
-        String.concat(
-          ".",
-          expand_alias(~file, ~path=module_path) @ [binding],
-        )
-      | _ => path_str
-      };
+  switch (resolve_class_ref(~file, ~scope, ~opens, path_str)) {
+  | Some(Local(className)) => className
+  | Some(Cross_module(longident)) =>
     Cross_module_refs.record(~file, ~longident, ~loc);
     Cross_module_refs.sentinel(longident);
   | None =>

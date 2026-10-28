@@ -1,6 +1,6 @@
 `styled-ppx.generate` emits no `@layer` at all: a page that links this
 output alongside anything else competes by ordinary CSS specificity and
-position, like plain CSS with no layers ever existing (see "Cascade tiers"
+position, like plain CSS with no layers ever existing (see "Sheet order"
 in `generate.ml`, and `global-tier.t`/`descendant-tier.t` for the
 consequences that accepts). The output order is still fixed - globals,
 then the atoms in the "Ordered sheet" order (parent-to-child shape, block
@@ -14,8 +14,8 @@ and an atom wrapped in `@media` (`conditional`).
 
   $ cat > combo.ml <<EOF
   > [@@@css "*{box-sizing:inherit;}"]
-  > [@@@css "._a_basewidget{color:red;}"]
-  > [@@@css "@media (min-width:768px){._a_condwidget:hover{color:blue;}}"]
+  > [@@@css ("._a_basewidget{color:red;}", "_a_basewidget", "0,1,0 own", "color", 1, false)]
+  > [@@@css ("@media (min-width:768px){._a_condwidget:hover{color:blue;}}", "_a_condwidget", "0,2,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate combo.ml
@@ -33,9 +33,9 @@ then the global, then the base atom. The two atoms do not compete (the
 `:hover` atom is more specific), so they keep definition order.
 
   $ cat > reordered.ml <<EOF
-  > [@@@css "@media (min-width:768px){._a_condwidget:hover{color:blue;}}"]
+  > [@@@css ("@media (min-width:768px){._a_condwidget:hover{color:blue;}}", "_a_condwidget", "0,2,0 own", "color", 1, false)]
   > [@@@css "*{box-sizing:inherit;}"]
-  > [@@@css "._a_basewidget{color:red;}"]
+  > [@@@css ("._a_basewidget{color:red;}", "_a_basewidget", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate reordered.ml

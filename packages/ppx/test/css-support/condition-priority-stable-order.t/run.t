@@ -17,21 +17,33 @@ same file so their relative sheet order is checked together:
   $ cat output.ml
   [@@@css "@property --pad-g2wfjo{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --pad-160gt2j{syntax:\"*\";inherits:false;}"]
-  [@@@css "@media (min-width: 768px) {._a_p6loh5rnofe{display:none;}}"]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._a_5kutk5rhjfe{display:block;}}"]
+    ("@media (min-width: 768px) {._a_p6loh5rnofe{display:none;}}",
+      "_a_p6loh5rnofe", "0,1,0 own", "207", 1, false)]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-top:var(--pad-g2wfjo);}}"]
+    ("@media (min-width: 768px) and (max-width: 1279px) {._a_5kutk5rhjfe{display:block;}}",
+      "_a_5kutk5rhjfe", "0,1,0 own", "207", 1, false)]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-left:var(--pad-g2wfjo);}}"]
+    ("@media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-top:var(--pad-g2wfjo);}}",
+      "_in_yqjybn", "0,1,0 own", "328", 8, false)]
   [@@@css
-    "@media (max-width: 1279px) {._in_11ru35y{padding-top:var(--pad-160gt2j);}}"]
+    ("@media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-left:var(--pad-g2wfjo);}}",
+      "_in_yqjybn", "0,1,0 own", "328", 2, false)]
   [@@@css
-    "@media (max-width: 1279px) {._in_11ru35y{padding-left:var(--pad-160gt2j);}}"]
+    ("@media (max-width: 1279px) {._in_11ru35y{padding-top:var(--pad-160gt2j);}}",
+      "_in_11ru35y", "0,1,0 own", "328", 8, false)]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._a_5kutk850y8f{max-height:1200px;}}"]
-  [@@@css "@media (max-width: 767px) {._a_tlkns85mrev{max-height:2000px;}}"]
-  [@@@css "@media (max-width: 1279px) {._a_9yyk885k4cx{max-height:10000px;}}"]
+    ("@media (max-width: 1279px) {._in_11ru35y{padding-left:var(--pad-160gt2j);}}",
+      "_in_11ru35y", "0,1,0 own", "328", 2, false)]
+  [@@@css
+    ("@media (min-width: 768px) and (max-width: 1279px) {._a_5kutk850y8f{max-height:1200px;}}",
+      "_a_5kutk850y8f", "0,1,0 own", "293", 1, false)]
+  [@@@css
+    ("@media (max-width: 767px) {._a_tlkns85mrev{max-height:2000px;}}",
+      "_a_tlkns85mrev", "0,1,0 own", "293", 1, false)]
+  [@@@css
+    ("@media (max-width: 1279px) {._a_9yyk885k4cx{max-height:10000px;}}",
+      "_a_9yyk885k4cx", "0,1,0 own", "293", 1, false)]
   [@@@css.bindings
     [("Input.toggleButton", "_id_my2sdh", "_a_p6loh5rnofe");
     ("Input.toggleButtonShowAtTablet", "_id_126medj", "_a_5kutk5rhjfe");
@@ -41,13 +53,13 @@ same file so their relative sheet order is checked together:
     ("Input.praiseViewportMobile", "_id_x35n3b", "_a_tlkns85mrev");
     ("Input.praiseViewportExpanded", "_id_kfijum", "_a_9yyk885k4cx")]]
   [@@@css.blocks
-    [(2, "_id_my2sdh _a_p6loh5rnofe");
-    (7, "_id_126medj _a_5kutk5rhjfe");
-    (12, "_id_1d8urtj _in_yqjybn");
-    (17, "_id_139wmul _in_11ru35y");
-    (22, "_id_j9wooj _a_5kutk850y8f");
-    (26, "_id_x35n3b _a_tlkns85mrev");
-    (30, "_id_kfijum _a_9yyk885k4cx")]]
+    [(2, "_id_my2sdh", [2]);
+    (7, "_id_126medj", [3]);
+    (12, "_id_1d8urtj", [4; 5]);
+    (17, "_id_139wmul", [6; 7]);
+    (22, "_id_j9wooj", [8]);
+    (26, "_id_x35n3b", [9]);
+    (30, "_id_kfijum", [10])]]
   let toggleButton = CSS.make "label:toggleButton _id_my2sdh _a_p6loh5rnofe" []
   let toggleButtonShowAtTablet =
     CSS.make "label:toggleButtonShowAtTablet _id_126medj _a_5kutk5rhjfe" []

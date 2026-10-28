@@ -15,38 +15,173 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_dh2far{touch-action:auto;}"];
-  [@css "._a_dhsbrd{touch-action:none;}"];
-  [@css "._a_dhsu0a{touch-action:pan-x;}"];
-  [@css "._a_dhcb00{touch-action:pan-y;}"];
-  [@css "._a_dhee94{touch-action:pan-x pan-y;}"];
-  [@css "._a_dh4v8x{touch-action:manipulation;}"];
-  [@css "._a_dht8dp{touch-action:pan-left;}"];
-  [@css "._a_dhiuj3{touch-action:pan-right;}"];
-  [@css "._a_dhtga0{touch-action:pan-up;}"];
-  [@css "._a_dhpx43{touch-action:pan-down;}"];
-  [@css "._a_dhn9hg{touch-action:pan-left pan-up;}"];
-  [@css "._a_dhgay6{touch-action:pinch-zoom;}"];
-  [@css "._a_dhive7{touch-action:pan-x pinch-zoom;}"];
-  [@css "._a_dh2qdh{touch-action:pan-y pinch-zoom;}"];
-  [@css "._a_dhbds3{touch-action:pan-x pan-y pinch-zoom;}"];
+  [@css
+    (
+      "._a_dh2far{touch-action:auto;}",
+      "_a_dh2far",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhsbrd{touch-action:none;}",
+      "_a_dhsbrd",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhsu0a{touch-action:pan-x;}",
+      "_a_dhsu0a",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhcb00{touch-action:pan-y;}",
+      "_a_dhcb00",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhee94{touch-action:pan-x pan-y;}",
+      "_a_dhee94",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dh4v8x{touch-action:manipulation;}",
+      "_a_dh4v8x",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dht8dp{touch-action:pan-left;}",
+      "_a_dht8dp",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhiuj3{touch-action:pan-right;}",
+      "_a_dhiuj3",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhtga0{touch-action:pan-up;}",
+      "_a_dhtga0",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhpx43{touch-action:pan-down;}",
+      "_a_dhpx43",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhn9hg{touch-action:pan-left pan-up;}",
+      "_a_dhn9hg",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhgay6{touch-action:pinch-zoom;}",
+      "_a_dhgay6",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhive7{touch-action:pan-x pinch-zoom;}",
+      "_a_dhive7",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dh2qdh{touch-action:pan-y pinch-zoom;}",
+      "_a_dh2qdh",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dhbds3{touch-action:pan-x pan-y pinch-zoom;}",
+      "_a_dhbds3",
+      "0,1,0 own",
+      "485",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (2, "_a_dh2far"),
-      (3, "_a_dhsbrd"),
-      (4, "_a_dhsu0a"),
-      (5, "_a_dhcb00"),
-      (6, "_a_dhee94"),
-      (7, "_a_dh4v8x"),
-      (10, "_a_dht8dp"),
-      (11, "_a_dhiuj3"),
-      (12, "_a_dhtga0"),
-      (13, "_a_dhpx43"),
-      (14, "_a_dhn9hg"),
-      (17, "_a_dhgay6"),
-      (18, "_a_dhive7"),
-      (19, "_a_dh2qdh"),
-      (20, "_a_dhbds3"),
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (10, "", [6]),
+      (11, "", [7]),
+      (12, "", [8]),
+      (13, "", [9]),
+      (14, "", [10]),
+      (17, "", [11]),
+      (18, "", [12]),
+      (19, "", [13]),
+      (20, "", [14]),
     ]
   ];
   

@@ -16,18 +16,22 @@ deduping.
 
   $ cat n1.ml
   [@@@css
-    "._a_9nd225rj253 > div:not(:last-child).\000Shared.row\000{display:flex;}"]
+    ("._a_9nd225rj253 > div:not(:last-child).\000Shared.row\000{display:flex;}",
+      "_a_9nd225rj253", "0,3,1 & > div:not(:last-child).\000Shared.row\000",
+      "207", 1, false)]
   [@@@css.bindings [("N1.list", "_id_1380c3q", "_a_9nd225rj253")]]
-  [@@@css.blocks [(1, "_id_1380c3q _a_9nd225rj253")]]
+  [@@@css.blocks [(1, "_id_1380c3q", [0])]]
   [@@@css.refs [("Shared.row", "n1.ml", 1, 45, 55)]]
   let _ = Shared.row
   let list = CSS.make "label:list _id_1380c3q _a_9nd225rj253" []
 
   $ cat n2.ml
   [@@@css
-    "._a_9nd225rj253 > div:not(:last-child).\000Shared.row\000{display:flex;}"]
+    ("._a_9nd225rj253 > div:not(:last-child).\000Shared.row\000{display:flex;}",
+      "_a_9nd225rj253", "0,3,1 & > div:not(:last-child).\000Shared.row\000",
+      "207", 1, false)]
   [@@@css.bindings [("N2.list", "_id_1bj4xb3", "_a_9nd225rj253")]]
-  [@@@css.blocks [(1, "_id_1bj4xb3 _a_9nd225rj253")]]
+  [@@@css.blocks [(1, "_id_1bj4xb3", [0])]]
   [@@@css.refs [("Shared.row", "n2.ml", 1, 45, 55)]]
   let _ = Shared.row
   let list = CSS.make "label:list _id_1bj4xb3 _a_9nd225rj253" []

@@ -652,6 +652,34 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   | _ => ()
   };
 
+/* `CSS.merge(a, b)` and `a +++ b`: their two arguments. */
+let merge_arguments = (fn: Ppxlib.expression, args) =>
+  switch (fn.pexp_desc, args) {
+  | (
+      Pexp_ident({
+        txt: Ldot(Lident("CSS"), "merge") | Lident("+++") | Ldot(_, "+++"),
+        _,
+      }),
+      [(Ppxlib.Nolabel, left), (Ppxlib.Nolabel, right)],
+    ) =>
+    Some((left, right))
+  | _ => None
+  };
+
+/* The arguments of a merge chain, in call order: `merge(merge(a, b), c)`
+   and `a +++ b +++ c` give [a, b, c]. */
+let rec flatten_merge = (fn, args) =>
+  switch (merge_arguments(fn, args)) {
+  | Some((left, right)) => merge_chain(left) @ merge_chain(right)
+  | None => []
+  }
+and merge_chain = (expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_apply(fn, args) when merge_arguments(fn, args) != None =>
+    flatten_merge(fn, args)
+  | _ => [expr]
+  };
+
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
   let rec map_with_label = (~label_name, expr) => {
@@ -665,6 +693,17 @@ let map_css_expressions =
           let args =
             args
             |> List.map(((label, arg)) => (label, self#expression(arg)));
+          switch (merge_arguments(fn, args)) {
+          | Some(_) =>
+            Css_file.record_merge(
+              ~line=expr.pexp_loc.loc_start.pos_lnum,
+              ~file,
+              ~scope,
+              ~opens,
+              flatten_merge(fn, args),
+            )
+          | None => ()
+          };
           Styles_attribute.expand({
             ...expr,
             pexp_desc: Pexp_apply(fn, args),
@@ -1020,7 +1059,7 @@ let () = {
       };
     let main_module = module_name_of_file(file);
     let str = map_ordered_structure(~file, ~main_module, ~scope=[], str);
-    let rules = Css_file.get();
+    let (rules, blocks, merges) = Css_file.get();
     let rule_items = List.map(Css_extraction.css_attribute, rules);
     let binding_entries = Css_bindings.drain();
     let bindings_items =
@@ -1029,9 +1068,14 @@ let () = {
       | _ => [make_bindings_attribute(binding_entries)]
       };
     let blocks_items =
-      switch (Css_blocks.drain()) {
+      switch (blocks) {
       | [] => []
       | blocks => [Css_extraction.blocks_attribute(blocks)]
+      };
+    let merges_items =
+      switch (merges) {
+      | [] => []
+      | merges => [Css_extraction.merges_attribute(merges)]
       };
     let (cross_module_entries, cross_module_longidents) =
       Cross_module_refs.drain();
@@ -1071,6 +1115,7 @@ let () = {
     @ rule_items
     @ bindings_items
     @ blocks_items
+    @ merges_items
     @ refs_items
     @ dep_items
     @ str;

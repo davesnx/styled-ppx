@@ -24,7 +24,7 @@ placed it relative to the style rules around it (`a_styles.ml`'s
 `._a_styles`, tiered, ends up after it here).
 
   $ cat > a_styles.ml <<EOF
-  > [@@@css "._a_styles{color:red;}"]
+  > [@@@css ("._a_styles{color:red;}", "_a_styles", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ cat > z_statements.ml <<EOF
@@ -78,7 +78,7 @@ after the tiered rules instead of hoisting it.
 
   $ cat > d_import_brace.ml <<EOF
   > [@@@css "@import url(\"a{b.css\");"]
-  > [@@@css "._a_dgreen{color:green;}"]
+  > [@@@css ("._a_dgreen{color:green;}", "_a_dgreen", "0,1,0 own", "color", 1, false)]
   > EOF
 
   $ styled-ppx.generate d_import_brace.ml

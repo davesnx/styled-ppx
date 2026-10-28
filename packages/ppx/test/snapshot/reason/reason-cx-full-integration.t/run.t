@@ -9,44 +9,91 @@
   [@@@css "@property --primary-1e50z5r{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --secondary-12msuqq{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --size-1tljh9b{syntax:\"*\";inherits:false;}"]
-  [@@@css "._a_5r08qs{display:flex;}"]
-  [@@@css "._a_9h0002ndxa{justify-content:center;}"]
-  [@@@css "._a_4esjgz{color:var(--color-1a279q8);}"]
-  [@@@css "._in_15a4g54{margin-block:var(--spacing-y96o3b);}"]
-  [@@@css "._in_15a4g54{margin-inline:var(--spacing-vh5lkd);}"]
-  [@@@css "._in_15a4g54{padding-block-start:var(--spacing-f3qjr);}"]
   [@@@css
-    "._in_15a4g54{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
-  [@@@css "._in_15a4g54{inset-block-start:var(--spacing-f3qjr);}"]
-  [@@@css "._a_qyw7u8mnfaz:hover{opacity:0.8;}"]
-  [@@@css "._a_3rgzi60ffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
-  [@@@css "@media (max-width: 768px) {._a_5eyct5rz0a1{display:block;}}"]
-  [@@@css "._a_65000wix1i{font-size:16px;}"]
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)]
   [@@@css
-    "@media (max-width: 768px) and (not (max-width: 480px)){._a_5eyct65000w2zb1{font-size:14px;}}"]
-  [@@@css "@media (max-width: 480px) {._a_fjsdf65000w7vub{font-size:12px;}}"]
-  [@@@css "._a_5ixlc60vle1 .item{-webkit-flex:1;-ms-flex:1;flex:1;}"]
+    ("._a_9h0002ndxa{justify-content:center;}", "_a_9h0002ndxa", "0,1,0 own",
+      "341", 2, false)]
   [@@@css
-    "@media (max-width: 768px) {._a_5eyct610001mfq6{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}"]
+    ("._a_4esjgz{color:var(--color-1a279q8);}", "_a_4esjgz", "0,1,0 own",
+      "158", 1, false)]
   [@@@css
-    "@media (max-width: 768px) {._a_xdd5e60frkw .item{-webkit-flex:none;-ms-flex:none;flex:none;}}"]
-  [@@@css "._a_5rj0h8{display:grid;}"]
+    ("._in_15a4g54{margin-block:var(--spacing-y96o3b);}", "_in_15a4g54",
+      "0,1,0 own", "278", 3, false)]
   [@@@css
-    "@media screen and (min-width: 768px) and (max-width: 1024px) {._a_hgkhj5riow9{display:flex;}}"]
+    ("._in_15a4g54{margin-inline:var(--spacing-vh5lkd);}", "_in_15a4g54",
+      "0,1,0 own", "279", 3, false)]
   [@@@css
-    "@media (prefers-color-scheme: dark) {._a_wkmu53900049mde{background-color:#1a1a1a;}}"]
-  [@@@css "@media (max-width: 768px) {._a_5eyct8mknlj{opacity:0.8;}}"]
+    ("._in_15a4g54{padding-block-start:var(--spacing-f3qjr);}", "_in_15a4g54",
+      "0,1,0 own", "329", 2, false)]
+  [@@@css
+    ("._in_15a4g54{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}",
+      "_in_15a4g54", "0,1,0 own", "330", 1, false)]
+  [@@@css
+    ("._in_15a4g54{inset-block-start:var(--spacing-f3qjr);}", "_in_15a4g54",
+      "0,1,0 own", "255", 2, false)]
+  [@@@css
+    ("._a_qyw7u8mnfaz:hover{opacity:0.8;}", "_a_qyw7u8mnfaz", "0,2,0 own",
+      "310", 1, false)]
+  [@@@css
+    ("._a_3rgzi60ffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}",
+      "_a_3rgzi60ffsa", "0,2,0 & .child", "216", 7, false)]
+  [@@@css
+    ("@media (max-width: 768px) {._a_5eyct5rz0a1{display:block;}}",
+      "_a_5eyct5rz0a1", "0,1,0 own", "207", 1, false)]
+  [@@@css
+    ("._a_65000wix1i{font-size:16px;}", "_a_65000wix1i", "0,1,0 own", "221",
+      32, false)]
+  [@@@css
+    ("@media (max-width: 768px) and (not (max-width: 480px)){._a_5eyct65000w2zb1{font-size:14px;}}",
+      "_a_5eyct65000w2zb1", "0,1,0 own", "221", 32, false)]
+  [@@@css
+    ("@media (max-width: 480px) {._a_fjsdf65000w7vub{font-size:12px;}}",
+      "_a_fjsdf65000w7vub", "0,1,0 own", "221", 32, false)]
+  [@@@css
+    ("._a_5ixlc60vle1 .item{-webkit-flex:1;-ms-flex:1;flex:1;}",
+      "_a_5ixlc60vle1", "0,2,0 & .item", "216", 7, false)]
+  [@@@css
+    ("@media (max-width: 768px) {._a_5eyct610001mfq6{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}",
+      "_a_5eyct610001mfq6", "0,1,0 own", "217", 1, false)]
+  [@@@css
+    ("@media (max-width: 768px) {._a_xdd5e60frkw .item{-webkit-flex:none;-ms-flex:none;flex:none;}}",
+      "_a_xdd5e60frkw", "0,2,0 & .item", "216", 7, false)]
+  [@@@css
+    ("._a_5rj0h8{display:grid;}", "_a_5rj0h8", "0,1,0 own", "207", 1, false)]
+  [@@@css
+    ("@media screen and (min-width: 768px) and (max-width: 1024px) {._a_hgkhj5riow9{display:flex;}}",
+      "_a_hgkhj5riow9", "0,1,0 own", "207", 1, false)]
+  [@@@css
+    ("@media (prefers-color-scheme: dark) {._a_wkmu53900049mde{background-color:#1a1a1a;}}",
+      "_a_wkmu53900049mde", "0,1,0 own", "117", 4, false)]
+  [@@@css
+    ("@media (max-width: 768px) {._a_5eyct8mknlj{opacity:0.8;}}",
+      "_a_5eyct8mknlj", "0,1,0 own", "310", 1, false)]
   [@@@css "@keyframes _k_jw9oix{from{opacity:0;}to{opacity:1;}}"]
   [@@@css
     "@keyframes _k_waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}"]
-  [@@@css "._a_4elny7{color:var(--primary-1e50z5r);}"]
-  [@@@css "._a_390004dlbg{background-color:var(--secondary-12msuqq);}"]
-  [@@@css "._a_65000w61at{font-size:var(--size-1tljh9b);}"]
-  [@@@css "._a_9432ej{padding:10px;}"]
-  [@@@css "._a_6i000ghlac{grid-template-columns:1fr 2fr 1fr;}"]
-  [@@@css "._a_6f10y9{gap:20px;}"]
-  [@@@css "._a_aajuhq{scroll-behavior:smooth;}"]
-  [@@@css "._a_8r00023rg8{overflow-y:auto;}"]
+  [@@@css
+    ("._a_4elny7{color:var(--primary-1e50z5r);}", "_a_4elny7", "0,1,0 own",
+      "158", 1, false)]
+  [@@@css
+    ("._a_390004dlbg{background-color:var(--secondary-12msuqq);}",
+      "_a_390004dlbg", "0,1,0 own", "117", 4, false)]
+  [@@@css
+    ("._a_65000w61at{font-size:var(--size-1tljh9b);}", "_a_65000w61at",
+      "0,1,0 own", "221", 32, false)]
+  [@@@css
+    ("._a_9432ej{padding:10px;}", "_a_9432ej", "0,1,0 own", "328", 15, false)]
+  [@@@css
+    ("._a_6i000ghlac{grid-template-columns:1fr 2fr 1fr;}", "_a_6i000ghlac",
+      "0,1,0 own", "234", 16, false)]
+  [@@@css ("._a_6f10y9{gap:20px;}", "_a_6f10y9", "0,1,0 own", "231", 3, false)]
+  [@@@css
+    ("._a_aajuhq{scroll-behavior:smooth;}", "_a_aajuhq", "0,1,0 own", "370", 1,
+      false)]
+  [@@@css
+    ("._a_8r00023rg8{overflow-y:auto;}", "_a_8r00023rg8", "0,1,0 own", "315",
+      2, false)]
   [@@@css.bindings
     [("Input.staticCss", "_id_sg14ha", "_a_5r08qs _a_9h0002ndxa");
     ("Input.dynamicCss", "_id_1iadhjt", "_a_4esjgz _a_5r08qs");
@@ -66,19 +113,18 @@
     ("Input.gridCss", "_id_9sqvao", "_a_5rj0h8 _a_6i000ghlac _a_6f10y9");
     ("Input.scrollCss", "_id_1jibd4z", "_a_aajuhq _a_8r00023rg8")]]
   [@@@css.blocks
-    [(4, "_id_sg14ha _a_5r08qs _a_9h0002ndxa");
-    (7, "_id_1iadhjt _a_4esjgz _a_5r08qs");
-    (15, "_id_ljrnvo _in_15a4g54");
-    (26, "_id_1mbrij3 _a_5r08qs _a_qyw7u8mnfaz _a_3rgzi60ffsa");
-    (39, "_id_1ry5l5u _a_5r08qs _a_5eyct5rz0a1");
-    (49, "_id_11h93yi _a_65000wix1i _a_5eyct65000w2zb1 _a_fjsdf65000w7vub");
-    (62,
-      "_id_yfle76 _a_5r08qs _a_5ixlc60vle1 _a_5eyct610001mfq6 _a_xdd5e60frkw");
-    (78, "_id_j5jxs _a_5rj0h8 _a_hgkhj5riow9 _a_wkmu53900049mde");
-    (91, "_id_1y4ylka _a_4esjgz _a_5eyct8mknlj");
-    (128, "_id_l7rgtn _a_4elny7 _a_390004dlbg _a_65000w61at _a_9432ej");
-    (138, "_id_9sqvao _a_5rj0h8 _a_6i000ghlac _a_6f10y9");
-    (145, "_id_1jibd4z _a_aajuhq _a_8r00023rg8")]]
+    [(4, "_id_sg14ha", [9; 10]);
+    (7, "_id_1iadhjt", [11; 9]);
+    (15, "_id_ljrnvo", [12; 13; 14; 15; 16]);
+    (26, "_id_1mbrij3", [9; 17; 18]);
+    (39, "_id_1ry5l5u", [9; 19]);
+    (49, "_id_11h93yi", [20; 21; 22]);
+    (62, "_id_yfle76", [9; 23; 24; 25]);
+    (78, "_id_j5jxs", [26; 27; 28]);
+    (91, "_id_1y4ylka", [11; 29]);
+    (128, "_id_l7rgtn", [32; 33; 34; 35]);
+    (138, "_id_9sqvao", [26; 36; 37]);
+    (145, "_id_1jibd4z", [38; 39])]]
   let staticCss =
     CSS.make "label:staticCss _id_sg14ha _a_5r08qs _a_9h0002ndxa" []
   let dynamicCss color =

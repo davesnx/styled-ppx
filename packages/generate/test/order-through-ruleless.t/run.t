@@ -7,7 +7,7 @@ ordering: `middle/middle.ml` carries no rule and no `[@@@css.config]`, but
 
   $ cat > z_base/z_base.ml <<EOF
   > [@@@css.config [("library-name", "z_base")]]
-  > [@@@css "._a_basewidget{color:red;}"]
+  > [@@@css ("._a_basewidget{color:red;}", "_a_basewidget", "0,1,0 own", "color", 1, false)]
   > let widget () = ()
   > EOF
 
@@ -21,7 +21,7 @@ existing purely as a reference hop.
 
   $ cat > a_app/main.ml <<EOF
   > [@@@css.config [("library-name", "a_app")]]
-  > [@@@css "._a_appmain{color:blue;}"]
+  > [@@@css ("._a_appmain{color:blue;}", "_a_appmain", "0,1,0 own", "color", 1, false)]
   > let _ = Middle.widget
   > EOF
 

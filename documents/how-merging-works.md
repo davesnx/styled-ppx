@@ -67,9 +67,9 @@ let narrow = [%css "margin-top: 0;"];
 CSS.merge(wide, narrow);
 /* both classes stay: a single side (margin-top) can never cover the whole
    shorthand's other three sides, so dropping the shorthand would silently
-   lose them. Which one wins the TOP edge then depends on sheet order - see
-   "Sheet order" below (narrow is defined after wide, so margin-top: 0
-   comes later and wins here too). */
+   lose them. The TOP edge is then decided by sheet order - see "Sheet
+   order" below: the merge puts margin-top: 0 after margin: 10px, so it
+   wins. */
 ```
 
 (`shorthand_then_longhand_keeps_both`, same file — this is the accepted
@@ -117,8 +117,9 @@ proves the mechanism directly against a real `_in_` class.
 ## Sheet order
 
 Inside one generated stylesheet, `[%styled.global]` rules (`html { ... }`,
-`* { ... }`, an author's own selector) come first. All atom rules follow, in
-one order that `styled-ppx.generate` builds from three sources:
+`* { ... }`, an author's own selector) come first, in the order you wrote
+them (`packages/generate/test/global-source-order.t`). All atom rules
+follow, in one order that `styled-ppx.generate` builds from three sources:
 
 1. **Parent-to-child rules first.** A rule that reaches an unclassed
    descendant (`.wrapper * { ... }`, `.list li { ... }`) is emitted before
@@ -131,25 +132,37 @@ one order that `styled-ppx.generate` builds from three sources:
    alias counts as its canonical property: `grid-gap` competes with `gap`,
    `word-wrap` with `overflow-wrap`.
    - *Block edge*: inside one block (one `[%css]`, named or not), an earlier
-     competing rule comes first. One block reads as plain CSS:
+     competing rule comes first, in the order emotion prints the block: the
+     block's own declarations first, then its nested rules (`&:hover`,
+     `@media`, selectors), each in source order, and the same inside each
+     nested rule.
      `[%css "&:focus { color: blue; } &:hover { color: red; }"]` gives `red`
      when both apply, because `:hover` is written last
      (`packages/generate/test/tiers-condition-tie-single-block.t`).
+     `[%css "@media (max-width: 600px) { color: pink; } color: black;"]`
+     gives `pink` under the media query: `color: black` is a declaration of
+     the block, so it comes before the nested `@media` rule
+     (`packages/ppx/test/css-support/ordered-sheet-emotion-order.t`).
+   - *Merge edge*: in a `CSS.merge(a, b)` or `a +++ b` whose arguments the
+     ppx can resolve (a `[%css]` binding of the same file or of another
+     module, or an inline `[%css]`), each competing rule of `a` comes before
+     each rule of `b`, whichever block defined each shared atom first
+     (`packages/ppx/test/css-support/ordered-sheet-merge-edges.t`). A class
+     the merge drops at run time takes no part.
 3. **Definition order** for every pair the edges leave open: library, then
-   module dependency order, then the order of definition in a file. A
-   `CSS.merge(a, b)` gets `b`'s rules last when `b` is defined after `a`.
+   module dependency order, then the order of definition in a file.
 
 The sheet is built from its end, so a rule stays at its definition position
-unless an edge pulls it ahead of a rule it must precede. Two blocks that put
-the same two rules in opposite orders are a conflict: the build prints a
-warning that names both blocks, and the pair keeps definition order
+unless an edge pulls it ahead of a rule it must precede. Two blocks or
+merges that put the same two rules in opposite orders are a conflict: the
+build prints a warning that names both, and the pair keeps definition order
 (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). A longer
-cycle of blocks is cut at one rule, with a warning
+cycle is cut at one rule, with a warning
 (`packages/generate/test/ordered-sheet-cycle.t`).
 
 There is no fixed rank between conditions (`:hover` against `:focus`,
 `@media` against `@supports`), and no rank between a shorthand and its
-longhands across blocks: a block or definition order decides. A
+longhands across blocks: a block, a merge or definition order decides. A
 "shorthand before the longhands it covers" rule would reach through
 unrelated blocks: a `padding-right` rule under one `@media` in another file
 would pull `headerWithBanner`'s `padding` rules ahead of `header`'s, and
@@ -237,26 +250,25 @@ share a class depends on which one the browser loads first
   starting with `_a_`.
 - **`merge(wide, narrow)` keeps both classes.** Same fact as the
   shorthand-then-longhand example above — it depends on sheet order, not
-  on `merge` itself, to pick the right one. With `narrow` defined before
-  `wide` it is the next limit
-  (`packages/generate/test/tiers-shorthand-sort.t`).
-- **A merge whose later argument is defined earlier.** `CSS.merge(a, b)`
-  where `b` is defined before `a` (earlier in the file, or in a file the
-  dependency order puts first) and no block orders the two competing rules:
-  definition order puts `b`'s rule first, so `a`'s rule wins the tie. Same
-  when the two blocks are in two files that do not depend on each other.
-  Define the override after the base, or write both in one block.
-- **A shared atom keeps its first position.** An atom rule that several
-  bindings share (same declaration in the same context) is emitted once, at
-  its first definition. So in `CSS.merge(a, b)` with `b` defined after `a`,
-  `a`'s rule still comes last when other bindings share both atoms and the
-  first definition of `a`'s atom is later than that of `b`'s. Seen in the
-  Ahrefs monorepo: `controls +++ controlsColumnStretchMobile`, where both
-  `flex-direction` atoms are shared with other files.
-- **Two blocks that disagree.** Two blocks that put the same two competing
-  rules in opposite orders can not both hold; the build warns, names both
-  blocks, and keeps definition order for the pair
-  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`).
+  on `merge` itself, to pick the right one. A merge the ppx resolves gives
+  that order (`packages/generate/test/tiers-shorthand-sort.t`); see the
+  next limit for one it can not resolve.
+- **A merge the ppx can not resolve.** Merge edges need both arguments to
+  name a `[%css]` block the ppx can see: a binding, or an inline `[%css]`.
+  A function call (`merge(base, variant(x))`, the `card` example above), a
+  function parameter, or a binding inside a function body gives no edge.
+  Then, when no block orders the two competing rules, definition order
+  decides: `b`'s rule wins only if its first definition (anywhere in the
+  app, an atom shared with another binding included) comes after `a`'s.
+  Same when the two blocks are in two files that do not depend on each
+  other.
+- **Two orders that disagree.** Two blocks or merges that put the same two
+  competing rules in opposite orders can not both hold; the build warns,
+  names both, and keeps definition order for the pair
+  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). This
+  includes `merge(a, b)` in one place and `merge(b, a)` elsewhere when
+  both calls keep both classes; a call that drops a class orders nothing
+  for it (`packages/ppx/test/css-support/ordered-sheet-merge-both-orders.t`).
 - **Rules of different specificity are not reordered.** An at-rule adds no
   specificity, a pseudo-class does: `&:hover` beats a bare `@media` atom
   whatever the order, as in plain CSS.

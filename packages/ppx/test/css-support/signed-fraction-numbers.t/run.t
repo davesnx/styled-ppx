@@ -26,17 +26,27 @@ it does not change how numbers render.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_7ppxco{margin:-0.5px;}"];
-  [@css "._a_7p1kc6{margin:0.5px;}"];
-  [@css "._a_dmr2ev{transition:opacity 0.3s ease -0.1s;}"];
-  [@css "._a_710008ktvb{top:-5px;}"];
+  [@css
+    ("._a_7ppxco{margin:-0.5px;}", "_a_7ppxco", "0,1,0 own", "277", 15, false)
+  ];
+  [@css
+    ("._a_7p1kc6{margin:0.5px;}", "_a_7p1kc6", "0,1,0 own", "277", 15, false)
+  ];
+  [@css
+    (
+      "._a_dmr2ev{transition:opacity 0.3s ease -0.1s;}",
+      "_a_dmr2ev",
+      "0,1,0 own",
+      "490",
+      31,
+      false,
+    )
+  ];
+  [@css
+    ("._a_710008ktvb{top:-5px;}", "_a_710008ktvb", "0,1,0 own", "253", 8, false)
+  ];
   [@css.blocks
-    [
-      (1, "_a_7ppxco"),
-      (2, "_a_7p1kc6"),
-      (3, "_a_dmr2ev"),
-      (4, "_a_710008ktvb"),
-    ]
+    [(1, "", [0]), (2, "", [1]), (3, "", [2]), (4, "", [3])]
   ];
   CSS.make("_a_7ppxco", []);
   CSS.make("_a_7p1kc6", []);

@@ -15,24 +15,82 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_ftcf4s{flow-from:none;}"];
-  [@css "._a_ftxqeo{flow-from:named-flow;}"];
-  [@css "._a_fuxqr6{flow-into:none;}"];
-  [@css "._a_fuywcc{flow-into:named-flow;}"];
-  [@css "._a_fu8xd9{flow-into:named-flow element;}"];
-  [@css "._a_futzaz{flow-into:named-flow content;}"];
-  [@css "._a_gc2igy{region-fragment:auto;}"];
-  [@css "._a_gc95p4{region-fragment:break;}"];
+  [@css
+    ("._a_ftcf4s{flow-from:none;}", "_a_ftcf4s", "0,1,0 own", "569", 1, false)
+  ];
+  [@css
+    (
+      "._a_ftxqeo{flow-from:named-flow;}",
+      "_a_ftxqeo",
+      "0,1,0 own",
+      "569",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_fuxqr6{flow-into:none;}", "_a_fuxqr6", "0,1,0 own", "570", 1, false)
+  ];
+  [@css
+    (
+      "._a_fuywcc{flow-into:named-flow;}",
+      "_a_fuywcc",
+      "0,1,0 own",
+      "570",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_fu8xd9{flow-into:named-flow element;}",
+      "_a_fu8xd9",
+      "0,1,0 own",
+      "570",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_futzaz{flow-into:named-flow content;}",
+      "_a_futzaz",
+      "0,1,0 own",
+      "570",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gc2igy{region-fragment:auto;}",
+      "_a_gc2igy",
+      "0,1,0 own",
+      "588",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_gc95p4{region-fragment:break;}",
+      "_a_gc95p4",
+      "0,1,0 own",
+      "588",
+      1,
+      false,
+    )
+  ];
   [@css.blocks
     [
-      (2, "_a_ftcf4s"),
-      (3, "_a_ftxqeo"),
-      (4, "_a_fuxqr6"),
-      (5, "_a_fuywcc"),
-      (6, "_a_fu8xd9"),
-      (7, "_a_futzaz"),
-      (8, "_a_gc2igy"),
-      (9, "_a_gc95p4"),
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
     ]
   ];
   

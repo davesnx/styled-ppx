@@ -3,8 +3,18 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   $ refmt --parse re --print binary input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "._a_7p0008fkc8{margin-top:32px;}"];
-  [@css.blocks [(21, "_a_7p0008fkc8")]];
+  [@css
+    (
+      "._a_7p0008fkc8{margin-top:32px;}",
+      "_a_7p0008fkc8",
+      "0,1,0 own",
+      "277",
+      8,
+      false,
+    )
+  ];
+  [@css.blocks [(21, "", [0])]];
+  [@css.merges [(21, ["Css.bodyLg", 0])]];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -44,8 +54,18 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   $ refmt --parse re --print binary input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "._a_7p0008fkc8{margin-top:32px;}"];
-  [@css.blocks [(21, "_a_7p0008fkc8")]];
+  [@css
+    (
+      "._a_7p0008fkc8{margin-top:32px;}",
+      "_a_7p0008fkc8",
+      "0,1,0 own",
+      "277",
+      8,
+      false,
+    )
+  ];
+  [@css.blocks [(21, "", [0])]];
+  [@css.merges [(21, ["Css.bodyLg", 0])]];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();

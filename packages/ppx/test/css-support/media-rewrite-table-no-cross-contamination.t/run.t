@@ -12,19 +12,24 @@ up independently:
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css
-    "@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}"]
-  [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
-  [@@@css "@media (min-width: 600px) {._a_izob0ec7x8k{width:10px;}}"]
+    ("@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}",
+      "_a_izob04e6zo5", "0,1,0 own", "158", 1, false)]
   [@@@css
-    "@media (min-width: 600px) and (orientation: landscape) and (not (orientation: portrait)){._a_58at36l1y01{height:1px;}}"]
+    ("@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}",
+      "_a_mp5mk4et4n8", "0,1,0 own", "158", 1, false)]
   [@@@css
-    "@media (min-width: 600px) and (orientation: portrait) {._a_p439r6lwrcv{height:2px;}}"]
+    ("@media (min-width: 600px) {._a_izob0ec7x8k{width:10px;}}",
+      "_a_izob0ec7x8k", "0,1,0 own", "516", 1, false)]
+  [@@@css
+    ("@media (min-width: 600px) and (orientation: landscape) and (not (orientation: portrait)){._a_58at36l1y01{height:1px;}}",
+      "_a_58at36l1y01", "0,1,0 own", "237", 1, false)]
+  [@@@css
+    ("@media (min-width: 600px) and (orientation: portrait) {._a_p439r6lwrcv{height:2px;}}",
+      "_a_p439r6lwrcv", "0,1,0 own", "237", 1, false)]
   [@@@css.bindings
     [("Output.block", "_id_1n4allv",
        "_a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv")]]
-  [@@@css.blocks
-    [(3,
-       "_id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv")]]
+  [@@@css.blocks [(3, "_id_1n4allv", [0; 1; 2; 3; 4])]]
   let block =
     CSS.make
       "label:block _id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv"

@@ -1,12 +1,23 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_9h0002ndxa{justify-content:center;}"];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_9h0002ndxa{justify-content:center;}",
+      "_a_9h0002ndxa",
+      "0,1,0 own",
+      "341",
+      2,
+      false,
+    )
+  ];
   [@css.bindings
     [("Output.SingleQuoteStrings", "_id_ihvjd0", "_a_5r08qs _a_9h0002ndxa")]
   ];
-  [@css.blocks [(2, "_id_ihvjd0 _a_5r08qs _a_9h0002ndxa")]];
+  [@css.blocks [(2, "_id_ihvjd0", [0, 1])]];
   module SingleQuoteStrings = {
     [@deriving abstract]
     [@warning "-69"]

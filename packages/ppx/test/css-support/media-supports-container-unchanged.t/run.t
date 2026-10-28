@@ -7,14 +7,18 @@ shape that must not regress into being rewritten.
   $ ../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css
-    "@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}"]
-  [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
-  [@@@css "@supports (display: grid) {._a_159rq4e3jvj{color:green;}}"]
+    ("@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}",
+      "_a_izob04e6zo5", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}",
+      "_a_mp5mk4et4n8", "0,1,0 own", "158", 1, false)]
+  [@@@css
+    ("@supports (display: grid) {._a_159rq4e3jvj{color:green;}}",
+      "_a_159rq4e3jvj", "0,1,0 own", "158", 1, false)]
   [@@@css.bindings
     [("Output.block", "_id_1n4allv",
        "_a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj")]]
-  [@@@css.blocks
-    [(3, "_id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj")]]
+  [@@@css.blocks [(3, "_id_1n4allv", [0; 1; 2])]]
   let block =
     CSS.make
       "label:block _id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj" []

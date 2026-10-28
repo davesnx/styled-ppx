@@ -13,8 +13,8 @@ media query with its OWN `!important` override of the same two
 properties, one class each.
 
   $ cat > no_side_padding.ml <<EOF
-  > [@@@css "._in_nospad_base{padding-left:40px !important;padding-right:40px !important;}"]
-  > [@@@css "@media (min-width:768px) and (max-width:1279px){._in_nospad_tablet{padding-left:24px !important;padding-right:24px !important;}}"]
+  > [@@@css ("._in_nospad_base{padding-left:40px !important;padding-right:40px !important;}", "_in_nospad_base", "!0,1,0 own", "padding", 5, false)]
+  > [@@@css ("@media (min-width:768px) and (max-width:1279px){._in_nospad_tablet{padding-left:24px !important;padding-right:24px !important;}}", "_in_nospad_tablet", "!0,1,0 own", "padding", 5, false)]
   > EOF
 
   $ styled-ppx.generate no_side_padding.ml

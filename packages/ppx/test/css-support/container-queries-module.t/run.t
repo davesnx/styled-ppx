@@ -15,26 +15,100 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_4v00027ccc{container-type:normal;}"];
-  [@css "._a_4v00026sj7{container-type:size;}"];
-  [@css "._a_4v0002zm71{container-type:inline-size;}"];
-  [@css "._a_4v0001nlpx{container-name:none;}"];
-  [@css "._a_4v0001baxz{container-name:sidebar;}"];
-  [@css "._a_4v0001qxl0{container-name:sidebar main;}"];
-  [@css "._a_4ve1gg{container:sidebar / inline-size;}"];
-  [@css "._a_4vbl4h{container:sidebar / size;}"];
-  [@css "._a_4v1iko{container:none;}"];
+  [@css
+    (
+      "._a_4v00027ccc{container-type:normal;}",
+      "_a_4v00027ccc",
+      "0,1,0 own",
+      "175",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v00026sj7{container-type:size;}",
+      "_a_4v00026sj7",
+      "0,1,0 own",
+      "175",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0002zm71{container-type:inline-size;}",
+      "_a_4v0002zm71",
+      "0,1,0 own",
+      "175",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0001nlpx{container-name:none;}",
+      "_a_4v0001nlpx",
+      "0,1,0 own",
+      "175",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0001baxz{container-name:sidebar;}",
+      "_a_4v0001baxz",
+      "0,1,0 own",
+      "175",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0001qxl0{container-name:sidebar main;}",
+      "_a_4v0001qxl0",
+      "0,1,0 own",
+      "175",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4ve1gg{container:sidebar / inline-size;}",
+      "_a_4ve1gg",
+      "0,1,0 own",
+      "175",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4vbl4h{container:sidebar / size;}",
+      "_a_4vbl4h",
+      "0,1,0 own",
+      "175",
+      3,
+      false,
+    )
+  ];
+  [@css
+    ("._a_4v1iko{container:none;}", "_a_4v1iko", "0,1,0 own", "175", 3, false)
+  ];
   [@css.blocks
     [
-      (2, "_a_4v00027ccc"),
-      (3, "_a_4v00026sj7"),
-      (4, "_a_4v0002zm71"),
-      (5, "_a_4v0001nlpx"),
-      (6, "_a_4v0001baxz"),
-      (7, "_a_4v0001qxl0"),
-      (8, "_a_4ve1gg"),
-      (9, "_a_4vbl4h"),
-      (10, "_a_4v1iko"),
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
+      (10, "", [8]),
     ]
   ];
   

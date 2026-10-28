@@ -7,18 +7,22 @@ match a color rule.
   $ refmt --parse re --print ml input.re > input.ml
   $ ../../standalone.exe --impl input.ml -o out.ml
   $ cat out.ml
-  [@@@css "._a_72w1o4ecagl._id_1iohsq8{color:red;}"]
-  [@@@css "._a_nqke54e3xpp._id_1yukm0j{color:red;}"]
+  [@@@css
+    ("._a_72w1o4ecagl._id_1iohsq8{color:red;}", "_a_72w1o4ecagl", "0,2,0 own",
+      "158", 1, false)]
+  [@@@css
+    ("._a_nqke54e3xpp._id_1yukm0j{color:red;}", "_a_nqke54e3xpp", "0,2,0 own",
+      "158", 1, false)]
   [@@@css.bindings
     [("Input.A.marker", "_id_1iohsq8", "");
     ("Input.A.first", "_id_1hiackk", "_a_72w1o4ecagl");
     ("Input.B.marker", "_id_1yukm0j", "");
     ("Input.B.second", "_id_z6g10d", "_a_nqke54e3xpp")]]
   [@@@css.blocks
-    [(3, "_id_1iohsq8");
-    (4, "_id_1hiackk _a_72w1o4ecagl");
-    (8, "_id_1yukm0j");
-    (9, "_id_z6g10d _a_nqke54e3xpp")]]
+    [(3, "_id_1iohsq8", []);
+    (4, "_id_1hiackk", [0]);
+    (8, "_id_1yukm0j", []);
+    (9, "_id_z6g10d", [1])]]
   module A =
     struct
       let marker = CSS.make "label:marker _id_1iohsq8" []

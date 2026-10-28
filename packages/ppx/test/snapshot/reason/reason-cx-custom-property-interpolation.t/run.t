@@ -7,9 +7,36 @@ verbatim - no Cascading.toString wrap.
   [@css "@property --colorStr-t58soe{syntax:\"*\";inherits:false;}"];
   [@css "@property --plainStr-vbhzka{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-13tu4ef{syntax:\"*\";inherits:false;}"];
-  [@css "._a_zy7gz1zq54yy{--color-link:var(--colorStr-t58soe);}"];
-  [@css "._a_zy4gc55zkohh{--spacing:var(--plainStr-vbhzka);}"];
-  [@css "._a_zyqed1fpwqpt{--token:var(--value-13tu4ef);}"];
+  [@css
+    (
+      "._a_zy7gz1zq54yy{--color-link:var(--colorStr-t58soe);}",
+      "_a_zy7gz1zq54yy",
+      "0,1,0 own",
+      "-c451772630",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_zy4gc55zkohh{--spacing:var(--plainStr-vbhzka);}",
+      "_a_zy4gc55zkohh",
+      "0,1,0 own",
+      "-c269305127",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_zyqed1fpwqpt{--token:var(--value-13tu4ef);}",
+      "_a_zyqed1fpwqpt",
+      "0,1,0 own",
+      "-c1596243589",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
       ("Output.row", "_id_3o3lvw", "_a_zy7gz1zq54yy"),
@@ -19,9 +46,9 @@ verbatim - no Cascading.toString wrap.
   ];
   [@css.blocks
     [
-      (3, "_id_3o3lvw _a_zy7gz1zq54yy"),
-      (7, "_id_1s07ooq _a_zy7gz1zq54yy _a_zy4gc55zkohh"),
-      (11, "_id_1gnvnw7 _a_zyqed1fpwqpt"),
+      (3, "_id_3o3lvw", [3]),
+      (7, "_id_1s07ooq", [3, 4]),
+      (11, "_id_1gnvnw7", [5]),
     ]
   ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));

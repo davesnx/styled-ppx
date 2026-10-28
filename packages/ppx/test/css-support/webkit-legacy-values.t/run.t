@@ -21,24 +21,47 @@ and "Rule not found in registry: webkit-mask-box-repeat".
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    "._a_399l4c{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}"
+    (
+      "._a_399l4c{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}",
+      "_a_399l4c",
+      "0,1,0 own",
+      "117",
+      511,
+      false,
+    )
   ];
   [@css
-    "._a_3995w2{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}"
+    (
+      "._a_3995w2{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}",
+      "_a_3995w2",
+      "0,1,0 own",
+      "117",
+      511,
+      false,
+    )
   ];
   [@css
-    "._a_2gsa3w{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}"
+    (
+      "._a_2gsa3w{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}",
+      "_a_2gsa3w",
+      "0,1,0 own",
+      "88",
+      1,
+      false,
+    )
   ];
   [@css
-    "._a_2g3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
+    (
+      "._a_2g3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}",
+      "_a_2g3brk",
+      "0,1,0 own",
+      "88",
+      1,
+      false,
+    )
   ];
   [@css.blocks
-    [
-      (5, "_a_399l4c"),
-      (8, "_a_3995w2"),
-      (12, "_a_2gsa3w"),
-      (13, "_a_2g3brk"),
-    ]
+    [(5, "", [0]), (8, "", [1]), (12, "", [2]), (13, "", [3])]
   ];
   
   CSS.make("_a_399l4c", []);

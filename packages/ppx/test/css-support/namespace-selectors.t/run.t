@@ -15,11 +15,56 @@ Namespace-qualified selectors (`svg|circle`, `*|a`, `|a`, `svg|*`,
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_zh70v5w9wvj svg|circle{fill:red;}"];
-  [@css "._a_jxqpf4ekoom *|a{color:blue;}"];
-  [@css "._a_noi564e8hmn |a{color:green;}"];
-  [@css "._a_bkgso4es6rf svg|*{color:pink;}"];
-  [@css "._a_rxkey4eowbc [xlink|href]{color:black;}"];
+  [@css
+    (
+      "._a_zh70v5w9wvj svg|circle{fill:red;}",
+      "_a_zh70v5w9wvj",
+      "0,1,1 & svg|circle",
+      "212",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "._a_jxqpf4ekoom *|a{color:blue;}",
+      "_a_jxqpf4ekoom",
+      "0,1,1 & *|a",
+      "158",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "._a_noi564e8hmn |a{color:green;}",
+      "_a_noi564e8hmn",
+      "0,1,1 & |a",
+      "158",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "._a_bkgso4es6rf svg|*{color:pink;}",
+      "_a_bkgso4es6rf",
+      "0,1,1 & svg|*",
+      "158",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "._a_rxkey4eowbc [xlink|href]{color:black;}",
+      "_a_rxkey4eowbc",
+      "0,2,0 & [xlink|href]",
+      "158",
+      1,
+      true,
+    )
+  ];
   [@css.bindings
     [
       ("Input._a", "_id_1235v4k", "_a_zh70v5w9wvj"),
@@ -31,11 +76,11 @@ Namespace-qualified selectors (`svg|circle`, `*|a`, `|a`, `svg|*`,
   ];
   [@css.blocks
     [
-      (3, "_id_1235v4k _a_zh70v5w9wvj"),
-      (4, "_id_1hlu4ra _a_jxqpf4ekoom"),
-      (5, "_id_b7q8yt _a_noi564e8hmn"),
-      (6, "_id_1ss4l1k _a_bkgso4es6rf"),
-      (7, "_id_v9szhm _a_rxkey4eowbc"),
+      (3, "_id_1235v4k", [0]),
+      (4, "_id_1hlu4ra", [1]),
+      (5, "_id_b7q8yt", [2]),
+      (6, "_id_1ss4l1k", [3]),
+      (7, "_id_v9szhm", [4]),
     ]
   ];
   

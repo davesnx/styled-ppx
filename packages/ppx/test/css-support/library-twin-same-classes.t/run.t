@@ -10,18 +10,21 @@ modules; no class hash takes it.
   $ ../../standalone.exe -cookie 'library-name="lib_js"' --impl Marker.ml -o js.ml
   $ cat native.ml
   [@@@css.config [("library-name", "lib_native")]]
-  [@@@css "._a_5r08qs{display:flex;}"]
-  [@@@css "._a_7peacs{margin:10px;}"]
-  [@@@css "@media (min-width: 768px) {._a_p6loh7p8ooi{margin:20px;}}"]
   [@@@css
-    "._a_kwhpm60b4vk > ._id_1nxznki{-webkit-flex:0 1 100%;-ms-flex:0 1 100%;flex:0 1 100%;}"]
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)]
+  [@@@css
+    ("._a_7peacs{margin:10px;}", "_a_7peacs", "0,1,0 own", "277", 15, false)]
+  [@@@css
+    ("@media (min-width: 768px) {._a_p6loh7p8ooi{margin:20px;}}",
+      "_a_p6loh7p8ooi", "0,1,0 own", "277", 15, false)]
+  [@@@css
+    ("._a_kwhpm60b4vk > ._id_1nxznki{-webkit-flex:0 1 100%;-ms-flex:0 1 100%;flex:0 1 100%;}",
+      "_a_kwhpm60b4vk", "0,2,0 & > ._id_1nxznki", "216", 7, false)]
   [@@@css.bindings
     [("Marker.group", "_id_1nxznki", "_a_5r08qs");
     ("Marker.carousel", "_id_1xu6fo2",
       "_a_7peacs _a_p6loh7p8ooi _a_kwhpm60b4vk")]]
-  [@@@css.blocks
-    [(1, "_id_1nxznki _a_5r08qs");
-    (4, "_id_1xu6fo2 _a_7peacs _a_p6loh7p8ooi _a_kwhpm60b4vk")]]
+  [@@@css.blocks [(1, "_id_1nxznki", [0]); (4, "_id_1xu6fo2", [1; 2; 3])]]
   let group = CSS.make "label:group _id_1nxznki _a_5r08qs" []
   let carousel =
     CSS.make
