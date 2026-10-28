@@ -1053,11 +1053,17 @@ module Css_transform = {
      blocks writing the same two conditions in opposite order silently
      collapse onto whichever block the aggregator saw first (see
      `media-order-dedup-flip.t`). Rewriting each earlier condition to
-     exclude every later one makes the group pairwise disjoint, so at most
-     one ever applies and "last written wins" holds regardless of
-     stylesheet position or which other block already emitted the same
-     rule. Runs here, before `atomize_rules` hashes each atom's rendered
-     text, so the REWRITTEN condition is what ends up in the class name.
+     exclude every later one that sets all of its longhands
+     (`Slot_key.removes`) means at most one of them ever applies, so "last
+     written wins" holds regardless of stylesheet position or which other
+     block already emitted the same rule. A later rule that sets other
+     longhands, or only some of them, does not negate the earlier one: in
+     plain CSS the earlier rule's other longhands still apply where both
+     conditions match (see `media-overlap-longhand-cover.t`); the block
+     order edges in `[@@@css.blocks]` (or a merge edge across blocks)
+     order that partial overlap in the sheet. Runs here, before
+     `atomize_rules` hashes each atom's rendered text, so the REWRITTEN
+     condition is what ends up in the class name.
 
      Scope, matching StyleX exactly: `@media` only - `@supports`/
      `@container` are left alone by construction (`media_atom_slot` only
@@ -1438,8 +1444,8 @@ module Css_transform = {
      each negation wrapped in its own parens (`(not (...))`, never a bare
      `and not (...)` - invalid MQ4, `not` only starts a whole condition).
      `later` are the ORIGINAL (not previously rewritten) preludes of every
-     strictly-later group member - a 3+-way group chains against all of
-     them, not just its neighbor.
+     strictly-later group member that covers `current`'s longhands - a
+     3+-way group chains against all of them, not just its neighbor.
 
      `~type_prefix`: for a same-type group (`split_type_prefix_and_chain`),
      `current`/`later` are already just the shared-type members' own
@@ -1564,8 +1570,8 @@ module Css_transform = {
 
   /* One rule-list level (siblings): find every classifiable `@media`
      at-rule, group by (target, family, !important, media_kind), and for
-     every group of 2+, record a rewritten prelude for every member but
-     the last, keyed by that member's OWN (pre-rewrite) prelude value -
+     every member that a later member of its group covers, record a
+     rewritten prelude, keyed by that member's OWN (pre-rewrite) prelude value -
      `atomize_rules` looks this up when it builds the atom, using the
      rewritten text for the class hash and the printed rule while
      `Slot_key.of_atom` still sees the ORIGINAL, un-rewritten prelude for
@@ -1617,35 +1623,55 @@ module Css_transform = {
          | []
          | [_] => () /* nothing else in this (target, family, kind) to negate against */
          | members =>
-           let reprs =
-             members
-             |> List.map(((ar, _, kind): (at_rule, Slot_key.t, media_kind)) =>
-                  later_representation(kind, fst(ar.prelude))
+           /* Each member paired with the later members that cover all of
+              its longhands (`Slot_key.removes`, the same test `CSS.merge`
+              uses). A later member that sets other longhands, or only
+              some of them, does not hide the earlier rule in plain CSS
+              either, so it is no negation source: negating against it
+              would drop the earlier rule's other longhands where both
+              conditions match. */
+           let indexed =
+             List.mapi(
+               (idx, (ar: at_rule, slot: Slot_key.t, kind)) =>
+                 (
+                   idx,
+                   ar,
+                   slot,
+                   kind,
+                   later_representation(kind, fst(ar.prelude)),
+                 ),
+               members,
+             );
+           let with_sources =
+             indexed
+             |> List.map(((idx, ar, slot, kind, _)) =>
+                  (
+                    ar,
+                    kind,
+                    indexed
+                    |> List.filter_map(((later_idx, _, later_slot, _, repr)) =>
+                         later_idx > idx
+                         && Slot_key.removes(~former=slot, ~latter=later_slot)
+                           ? Some(repr) : None
+                       ),
+                  )
                 );
-           let arr = Array.of_list(reprs);
-           let n = Array.length(arr);
-           /* Every member from index 1 on is a potential negation SOURCE
-              for some earlier member (index 0 is never negated - nothing
-              precedes it). If any of them can resolve to "unknown" (see
+           /* If any negation source can resolve to "unknown" (see
               `query_is_negation_safe`'s doc), negating ANY member of this
               group can turn an earlier, always-applying rule into one
               that never applies: leave the WHOLE group untouched rather
-              than negate against the safe members only and silently
+              than negate against the safe sources only and silently
               accept a narrower, harder-to-audit gap. */
            let (_, _, group_kind) = List.hd(members);
-           let later_side_is_safe =
-             Array.to_list(Array.sub(arr, 1, n - 1))
-             |> List.for_all(repr => is_safe_as_later(group_kind, repr));
-           if (later_side_is_safe) {
-             members
-             |> List.iteri(
-                  (
-                    idx,
-                    (ar, _slot, kind): (at_rule, Slot_key.t, media_kind),
-                  ) =>
-                  if (idx < n - 1) {
-                    let later =
-                      Array.to_list(Array.sub(arr, idx + 1, n - idx - 1));
+           let sources_are_safe =
+             with_sources
+             |> List.for_all(((_, _, later)) =>
+                  List.for_all(is_safe_as_later(group_kind), later)
+                );
+           if (sources_are_safe) {
+             with_sources
+             |> List.iter(((ar: at_rule, kind, later)) =>
+                  if (later != []) {
                     let new_prelude =
                       switch (kind) {
                       | Plain =>

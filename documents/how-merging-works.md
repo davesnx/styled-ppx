@@ -180,7 +180,8 @@ The grouping above decides ties BETWEEN rules; it says nothing about two
 `@media` rules for the same property inside the SAME block. Plain CSS
 would give that tie to stylesheet position too, not to which `@media`
 was written last - so extraction rewrites each earlier condition to
-exclude every later one on the same selector and property family
+exclude every later one on the same selector that sets all of the
+earlier rule's longhands
 (`packages/ppx/src/Css_file.re`'s `rewrite_media_conditions`), before
 the rule is hashed into a class:
 
@@ -204,6 +205,15 @@ Blue now wins at 900px and above no matter where either rule lands in
 the sheet, and no matter whether some OTHER block already emitted the
 same two `@media` rules in the opposite order. Only `@media` gets this
 treatment - see "Known limits" below.
+
+A later rule that sets other longhands, or only some of them, does not
+exclude the earlier condition: `margin: 1px` at 600px followed by
+`margin-top: 2px` at 900px keeps `margin: 1px` at 900px and above, so
+the other three sides stay 1px, as in plain CSS. Both rules then apply
+at 900px and above, and the block order above puts `margin: 1px` first
+in the sheet, so `margin-top: 2px` wins there. When the two rules come
+from different blocks, `CSS.merge(a, b)` orders `a`'s rule first
+(`packages/ppx/test/css-support/media-overlap-longhand-cover.t`).
 
 The rewrite changes the printed rule and the class name, not what
 `CSS.merge` compares: the merge key keeps the condition as you wrote it.
@@ -295,8 +305,8 @@ share a class depends on which one the browser loads first
   `orientation`; never `calc()`, a percentage, or range-comparison
   syntax. Media features use three-valued logic: negating a feature the
   browser cannot evaluate gives "unknown", so the earlier rule would never
-  apply again and its value would be lost. If any later member of a group is unsafe this way, the WHOLE
-  group is left untouched. Tested by
+  apply again and its value would be lost. If any later member that
+  would be negated is unsafe this way, the WHOLE group is left untouched. Tested by
   `packages/ppx/test/css-support/media-calc-feature-unchanged.t`.
 - **The rewrite always wraps, even when already disjoint.** It does not
   reason about ranges (`(min-width: 768px) and (max-width: 1279px)`
