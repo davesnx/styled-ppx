@@ -233,6 +233,7 @@ let expand_css_expression =
       ~main_module,
       ~scope,
       ~opens,
+      ~locals,
       ~label_name,
       ~registry_name,
       payload,
@@ -263,6 +264,7 @@ let expand_css_expression =
             ~main_module,
             ~scope,
             ~opens,
+            ~locals,
             ~source_position_start,
             ~name=label_name,
             rule_list,
@@ -553,6 +555,7 @@ let expand_styled_module =
             ~main_module,
             ~scope,
             ~opens,
+            ~locals=[],
             ~source_position_start,
             ~name=Some(name),
             rule_list,
@@ -680,9 +683,23 @@ and merge_chain = (expr: Ppxlib.expression) =>
   | _ => [expr]
   };
 
+/* [locals] are the variables bound inside the top-level binding at the
+   current point (function parameters, local lets, pattern variables): a
+   `$(x)` or merge argument naming one of them does not refer to a [%css]
+   binding of that name. */
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
-  let rec map_with_label = (~label_name, expr) => {
+  let rec map_with = (~label_name, ~locals, expr) => {
+    let in_scope = (bound, expr) =>
+      map_with(~label_name, ~locals=bound @ locals, expr);
+    let map_case = (~outer=[], case: Ppxlib.case) => {
+      let bound = Local_selector_environment.bound_names(case.pc_lhs) @ outer;
+      {
+        ...case,
+        pc_guard: Option.map(in_scope(bound), case.pc_guard),
+        pc_rhs: in_scope(bound, case.pc_rhs),
+      };
+    };
     let mapper = {
       as self;
       inherit class Ppxlib.Ast_traverse.map as super;
@@ -700,6 +717,7 @@ let map_css_expressions =
               ~file,
               ~scope,
               ~opens,
+              ~locals,
               flatten_merge(fn, args),
             )
           | None => ()
@@ -716,6 +734,7 @@ let map_css_expressions =
               ~main_module,
               ~scope,
               ~opens,
+              ~locals,
               ~label_name,
               ~registry_name=top_binding,
               payload,
@@ -742,34 +761,140 @@ let map_css_expressions =
               "[%keyframe] expects a string of CSS with keyframe definitions.",
             )
           }
+        | Pexp_function(params, constraint_, body) =>
+          let (params_rev, bound) =
+            List.fold_left(
+              ((params_rev, bound), param: Ppxlib.function_param) =>
+                switch (param.pparam_desc) {
+                | Pparam_val(label, default, pattern) => (
+                    [
+                      {
+                        ...param,
+                        pparam_desc:
+                          Pparam_val(
+                            label,
+                            Option.map(in_scope(bound), default),
+                            pattern,
+                          ),
+                      },
+                      ...params_rev,
+                    ],
+                    Local_selector_environment.bound_names(pattern) @ bound,
+                  )
+                | Pparam_newtype(_) => ([param, ...params_rev], bound)
+                },
+              ([], []),
+              params,
+            );
+          let body =
+            switch (body) {
+            | Pfunction_body(body) =>
+              Ppxlib.Pfunction_body(in_scope(bound, body))
+            | Pfunction_cases(cases, loc, attributes) =>
+              Pfunction_cases(
+                List.map(map_case(~outer=bound), cases),
+                loc,
+                attributes,
+              )
+            };
+          {
+            ...expr,
+            pexp_desc:
+              Pexp_function(List.rev(params_rev), constraint_, body),
+          };
+        | Pexp_match(scrutinee, cases) => {
+            ...expr,
+            pexp_desc:
+              Pexp_match(
+                self#expression(scrutinee),
+                List.map(case => map_case(case), cases),
+              ),
+          }
+        | Pexp_try(body, cases) => {
+            ...expr,
+            pexp_desc:
+              Pexp_try(
+                self#expression(body),
+                List.map(case => map_case(case), cases),
+              ),
+          }
+        | Pexp_for(pattern, low, high, direction, body) => {
+            ...expr,
+            pexp_desc:
+              Pexp_for(
+                pattern,
+                self#expression(low),
+                self#expression(high),
+                direction,
+                in_scope(
+                  Local_selector_environment.bound_names(pattern),
+                  body,
+                ),
+              ),
+          }
+        | Pexp_letop({ let_, ands, body }) =>
+          let map_binding_op = (op: Ppxlib.binding_op) => {
+            ...op,
+            pbop_exp: self#expression(op.pbop_exp),
+          };
+          let bound =
+            List.concat_map(
+              (op: Ppxlib.binding_op) =>
+                Local_selector_environment.bound_names(op.pbop_pat),
+              [let_, ...ands],
+            );
+          {
+            ...expr,
+            pexp_desc:
+              Pexp_letop({
+                let_: map_binding_op(let_),
+                ands: List.map(map_binding_op, ands),
+                body: in_scope(bound, body),
+              }),
+          };
         | Pexp_let(rec_flag, bindings, body) =>
+          let bound =
+            List.concat_map(
+              (binding: Ppxlib.value_binding) =>
+                Local_selector_environment.bound_names(binding.pvb_pat),
+              bindings,
+            );
+          let binding_locals =
+            switch (rec_flag) {
+            | Recursive => bound @ locals
+            | Nonrecursive => locals
+            };
           let bindings =
             List.map(
               (binding: Ppxlib.value_binding) => {
-                let expr =
+                let label_name =
                   switch (binding_name_from_pat(binding.pvb_pat)) {
-                  | Some(name) when !is_generated_binder(name) =>
-                    map_with_label(~label_name=Some(name), binding.pvb_expr)
+                  | Some(name) when !is_generated_binder(name) => Some(name)
                   | Some(_)
-                  | None => self#expression(binding.pvb_expr)
+                  | None => label_name
                   };
                 {
                   ...binding,
-                  pvb_expr: expr,
+                  pvb_expr:
+                    map_with(
+                      ~label_name,
+                      ~locals=binding_locals,
+                      binding.pvb_expr,
+                    ),
                 };
               },
               bindings,
             );
           {
             ...expr,
-            pexp_desc: Pexp_let(rec_flag, bindings, self#expression(body)),
+            pexp_desc: Pexp_let(rec_flag, bindings, in_scope(bound, body)),
           };
         | _ => super#expression(expr)
         }
     };
     mapper#expression(expr);
   };
-  map_with_label(~label_name=top_binding, expr);
+  map_with(~label_name=top_binding, ~locals=[], expr);
 };
 
 let module_path_from_expr = (expr: Ppxlib.module_expr): option(list(string)) =>

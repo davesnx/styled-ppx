@@ -88,6 +88,7 @@
 - [DOCS] Rewrite the documentation for static extraction, including the introduction, architecture, dune setup, `[%css]`, and `CSS.styles`; replace ReScript pages with a deprecation notice and use mlx syntax for OCaml examples (@davesnx)
 - [FIX] `styled-ppx.generate` breaks a dependency cycle between files with an edge inside the cycle. It dropped the edge of a file that only depended on the cycle, so with `a` and `b` referencing each other and `z` referencing `a`, `z`'s CSS came before `a`'s. The warning now names only the files in the cycle (@davesnx)
 - [FIX] `dune test` runs the `slot_key` registry test with `seed.snapshot` as a dependency; it failed with `Sys_error("seed.snapshot: No such file or directory")` (@davesnx)
+- [FIX] A `$(x)` selector reference and a `CSS.merge`/`+++` argument no longer resolve to a `[%css]` binding named `x` when a function parameter, a local `let`, a pattern variable or a dynamic styled component's prop named `x` shadows it. `$(x)` then fails with an error that names the shadowing, and the merge argument is left out of `[@@@css.merges]` (@davesnx)
 
 ## 0.61.0
 

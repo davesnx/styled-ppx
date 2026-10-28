@@ -194,12 +194,14 @@ module Css_transform = {
   };
 
   /* Threaded unchanged through the whole transform walk: resolution
-     inputs, the position AST locations are rebased against, and the
-     accumulator for hoisted interpolations. */
+     inputs (with [locals], the local variables in scope at the block, which
+     shadow a binding of the same name), the position AST locations are
+     rebased against, and the accumulator for hoisted interpolations. */
   type ctx = {
     file: string,
     scope: list(string),
     opens: list(list(string)),
+    locals: list(string),
     source_position_start: Lexing.position,
     dynamic_vars: ref(list(dynamic_var)),
   };
@@ -538,6 +540,7 @@ module Css_transform = {
           ~file=ctx.file,
           ~scope=ctx.scope,
           ~opens=ctx.opens,
+          ~locals=ctx.locals,
           ~loc=var_loc,
           path_str,
         );
@@ -567,6 +570,7 @@ module Css_transform = {
           ~file=ctx.file,
           ~scope=ctx.scope,
           ~opens=ctx.opens,
+          ~locals=ctx.locals,
           ~loc=to_file_loc(ctx, var_loc),
           path_str,
         );
@@ -2068,6 +2072,7 @@ module Css_transform = {
         ~file,
         ~scope: list(string),
         ~opens: list(list(string)),
+        ~locals: list(string),
         ~source_position_start,
         rule_list: rule_list,
       ) => {
@@ -2075,6 +2080,7 @@ module Css_transform = {
       file,
       scope,
       opens,
+      locals,
       source_position_start,
       dynamic_vars: ref([]),
     };
@@ -2351,6 +2357,7 @@ let push =
       ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~locals: list(string),
       ~source_position_start,
       ~name: option(string),
       declarations: Styled_ppx_css_parser.Ast.rule_list,
@@ -2360,6 +2367,7 @@ let push =
       ~file,
       ~scope,
       ~opens,
+      ~locals,
       ~source_position_start,
       declarations,
     );
@@ -2437,6 +2445,7 @@ let push_keyframe =
       file,
       scope,
       opens,
+      locals: [],
       source_position_start,
       dynamic_vars: ref([]),
     };
@@ -2514,6 +2523,7 @@ let push_global =
       file,
       scope,
       opens,
+      locals: [],
       source_position_start,
       dynamic_vars: ref([]),
     };
@@ -2587,7 +2597,7 @@ let push_global =
 /* A merge argument, resolved to a block of this file or to another module's
    binding: a [%css] binding name, or an inline [%css] already lowered to
    `CSS.make("<classes>", ...)`. */
-let merge_operand = (~file, ~scope, ~opens, expr: Ppxlib.expression) =>
+let merge_operand = (~file, ~scope, ~opens, ~locals, expr: Ppxlib.expression) =>
   switch (expr.pexp_desc) {
   | Pexp_ident({ txt: lid, _ }) =>
     switch (
@@ -2595,6 +2605,7 @@ let merge_operand = (~file, ~scope, ~opens, expr: Ppxlib.expression) =>
         ~file,
         ~scope,
         ~opens,
+        ~locals,
         String.concat(".", Ppxlib.Longident.flatten_exn(lid)),
       )
     ) {
@@ -2623,8 +2634,10 @@ let merge_operand = (~file, ~scope, ~opens, expr: Ppxlib.expression) =>
   | _ => None
   };
 
-let record_merge = (~line, ~file, ~scope, ~opens, arguments) =>
-  switch (List.filter_map(merge_operand(~file, ~scope, ~opens), arguments)) {
+let record_merge = (~line, ~file, ~scope, ~opens, ~locals, arguments) =>
+  switch (
+    List.filter_map(merge_operand(~file, ~scope, ~opens, ~locals), arguments)
+  ) {
   | [_, _, ..._] as operands => Blocks.record_merge(~line, operands)
   | _ => ()
   };

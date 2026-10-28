@@ -223,14 +223,32 @@ type class_ref =
   | Local(string)
   | Cross_module(string);
 
+let bound_names = (pattern: Ppxlib.pattern): list(string) => {
+  let collector = {
+    as _;
+    inherit class Ppxlib.Ast_traverse.fold(list(string)) as super;
+    pub! pattern = (pattern, names) =>
+      switch (pattern.ppat_desc) {
+      | Ppat_var({ txt: name, _ })
+      | Ppat_alias(_, { txt: name, _ }) =>
+        super#pattern(pattern, [name, ...names])
+      | _ => super#pattern(pattern, names)
+      }
+  };
+  collector#pattern(pattern, []);
+};
+
 let resolve_class_ref =
     (
       ~file: string,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~locals: list(string),
       path_str: string,
     ) =>
   switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
+  | _ when !String.contains(path_str, '.') && List.mem(path_str, locals) =>
+    None
   | Some(className) => Some(Local(className))
   | None
       when
@@ -257,14 +275,22 @@ let resolve_selector_class_ref =
       ~file: string,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~locals: list(string),
       ~loc,
       path_str: string,
     ) => {
-  switch (resolve_class_ref(~file, ~scope, ~opens, path_str)) {
+  switch (resolve_class_ref(~file, ~scope, ~opens, ~locals, path_str)) {
   | Some(Local(className)) => className
   | Some(Cross_module(longident)) =>
     Cross_module_refs.record(~file, ~longident, ~loc);
     Cross_module_refs.sentinel(longident);
+  | None when List.mem(path_str, locals) =>
+    Ppxlib.Location.raise_errorf(
+      ~loc,
+      "Selector interpolation `$(%s)` names a function parameter or local variable, not a [%%css] binding.\n- To reference the [%%css] binding `%s`, rename the local variable.\n- Otherwise, use [%%cx] for runtime substitution.",
+      path_str,
+      path_str,
+    )
   | None =>
     Ppxlib.Location.raise_errorf(
       ~loc,
