@@ -20,6 +20,51 @@ let references (structure : Ppxlib.structure) : string list =
   Depend.add_implementation Depend.String.Map.empty compiler_structure;
   Depend.String.Set.elements !Depend.free_structure_names
 
+(** Strongly connected components (Tarjan). Maps each of [nodes] to the index of
+    its component; two keys share an index exactly when each can reach the
+    other. [edges k] must return only keys from [nodes]. *)
+let components ~(nodes : string list) ~(edges : string -> string list) :
+  (string, int) Hashtbl.t =
+  let index = Hashtbl.create (List.length nodes) in
+  let low = Hashtbl.create (List.length nodes) in
+  let on_stack = Hashtbl.create (List.length nodes) in
+  let component = Hashtbl.create (List.length nodes) in
+  let stack = ref [] in
+  let next_index = ref 0 in
+  let next_component = ref 0 in
+  let rec visit k =
+    Hashtbl.replace index k !next_index;
+    Hashtbl.replace low k !next_index;
+    incr next_index;
+    stack := k :: !stack;
+    Hashtbl.replace on_stack k ();
+    List.iter
+      (fun d ->
+        if not (Hashtbl.mem index d) then begin
+          visit d;
+          Hashtbl.replace low k (min (Hashtbl.find low k) (Hashtbl.find low d))
+        end
+        else if Hashtbl.mem on_stack d then
+          Hashtbl.replace low k
+            (min (Hashtbl.find low k) (Hashtbl.find index d)))
+      (edges k);
+    if Hashtbl.find low k = Hashtbl.find index k then begin
+      let rec pop () =
+        match !stack with
+        | top :: rest ->
+          stack := rest;
+          Hashtbl.remove on_stack top;
+          Hashtbl.replace component top !next_component;
+          if top <> k then pop ()
+        | [] -> ()
+      in
+      pop ();
+      incr next_component
+    end
+  in
+  List.iter (fun k -> if not (Hashtbl.mem index k) then visit k) nodes;
+  component
+
 (** Kahn's algorithm that always breaks ties on the smallest [key] among ready
     nodes, so the output matches the input order (assuming the caller lists
     nodes in that order already) unless an edge forces a change. This keeps the
@@ -37,10 +82,12 @@ let references (structure : Ppxlib.structure) : string list =
     dune would have refused to build it. A cycle here is therefore necessarily
     an artifact of how the caller resolved a referenced name to a node (its
     ambiguous-name heuristic can pick an edge a real build wouldn't have). We
-    never fail the build over an ordering problem: warn once naming the stuck
-    nodes, drop the blocking edge whose dependent (source) key sorts
-    alphabetically last, and keep going. Dropping only ever removes edges from a
-    finite graph, so this always terminates.
+    never fail the build over an ordering problem: among the stuck edges that
+    lie on a cycle (both ends in one strongly connected component), drop the one
+    whose dependent (source) key sorts alphabetically last, warn naming that
+    cycle's nodes, and keep going. A node that only depends on a cycle keeps its
+    edge. Dropping only ever removes edges from a finite graph, so this always
+    terminates.
 
     Two nodes sharing a [key] collapse into one (the later one in [nodes] wins,
     since [node_of_key] is filled with [Hashtbl.replace]); [node_count] below is
@@ -111,22 +158,32 @@ let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
       in
       let left_keys = List.sort String.compare (List.map key left) in
       let left_key_set = KeySet.of_list left_keys in
+      let stuck_deps k =
+        !(Hashtbl.find pending k)
+        |> List.filter (fun dep -> KeySet.mem dep left_key_set)
+      in
+      let component = components ~nodes:left_keys ~edges:stuck_deps in
       let blocking =
-        left
-        |> List.concat_map (fun n ->
-          !(Hashtbl.find pending (key n))
-          |> List.filter (fun dep -> KeySet.mem dep left_key_set)
-          |> List.map (fun dep -> key n, dep))
+        left_keys
+        |> List.concat_map (fun k ->
+          stuck_deps k
+          |> List.filter (fun dep ->
+            Hashtbl.find component dep = Hashtbl.find component k)
+          |> List.map (fun dep -> k, dep))
         |> List.sort (fun (s1, _) (s2, _) -> String.compare s2 s1)
       in
       (match blocking with
       | (source, dep) :: _ ->
+        let cycle =
+          List.filter
+            (fun k -> Hashtbl.find component k = Hashtbl.find component source)
+            left_keys
+        in
         Printf.eprintf
           "styled-ppx: dependency cycle among %s; dropping the edge from %s to \
            %s to keep a deterministic order\n\
            %!"
-          (String.concat ", " left_keys)
-          source dep;
+          (String.concat ", " cycle) source dep;
         let deps = Hashtbl.find pending source in
         deps := List.filter (fun d -> d <> dep) !deps;
         if !deps = [] then ready := KeySet.add source !ready

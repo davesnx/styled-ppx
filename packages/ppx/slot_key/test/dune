@@ -12,6 +12,7 @@
 (test
  (name test_slot_key_registry)
  (modules test_slot_key_registry)
+ (deps seed.snapshot)
  (libraries alcotest alcotest_extra slot_key Css_grammar))
 
 (rule

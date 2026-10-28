@@ -85,6 +85,8 @@
 - [FIX] Hash atomic classes with the main module name rather than the file path, keeping class names stable across build contexts (@davesnx)
 - [DOCS] Add an `@webref/css` coverage oracle that checks supported properties, at-rules, media features, and generated conformance tests in CI (@davesnx)
 - [DOCS] Rewrite the documentation for static extraction, including the introduction, architecture, dune setup, `[%css]`, and `CSS.styles`; replace ReScript pages with a deprecation notice and use mlx syntax for OCaml examples (@davesnx)
+- [FIX] `styled-ppx.generate` breaks a dependency cycle between files with an edge inside the cycle. It dropped the edge of a file that only depended on the cycle, so with `a` and `b` referencing each other and `z` referencing `a`, `z`'s CSS came before `a`'s. The warning now names only the files in the cycle (@davesnx)
+- [FIX] `dune test` runs the `slot_key` registry test with `seed.snapshot` as a dependency; it failed with `Sys_error("seed.snapshot: No such file or directory")` (@davesnx)
 
 ## 0.61.0
 
