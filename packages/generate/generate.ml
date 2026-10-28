@@ -298,18 +298,18 @@ let format_location (r : Refs.ref_loc) : string =
   Printf.sprintf "File %S, line %d, characters %d-%d:" r.file r.start_line
     r.start_col r.end_col
 
-(** Derive the module name from a file path the way dune/OCaml does: take the
-    basename, strip the [.ml] / [.re] / [.pp.ml] extension, and capitalize the
-    first letter. This matches how a user writes [M.foo] when the source file is
-    [m.re]. *)
+(** Derive the module name from a file path the way dune does: take the basename
+    up to its first [.] and capitalize it. A module name cannot contain [.], so
+    this covers [m.ml], [m.re], [m.mlx] and every name dune gives them on the
+    way ([m.pp.ml], [m.re.ml], [m.re.pp.ml], [m.mlx.pp.ml]). *)
 let module_of_filename filename =
   let base = Filename.basename filename in
   let stem =
-    if String.ends_with base ~suffix:".pp.ml" then
-      String.sub base 0 (String.length base - String.length ".pp.ml")
-    else Filename.remove_extension base
+    match String.index_opt base '.' with
+    | Some i -> String.sub base 0 i
+    | None -> base
   in
-  if stem = "" then stem else String.capitalize_ascii stem
+  String.capitalize_ascii stem
 
 (** Detect cross-library references: a longident whose root module is NOT one of
     the input files passed to the generator. The generator only sees files from

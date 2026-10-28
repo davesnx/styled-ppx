@@ -1103,13 +1103,10 @@ let () = {
         }
       );
     let config_items =
-      switch (config_entries) {
-      | [] => []
-      | _ =>
-        switch (rule_items, bindings_items) {
-        | ([], []) => []
-        | _ => [Css_extraction.config_attribute(config_entries)]
-        }
+      switch (config_entries, rule_items, bindings_items) {
+      | ([], _, _) => []
+      | (_, [], []) when Settings.Get.library() == None => []
+      | _ => [Css_extraction.config_attribute(config_entries)]
       };
     config_items
     @ rule_items
