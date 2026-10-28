@@ -13,7 +13,6 @@ html{margin:0;padding:0;}
 body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9);font-family:"Menlo", "monospace";line-height:1.5;}
 ._a_5r08qs{display:flex;}
 ._a_610001q59l{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
-._a_604qq7{-webkit-flex:1;-ms-flex:1;flex:1;}
 ._a_6fvq9t{gap:var(--lola-8erbae);}
 ._a_4ekvmb{color:red;}
 ._a_qyw7u4enfjo:hover{color:blue;}
@@ -92,3 +91,4 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_39fawg{background:linear-gradient(135deg, #101828 0%, #364152 100%);}
 ._a_4en7if{color:white;}
 ._a_4092kl{box-shadow:0 20px 40px rgba(16, 24, 40, 0.22);}
+._a_604qq7{-webkit-flex:1;-ms-flex:1;flex:1;}
