@@ -139,6 +139,7 @@ let make_bindings_attribute = (entries: list(Css_bindings.entry)) =>
   |> List.map((entry: Css_bindings.entry) =>
        Css_extraction.binding(
          ~longident=entry.longident,
+         ~identity=entry.identity,
          ~class_string=entry.class_string,
        )
      )
@@ -208,12 +209,22 @@ let css_error_expr = (~payload_loc) => {
   );
 };
 
-let record_css_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
-  Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
-  let longident = String.concat(".", [main_module, ...scope] @ [name]);
-  let class_string = String.concat(" ", classNames);
-  Css_bindings.record(~longident, ~class_string);
-};
+/* [name] is the registry name (the top-level binding, or the styled module
+   name) - always what cross-module `$(M.name)` refs and the longident use.
+   A [%css] under a function-local `let` has no registry name: that local
+   names it, not the top-level binding. [identity] is the binding's identity
+   class, computed by `Css_file.push`; `None` for an anonymous/`_` binding,
+   in which case there is nothing to register or index. */
+let record_css_binding =
+    (~file, ~main_module, ~scope, ~name, ~identity, ~atomClasses) =>
+  switch (identity) {
+  | Some(cid) =>
+    Local_selector_environment.register(~file, ~scope, ~name, ~className=cid);
+    let longident = String.concat(".", [main_module, ...scope] @ [name]);
+    let class_string = String.concat(" ", atomClasses);
+    Css_bindings.record(~longident, ~identity=cid, ~class_string);
+  | None => ()
+  };
 
 let expand_css_expression =
     (
@@ -221,13 +232,13 @@ let expand_css_expression =
       ~main_module,
       ~scope,
       ~opens,
+      ~locals,
       ~label_name,
       ~registry_name,
       payload,
     ) => {
   open Ppxlib;
   File.set(file);
-  let label = Settings.Get.minify() ? None : label_name;
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
     let source_position_start =
@@ -246,18 +257,29 @@ let expand_css_expression =
       let validations = type_check_rule_list(rule_list);
       switch (get_errors(validations)) {
       | [] =>
-        let (classNames, dynamic_vars) =
+        let (identity, atomClasses, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
+            ~locals,
             ~source_position_start,
-            ~label?,
+            ~name=label_name,
             rule_list,
           );
+        let classNames =
+          Css_file.classes_with_identity(~identity, atomClasses);
         switch (registry_name) {
         | Some(name) =>
-          record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
+          record_css_binding(
+            ~file,
+            ~main_module,
+            ~scope,
+            ~name,
+            ~identity,
+            ~atomClasses,
+          )
         | None => ()
         };
         let marker = Dev_mode.marker(label_name);
@@ -499,8 +521,15 @@ let expand_styled_module =
     (~file, ~main_module, ~scope, ~opens, ~name, ~htmlTag, payload) => {
   open Ppxlib;
   File.set(file);
-  let record_component_binding = classNames =>
-    record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames);
+  let record_component_binding = (~identity, atomClasses) =>
+    record_css_binding(
+      ~file,
+      ~main_module,
+      ~scope,
+      ~name,
+      ~identity,
+      ~atomClasses,
+    );
 
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
@@ -519,20 +548,24 @@ let expand_styled_module =
     | Ok(rule_list) =>
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
-        let (classNames, dynamic_vars) =
+        let (identity, atomClasses, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
+            ~locals=[],
             ~source_position_start,
-            ~label=name,
+            ~name=Some(name),
             rule_list,
           );
-        record_component_binding(classNames);
+        let classNames =
+          Css_file.classes_with_identity(~identity, atomClasses);
+        record_component_binding(~identity, atomClasses);
         let styles =
           Css_to_runtime.render_make_call(
             ~loc=stringLoc,
-            ~marker=None,
+            ~marker=Dev_mode.marker(Some(name)),
             ~classNames,
             ~dynamic_vars,
           );
@@ -581,6 +614,7 @@ let expand_styled_module =
     Generate.dynamicExtractedComponent(
       ~loc=payload.pexp_loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~htmlTag,
@@ -601,6 +635,13 @@ let binding_name_from_pat = (pat: Ppxlib.pattern): option(string) =>
   | _ => None
   };
 
+/* A `let` whose name starts with `__` is a temporary another ppx introduced
+   (server-reason-react's styles-attribute expansion binds `__incoming` and
+   `__existing` before this ppx lowers the `[%css]` inside them), so a `[%css]`
+   under it keeps the enclosing user binding as its label, marker and identity
+   instead of taking the generated name. */
+let is_generated_binder = name => String.starts_with(~prefix="__", name);
+
 let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   switch (expr.pexp_desc) {
   | Pexp_constant(Pconst_string(value, _, _)) =>
@@ -608,14 +649,58 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
       ~file,
       ~scope,
       ~name,
-      ~classNames=[value],
+      ~className=value,
     )
   | _ => ()
   };
 
+/* `CSS.merge(a, b)` and `a +++ b`: their two arguments. */
+let merge_arguments = (fn: Ppxlib.expression, args) =>
+  switch (fn.pexp_desc, args) {
+  | (
+      Pexp_ident({
+        txt: Ldot(Lident("CSS"), "merge") | Lident("+++") | Ldot(_, "+++"),
+        _,
+      }),
+      [(Ppxlib.Nolabel, left), (Ppxlib.Nolabel, right)],
+    ) =>
+    Some((left, right))
+  | _ => None
+  };
+
+/* The arguments of a merge chain, in call order: `merge(merge(a, b), c)`
+   and `a +++ b +++ c` give [a, b, c]. */
+let rec flatten_merge = (fn, args) =>
+  switch (merge_arguments(fn, args)) {
+  | Some((left, right)) => merge_chain(left) @ merge_chain(right)
+  | None => []
+  }
+and merge_chain = (expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_apply(fn, args) when merge_arguments(fn, args) != None =>
+    flatten_merge(fn, args)
+  | _ => [expr]
+  };
+
+/* [locals] are the variables bound inside the top-level binding at the
+   current point (function parameters, local lets, pattern variables): a
+   `$(x)` or merge argument naming one of them does not refer to a top-level
+   [%css] binding of that name. A local `let` bound to [%css] resolves to
+   its own identity class instead. */
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
-  let rec map_with_label = (~label_name, expr) => {
+  let rec map_with = (~label_name, ~registry_name, ~locals, expr) => {
+    let in_scope = (bound, expr) =>
+      map_with(~label_name, ~registry_name, ~locals=bound @ locals, expr);
+    let map_case = (~outer=[], case: Ppxlib.case) => {
+      let bound =
+        Local_selector_environment.bound_locals(case.pc_lhs) @ outer;
+      {
+        ...case,
+        pc_guard: Option.map(in_scope(bound), case.pc_guard),
+        pc_rhs: in_scope(bound, case.pc_rhs),
+      };
+    };
     let mapper = {
       as self;
       inherit class Ppxlib.Ast_traverse.map as super;
@@ -626,6 +711,18 @@ let map_css_expressions =
           let args =
             args
             |> List.map(((label, arg)) => (label, self#expression(arg)));
+          switch (merge_arguments(fn, args)) {
+          | Some(_) =>
+            Css_file.record_merge(
+              ~line=expr.pexp_loc.loc_start.pos_lnum,
+              ~file,
+              ~scope,
+              ~opens,
+              ~locals,
+              flatten_merge(fn, args),
+            )
+          | None => ()
+          };
           Styles_attribute.expand({
             ...expr,
             pexp_desc: Pexp_apply(fn, args),
@@ -638,8 +735,9 @@ let map_css_expressions =
               ~main_module,
               ~scope,
               ~opens,
+              ~locals,
               ~label_name,
-              ~registry_name=top_binding,
+              ~registry_name,
               payload,
             )
           | None => css_error_expr(~payload_loc=expr.pexp_loc)
@@ -664,34 +762,167 @@ let map_css_expressions =
               "[%keyframe] expects a string of CSS with keyframe definitions.",
             )
           }
+        | Pexp_function(params, constraint_, body) =>
+          let (params_rev, bound) =
+            List.fold_left(
+              ((params_rev, bound), param: Ppxlib.function_param) =>
+                switch (param.pparam_desc) {
+                | Pparam_val(label, default, pattern) => (
+                    [
+                      {
+                        ...param,
+                        pparam_desc:
+                          Pparam_val(
+                            label,
+                            Option.map(in_scope(bound), default),
+                            pattern,
+                          ),
+                      },
+                      ...params_rev,
+                    ],
+                    Local_selector_environment.bound_locals(pattern) @ bound,
+                  )
+                | Pparam_newtype(_) => ([param, ...params_rev], bound)
+                },
+              ([], []),
+              params,
+            );
+          let body =
+            switch (body) {
+            | Pfunction_body(body) =>
+              Ppxlib.Pfunction_body(in_scope(bound, body))
+            | Pfunction_cases(cases, loc, attributes) =>
+              Pfunction_cases(
+                List.map(map_case(~outer=bound), cases),
+                loc,
+                attributes,
+              )
+            };
+          {
+            ...expr,
+            pexp_desc:
+              Pexp_function(List.rev(params_rev), constraint_, body),
+          };
+        | Pexp_match(scrutinee, cases) => {
+            ...expr,
+            pexp_desc:
+              Pexp_match(
+                self#expression(scrutinee),
+                List.map(case => map_case(case), cases),
+              ),
+          }
+        | Pexp_try(body, cases) => {
+            ...expr,
+            pexp_desc:
+              Pexp_try(
+                self#expression(body),
+                List.map(case => map_case(case), cases),
+              ),
+          }
+        | Pexp_for(pattern, low, high, direction, body) => {
+            ...expr,
+            pexp_desc:
+              Pexp_for(
+                pattern,
+                self#expression(low),
+                self#expression(high),
+                direction,
+                in_scope(
+                  Local_selector_environment.bound_locals(pattern),
+                  body,
+                ),
+              ),
+          }
+        | Pexp_letop({ let_, ands, body }) =>
+          let map_binding_op = (op: Ppxlib.binding_op) => {
+            ...op,
+            pbop_exp: self#expression(op.pbop_exp),
+          };
+          let bound =
+            List.concat_map(
+              (op: Ppxlib.binding_op) =>
+                Local_selector_environment.bound_locals(op.pbop_pat),
+              [let_, ...ands],
+            );
+          {
+            ...expr,
+            pexp_desc:
+              Pexp_letop({
+                let_: map_binding_op(let_),
+                ands: List.map(map_binding_op, ands),
+                body: in_scope(bound, body),
+              }),
+          };
         | Pexp_let(rec_flag, bindings, body) =>
+          let binding_locals =
+            switch (rec_flag) {
+            | Recursive =>
+              List.concat_map(
+                (binding: Ppxlib.value_binding) =>
+                  Local_selector_environment.bound_locals(binding.pvb_pat),
+                bindings,
+              )
+              @ locals
+            | Nonrecursive => locals
+            };
           let bindings =
             List.map(
               (binding: Ppxlib.value_binding) => {
-                let label_name = binding_name_from_pat(binding.pvb_pat);
-                let expr =
-                  switch (label_name) {
-                  | Some(name) =>
-                    map_with_label(~label_name=Some(name), binding.pvb_expr)
-                  | None => self#expression(binding.pvb_expr)
+                let (label_name, registry_name) =
+                  switch (binding_name_from_pat(binding.pvb_pat)) {
+                  | Some(name) when !is_generated_binder(name) => (
+                      Some(name),
+                      None,
+                    )
+                  | Some(_)
+                  | None => (label_name, registry_name)
                   };
                 {
                   ...binding,
-                  pvb_expr: expr,
+                  pvb_expr:
+                    map_with(
+                      ~label_name,
+                      ~registry_name,
+                      ~locals=binding_locals,
+                      binding.pvb_expr,
+                    ),
                 };
               },
               bindings,
             );
+          let bound =
+            List.concat_map(
+              (binding: Ppxlib.value_binding) =>
+                switch (
+                  binding_name_from_pat(binding.pvb_pat),
+                  Css_file.lowered_identity(binding.pvb_expr),
+                ) {
+                | (Some(name), Some(identity)) => [
+                    {
+                      Local_selector_environment.name,
+                      identity: Some(identity),
+                    },
+                  ]
+                | _ =>
+                  Local_selector_environment.bound_locals(binding.pvb_pat)
+                },
+              bindings,
+            );
           {
             ...expr,
-            pexp_desc: Pexp_let(rec_flag, bindings, self#expression(body)),
+            pexp_desc: Pexp_let(rec_flag, bindings, in_scope(bound, body)),
           };
         | _ => super#expression(expr)
         }
     };
     mapper#expression(expr);
   };
-  map_with_label(~label_name=top_binding, expr);
+  map_with(
+    ~label_name=top_binding,
+    ~registry_name=top_binding,
+    ~locals=[],
+    expr,
+  );
 };
 
 let module_path_from_expr = (expr: Ppxlib.module_expr): option(list(string)) =>
@@ -947,7 +1178,7 @@ let () = {
   Ppxlib.Driver.add_arg(
     ~doc=Settings.dev.doc,
     Settings.dev.flag,
-    Arg.Unit(_ => Settings.Update.dev(true)),
+    Arg.Unit(_ => Settings.Update.devFlag()),
   );
 
   Ppxlib.Driver.add_arg(
@@ -961,6 +1192,18 @@ let () = {
     ),
   );
 
+  /* dune passes `--cookie library-name="<name>"` to every ppx run inside a
+     (library ...) stanza. Recorded so the wire protocol can tell the
+     aggregator which library a file's rules belong to. */
+  Ppxlib.Driver.Cookies.add_simple_handler(
+    "library-name",
+    Ppxlib.Ast_pattern.estring(Ppxlib.Ast_pattern.__),
+    ~f=
+      fun
+      | Some(name) => Settings.Update.library(name)
+      | None => (),
+  );
+
   let impl = (_ctx, str: Ppxlib.structure) => {
     let file =
       switch (str) {
@@ -969,13 +1212,23 @@ let () = {
       };
     let main_module = module_name_of_file(file);
     let str = map_ordered_structure(~file, ~main_module, ~scope=[], str);
-    let rules = Css_file.get();
+    let (rules, blocks, merges) = Css_file.get();
     let rule_items = List.map(Css_extraction.css_attribute, rules);
     let binding_entries = Css_bindings.drain();
     let bindings_items =
       switch (binding_entries) {
       | [] => []
       | _ => [make_bindings_attribute(binding_entries)]
+      };
+    let blocks_items =
+      switch (blocks) {
+      | [] => []
+      | blocks => [Css_extraction.blocks_attribute(blocks)]
+      };
+    let merges_items =
+      switch (merges) {
+      | [] => []
+      | merges => [Css_extraction.merges_attribute(merges)]
       };
     let (cross_module_entries, cross_module_longidents) =
       Cross_module_refs.drain();
@@ -985,24 +1238,37 @@ let () = {
       | _ => [make_refs_attribute(cross_module_entries)]
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
-    /* Declares production mode in the wire protocol so the aggregator can
-       minify without a flag of its own; absence means development. */
+    let config_entries =
+      (
+        Settings.Get.minify()
+          ? [
+            (
+              Css_extraction.config_env_key,
+              Css_extraction.config_env_production,
+            ),
+          ]
+          : []
+      )
+      @ (
+        switch (Settings.Get.library()) {
+        | Some(name) => [(Css_extraction.config_library_key, name)]
+        | None => []
+        }
+      );
     let config_items =
-      switch (rule_items, bindings_items) {
-      | ([], []) => []
-      | _ when Settings.Get.minify() => [
-          Css_extraction.config_attribute([("env", "production")]),
-        ]
-      | _ => []
+      switch (config_entries, rule_items, bindings_items) {
+      | ([], _, _) => []
+      | (_, [], []) when Settings.Get.library() == None => []
+      | _ => [Css_extraction.config_attribute(config_entries)]
       };
-    /* Order:
-       - extraction config (production marker)
-       - extracted CSS rules
-       - binding exports
-       - cross-module refs descriptor
-       - dep-tracking synthetic lets
-       - user's source. */
-    config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
+    config_items
+    @ rule_items
+    @ bindings_items
+    @ blocks_items
+    @ merges_items
+    @ refs_items
+    @ dep_items
+    @ str;
   };
 
   Ppxlib.Driver.V2.register_transformation(

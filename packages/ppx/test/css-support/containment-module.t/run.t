@@ -15,57 +15,222 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-2agt40{contain:none;}"];
-  [@css ".css-deyisx{contain:strict;}"];
-  [@css ".css-1x07x2x{contain:content;}"];
-  [@css ".css-eq1cha{contain:size;}"];
-  [@css ".css-bzw7cp{contain:layout;}"];
-  [@css ".css-52yn5q{contain:paint;}"];
-  [@css ".css-j5jwgs{contain:size layout;}"];
-  [@css ".css-567zd4{contain:size paint;}"];
-  [@css ".css-1ubc7bb{contain:size layout paint;}"];
-  [@css ".css-114lzv6{width:5cqw;}"];
-  [@css ".css-1fqsy8j{width:5cqh;}"];
-  [@css ".css-12zq9h0{width:5cqi;}"];
-  [@css ".css-1q7cz18{width:5cqb;}"];
-  [@css ".css-b0idqw{width:5cqmin;}"];
-  [@css ".css-1a08ucx{width:5cqmax;}"];
-  [@css ".css-1e77ccc{container-type:normal;}"];
-  [@css ".css-14f6sj7{container-type:size;}"];
-  [@css ".css-3qzm71{container-type:inline-size;}"];
-  [@css ".css-glnlpx{container-name:none;}"];
-  [@css ".css-jd9f0l{container-name:x;}"];
-  [@css ".css-1qckmkr{container-name:x y;}"];
-  [@css ".css-hs1iko{container:none;}"];
-  [@css ".css-1q052qy{container:x / normal;}"];
-  [@css ".css-m4cq8j{container:x / size;}"];
-  [@css ".css-10da7f0{container:x / inline-size;}"];
-  [@css ".css-lrppda{container:x y / size;}"];
+  [@css
+    ("._a_4pgt40{contain:none;}", "_a_4pgt40", "0,1,0 own", "169", 1, false)
+  ];
+  [@css
+    ("._a_4pyisx{contain:strict;}", "_a_4pyisx", "0,1,0 own", "169", 1, false)
+  ];
+  [@css
+    ("._a_4p7x2x{contain:content;}", "_a_4p7x2x", "0,1,0 own", "169", 1, false)
+  ];
+  [@css
+    ("._a_4p1cha{contain:size;}", "_a_4p1cha", "0,1,0 own", "169", 1, false)
+  ];
+  [@css
+    ("._a_4pw7cp{contain:layout;}", "_a_4pw7cp", "0,1,0 own", "169", 1, false)
+  ];
+  [@css
+    ("._a_4pyn5q{contain:paint;}", "_a_4pyn5q", "0,1,0 own", "169", 1, false)
+  ];
+  [@css
+    (
+      "._a_4pjwgs{contain:size layout;}",
+      "_a_4pjwgs",
+      "0,1,0 own",
+      "169",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4p7zd4{contain:size paint;}",
+      "_a_4p7zd4",
+      "0,1,0 own",
+      "169",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4pc7bb{contain:size layout paint;}",
+      "_a_4pc7bb",
+      "0,1,0 own",
+      "169",
+      1,
+      false,
+    )
+  ];
+  [@css ("._a_eclzv6{width:5cqw;}", "_a_eclzv6", "0,1,0 own", "516", 1, false)];
+  [@css ("._a_ecsy8j{width:5cqh;}", "_a_ecsy8j", "0,1,0 own", "516", 1, false)];
+  [@css ("._a_ecq9h0{width:5cqi;}", "_a_ecq9h0", "0,1,0 own", "516", 1, false)];
+  [@css ("._a_eccz18{width:5cqb;}", "_a_eccz18", "0,1,0 own", "516", 1, false)];
+  [@css
+    ("._a_ecidqw{width:5cqmin;}", "_a_ecidqw", "0,1,0 own", "516", 1, false)
+  ];
+  [@css
+    ("._a_ec8ucx{width:5cqmax;}", "_a_ec8ucx", "0,1,0 own", "516", 1, false)
+  ];
+  [@css
+    (
+      "._a_4v00027ccc{container-type:normal;}",
+      "_a_4v00027ccc",
+      "0,1,0 own",
+      "175",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v00026sj7{container-type:size;}",
+      "_a_4v00026sj7",
+      "0,1,0 own",
+      "175",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0002zm71{container-type:inline-size;}",
+      "_a_4v0002zm71",
+      "0,1,0 own",
+      "175",
+      2,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0001nlpx{container-name:none;}",
+      "_a_4v0001nlpx",
+      "0,1,0 own",
+      "175",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v00019f0l{container-name:x;}",
+      "_a_4v00019f0l",
+      "0,1,0 own",
+      "175",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4v0001kmkr{container-name:x y;}",
+      "_a_4v0001kmkr",
+      "0,1,0 own",
+      "175",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_4v1iko{container:none;}", "_a_4v1iko", "0,1,0 own", "175", 3, false)
+  ];
+  [@css
+    (
+      "._a_4v52qy{container:x / normal;}",
+      "_a_4v52qy",
+      "0,1,0 own",
+      "175",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4vcq8j{container:x / size;}",
+      "_a_4vcq8j",
+      "0,1,0 own",
+      "175",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4va7f0{container:x / inline-size;}",
+      "_a_4va7f0",
+      "0,1,0 own",
+      "175",
+      3,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4vppda{container:x y / size;}",
+      "_a_4vppda",
+      "0,1,0 own",
+      "175",
+      3,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
+      (10, "", [8]),
+      (22, "", [9]),
+      (23, "", [10]),
+      (24, "", [11]),
+      (25, "", [12]),
+      (26, "", [13]),
+      (27, "", [14]),
+      (28, "", [15]),
+      (29, "", [16]),
+      (30, "", [17]),
+      (31, "", [18]),
+      (32, "", [19]),
+      (33, "", [20]),
+      (34, "", [21]),
+      (35, "", [22]),
+      (36, "", [23]),
+      (37, "", [24]),
+      (38, "", [25]),
+    ]
+  ];
   
-  CSS.make("css-2agt40", []);
-  CSS.make("css-deyisx", []);
-  CSS.make("css-1x07x2x", []);
-  CSS.make("css-eq1cha", []);
-  CSS.make("css-bzw7cp", []);
-  CSS.make("css-52yn5q", []);
-  CSS.make("css-j5jwgs", []);
-  CSS.make("css-567zd4", []);
-  CSS.make("css-1ubc7bb", []);
+  CSS.make("_a_4pgt40", []);
+  CSS.make("_a_4pyisx", []);
+  CSS.make("_a_4p7x2x", []);
+  CSS.make("_a_4p1cha", []);
+  CSS.make("_a_4pw7cp", []);
+  CSS.make("_a_4pyn5q", []);
+  CSS.make("_a_4pjwgs", []);
+  CSS.make("_a_4p7zd4", []);
+  CSS.make("_a_4pc7bb", []);
   
-  CSS.make("css-114lzv6", []);
-  CSS.make("css-1fqsy8j", []);
-  CSS.make("css-12zq9h0", []);
-  CSS.make("css-1q7cz18", []);
-  CSS.make("css-b0idqw", []);
-  CSS.make("css-1a08ucx", []);
-  CSS.make("css-1e77ccc", []);
-  CSS.make("css-14f6sj7", []);
-  CSS.make("css-3qzm71", []);
-  CSS.make("css-glnlpx", []);
-  CSS.make("css-jd9f0l", []);
-  CSS.make("css-1qckmkr", []);
-  CSS.make("css-hs1iko", []);
-  CSS.make("css-1q052qy", []);
-  CSS.make("css-m4cq8j", []);
-  CSS.make("css-10da7f0", []);
-  CSS.make("css-lrppda", []);
+  CSS.make("_a_eclzv6", []);
+  CSS.make("_a_ecsy8j", []);
+  CSS.make("_a_ecq9h0", []);
+  CSS.make("_a_eccz18", []);
+  CSS.make("_a_ecidqw", []);
+  CSS.make("_a_ec8ucx", []);
+  CSS.make("_a_4v00027ccc", []);
+  CSS.make("_a_4v00026sj7", []);
+  CSS.make("_a_4v0002zm71", []);
+  CSS.make("_a_4v0001nlpx", []);
+  CSS.make("_a_4v00019f0l", []);
+  CSS.make("_a_4v0001kmkr", []);
+  CSS.make("_a_4v1iko", []);
+  CSS.make("_a_4v52qy", []);
+  CSS.make("_a_4vcq8j", []);
+  CSS.make("_a_4va7f0", []);
+  CSS.make("_a_4vppda", []);

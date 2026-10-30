@@ -1,20 +1,32 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body:not(.css-nk32ej-card){margin:0;}"];
-  [@css ".css-nk32ej-card{background:var(--bg-1rdts9a);}"];
-  [@css ".css-b7rhyr-active.css-nk32ej-card{color:white;}"];
-  [@css ".container .css-nk32ej-card{color:var(--bg-raax3p);}"];
-  [@css ".css-nk32ej-card{padding:10px;}"];
-  [@css ".css-b7rhyr-active{border:1px solid;}"];
+  [@css "body:not(._id_cr5zkq){margin:0;}"];
+  [@css "._id_cr5zkq{background:var(--bg-1rdts9a);}"];
+  [@css "._id_r2s0n3._id_cr5zkq{color:white;}"];
+  [@css ".container ._id_cr5zkq{color:var(--bg-raax3p);}"];
+  [@css
+    ("._a_9432ej{padding:10px;}", "_a_9432ej", "0,1,0 own", "328", 15, false)
+  ];
+  [@css
+    (
+      "._a_3hrhyr{border:1px solid;}",
+      "_a_3hrhyr",
+      "0,1,0 own",
+      "125",
+      131071,
+      false,
+    )
+  ];
   [@css.bindings
     [
-      ("Output.card", "css-nk32ej-card"),
-      ("Output.active", "css-b7rhyr-active"),
+      ("Output.card", "_id_cr5zkq", "_a_9432ej"),
+      ("Output.active", "_id_r2s0n3", "_a_3hrhyr"),
     ]
   ];
-  let card = CSS.make("css-nk32ej-card", []);
-  let active = CSS.make("css-b7rhyr-active", []);
+  [@css.blocks [(1, "_id_cr5zkq", [4]), (2, "_id_r2s0n3", [5])]];
+  let card = CSS.make("label:card _id_cr5zkq _a_9432ej", []);
+  let active = CSS.make("label:active _id_r2s0n3 _a_3hrhyr", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>

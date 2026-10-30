@@ -3,7 +3,36 @@ module Builder = Ppxlib.Ast_builder.Default
 
 type binding = {
   longident : string;
+  identity : string;
   class_string : string;
+}
+
+type atom_key = {
+  class_name : string;
+  scope : string;
+  family : string;
+  mask : int;
+  descendant : bool;
+}
+
+type rule = {
+  text : string;
+  key : atom_key option;
+}
+
+type block = {
+  line : int;
+  identity : string option;
+  rules : int list;
+}
+
+type operand =
+  | Block of int
+  | Binding of string
+
+type merge = {
+  merge_line : int;
+  operands : operand list;
 }
 
 type ref_loc = {
@@ -17,20 +46,33 @@ type ref_loc = {
 let css_attribute_name = "css"
 let bindings_attribute_name = "css.bindings"
 let refs_attribute_name = "css.refs"
+let blocks_attribute_name = "css.blocks"
+let merges_attribute_name = "css.merges"
 let config_attribute_name = "css.config"
 let config_env_key = "env"
 let config_env_production = "production"
+let config_library_key = "library-name"
 let sentinel_byte = '\x00'
 
 let sentinel longident =
   String.make 1 sentinel_byte ^ longident ^ String.make 1 sentinel_byte
 
-let class_chain_of_class_string class_string =
-  String.split_on_char ' ' class_string
-  |> List.filter (fun s -> s <> "")
-  |> String.concat "."
+let binding ~longident ~identity ~class_string =
+  { longident; identity; class_string }
 
-let binding ~longident ~class_string = { longident; class_string }
+let atom_key ~class_name ~scope ~family ~mask ~descendant =
+  { class_name; scope; family; mask; descendant }
+
+let all_family = "*"
+let resets_with_all key = key.family <> all_family && key.family.[0] <> '-'
+
+let overlaps a b =
+  (a.family = all_family && (b.family = all_family || resets_with_all b))
+  || (b.family = all_family && resets_with_all a)
+  || (a.family = b.family && a.mask land b.mask <> 0)
+
+let block ~line ~identity ~rules = { line; identity; rules }
+let merge ~line ~operands = { merge_line = line; operands }
 
 let ref_loc ~longident ~file ~start_line ~start_col ~end_col =
   { longident; file; start_line; start_col; end_col }
@@ -54,9 +96,23 @@ let make_list_attribute ~name expr =
   in
   Builder.pstr_attribute ~loc attr
 
-let css_attribute rule =
+let css_attribute { text; key } =
   let loc = Ppxlib.Location.none in
-  make_list_attribute ~name:css_attribute_name (Builder.estring ~loc rule)
+  let payload =
+    match key with
+    | None -> Builder.estring ~loc text
+    | Some { class_name; scope; family; mask; descendant } ->
+      Builder.pexp_tuple ~loc
+        [
+          Builder.estring ~loc text;
+          Builder.estring ~loc class_name;
+          Builder.estring ~loc scope;
+          Builder.estring ~loc family;
+          Builder.eint ~loc mask;
+          Builder.ebool ~loc descendant;
+        ]
+  in
+  make_list_attribute ~name:css_attribute_name payload
 
 let bindings_attribute entries =
   let loc = Ppxlib.Location.none in
@@ -64,10 +120,40 @@ let bindings_attribute entries =
     Builder.pexp_tuple ~loc
       [
         Builder.estring ~loc entry.longident;
+        Builder.estring ~loc entry.identity;
         Builder.estring ~loc entry.class_string;
       ]
   in
   make_list_attribute ~name:bindings_attribute_name
+    (Builder.elist ~loc (List.map entry_to_expr entries))
+
+let blocks_attribute entries =
+  let loc = Ppxlib.Location.none in
+  let entry_to_expr (entry : block) =
+    Builder.pexp_tuple ~loc
+      [
+        Builder.eint ~loc entry.line;
+        Builder.estring ~loc (Option.value entry.identity ~default:"");
+        Builder.elist ~loc (List.map (Builder.eint ~loc) entry.rules);
+      ]
+  in
+  make_list_attribute ~name:blocks_attribute_name
+    (Builder.elist ~loc (List.map entry_to_expr entries))
+
+let merges_attribute entries =
+  let loc = Ppxlib.Location.none in
+  let operand_to_expr = function
+    | Block index -> Builder.eint ~loc index
+    | Binding longident -> Builder.estring ~loc longident
+  in
+  let entry_to_expr (entry : merge) =
+    Builder.pexp_tuple ~loc
+      [
+        Builder.eint ~loc entry.merge_line;
+        Builder.elist ~loc (List.map operand_to_expr entry.operands);
+      ]
+  in
+  make_list_attribute ~name:merges_attribute_name
     (Builder.elist ~loc (List.map entry_to_expr entries))
 
 let config_attribute entries =
@@ -105,10 +191,42 @@ let int_of_const_expr (e : Ppxlib.expression) : int option =
     (try Some (int_of_string s) with Failure _ -> None)
   | _ -> None
 
-let decode_css_payload value =
-  match string_of_const_expr value with
-  | Some rule -> Ok rule
-  | None -> Error "expected [@@@css] payload to be a string literal"
+let bool_of_const_expr (e : Ppxlib.expression) : bool option =
+  match e.pexp_desc with
+  | Pexp_construct ({ txt = Lident "true"; _ }, None) -> Some true
+  | Pexp_construct ({ txt = Lident "false"; _ }, None) -> Some false
+  | _ -> None
+
+let decode_css_payload (value : Ppxlib.expression) =
+  match value.pexp_desc with
+  | Pexp_tuple [ text_e; class_e; scope_e; family_e; mask_e; descendant_e ] ->
+    (match
+       ( string_of_const_expr text_e,
+         string_of_const_expr class_e,
+         string_of_const_expr scope_e,
+         string_of_const_expr family_e,
+         int_of_const_expr mask_e,
+         bool_of_const_expr descendant_e )
+     with
+    | ( Some text,
+        Some class_name,
+        Some scope,
+        Some family,
+        Some mask,
+        Some descendant )
+      when family <> "" ->
+      Ok { text; key = Some { class_name; scope; family; mask; descendant } }
+    | _ ->
+      Error
+        "expected [@@@css] payload (text, class, scope, family, mask, \
+         descendant)")
+  | _ ->
+    (match string_of_const_expr value with
+    | Some text -> Ok { text; key = None }
+    | None ->
+      Error
+        "expected [@@@css] payload to be a string literal or a (text, class, \
+         scope, family, mask, descendant) tuple")
 
 let decode_list ~attribute ~decode (e : Ppxlib.expression) =
   let rec loop index (e : Ppxlib.expression) acc =
@@ -129,11 +247,16 @@ let decode_list ~attribute ~decode (e : Ppxlib.expression) =
 
 let decode_binding (e : Ppxlib.expression) =
   match e.pexp_desc with
-  | Pexp_tuple [ longident_e; class_e ] ->
-    (match string_of_const_expr longident_e, string_of_const_expr class_e with
-    | Some longident, Some class_string -> Ok { longident; class_string }
-    | _ -> Error "expected (longident, class_string) string tuple")
-  | _ -> Error "expected (longident, class_string) tuple"
+  | Pexp_tuple [ longident_e; identity_e; class_e ] ->
+    (match
+       ( string_of_const_expr longident_e,
+         string_of_const_expr identity_e,
+         string_of_const_expr class_e )
+     with
+    | Some longident, Some identity, Some class_string ->
+      Ok { longident; identity; class_string }
+    | _ -> Error "expected (longident, identity, class_string) string tuple")
+  | _ -> Error "expected (longident, identity, class_string) tuple"
 
 let decode_ref (e : Ppxlib.expression) =
   match e.pexp_desc with
@@ -153,6 +276,52 @@ let decode_ref (e : Ppxlib.expression) =
   | _ ->
     Error "expected (longident, file, start_line, start_col, end_col) tuple"
 
+let decode_ints ~what (e : Ppxlib.expression) =
+  decode_list ~attribute:what
+    ~decode:(fun e ->
+      match int_of_const_expr e with
+      | Some i -> Ok i
+      | None -> Error "expected an integer")
+    e
+
+let decode_block (e : Ppxlib.expression) =
+  let shape = "expected (line, identity, [rule indices]) tuple" in
+  match e.pexp_desc with
+  | Pexp_tuple [ line_e; identity_e; rules_e ] ->
+    (match
+       ( int_of_const_expr line_e,
+         string_of_const_expr identity_e,
+         decode_ints ~what:"rule index" rules_e )
+     with
+    | Some line, Some identity, Ok rules ->
+      Ok
+        {
+          line;
+          identity = (if identity = "" then None else Some identity);
+          rules;
+        }
+    | _ -> Error shape)
+  | _ -> Error shape
+
+let decode_operand (e : Ppxlib.expression) =
+  match int_of_const_expr e, string_of_const_expr e with
+  | Some index, _ -> Ok (Block index)
+  | None, Some longident -> Ok (Binding longident)
+  | None, None -> Error "expected a block index or a longident"
+
+let decode_merge (e : Ppxlib.expression) =
+  let shape = "expected (line, [operands]) tuple" in
+  match e.pexp_desc with
+  | Pexp_tuple [ line_e; operands_e ] ->
+    (match
+       ( int_of_const_expr line_e,
+         decode_list ~attribute:"merge operand" ~decode:decode_operand
+           operands_e )
+     with
+    | Some line, Ok operands -> Ok { merge_line = line; operands }
+    | _ -> Error shape)
+  | _ -> Error shape
+
 let decode_config_entry (e : Ppxlib.expression) =
   match e.pexp_desc with
   | Pexp_tuple [ key_e; value_e ] ->
@@ -166,6 +335,12 @@ let decode_bindings_payload =
 
 let decode_config_payload =
   decode_list ~attribute:config_attribute_name ~decode:decode_config_entry
+
+let decode_blocks_payload =
+  decode_list ~attribute:blocks_attribute_name ~decode:decode_block
+
+let decode_merges_payload =
+  decode_list ~attribute:merges_attribute_name ~decode:decode_merge
 
 let decode_refs_payload =
   decode_list ~attribute:refs_attribute_name ~decode:decode_ref
@@ -195,8 +370,7 @@ let resolve_sentinels ~lookup ~on_unresolved ~on_malformed (rule : string) :
       | Some j ->
         let longident = String.sub rule start (j - start) in
         (match lookup longident with
-        | Some class_string ->
-          Buffer.add_string buf (class_chain_of_class_string class_string)
+        | Some identity -> Buffer.add_string buf identity
         | None ->
           on_unresolved longident;
           Buffer.add_char buf c;

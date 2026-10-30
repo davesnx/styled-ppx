@@ -2,19 +2,55 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "@media (min-width: 600px) {.css-99qt2j-SelectorsMediaQueries{background:blue;}}"
+    (
+      "@media (min-width: 600px) {._a_izob039qt2j{background:blue;}}",
+      "_a_izob039qt2j",
+      "0,1,0 own",
+      "117",
+      511,
+      false,
+    )
   ];
-  [@css ".css-hxxfxf-SelectorsMediaQueries:hover{background:green;}"];
-  [@css ".css-qzw9gh-SelectorsMediaQueries > p{color:pink;}"];
-  [@css ".css-z0beaj-SelectorsMediaQueries > p{font-size:24px;}"];
+  [@css
+    (
+      "._a_qyw7u39xfxf:hover{background:green;}",
+      "_a_qyw7u39xfxf",
+      "0,2,0 own",
+      "117",
+      511,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_og90v4ew9gh > p{color:pink;}",
+      "_a_og90v4ew9gh",
+      "0,1,1 & > p",
+      "158",
+      1,
+      true,
+    )
+  ];
+  [@css
+    (
+      "._a_og90v65000wbeaj > p{font-size:24px;}",
+      "_a_og90v65000wbeaj",
+      "0,1,1 & > p",
+      "221",
+      32,
+      true,
+    )
+  ];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "_id_p213nh",
+        "_a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
       ),
     ]
   ];
+  [@css.blocks [(3, "_id_p213nh", [0, 1, 2, 3])]];
   module SelectorsMediaQueries = {
     [@deriving abstract]
     [@warning "-69"]
@@ -1000,7 +1036,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "label:SelectorsMediaQueries _id_p213nh _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
         [],
       );
     let make = (props: makeProps) => {

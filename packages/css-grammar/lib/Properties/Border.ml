@@ -355,6 +355,188 @@ module Property_border_radius =
 let property_border_radius : property_border_radius Rule.rule =
   Property_border_radius.rule
 
+(* CSS Borders and Box Decorations L4 § 3.6.1 (per-side radius shorthands):
+   https://drafts.csswg.org/css-borders-4/#propdef-border-top-radius
+   Same shape as border-radius, but 1-2 values (one side's two corners) not
+   1-4. Each sets the two border-*-*-radius longhands of its own side. *)
+module Property_border_top_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_top_radius : property_border_top_radius Rule.rule =
+  Property_border_top_radius.rule
+
+module Property_border_right_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_right_radius : property_border_right_radius Rule.rule =
+  Property_border_right_radius.rule
+
+module Property_border_bottom_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_bottom_radius : property_border_bottom_radius Rule.rule =
+  Property_border_bottom_radius.rule
+
+module Property_border_left_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_left_radius : property_border_left_radius Rule.rule =
+  Property_border_left_radius.rule
+
+module Property_border_block_start_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_block_start_radius :
+  property_border_block_start_radius Rule.rule =
+  Property_border_block_start_radius.rule
+
+module Property_border_block_end_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_block_end_radius :
+  property_border_block_end_radius Rule.rule =
+  Property_border_block_end_radius.rule
+
+module Property_border_inline_start_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_inline_start_radius :
+  property_border_inline_start_radius Rule.rule =
+  Property_border_inline_start_radius.rule
+
+module Property_border_inline_end_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_inline_end_radius :
+  property_border_inline_end_radius Rule.rule =
+  Property_border_inline_end_radius.rule
+
+(* CSS Borders and Box Decorations L4 § 5.1: https://drafts.csswg.org/css-borders-4/#propdef-border-limit
+   Standalone - no shorthand relation. *)
+module Property_border_limit =
+  [%spec_module
+  "'all' | [ 'sides' | 'corners' ] [ <extended-length> | <extended-percentage> \
+   ]? | [ 'top' | 'right' | 'bottom' | 'left' ] [ <extended-length> | \
+   <extended-percentage> ]",
+  (module Css_types.BorderLimit)]
+
+let property_border_limit : property_border_limit Rule.rule =
+  Property_border_limit.rule
+
+(* CSS Borders and Box Decorations L4 § 5.2: https://drafts.csswg.org/css-borders-4/#propdef-border-clip
+   8 leaves (physical + logical), then 3 shorthands over them. *)
+module Property_border_top_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_top_clip : property_border_top_clip Rule.rule =
+  Property_border_top_clip.rule
+
+module Property_border_right_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_right_clip : property_border_right_clip Rule.rule =
+  Property_border_right_clip.rule
+
+module Property_border_bottom_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_bottom_clip : property_border_bottom_clip Rule.rule =
+  Property_border_bottom_clip.rule
+
+module Property_border_left_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_left_clip : property_border_left_clip Rule.rule =
+  Property_border_left_clip.rule
+
+module Property_border_block_start_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_block_start_clip :
+  property_border_block_start_clip Rule.rule =
+  Property_border_block_start_clip.rule
+
+module Property_border_block_end_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_block_end_clip : property_border_block_end_clip Rule.rule =
+  Property_border_block_end_clip.rule
+
+module Property_border_inline_start_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_inline_start_clip :
+  property_border_inline_start_clip Rule.rule =
+  Property_border_inline_start_clip.rule
+
+module Property_border_inline_end_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_inline_end_clip : property_border_inline_end_clip Rule.rule
+    =
+  Property_border_inline_end_clip.rule
+
+module Property_border_block_clip =
+  [%spec_module
+  "<'border-top-clip'>", (module Css_types.BorderClip)]
+
+let property_border_block_clip : property_border_block_clip Rule.rule =
+  Property_border_block_clip.rule
+
+module Property_border_inline_clip =
+  [%spec_module
+  "<'border-top-clip'>", (module Css_types.BorderClip)]
+
+let property_border_inline_clip : property_border_inline_clip Rule.rule =
+  Property_border_inline_clip.rule
+
+module Property_border_clip =
+  [%spec_module
+  "<'border-top-clip'>", (module Css_types.BorderClip)]
+
+let property_border_clip : property_border_clip Rule.rule =
+  Property_border_clip.rule
+
 module Property_border_right =
   [%spec_module
   "<'border'>", (module Css_types.Border)]
@@ -382,6 +564,25 @@ module Property_border_right_width =
 
 let property_border_right_width : property_border_right_width Rule.rule =
   Property_border_right_width.rule
+
+(* CSS Borders and Box Decorations L4: https://drafts.csswg.org/css-borders-4/#propdef-border-shape *)
+module Property_border_shape =
+  [%spec_module
+  "'none' | [ <basic-shape> <geometry-box>? ]{1,2}",
+  (module Css_types.BorderShape)]
+
+let property_border_shape : property_border_shape Rule.rule =
+  Property_border_shape.rule
+
+(* CSS Round Display L1 (border-boundary is round-display's own property,
+   despite the "border-" name, not css-borders-4's):
+   https://drafts.csswg.org/css-round-display/#propdef-border-boundary *)
+module Property_border_boundary =
+  [%spec_module
+  "'none' | 'parent' | 'display'", (module Css_types.BorderBoundary)]
+
+let property_border_boundary : property_border_boundary Rule.rule =
+  Property_border_boundary.rule
 
 module Property_border_spacing =
   [%spec_module
@@ -472,24 +673,60 @@ let property_border_width : property_border_width Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "border", pack_module (module Property_border);
-    Property "border-block", pack_module (module Property_border_block);
-    Property "border-block-end", pack_module (module Property_border_block_end);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border",
+          [ "border-width"; "border-style"; "border-color"; "border-image" ] ),
+      pack_module (module Property_border) );
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-block",
+          [ "border-block-width"; "border-block-style"; "border-block-color" ]
+        ),
+      pack_module (module Property_border_block) );
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-block-end",
+          [
+            "border-block-end-width";
+            "border-block-end-style";
+            "border-block-end-color";
+          ] ),
+      pack_module (module Property_border_block_end) );
     ( Property "border-block-end-style",
       pack_module (module Property_border_block_end_style) );
     ( Property "border-block-end-width",
       pack_module (module Property_border_block_end_width) );
-    ( Property "border-block-start",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-block-start",
+          [
+            "border-block-start-width";
+            "border-block-start-style";
+            "border-block-start-color";
+          ] ),
       pack_module (module Property_border_block_start) );
     ( Property "border-block-start-style",
       pack_module (module Property_border_block_start_style) );
     ( Property "border-block-start-width",
       pack_module (module Property_border_block_start_width) );
-    ( Property "border-block-style",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-block-style",
+          [ "border-block-start-style"; "border-block-end-style" ] ),
       pack_module (module Property_border_block_style) );
-    ( Property "border-block-width",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-block-width",
+          [ "border-block-start-width"; "border-block-end-width" ] ),
       pack_module (module Property_border_block_width) );
-    Property "border-bottom", pack_module (module Property_border_bottom);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-bottom",
+          [
+            "border-bottom-width"; "border-bottom-style"; "border-bottom-color";
+          ] ),
+      pack_module (module Property_border_bottom) );
     ( Property "border-bottom-left-radius",
       pack_module (module Property_border_bottom_left_radius) );
     ( Property "border-bottom-right-radius",
@@ -502,50 +739,184 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_border_end_end_radius) );
     ( Property "border-end-start-radius",
       pack_module (module Property_border_end_start_radius) );
-    Property "border-inline", pack_module (module Property_border_inline);
-    ( Property "border-inline-end",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-inline",
+          [
+            "border-inline-width"; "border-inline-style"; "border-inline-color";
+          ] ),
+      pack_module (module Property_border_inline) );
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-inline-end",
+          [
+            "border-inline-end-width";
+            "border-inline-end-style";
+            "border-inline-end-color";
+          ] ),
       pack_module (module Property_border_inline_end) );
     ( Property "border-inline-end-style",
       pack_module (module Property_border_inline_end_style) );
     ( Property "border-inline-end-width",
       pack_module (module Property_border_inline_end_width) );
-    ( Property "border-inline-start",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-inline-start",
+          [
+            "border-inline-start-width";
+            "border-inline-start-style";
+            "border-inline-start-color";
+          ] ),
       pack_module (module Property_border_inline_start) );
     ( Property "border-inline-start-style",
       pack_module (module Property_border_inline_start_style) );
     ( Property "border-inline-start-width",
       pack_module (module Property_border_inline_start_width) );
-    ( Property "border-inline-style",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-inline-style",
+          [ "border-inline-start-style"; "border-inline-end-style" ] ),
       pack_module (module Property_border_inline_style) );
-    ( Property "border-inline-width",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-inline-width",
+          [ "border-inline-start-width"; "border-inline-end-width" ] ),
       pack_module (module Property_border_inline_width) );
-    Property "border-left", pack_module (module Property_border_left);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-left",
+          [ "border-left-width"; "border-left-style"; "border-left-color" ] ),
+      pack_module (module Property_border_left) );
     ( Property "border-left-style",
       pack_module (module Property_border_left_style) );
     ( Property "border-left-width",
       pack_module (module Property_border_left_width) );
-    Property "border-radius", pack_module (module Property_border_radius);
-    Property "border-right", pack_module (module Property_border_right);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-radius",
+          [
+            "border-top-left-radius";
+            "border-top-right-radius";
+            "border-bottom-right-radius";
+            "border-bottom-left-radius";
+          ] ),
+      pack_module (module Property_border_radius) );
+    (* CSS Borders and Box Decorations L4 § 3.6.1: https://drafts.csswg.org/css-borders-4/#propdef-border-top-radius *)
+    ( Shorthand
+        ( "border-top-radius",
+          [ "border-top-left-radius"; "border-top-right-radius" ] ),
+      pack_module (module Property_border_top_radius) );
+    ( Shorthand
+        ( "border-right-radius",
+          [ "border-top-right-radius"; "border-bottom-right-radius" ] ),
+      pack_module (module Property_border_right_radius) );
+    ( Shorthand
+        ( "border-bottom-radius",
+          [ "border-bottom-left-radius"; "border-bottom-right-radius" ] ),
+      pack_module (module Property_border_bottom_radius) );
+    ( Shorthand
+        ( "border-left-radius",
+          [ "border-top-left-radius"; "border-bottom-left-radius" ] ),
+      pack_module (module Property_border_left_radius) );
+    (* Registered as plain properties, not Shorthand: see CHANGES.md - each
+       would union two of the pre-existing logical radius leaves, and since
+       the four together transitively cover all four leaves, that would
+       move those leaves into one new shared family instead of their own. *)
+    ( Property "border-block-start-radius",
+      pack_module (module Property_border_block_start_radius) );
+    ( Property "border-block-end-radius",
+      pack_module (module Property_border_block_end_radius) );
+    ( Property "border-inline-start-radius",
+      pack_module (module Property_border_inline_start_radius) );
+    ( Property "border-inline-end-radius",
+      pack_module (module Property_border_inline_end_radius) );
+    (* CSS Borders and Box Decorations L4 § 5.1: https://drafts.csswg.org/css-borders-4/#propdef-border-limit *)
+    Property "border-limit", pack_module (module Property_border_limit);
+    (* CSS Borders and Box Decorations L4 § 5.2: https://drafts.csswg.org/css-borders-4/#propdef-border-top-clip *)
+    Property "border-top-clip", pack_module (module Property_border_top_clip);
+    ( Property "border-right-clip",
+      pack_module (module Property_border_right_clip) );
+    ( Property "border-bottom-clip",
+      pack_module (module Property_border_bottom_clip) );
+    Property "border-left-clip", pack_module (module Property_border_left_clip);
+    ( Property "border-block-start-clip",
+      pack_module (module Property_border_block_start_clip) );
+    ( Property "border-block-end-clip",
+      pack_module (module Property_border_block_end_clip) );
+    ( Property "border-inline-start-clip",
+      pack_module (module Property_border_inline_start_clip) );
+    ( Property "border-inline-end-clip",
+      pack_module (module Property_border_inline_end_clip) );
+    ( Shorthand
+        ( "border-block-clip",
+          [ "border-block-start-clip"; "border-block-end-clip" ] ),
+      pack_module (module Property_border_block_clip) );
+    ( Shorthand
+        ( "border-inline-clip",
+          [ "border-inline-start-clip"; "border-inline-end-clip" ] ),
+      pack_module (module Property_border_inline_clip) );
+    ( Shorthand
+        ( "border-clip",
+          [
+            "border-top-clip";
+            "border-right-clip";
+            "border-bottom-clip";
+            "border-left-clip";
+          ] ),
+      pack_module (module Property_border_clip) );
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-right",
+          [ "border-right-width"; "border-right-style"; "border-right-color" ]
+        ),
+      pack_module (module Property_border_right) );
     ( Property "border-right-style",
       pack_module (module Property_border_right_style) );
     ( Property "border-right-width",
       pack_module (module Property_border_right_width) );
+    Property "border-shape", pack_module (module Property_border_shape);
+    Property "border-boundary", pack_module (module Property_border_boundary);
     Property "border-spacing", pack_module (module Property_border_spacing);
     ( Property "border-start-end-radius",
       pack_module (module Property_border_start_end_radius) );
     ( Property "border-start-start-radius",
       pack_module (module Property_border_start_start_radius) );
-    Property "border-style", pack_module (module Property_border_style);
-    Property "border-top", pack_module (module Property_border_top);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-style",
+          [
+            "border-top-style";
+            "border-right-style";
+            "border-bottom-style";
+            "border-left-style";
+          ] ),
+      pack_module (module Property_border_style) );
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-top",
+          [ "border-top-width"; "border-top-style"; "border-top-color" ] ),
+      pack_module (module Property_border_top) );
     ( Property "border-top-left-radius",
       pack_module (module Property_border_top_left_radius) );
     ( Property "border-top-right-radius",
       pack_module (module Property_border_top_right_radius) );
     Property "border-top-style", pack_module (module Property_border_top_style);
     Property "border-top-width", pack_module (module Property_border_top_width);
-    Property "border-width", pack_module (module Property_border_width);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-width",
+          [
+            "border-top-width";
+            "border-right-width";
+            "border-bottom-width";
+            "border-left-width";
+          ] ),
+      pack_module (module Property_border_width) );
     Property "border-collapse", pack_module (module Property_border_collapse);
-    ( Property "border-block-color",
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-block-color",
+          [ "border-block-start-color"; "border-block-end-color" ] ),
       pack_module (module Property_border_block_color) );
     ( Property "border-block-end-color",
       pack_module (module Property_border_block_end_color) );
@@ -553,8 +924,20 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_border_block_start_color) );
     ( Property "border-bottom-color",
       pack_module (module Property_border_bottom_color) );
-    Property "border-color", pack_module (module Property_border_color);
-    ( Property "border-inline-color",
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-color",
+          [
+            "border-top-color";
+            "border-right-color";
+            "border-bottom-color";
+            "border-left-color";
+          ] ),
+      pack_module (module Property_border_color) );
+    (* Logical Properties L1 (border; mirrors the physical decomposition above): https://www.w3.org/TR/css-logical-1/#border-shorthands *)
+    ( Shorthand
+        ( "border-inline-color",
+          [ "border-inline-start-color"; "border-inline-end-color" ] ),
       pack_module (module Property_border_inline_color) );
     ( Property "border-inline-end-color",
       pack_module (module Property_border_inline_end_color) );
@@ -567,7 +950,17 @@ let entries : (kind * packed_rule) list =
     Property "border-top-color", pack_module (module Property_border_top_color);
     ( Property "border-image-repeat",
       pack_module (module Property_border_image_repeat) );
-    Property "border-image", pack_module (module Property_border_image);
+    (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
+    ( Shorthand
+        ( "border-image",
+          [
+            "border-image-source";
+            "border-image-slice";
+            "border-image-width";
+            "border-image-outset";
+            "border-image-repeat";
+          ] ),
+      pack_module (module Property_border_image) );
     ( Property "border-image-outset",
       pack_module (module Property_border_image_outset) );
     ( Property "border-image-slice",

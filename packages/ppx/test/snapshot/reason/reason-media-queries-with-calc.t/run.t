@@ -2,19 +2,29 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "@media (min-width: calc(2px + 1px)) {.css-1gk5m2e-MediaQueryCalc{color:red;}}"
+    (
+      "@media (min-width: calc(2px + 1px)) {._a_aveay4e5m2e{color:red;}}",
+      "_a_aveay4e5m2e",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
   ];
   [@css
-    "@media (min-width: calc(1000px - 2%)) {.css-d1l0w0-MediaQueryCalc{color:red;}}"
+    (
+      "@media (min-width: calc(1000px - 2%)) {._a_h4c6e4el0w0{color:red;}}",
+      "_a_h4c6e4el0w0",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
   ];
   [@css.bindings
-    [
-      (
-        "Output.MediaQueryCalc",
-        "css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc",
-      ),
-    ]
+    [("Output.MediaQueryCalc", "_id_q4nngg", "_a_aveay4e5m2e _a_h4c6e4el0w0")]
   ];
+  [@css.blocks [(3, "_id_q4nngg", [0, 1])]];
   module MediaQueryCalc = {
     [@deriving abstract]
     [@warning "-69"]
@@ -999,7 +1009,10 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make("css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc", []);
+      CSS.make(
+        "label:MediaQueryCalc _id_q4nngg _a_aveay4e5m2e _a_h4c6e4el0w0",
+        [],
+      );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

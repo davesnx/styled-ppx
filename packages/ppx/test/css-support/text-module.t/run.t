@@ -15,174 +15,888 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-kmzs7t{text-transform:full-width;}"];
-  [@css ".css-1xpcm01{text-transform:full-size-kana;}"];
-  [@css ".css-y1d4rk{-moz-tab-size:4;-o-tab-size:4;tab-size:4;}"];
-  [@css ".css-17xseav{-moz-tab-size:1em;-o-tab-size:1em;tab-size:1em;}"];
-  [@css ".css-1i9f57d{line-break:auto;}"];
-  [@css ".css-1jpu21a{line-break:loose;}"];
-  [@css ".css-n4txm8{line-break:normal;}"];
-  [@css ".css-1tlkryp{line-break:strict;}"];
-  [@css ".css-ym3sz0{line-break:anywhere;}"];
-  [@css ".css-ktgras{word-break:normal;}"];
-  [@css ".css-1nw2x84{word-break:keep-all;}"];
-  [@css ".css-1hg9omi{word-break:break-all;}"];
-  [@css ".css-1vw5a1r{white-space:break-spaces;}"];
   [@css
-    ".css-y8yffq{-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;hyphens:auto;}"
+    (
+      "._a_d1zs7t{text-transform:full-width;}",
+      "_a_d1zs7t",
+      "0,1,0 own",
+      "469",
+      1,
+      false,
+    )
   ];
   [@css
-    ".css-16qmz35{-webkit-hyphens:manual;-moz-hyphens:manual;-ms-hyphens:manual;hyphens:manual;}"
+    (
+      "._a_d1cm01{text-transform:full-size-kana;}",
+      "_a_d1cm01",
+      "0,1,0 own",
+      "469",
+      1,
+      false,
+    )
   ];
   [@css
-    ".css-1oys3eu{-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none;}"
+    (
+      "._a_c3d4rk{-moz-tab-size:4;-o-tab-size:4;tab-size:4;}",
+      "_a_c3d4rk",
+      "0,1,0 own",
+      "435",
+      1,
+      false,
+    )
   ];
-  [@css ".css-kilw6e{overflow-wrap:normal;}"];
-  [@css ".css-1wekrze{overflow-wrap:break-word;}"];
-  [@css ".css-9x4jlj{overflow-wrap:anywhere;}"];
-  [@css ".css-nvzy01{word-wrap:normal;}"];
-  [@css ".css-kwpt08{word-wrap:break-word;}"];
-  [@css ".css-1q4nm8r{word-wrap:anywhere;}"];
-  [@css ".css-1eif5ff{text-align:start;}"];
-  [@css ".css-1djk842{text-align:end;}"];
-  [@css ".css-13brihr{text-align:left;}"];
-  [@css ".css-s2uf1z{text-align:right;}"];
-  [@css ".css-xi606m{text-align:center;}"];
-  [@css ".css-tpvos8{text-align:justify;}"];
-  [@css ".css-1jf8mhn{text-align:match-parent;}"];
-  [@css ".css-1in3ksq{text-align:justify-all;}"];
-  [@css ".css-ojrn5a{text-align-all:start;}"];
-  [@css ".css-10ach4g{text-align-all:end;}"];
-  [@css ".css-1hjrnp3{text-align-all:left;}"];
-  [@css ".css-7uxe7j{text-align-all:right;}"];
-  [@css ".css-q3c0st{text-align-all:center;}"];
-  [@css ".css-6d51av{text-align-all:justify;}"];
-  [@css ".css-8urne5{text-align-all:match-parent;}"];
-  [@css ".css-1bxwb1w{text-align-last:auto;}"];
-  [@css ".css-qnaxb4{text-align-last:start;}"];
-  [@css ".css-8zt416{text-align-last:end;}"];
-  [@css ".css-hu6fl7{text-align-last:left;}"];
-  [@css ".css-zmb6fv{text-align-last:right;}"];
-  [@css ".css-1ai0fqu{text-align-last:center;}"];
-  [@css ".css-trasgv{text-align-last:justify;}"];
-  [@css ".css-1oo70fx{text-align-last:match-parent;}"];
-  [@css ".css-88qbb2{text-justify:auto;}"];
-  [@css ".css-jlbh2m{text-justify:none;}"];
-  [@css ".css-11asqlp{text-justify:inter-word;}"];
-  [@css ".css-1s1z8sg{text-justify:inter-character;}"];
-  [@css ".css-1d6c0xc{word-spacing:50%;}"];
-  [@css ".css-1x8miop{text-indent:1em hanging;}"];
-  [@css ".css-7sot2l{text-indent:1em each-line;}"];
-  [@css ".css-q7r8hy{text-indent:1em hanging each-line;}"];
-  [@css ".css-6z3lqv{hanging-punctuation:none;}"];
-  [@css ".css-1t0jo68{hanging-punctuation:first;}"];
-  [@css ".css-o1534q{hanging-punctuation:last;}"];
-  [@css ".css-tu34w2{hanging-punctuation:force-end;}"];
-  [@css ".css-m9c78w{hanging-punctuation:allow-end;}"];
-  [@css ".css-19qgwj2{hanging-punctuation:first last;}"];
-  [@css ".css-yms42f{hanging-punctuation:first force-end;}"];
-  [@css ".css-10cfy1{hanging-punctuation:first force-end last;}"];
-  [@css ".css-huznai{hanging-punctuation:first allow-end last;}"];
-  [@css ".css-1qww0i2{text-wrap:wrap;}"];
-  [@css ".css-1g7kd96{text-wrap:nowrap;}"];
-  [@css ".css-1lsoged{text-wrap:balance;}"];
-  [@css ".css-7rw6iq{text-wrap:stable;}"];
-  [@css ".css-e53dgl{text-wrap:pretty;}"];
-  [@css ".css-1uwb0wo{text-wrap-mode:wrap;}"];
-  [@css ".css-smodyq{text-wrap-mode:nowrap;}"];
-  [@css ".css-16ylvfv{text-wrap-style:auto;}"];
-  [@css ".css-djejd6{text-wrap-style:balance;}"];
-  [@css ".css-gfqii6{text-wrap-style:stable;}"];
-  [@css ".css-z764fg{text-wrap-style:pretty;}"];
-  [@css ".css-ga76yp{hyphenate-character:auto;}"];
-  [@css ".css-r4qykq{hyphenate-limit-zone:1%;}"];
-  [@css ".css-j6imjy{hyphenate-limit-zone:1em;}"];
-  [@css ".css-vclbs0{hyphenate-limit-chars:auto;}"];
-  [@css ".css-1bnp8d5{hyphenate-limit-chars:5;}"];
-  [@css ".css-3tx7k1{hyphenate-limit-lines:no-limit;}"];
-  [@css ".css-16vrd43{hyphenate-limit-lines:2;}"];
+  [@css
+    (
+      "._a_c3seav{-moz-tab-size:1em;-o-tab-size:1em;tab-size:1em;}",
+      "_a_c3seav",
+      "0,1,0 own",
+      "435",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_7kf57d{line-break:auto;}", "_a_7kf57d", "0,1,0 own", "272", 1, false)
+  ];
+  [@css
+    ("._a_7ku21a{line-break:loose;}", "_a_7ku21a", "0,1,0 own", "272", 1, false)
+  ];
+  [@css
+    (
+      "._a_7ktxm8{line-break:normal;}",
+      "_a_7ktxm8",
+      "0,1,0 own",
+      "272",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7kkryp{line-break:strict;}",
+      "_a_7kkryp",
+      "0,1,0 own",
+      "272",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_7k3sz0{line-break:anywhere;}",
+      "_a_7k3sz0",
+      "0,1,0 own",
+      "272",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_eegras{word-break:normal;}",
+      "_a_eegras",
+      "0,1,0 own",
+      "518",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ee2x84{word-break:keep-all;}",
+      "_a_ee2x84",
+      "0,1,0 own",
+      "518",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ee9omi{word-break:break-all;}",
+      "_a_ee9omi",
+      "0,1,0 own",
+      "518",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_e95a1r{white-space:break-spaces;}",
+      "_a_e95a1r",
+      "0,1,0 own",
+      "513",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ryffq{-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;hyphens:auto;}",
+      "_a_6ryffq",
+      "0,1,0 own",
+      "243",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6rmz35{-webkit-hyphens:manual;-moz-hyphens:manual;-ms-hyphens:manual;hyphens:manual;}",
+      "_a_6rmz35",
+      "0,1,0 own",
+      "243",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6rs3eu{-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none;}",
+      "_a_6rs3eu",
+      "0,1,0 own",
+      "243",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8xlw6e{overflow-wrap:normal;}",
+      "_a_8xlw6e",
+      "0,1,0 own",
+      "321",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8xkrze{overflow-wrap:break-word;}",
+      "_a_8xkrze",
+      "0,1,0 own",
+      "321",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8x4jlj{overflow-wrap:anywhere;}",
+      "_a_8x4jlj",
+      "0,1,0 own",
+      "321",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_8xzy01{word-wrap:normal;}", "_a_8xzy01", "0,1,0 own", "321", 1, false)
+  ];
+  [@css
+    (
+      "._a_8xpt08{word-wrap:break-word;}",
+      "_a_8xpt08",
+      "0,1,0 own",
+      "321",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8xnm8r{word-wrap:anywhere;}",
+      "_a_8xnm8r",
+      "0,1,0 own",
+      "321",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_c5f5ff{text-align:start;}", "_a_c5f5ff", "0,1,0 own", "437", 1, false)
+  ];
+  [@css
+    ("._a_c5k842{text-align:end;}", "_a_c5k842", "0,1,0 own", "437", 1, false)
+  ];
+  [@css
+    ("._a_c5rihr{text-align:left;}", "_a_c5rihr", "0,1,0 own", "437", 1, false)
+  ];
+  [@css
+    ("._a_c5uf1z{text-align:right;}", "_a_c5uf1z", "0,1,0 own", "437", 1, false)
+  ];
+  [@css
+    (
+      "._a_c5606m{text-align:center;}",
+      "_a_c5606m",
+      "0,1,0 own",
+      "437",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c5vos8{text-align:justify;}",
+      "_a_c5vos8",
+      "0,1,0 own",
+      "437",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c58mhn{text-align:match-parent;}",
+      "_a_c58mhn",
+      "0,1,0 own",
+      "437",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c53ksq{text-align:justify-all;}",
+      "_a_c53ksq",
+      "0,1,0 own",
+      "437",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c6rn5a{text-align-all:start;}",
+      "_a_c6rn5a",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c6ch4g{text-align-all:end;}",
+      "_a_c6ch4g",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c6rnp3{text-align-all:left;}",
+      "_a_c6rnp3",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c6xe7j{text-align-all:right;}",
+      "_a_c6xe7j",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c6c0st{text-align-all:center;}",
+      "_a_c6c0st",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c651av{text-align-all:justify;}",
+      "_a_c651av",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c6rne5{text-align-all:match-parent;}",
+      "_a_c6rne5",
+      "0,1,0 own",
+      "438",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c7wb1w{text-align-last:auto;}",
+      "_a_c7wb1w",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c7axb4{text-align-last:start;}",
+      "_a_c7axb4",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c7t416{text-align-last:end;}",
+      "_a_c7t416",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c76fl7{text-align-last:left;}",
+      "_a_c76fl7",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c7b6fv{text-align-last:right;}",
+      "_a_c7b6fv",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c70fqu{text-align-last:center;}",
+      "_a_c70fqu",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c7asgv{text-align-last:justify;}",
+      "_a_c7asgv",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_c770fx{text-align-last:match-parent;}",
+      "_a_c770fx",
+      "0,1,0 own",
+      "439",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_crqbb2{text-justify:auto;}",
+      "_a_crqbb2",
+      "0,1,0 own",
+      "459",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_crbh2m{text-justify:none;}",
+      "_a_crbh2m",
+      "0,1,0 own",
+      "459",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_crsqlp{text-justify:inter-word;}",
+      "_a_crsqlp",
+      "0,1,0 own",
+      "459",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_crz8sg{text-justify:inter-character;}",
+      "_a_crz8sg",
+      "0,1,0 own",
+      "459",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_egc0xc{word-spacing:50%;}", "_a_egc0xc", "0,1,0 own", "520", 1, false)
+  ];
+  [@css
+    (
+      "._a_cqmiop{text-indent:1em hanging;}",
+      "_a_cqmiop",
+      "0,1,0 own",
+      "458",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_cqot2l{text-indent:1em each-line;}",
+      "_a_cqot2l",
+      "0,1,0 own",
+      "458",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_cqr8hy{text-indent:1em hanging each-line;}",
+      "_a_cqr8hy",
+      "0,1,0 own",
+      "458",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6k3lqv{hanging-punctuation:none;}",
+      "_a_6k3lqv",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6kjo68{hanging-punctuation:first;}",
+      "_a_6kjo68",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6k534q{hanging-punctuation:last;}",
+      "_a_6k534q",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6k34w2{hanging-punctuation:force-end;}",
+      "_a_6k34w2",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6kc78w{hanging-punctuation:allow-end;}",
+      "_a_6kc78w",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6kgwj2{hanging-punctuation:first last;}",
+      "_a_6kgwj2",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ks42f{hanging-punctuation:first force-end;}",
+      "_a_6ks42f",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6kcfy1{hanging-punctuation:first force-end last;}",
+      "_a_6kcfy1",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6kznai{hanging-punctuation:first allow-end last;}",
+      "_a_6kznai",
+      "0,1,0 own",
+      "236",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_d4w0i2{text-wrap:wrap;}", "_a_d4w0i2", "0,1,0 own", "472", 1, false)
+  ];
+  [@css
+    ("._a_d4kd96{text-wrap:nowrap;}", "_a_d4kd96", "0,1,0 own", "472", 1, false)
+  ];
+  [@css
+    (
+      "._a_d4oged{text-wrap:balance;}",
+      "_a_d4oged",
+      "0,1,0 own",
+      "472",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_d4w6iq{text-wrap:stable;}", "_a_d4w6iq", "0,1,0 own", "472", 1, false)
+  ];
+  [@css
+    ("._a_d43dgl{text-wrap:pretty;}", "_a_d43dgl", "0,1,0 own", "472", 1, false)
+  ];
+  [@css
+    (
+      "._a_d5b0wo{text-wrap-mode:wrap;}",
+      "_a_d5b0wo",
+      "0,1,0 own",
+      "473",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_d5odyq{text-wrap-mode:nowrap;}",
+      "_a_d5odyq",
+      "0,1,0 own",
+      "473",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_d6lvfv{text-wrap-style:auto;}",
+      "_a_d6lvfv",
+      "0,1,0 own",
+      "474",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_d6ejd6{text-wrap-style:balance;}",
+      "_a_d6ejd6",
+      "0,1,0 own",
+      "474",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_d6qii6{text-wrap-style:stable;}",
+      "_a_d6qii6",
+      "0,1,0 own",
+      "474",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_d664fg{text-wrap-style:pretty;}",
+      "_a_d664fg",
+      "0,1,0 own",
+      "474",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6m76yp{hyphenate-character:auto;}",
+      "_a_6m76yp",
+      "0,1,0 own",
+      "238",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6qqykq{hyphenate-limit-zone:1%;}",
+      "_a_6qqykq",
+      "0,1,0 own",
+      "242",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6qimjy{hyphenate-limit-zone:1em;}",
+      "_a_6qimjy",
+      "0,1,0 own",
+      "242",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6nlbs0{hyphenate-limit-chars:auto;}",
+      "_a_6nlbs0",
+      "0,1,0 own",
+      "239",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6np8d5{hyphenate-limit-chars:5;}",
+      "_a_6np8d5",
+      "0,1,0 own",
+      "239",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6px7k1{hyphenate-limit-lines:no-limit;}",
+      "_a_6px7k1",
+      "0,1,0 own",
+      "241",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6prd43{hyphenate-limit-lines:2;}",
+      "_a_6prd43",
+      "0,1,0 own",
+      "241",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (6, "", [2]),
+      (7, "", [3]),
+      (8, "", [4]),
+      (9, "", [5]),
+      (10, "", [6]),
+      (11, "", [7]),
+      (12, "", [8]),
+      (13, "", [9]),
+      (14, "", [10]),
+      (15, "", [11]),
+      (16, "", [12]),
+      (17, "", [13]),
+      (18, "", [14]),
+      (19, "", [15]),
+      (20, "", [16]),
+      (21, "", [17]),
+      (22, "", [18]),
+      (23, "", [19]),
+      (24, "", [20]),
+      (25, "", [21]),
+      (26, "", [22]),
+      (27, "", [23]),
+      (28, "", [24]),
+      (29, "", [25]),
+      (30, "", [26]),
+      (31, "", [27]),
+      (32, "", [28]),
+      (33, "", [29]),
+      (34, "", [30]),
+      (35, "", [31]),
+      (36, "", [32]),
+      (37, "", [33]),
+      (38, "", [34]),
+      (39, "", [35]),
+      (40, "", [36]),
+      (41, "", [37]),
+      (42, "", [38]),
+      (43, "", [39]),
+      (44, "", [40]),
+      (45, "", [41]),
+      (46, "", [42]),
+      (47, "", [43]),
+      (48, "", [44]),
+      (49, "", [45]),
+      (50, "", [46]),
+      (51, "", [47]),
+      (52, "", [48]),
+      (53, "", [49]),
+      (54, "", [50]),
+      (55, "", [51]),
+      (56, "", [52]),
+      (57, "", [53]),
+      (58, "", [54]),
+      (59, "", [55]),
+      (60, "", [56]),
+      (61, "", [57]),
+      (62, "", [58]),
+      (63, "", [59]),
+      (64, "", [60]),
+      (65, "", [61]),
+      (79, "", [62]),
+      (80, "", [63]),
+      (81, "", [64]),
+      (82, "", [65]),
+      (83, "", [66]),
+      (84, "", [67]),
+      (85, "", [68]),
+      (86, "", [69]),
+      (87, "", [70]),
+      (88, "", [71]),
+      (89, "", [72]),
+      (104, "", [73]),
+      (105, "", [74]),
+      (106, "", [75]),
+      (107, "", [76]),
+      (108, "", [77]),
+      (111, "", [78]),
+      (112, "", [79]),
+    ]
+  ];
   
-  CSS.make("css-kmzs7t", []);
-  CSS.make("css-1xpcm01", []);
+  CSS.make("_a_d1zs7t", []);
+  CSS.make("_a_d1cm01", []);
   
-  CSS.make("css-y1d4rk", []);
-  CSS.make("css-17xseav", []);
-  CSS.make("css-1i9f57d", []);
-  CSS.make("css-1jpu21a", []);
-  CSS.make("css-n4txm8", []);
-  CSS.make("css-1tlkryp", []);
-  CSS.make("css-ym3sz0", []);
-  CSS.make("css-ktgras", []);
-  CSS.make("css-1nw2x84", []);
-  CSS.make("css-1hg9omi", []);
-  CSS.make("css-1vw5a1r", []);
-  CSS.make("css-y8yffq", []);
-  CSS.make("css-16qmz35", []);
-  CSS.make("css-1oys3eu", []);
-  CSS.make("css-kilw6e", []);
-  CSS.make("css-1wekrze", []);
-  CSS.make("css-9x4jlj", []);
-  CSS.make("css-nvzy01", []);
-  CSS.make("css-kwpt08", []);
-  CSS.make("css-1q4nm8r", []);
-  CSS.make("css-1eif5ff", []);
-  CSS.make("css-1djk842", []);
-  CSS.make("css-13brihr", []);
-  CSS.make("css-s2uf1z", []);
-  CSS.make("css-xi606m", []);
-  CSS.make("css-tpvos8", []);
-  CSS.make("css-1jf8mhn", []);
-  CSS.make("css-1in3ksq", []);
-  CSS.make("css-ojrn5a", []);
-  CSS.make("css-10ach4g", []);
-  CSS.make("css-1hjrnp3", []);
-  CSS.make("css-7uxe7j", []);
-  CSS.make("css-q3c0st", []);
-  CSS.make("css-6d51av", []);
-  CSS.make("css-8urne5", []);
-  CSS.make("css-1bxwb1w", []);
-  CSS.make("css-qnaxb4", []);
-  CSS.make("css-8zt416", []);
-  CSS.make("css-hu6fl7", []);
-  CSS.make("css-zmb6fv", []);
-  CSS.make("css-1ai0fqu", []);
-  CSS.make("css-trasgv", []);
-  CSS.make("css-1oo70fx", []);
-  CSS.make("css-88qbb2", []);
-  CSS.make("css-jlbh2m", []);
-  CSS.make("css-11asqlp", []);
-  CSS.make("css-1s1z8sg", []);
-  CSS.make("css-1d6c0xc", []);
-  CSS.make("css-1x8miop", []);
-  CSS.make("css-7sot2l", []);
-  CSS.make("css-q7r8hy", []);
-  CSS.make("css-6z3lqv", []);
-  CSS.make("css-1t0jo68", []);
-  CSS.make("css-o1534q", []);
-  CSS.make("css-tu34w2", []);
-  CSS.make("css-m9c78w", []);
-  CSS.make("css-19qgwj2", []);
-  CSS.make("css-yms42f", []);
-  CSS.make("css-10cfy1", []);
-  CSS.make("css-huznai", []);
+  CSS.make("_a_c3d4rk", []);
+  CSS.make("_a_c3seav", []);
+  CSS.make("_a_7kf57d", []);
+  CSS.make("_a_7ku21a", []);
+  CSS.make("_a_7ktxm8", []);
+  CSS.make("_a_7kkryp", []);
+  CSS.make("_a_7k3sz0", []);
+  CSS.make("_a_eegras", []);
+  CSS.make("_a_ee2x84", []);
+  CSS.make("_a_ee9omi", []);
+  CSS.make("_a_e95a1r", []);
+  CSS.make("_a_6ryffq", []);
+  CSS.make("_a_6rmz35", []);
+  CSS.make("_a_6rs3eu", []);
+  CSS.make("_a_8xlw6e", []);
+  CSS.make("_a_8xkrze", []);
+  CSS.make("_a_8x4jlj", []);
+  CSS.make("_a_8xzy01", []);
+  CSS.make("_a_8xpt08", []);
+  CSS.make("_a_8xnm8r", []);
+  CSS.make("_a_c5f5ff", []);
+  CSS.make("_a_c5k842", []);
+  CSS.make("_a_c5rihr", []);
+  CSS.make("_a_c5uf1z", []);
+  CSS.make("_a_c5606m", []);
+  CSS.make("_a_c5vos8", []);
+  CSS.make("_a_c58mhn", []);
+  CSS.make("_a_c53ksq", []);
+  CSS.make("_a_c6rn5a", []);
+  CSS.make("_a_c6ch4g", []);
+  CSS.make("_a_c6rnp3", []);
+  CSS.make("_a_c6xe7j", []);
+  CSS.make("_a_c6c0st", []);
+  CSS.make("_a_c651av", []);
+  CSS.make("_a_c6rne5", []);
+  CSS.make("_a_c7wb1w", []);
+  CSS.make("_a_c7axb4", []);
+  CSS.make("_a_c7t416", []);
+  CSS.make("_a_c76fl7", []);
+  CSS.make("_a_c7b6fv", []);
+  CSS.make("_a_c70fqu", []);
+  CSS.make("_a_c7asgv", []);
+  CSS.make("_a_c770fx", []);
+  CSS.make("_a_crqbb2", []);
+  CSS.make("_a_crbh2m", []);
+  CSS.make("_a_crsqlp", []);
+  CSS.make("_a_crz8sg", []);
+  CSS.make("_a_egc0xc", []);
+  CSS.make("_a_cqmiop", []);
+  CSS.make("_a_cqot2l", []);
+  CSS.make("_a_cqr8hy", []);
+  CSS.make("_a_6k3lqv", []);
+  CSS.make("_a_6kjo68", []);
+  CSS.make("_a_6k534q", []);
+  CSS.make("_a_6k34w2", []);
+  CSS.make("_a_6kc78w", []);
+  CSS.make("_a_6kgwj2", []);
+  CSS.make("_a_6ks42f", []);
+  CSS.make("_a_6kcfy1", []);
+  CSS.make("_a_6kznai", []);
   
-  CSS.make("css-1qww0i2", []);
-  CSS.make("css-1g7kd96", []);
-  CSS.make("css-1lsoged", []);
-  CSS.make("css-7rw6iq", []);
-  CSS.make("css-e53dgl", []);
-  CSS.make("css-1uwb0wo", []);
-  CSS.make("css-smodyq", []);
-  CSS.make("css-16ylvfv", []);
-  CSS.make("css-djejd6", []);
-  CSS.make("css-gfqii6", []);
-  CSS.make("css-z764fg", []);
+  CSS.make("_a_d4w0i2", []);
+  CSS.make("_a_d4kd96", []);
+  CSS.make("_a_d4oged", []);
+  CSS.make("_a_d4w6iq", []);
+  CSS.make("_a_d43dgl", []);
+  CSS.make("_a_d5b0wo", []);
+  CSS.make("_a_d5odyq", []);
+  CSS.make("_a_d6lvfv", []);
+  CSS.make("_a_d6ejd6", []);
+  CSS.make("_a_d6qii6", []);
+  CSS.make("_a_d664fg", []);
   
-  CSS.make("css-ga76yp", []);
-  CSS.make("css-r4qykq", []);
-  CSS.make("css-j6imjy", []);
-  CSS.make("css-vclbs0", []);
-  CSS.make("css-1bnp8d5", []);
+  CSS.make("_a_6m76yp", []);
+  CSS.make("_a_6qqykq", []);
+  CSS.make("_a_6qimjy", []);
+  CSS.make("_a_6nlbs0", []);
+  CSS.make("_a_6np8d5", []);
   
-  CSS.make("css-3tx7k1", []);
-  CSS.make("css-16vrd43", []);
+  CSS.make("_a_6px7k1", []);
+  CSS.make("_a_6prd43", []);

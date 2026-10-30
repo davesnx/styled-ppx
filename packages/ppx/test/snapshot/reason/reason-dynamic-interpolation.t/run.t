@@ -2,16 +2,23 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --var-17zksex{syntax:\"*\";inherits:false;}"];
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
-  [@css ".css-13o7eu2-DynamicComponent{display:block;}"];
-  [@css.bindings
-    [
-      (
-        "Output.DynamicComponent",
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
-      ),
-    ]
+  [@css
+    (
+      "._a_4e7bjx{color:var(--var-17zksex);}",
+      "_a_4e7bjx",
+      "0,1,0 own",
+      "158",
+      1,
+      false,
+    )
   ];
+  [@css
+    ("._a_5r7eu2{display:block;}", "_a_5r7eu2", "0,1,0 own", "207", 1, false)
+  ];
+  [@css.bindings
+    [("Output.DynamicComponent", "_id_1sfnaz9", "_a_4e7bjx _a_5r7eu2")]
+  ];
+  [@css.blocks [(2, "_id_1sfnaz9", [1, 2])]];
   module DynamicComponent = {
     [@deriving abstract]
     [@warning "-69"]
@@ -1001,7 +1008,7 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
+        "label:DynamicComponent _id_1sfnaz9 _a_4e7bjx _a_5r7eu2",
         [("--var-17zksex", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {

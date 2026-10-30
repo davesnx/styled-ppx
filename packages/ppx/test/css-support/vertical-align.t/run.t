@@ -15,19 +15,103 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1wj9eo6{vertical-align:baseline;}"];
-  [@css ".css-c6kzuz{vertical-align:sub;}"];
-  [@css ".css-9z1ck9{vertical-align:super;}"];
-  [@css ".css-1hgawz4{vertical-align:top;}"];
-  [@css ".css-ezbbe2{vertical-align:text-top;}"];
-  [@css ".css-uk6cul{vertical-align:middle;}"];
-  [@css ".css-1170n61{vertical-align:bottom;}"];
-  [@css ".css-i6dzq1{vertical-align:text-bottom;}"];
-  CSS.make("css-1wj9eo6", []);
-  CSS.make("css-c6kzuz", []);
-  CSS.make("css-9z1ck9", []);
-  CSS.make("css-1hgawz4", []);
-  CSS.make("css-ezbbe2", []);
-  CSS.make("css-uk6cul", []);
-  CSS.make("css-1170n61", []);
-  CSS.make("css-i6dzq1", []);
+  [@css
+    (
+      "._a_dt9eo6{vertical-align:baseline;}",
+      "_a_dt9eo6",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dtkzuz{vertical-align:sub;}",
+      "_a_dtkzuz",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dt1ck9{vertical-align:super;}",
+      "_a_dt1ck9",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dtawz4{vertical-align:top;}",
+      "_a_dtawz4",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dtbbe2{vertical-align:text-top;}",
+      "_a_dtbbe2",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dt6cul{vertical-align:middle;}",
+      "_a_dt6cul",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dt0n61{vertical-align:bottom;}",
+      "_a_dt0n61",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dtdzq1{vertical-align:text-bottom;}",
+      "_a_dtdzq1",
+      "0,1,0 own",
+      "497",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (1, "", [0]),
+      (2, "", [1]),
+      (3, "", [2]),
+      (4, "", [3]),
+      (5, "", [4]),
+      (6, "", [5]),
+      (7, "", [6]),
+      (8, "", [7]),
+    ]
+  ];
+  CSS.make("_a_dt9eo6", []);
+  CSS.make("_a_dtkzuz", []);
+  CSS.make("_a_dt1ck9", []);
+  CSS.make("_a_dtawz4", []);
+  CSS.make("_a_dtbbe2", []);
+  CSS.make("_a_dt6cul", []);
+  CSS.make("_a_dt0n61", []);
+  CSS.make("_a_dtdzq1", []);

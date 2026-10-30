@@ -24,44 +24,127 @@ let render_prefixed_rule = Css_autoprefixer.render_rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
 module Buffer = {
-  type rule = (string, string);
-  /* Rules are deduped by className on insert. [seen] mirrors the
-     classNames present in [rules] so membership is amortized O(1)
-     instead of an O(n) [List.exists] scan per call, which made rule
-     accumulation quadratic in the number of [%css] atoms per file. */
+  /* Rules are deduped by key on insert; [index] maps a key to its rule's
+     position, so a block can name its rules by position. */
   type target = {
-    mutable rules: list(rule),
-    seen: Hashtbl.t(string, unit),
+    mutable rules: list(Css_extraction.rule),
+    mutable count: int,
+    index: Hashtbl.t(string, int),
   };
-  let accumulated_rules: target = {
+  let make_target = size => {
     rules: [],
-    seen: Hashtbl.create(256),
+    count: 0,
+    index: Hashtbl.create(size),
   };
-  let global_rules: target = {
-    rules: [],
-    seen: Hashtbl.create(64),
-  };
+  let accumulated_rules: target = make_target(256);
+  let global_rules: target = make_target(64);
 
-  let add_to = (target, className, cssText) =>
-    if (!Hashtbl.mem(target.seen, className)) {
-      Hashtbl.add(target.seen, className, ());
-      target.rules = [(className, cssText), ...target.rules];
+  let add_to = (target, key, rule) =>
+    switch (Hashtbl.find_opt(target.index, key)) {
+    | Some(position) => position
+    | None =>
+      let position = target.count;
+      Hashtbl.add(target.index, key, position);
+      target.rules = [rule, ...target.rules];
+      target.count = position + 1;
+      position;
     };
 
   let add_rule = add_to(accumulated_rules);
-  let add_global_rule = add_to(global_rules);
+  let add_global_rule = (key, text) =>
+    ignore(
+      add_to(
+        global_rules,
+        key,
+        {
+          Css_extraction.text,
+          key: None,
+        },
+      ),
+    );
 
-  let get_rules = () => {
-    let dump = target =>
-      List.rev_map(((_, cssText)) => cssText, target.rules);
-    dump(global_rules) @ dump(accumulated_rules);
-  };
+  /* Global rules come first in the file, so an accumulated rule's index in
+     the file is its position plus this offset. */
+  let accumulated_offset = () => global_rules.count;
+
+  let get_rules = () =>
+    List.rev(global_rules.rules) @ List.rev(accumulated_rules.rules);
 
   let clear = () => {
-    accumulated_rules.rules = [];
-    global_rules.rules = [];
-    Hashtbl.reset(accumulated_rules.seen);
-    Hashtbl.reset(global_rules.seen);
+    List.iter(
+      target => {
+        target.rules = [];
+        target.count = 0;
+        Hashtbl.reset(target.index);
+      },
+      [accumulated_rules, global_rules],
+    );
+  };
+};
+
+/* Every block and merge of the compilation unit, for [[@@@css.blocks]] and
+   [[@@@css.merges]]. A block's rules are positions in
+   [Buffer.accumulated_rules] until [get] shifts them past the global
+   rules. */
+module Blocks = {
+  type pending = {
+    line: int,
+    identity: option(string),
+    classes: string,
+    rules: list(int),
+  };
+  let blocks: ref(list(pending)) = ref([]);
+  let count = ref(0);
+  let merges: ref(list(Css_extraction.merge)) = ref([]);
+
+  let find = predicate => {
+    let rec go = (index, blocks) =>
+      switch (blocks) {
+      | [] => None
+      | [block, ...rest] =>
+        predicate(block) ? Some(index) : go(index - 1, rest)
+      };
+    go(count^ - 1, blocks^);
+  };
+
+  let record = block =>
+    switch (find(existing => existing == block)) {
+    | Some(index) => index
+    | None =>
+      blocks := [block, ...blocks^];
+      incr(count);
+      count^ - 1;
+    };
+
+  let of_identity = identity =>
+    find(block => block.identity == Some(identity));
+  let of_classes = classes => find(block => block.classes == classes);
+  let identity_of_classes = classes =>
+    List.find_map(
+      block => block.classes == classes ? block.identity : None,
+      blocks^,
+    );
+
+  let record_merge = (~line, operands) =>
+    merges := [Css_extraction.merge(~line, ~operands), ...merges^];
+
+  let drain = () => {
+    let offset = Buffer.accumulated_offset();
+    let out =
+      List.rev_map(
+        ({ line, identity, rules, _ }) =>
+          Css_extraction.block(
+            ~line,
+            ~identity,
+            ~rules=List.map(index => index + offset, rules),
+          ),
+        blocks^,
+      );
+    let merges_out = List.rev(merges^);
+    blocks := [];
+    count := 0;
+    merges := [];
+    (out, merges_out);
   };
 };
 
@@ -116,12 +199,14 @@ module Css_transform = {
   };
 
   /* Threaded unchanged through the whole transform walk: resolution
-     inputs, the position AST locations are rebased against, and the
-     accumulator for hoisted interpolations. */
+     inputs (with [locals], the local variables in scope at the block, which
+     shadow a binding of the same name), the position AST locations are
+     rebased against, and the accumulator for hoisted interpolations. */
   type ctx = {
     file: string,
     scope: list(string),
     opens: list(list(string)),
+    locals: list(Local_selector_environment.local),
     source_position_start: Lexing.position,
     dynamic_vars: ref(list(dynamic_var)),
   };
@@ -141,25 +226,6 @@ module Css_transform = {
       ctx.dynamic_vars := [dynamic_var, ...ctx.dynamic_vars^];
     };
 
-  /* Detect a `$(name)` interpolation anywhere in a component-value list,
-     recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
-     The naive top-level check misses interpolations nested inside those
-     groupings (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
-  let rec component_value_has_interpolation = (cv: component_value) =>
-    switch (cv) {
-    | Variable(_, _) => true
-    | Paren_block(values)
-    | Bracket_block(values) => component_value_list_has_interpolation(values)
-    | Function({ body: (values, _), _ }) =>
-      component_value_list_has_interpolation(values)
-    | _ => false
-    }
-  and component_value_list_has_interpolation = values =>
-    List.exists(
-      ((cv, _loc)) => component_value_has_interpolation(cv),
-      values,
-    );
-
   /* A declaration hoists a custom property iff its *value* carries a
      `$(…)` interpolation. Selector-position interpolations (`.$(name)`)
      are resolved statically and never hoisted, so they are irrelevant
@@ -167,9 +233,47 @@ module Css_transform = {
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
 
+  /* Every `$(name)` source path a value interpolates, recursing the same
+     shape `component_value_has_interpolation` does (into `Paren_block`,
+     `Bracket_block`, `Function` bodies) - collecting the path string
+     instead of stopping at a bool. Used to decide which of a block's
+     interpolating declarations must SHARE a bundle (see
+     `transform_rule_list`'s bundle grouping below): two declarations that
+     interpolate the same path need one variable between them; two that
+     interpolate different, unrelated paths do not. */
+  let rec component_value_interpolation_paths = (cv: component_value) =>
+    switch (cv) {
+    | Variable(path, _) => [path]
+    | Paren_block(values)
+    | Bracket_block(values) =>
+      component_value_list_interpolation_paths(values)
+    | Function({ body: (values, _), _ }) =>
+      component_value_list_interpolation_paths(values)
+    | _ => []
+    }
+  and component_value_list_interpolation_paths = values =>
+    List.concat_map(
+      ((cv, _loc)) => component_value_interpolation_paths(cv),
+      values,
+    );
+
+  let declaration_interpolation_paths = (decl: declaration) =>
+    component_value_list_interpolation_paths(fst(decl.value));
+
   /* The single declaration an atom carries: bare (top-level), nested under a
      selector (`Style_rule`), or under an at-rule. None for an atom with no
-     declaration body (e.g. an empty at-rule). */
+     declaration body (e.g. an empty at-rule), OR for a multi-declaration
+     group (same-property or same-family, see `group_declarations_by_family`)
+     - such a group's bundling eligibility (`atom_has_value_interpolation`
+     below) is therefore always [false], never re-examined per member. This
+     is harmless, not a gap: a multi-declaration group already puts every
+     member in ONE atom with its own inline `var(--...)` per interpolating
+     declaration (unaffected by grouping - substitution happens per
+     declaration, before grouping), so the sharing bundling exists for
+     (one variable, not one per occurrence) is already achieved by the
+     grouping itself; bundling's remaining, distinct job is sharing a value
+     ACROSS separately-grouped atoms (base vs `:hover` vs `@media`), which a
+     single already-merged group has no need for. */
   let rec atom_declaration = (rule: rule): option(declaration) =>
     switch (rule) {
     | Declaration(decl) => Some(decl)
@@ -409,12 +513,6 @@ module Css_transform = {
     };
   }
 
-  /* Resolve `ClassVariable(name)` (i.e. `.$(name)`) by replacing it with
-     the chain of `Class(c)` subclass selectors corresponding to the
-     classNames the referenced [%css] binding minted. Multi-declaration
-     bindings expand to a compound chain (`&.cssA.cssB`) which matches the
-     "AND" semantics: every consumer of the referenced binding has all of
-     its atomized classes applied to the same element. */
   and transform_compound_selector = (ctx, compound: compound_selector) => {
     let transformed_type_selector =
       Option.map(
@@ -423,9 +521,7 @@ module Css_transform = {
       );
     let transformed_subclasses =
       compound.subclass_selectors
-      |> List.concat_map(subclass =>
-           transform_subclass_selector_to_list(ctx, subclass)
-         );
+      |> List.map(subclass => transform_subclass_selector(ctx, subclass));
     let transformed_pseudos =
       compound.pseudo_selectors
       |> List.map(pseudo => transform_pseudo_selector(ctx, pseudo));
@@ -449,20 +545,11 @@ module Css_transform = {
           ~file=ctx.file,
           ~scope=ctx.scope,
           ~opens=ctx.opens,
+          ~locals=ctx.locals,
           ~loc=var_loc,
           path_str,
         );
-      switch (resolved) {
-      | [single] => Subclass(Class(single))
-      | _ =>
-        Ppxlib.Location.raise_errorf(
-          ~loc=var_loc,
-          "Bare `$(%s)` selector interpolation expanded to %d class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(%s)`.",
-          path_str,
-          List.length(resolved),
-          path_str,
-        )
-      };
+      Subclass(Class(resolved));
     | _ => simple
     };
   }
@@ -479,26 +566,23 @@ module Css_transform = {
     };
   }
 
-  /* `transform_subclass_selector_to_list` returns a *list* of subclass
-     selectors so `ClassVariable` can fan out into a compound chain
-     (`.cssA.cssB`) for multi-declaration source bindings. */
-  and transform_subclass_selector_to_list =
-      (ctx, subclass: subclass_selector): list(subclass_selector) => {
+  and transform_subclass_selector =
+      (ctx, subclass: subclass_selector): subclass_selector => {
     switch (subclass) {
     | ClassVariable(path_str, var_loc) =>
-      let classNames =
+      let className =
         Local_selector_environment.resolve_selector_class_ref(
           ~file=ctx.file,
           ~scope=ctx.scope,
           ~opens=ctx.opens,
+          ~locals=ctx.locals,
           ~loc=to_file_loc(ctx, var_loc),
           path_str,
         );
-      List.map(c => Class(c), classNames);
-    | Pseudo_class(pseudo) => [
-        Pseudo_class(transform_pseudo_selector(ctx, pseudo)),
-      ]
-    | _ => [subclass]
+      Class(className);
+    | Pseudo_class(pseudo) =>
+      Pseudo_class(transform_pseudo_selector(ctx, pseudo))
+    | _ => subclass
     };
   }
 
@@ -556,6 +640,65 @@ module Css_transform = {
       });
     };
   };
+
+  /* Resolve `$(binding)`/`&.$(binding)` selector-class references (via
+     `transform_selector`, reused unchanged from above) BEFORE atomization,
+     leaving declaration values untouched. This must run ahead of
+     `atomize_rules`: an atom's class name and `Slot_key` context both hash
+     the rendered rule text (`render_rule`/`render_declaration`,
+     `Render.selector` respectively), and that text must already carry the
+     REFERENCED BINDING'S identity class, not the literal `$(row)` marker -
+     otherwise two files with the same local binding name and the same
+     nested selector (e.g. `& > div:not(:last-child).$(row)`) render
+     identical unresolved text and mint the SAME atom class even though
+     `row` resolves to a different `_id_` class in each file, which
+     `styled-ppx.generate`'s atom-class-collision check then rightly rejects
+     (same class, different final CSS).
+
+     Declaration values are NOT resolved here - deferred to `lower_atom`
+     (`transform_rule`'s full walk), since a value interpolation's own
+     variable name depends on the atom's own class/namespace, which is only
+     known once atomize_rules and `Hash_class.class_and_namespace` have run;
+     resolving selector-class refs first creates no such cycle, because
+     `resolve_selector_class_ref` only needs the REFERENCED binding's
+     already-registered identity class, never this atom's own.
+
+     Idempotent: a selector already resolved to `Class(...)`/
+     `Subclass(Class(...))` falls through `transform_selector`'s
+     catch-all, so running it again in `lower_atom` later is a no-op. */
+  let rec resolve_rule_selectors = (ctx, rule: rule): rule =>
+    switch (rule) {
+    | Declaration(_) => rule
+    | Style_rule({ prelude: (selectors, selector_loc), block, loc }) =>
+      let (rule_list, rule_loc) = block;
+      Style_rule({
+        prelude: (
+          List.map(
+            ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+            selectors,
+          ),
+          selector_loc,
+        ),
+        block: (List.map(resolve_rule_selectors(ctx), rule_list), rule_loc),
+        loc,
+      });
+    | At_rule({ name, prelude, block, loc }) =>
+      let map_payload = ((rules, rule_loc)) => (
+        List.map(resolve_rule_selectors(ctx), rules),
+        rule_loc,
+      );
+      At_rule({
+        name,
+        prelude,
+        block:
+          switch (block) {
+          | Empty => Empty
+          | Rule_list(payload) => Rule_list(map_payload(payload))
+          | Stylesheet(payload) => Stylesheet(map_payload(payload))
+          },
+        loc,
+      });
+    };
 
   let transform_declaration = (ctx, ~var_namespace, decl: declaration) => {
     let (property_name, _) = decl.name;
@@ -657,7 +800,7 @@ module Css_transform = {
     let (prelude_values, prelude_loc) = prelude;
 
     /* Detect any `$(name)` interpolation anywhere in the at-rule prelude
-       (recursing into nested groupings — see `component_value_has_interpolation`)
+       (recursing into nested groupings — see `Ast.component_value_has_interpolation`)
        — e.g. the canonical `@media (max-width: $(bp))` form, where `$(bp)`
        lives inside a `Paren_block` of the `(max-width: $(bp))` group.
 
@@ -774,67 +917,829 @@ module Css_transform = {
     );
   };
 
-  /* Same-property declarations of a block group into ONE atom so the
-     winner is decided by intra-atom source order (emotion parity) —
-     fallback pairs like `display: -webkit-box; display: flex` stay
-     together; splitting them would let stylesheet position pick the
-     winner. Groups anchor at the LAST occurrence (a group cascades like
-     its last member; first-anchoring would hoist duplicates past
-     intervening rules). Singletons keep the historical atom shape and
-     hash. */
+  /* Declarations of a block group into one atom when their COVERED LEAF
+     PROPERTIES overlap, taken transitively - not merely because they share
+     a family. Sharing a family is necessary but not sufficient:
+     `padding-left`/`padding-right` are both in the "padding" family but
+     cover disjoint leaves (no shared longhand), so they stay separate
+     atoms - grouping them would make a future `CSS.merge` too coarse (it
+     could no longer drop just one side's atom without also dropping the
+     other's). `margin: 10px; margin-top: 0;` DO overlap (margin's full
+     leaf set includes margin-top), so they group into one atom, and a
+     same-property repeat overlaps itself trivially (fallback pairs like
+     `display: -webkit-box; display: flex` stay together, as before).
+     "Transitively": a bridging declaration pulls everything it overlaps
+     into one group even when those things don't overlap each other
+     directly - `border: 1px solid; border-left-width: 2px;` group
+     together (border's full leaf set includes border-left-width), but
+     `border-top: 1px solid; border-left-width: 2px;` do NOT (border-top's
+     three leaves are all on the top side, none of them is
+     border-left-width). An alias (`grid-row-gap`) counts as its canonical
+     property (`row-gap`). Groups anchor at the LAST occurrence among the
+     block's declarations (a group cascades like its last member). The
+     block's nested rules follow its declarations (emotion order: a
+     declaration written after a nested rule still comes before it).
+     Singleton, single-declaration groups keep the historical atom shape
+     and hash. */
   type block_item =
     | Declaration_group(list(declaration))
     | Nested_rule(rule);
 
-  /* Property names are case-insensitive; custom properties (`--*`) are
-     case-sensitive. */
-  let declaration_group_key = ({ name: (name, _), _ }: declaration) =>
-    if (String.length(name) >= 2 && String.sub(name, 0, 2) == "--") {
-      name;
-    } else {
-      String.lowercase_ascii(name);
+  /* A declaration's covered leaf (non-shorthand) properties (see
+     `Slot_key.leaves_of`) - `[property]` itself when it names no
+     shorthand. `Slot_key.normalize_property` lowercases everything except
+     a custom property (`--*`, case-sensitive); a custom property is never
+     a shorthand member, so `leaves_of` returns it unchanged and two
+     differently-cased custom properties correctly never overlap. */
+  let declaration_leaves = ({ name: (name, _), _ }: declaration) =>
+    Slot_key.leaves_of(
+      Slot_key.resolve_alias(Slot_key.normalize_property(name)),
+    );
+
+  let leaf_sets_overlap = (a: list(string), b: list(string)) =>
+    List.exists(leaf => List.mem(leaf, b), a);
+
+  let group_declarations_by_family = (rules: list(rule)): list(block_item) => {
+    /* Every `Declaration` in this block, in order, paired with its leaf
+       set (computed once per declaration, not once per pair compared
+       below) and its position in `rules` (for last-occurrence anchoring). */
+    let decls =
+      rules
+      |> List.mapi((index, rule) => (index, rule))
+      |> List.filter_map(((index, rule)) =>
+           switch (rule) {
+           | Declaration(decl) =>
+             Some((index, decl, declaration_leaves(decl)))
+           | _ => None
+           }
+         )
+      |> Array.of_list;
+    let n = Array.length(decls);
+
+    /* Union-find over positions [0, n) in `decls` - path-compressed, no
+       union-by-rank (n is a block's declaration count, always small).
+       Connects i and j when their leaf sets overlap, so the relation is
+       transitive by construction: if i-j and j-k are each unioned, find(i)
+       = find(j) = find(k) regardless of whether i and k overlap directly. */
+    let parent = Array.init(n, i => i);
+    let rec find = i =>
+      if (parent[i] == i) {
+        i;
+      } else {
+        let root = find(parent[i]);
+        parent[i] = root;
+        root;
+      };
+    let union = (i, j) => {
+      let (ri, rj) = (find(i), find(j));
+      if (ri != rj) {
+        parent[max(ri, rj)] = min(ri, rj);
+      };
+    };
+    for (i in 0 to n - 1) {
+      for (j in i + 1 to n - 1) {
+        let (_, _, leaves_i) = decls[i];
+        let (_, _, leaves_j) = decls[j];
+        if (leaf_sets_overlap(leaves_i, leaves_j)) {
+          union(i, j);
+        };
+      };
     };
 
-  let group_declarations_by_property = (rules: list(rule)): list(block_item) => {
-    /* Pass 1: collect declarations per key + each key's last index. */
-    let decls_by_key: Hashtbl.t(string, ref(list(declaration))) =
+    /* Collect each group's members (in author order) and the block-level
+       index of its LAST member, keyed by union-find root. */
+    let members_by_root: Hashtbl.t(int, ref(list(declaration))) =
       Hashtbl.create(8);
-    let last_index_by_key: Hashtbl.t(string, int) = Hashtbl.create(8);
-    List.iteri(
-      (index, rule) =>
-        switch (rule) {
-        | Declaration(decl) =>
-          let key = declaration_group_key(decl);
-          switch (Hashtbl.find_opt(decls_by_key, key)) {
-          | Some(group) => group := [decl, ...group^]
-          | None => Hashtbl.add(decls_by_key, key, ref([decl]))
-          };
-          Hashtbl.replace(last_index_by_key, key, index);
-        | _ => ()
-        },
-      rules,
+    let last_index_by_root: Hashtbl.t(int, int) = Hashtbl.create(8);
+    let root_by_block_index: Hashtbl.t(int, int) = Hashtbl.create(8);
+    Array.iteri(
+      (i, (block_index, decl, _leaves)) => {
+        let root = find(i);
+        Hashtbl.replace(root_by_block_index, block_index, root);
+        switch (Hashtbl.find_opt(members_by_root, root)) {
+        | Some(group) => group := [decl, ...group^]
+        | None => Hashtbl.add(members_by_root, root, ref([decl]))
+        };
+        Hashtbl.replace(last_index_by_root, root, block_index);
+      },
+      decls,
     );
-    /* Pass 2: emit each group at its last occurrence. */
-    List.mapi(
-      (index, rule) =>
-        switch (rule) {
-        | Declaration(decl) =>
-          let key = declaration_group_key(decl);
-          if (Hashtbl.find(last_index_by_key, key) == index) {
-            let group = Hashtbl.find(decls_by_key, key);
-            [Declaration_group(List.rev(group^))];
-          } else {
-            [];
-          };
-        | rule => [Nested_rule(rule)]
-        },
-      rules,
-    )
-    |> List.concat;
+
+    /* Emotion order: each group at its last member's position among the
+       block's declarations, then the nested rules in source order. */
+    let groups =
+      List.mapi(
+        (index, rule) =>
+          switch (rule) {
+          | Declaration(_) =>
+            let root = Hashtbl.find(root_by_block_index, index);
+            if (Hashtbl.find(last_index_by_root, root) == index) {
+              let group = Hashtbl.find(members_by_root, root);
+              [Declaration_group(List.rev(group^))];
+            } else {
+              [];
+            };
+          | _ => []
+          },
+        rules,
+      )
+      |> List.concat;
+    let nested =
+      List.filter_map(
+        fun
+        | Declaration(_) => None
+        | rule => Some(Nested_rule(rule)),
+        rules,
+      );
+    groups @ nested;
   };
 
+  /* Media condition ordering (StyleX's `lastMediaQueryWinsTransform`).
+     Within one block, when 2+ sibling `@media` at-rules set the same
+     property family under the same selector target, plain CSS gives the
+     tie at equal specificity to stylesheet POSITION, not source order -
+     and `generate` dedupes byte-identical rules by first sighting, so two
+     blocks writing the same two conditions in opposite order silently
+     collapse onto whichever block the aggregator saw first (see
+     `media-order-dedup-flip.t`). Rewriting each earlier condition to
+     exclude every later one that sets all of its longhands
+     (`Slot_key.removes`) means at most one of them ever applies, so "last
+     written wins" holds regardless of stylesheet position or which other
+     block already emitted the same rule. A later rule that sets other
+     longhands, or only some of them, does not negate the earlier one: in
+     plain CSS the earlier rule's other longhands still apply where both
+     conditions match (see `media-overlap-longhand-cover.t`); the block
+     order edges in `[@@@css.blocks]` (or a merge edge across blocks)
+     order that partial overlap in the sheet. Runs here, before
+     `atomize_rules` hashes each atom's rendered text, so the REWRITTEN
+     condition is what ends up in the class name.
+
+     Scope, matching StyleX exactly: `@media` only - `@supports`/
+     `@container` are left alone by construction (`media_atom_slot` only
+     classifies `At_rule` nodes named "media"). A prelude this can't
+     confidently classify (further nesting, a block mixing more than one
+     property family, an interpolated condition - rejected later anyway,
+     see `media-query-interpolation-error.t`) is left untouched rather
+     than guessed at: this pass is an ordering optimization, not a
+     validity check. */
+
+  /* One `@media` at-rule's (selector, family, important) - the same
+     grouping question `CSS.merge` (`Slot_key.removes`) already asks of
+     two atoms ("do these compete for the same spot"), minus the at-rule
+     chain itself (exactly the part a group's members are allowed to
+     differ on - that's the thing being rewritten). `None` when the
+     at-rule's own content doesn't reduce to one clean (target, family)
+     unit, e.g. two unrelated properties or a nested at-rule - see the
+     scope note above. */
+  let media_atom_slot = (at_rule: at_rule): option(Slot_key.t) => {
+    let inner_rules =
+      switch (at_rule.block) {
+      | Rule_list((rules, _))
+      | Stylesheet((rules, _)) => rules
+      | Empty => []
+      };
+    switch (group_declarations_by_family(inner_rules)) {
+    | [Declaration_group(decls)] =>
+      let synthetic =
+        switch (decls) {
+        | [d] => Declaration(d)
+        | decls =>
+          Style_rule({
+            prelude: (
+              [(SimpleSelector(Ampersand), Ppxlib.Location.none)],
+              Ppxlib.Location.none,
+            ),
+            block: (
+              List.map(d => Declaration(d), decls),
+              Ppxlib.Location.none,
+            ),
+            loc: Ppxlib.Location.none,
+          })
+        };
+      Slot_key.of_atom(synthetic);
+    | [Nested_rule(Style_rule(_) as sr)] => Slot_key.of_atom(sr)
+    | _ => None /* mixed families or further nesting: left alone, see above */
+    };
+  };
+
+  /* Same trim `Selector_nesting` already uses for a media prelude
+     (`join_media`). */
+  let drop_leading_whitespace = Styled_ppx_css_parser.Selector_nesting.trim_left;
+  let trim_whitespace = tokens =>
+    tokens
+    |> Styled_ppx_css_parser.Selector_nesting.trim_left
+    |> Styled_ppx_css_parser.Selector_nesting.trim_right;
+
+  /* `tokens` split on top-level commas (an MQ4 query list is CSS's `or`).
+     A comma nested inside a `Paren_block`/`Function` is already part of
+     that token's own sub-list, never visible here - the parser has
+     already done the depth tracking, so this needs none of its own. */
+  let split_top_level_commas =
+      (tokens: component_value_list): list(component_value_list) => {
+    let (branches, current) =
+      List.fold_left(
+        ((branches, current), (cv, _loc) as tok) =>
+          switch (cv) {
+          | Delim(Delimiter_comma) => (
+              [List.rev(current), ...branches],
+              [],
+            )
+          | _ => (branches, [tok, ...current])
+          },
+        ([], []),
+        tokens,
+      );
+    List.rev([List.rev(current), ...branches]) |> List.map(trim_whitespace);
+  };
+
+  /* True when one OR-branch (one comma-separated alternative) carries a
+     leading media-type keyword (`screen`, `print`, `all`, ...), optionally
+     itself prefixed by `not`/`only` - the `<media-query>`
+     `['not'|'only']? <media-type> ['and' ...]?` production, as opposed to a
+     bare `<media-condition>` (an and/or-chain of parenthesized features,
+     optionally `not`-prefixed). A media type can never be wrapped in
+     parentheses (`<media-in-parens>` only ever contains a
+     `<media-condition>`, and a media type is not one), so a query built
+     this way cannot be turned into a `(not (...))` AND-term at all -
+     negating it correctly would need the OUTER, per-query `not`/`only`
+     toggle instead, a different mechanism this pass does not implement.
+     Conservative default (anything that isn't clearly a parenthesized
+     condition counts as "has a media type") so an unrecognized shape is
+     excluded rather than mishandled - see `rewrite_media_prelude_siblings`,
+     which drops any candidate with a `true` branch here entirely, matching
+     `media-type-query-unchanged.t`. */
+  let branch_has_media_type = (branch: component_value_list): bool => {
+    let skip_leading_not_or_only = tokens =>
+      switch (tokens) {
+      | [(Ident(name), _), ...rest]
+          when
+            String.lowercase_ascii(name) == "not"
+            || String.lowercase_ascii(name) == "only" =>
+        drop_leading_whitespace(rest)
+      | tokens => tokens
+      };
+    switch (skip_leading_not_or_only(drop_leading_whitespace(branch))) {
+    | [(Paren_block(_), _), ..._] => false
+    | [] => false
+    | _ => true
+    };
+  };
+
+  /* `<mf-name>`s whose range test every supported browser resolves to a
+     plain, definite true/false - never CSS's third ("unknown") truth
+     value - for a literal `px`/`em`/`rem` length. */
+  let is_safe_range_feature_name = name =>
+    switch (String.lowercase_ascii(name)) {
+    | "min-width"
+    | "max-width"
+    | "min-height"
+    | "max-height" => true
+    | _ => false
+    };
+
+  let is_safe_length_unit = unit =>
+    switch (String.lowercase_ascii(unit)) {
+    | "px"
+    | "em"
+    | "rem" => true
+    | _ => false
+    };
+
+  /* Contents of ONE `Paren_block` - true only for the two shapes every
+     supported browser resolves to a definite true/false: `<safe-name>:
+     <literal px/em/rem length>`, or `orientation: landscape|portrait`.
+     Anything else (`calc()`, a percentage, a range comparison, a boolean
+     feature) is NOT safe to negate - see `query_is_negation_safe`. */
+  let paren_contents_is_safe_feature = (contents: component_value_list): bool =>
+    switch (List.filter(((cv, _)) => cv != Whitespace, contents)) {
+    | [
+        (Ident(name), _),
+        (Delim(Delimiter_colon), _),
+        (Dimension({ unit, _ }), _),
+      ] =>
+      is_safe_range_feature_name(name) && is_safe_length_unit(unit)
+    | [(Ident(name), _), (Delim(Delimiter_colon), _), (Ident(value), _)]
+        when String.lowercase_ascii(name) == "orientation" =>
+      switch (String.lowercase_ascii(value)) {
+      | "landscape"
+      | "portrait" => true
+      | _ => false
+      }
+    | _ => false
+    };
+
+  /* True when every feature test in this query (one full `@media`
+     prelude, already known to carry no media type) is one of the two
+     safe shapes above, so the query only ever resolves to a definite
+     true/false - never "unknown". Matters for a query used as a
+     NEGATION SOURCE (the `<later>` in `and (not (<later>))`):
+     three-valued media-feature logic means `not unknown` is itself
+     `unknown`, and `true and unknown` is `unknown`, not `false` - so
+     negating an "unknown"-capable later query can turn an EARLIER rule
+     that used to apply unconditionally into one that never applies
+     again. `min-width: calc(1000px - 2%)` mixes an absolute length with
+     a percentage, not a valid `<length>` in a media feature; the
+     browser resolves it, and its negation, to permanently `false` -
+     not `true`, the way negating an ordinary `false` would - see
+     `media-calc-feature-unchanged.t`, which shows the computed-style
+     loss this would otherwise cause.
+
+     Checked per OR-branch (an unsafe feature anywhere in any branch
+     makes the whole query unsafe - De Morgan negates every branch), after
+     stripping an optional leading condition-level `not` (already known
+     absent a media type, so every remaining top-level token is a
+     `Paren_block`, the `and` keyword, or whitespace). Shared with the
+     same-type-prefix path below (`split_type_prefix_and_chain`), whose
+     own chain (after the shared type prefix + its own leading `and`) has
+     exactly this same shape and the exact same "unknown" risk. */
+  let chain_is_negation_safe = (tokens: component_value_list): bool =>
+    tokens
+    |> List.for_all(((cv, _)) =>
+         switch (cv) {
+         | Paren_block(inner) => paren_contents_is_safe_feature(inner)
+         | Ident(kw) when String.lowercase_ascii(kw) == "and" => true
+         | Whitespace => true
+         | _ => false
+         }
+       );
+
+  let query_is_negation_safe = (prelude: component_value_list): bool =>
+    split_top_level_commas(prelude)
+    |> List.for_all(branch => {
+         let checked =
+           switch (branch) {
+           | [(Ident(name), _), ...rest]
+               when String.lowercase_ascii(name) == "not" => rest
+           | branch => branch
+           };
+         chain_is_negation_safe(checked);
+       });
+
+  /* The four media types Media Queries 4 still defines (`tty`/`tv`/
+     `projection`/`handheld`/`braille`/`embossed`/`aural` were removed
+     from the spec) - unlike a feature's VALUE, a media type test is
+     never partially-supported or invalid, so recognizing one carries
+     none of `query_is_negation_safe`'s "unknown" risk; the reason it is
+     handled separately at all is purely syntactic (`branch_has_media_type`'s
+     doc: a type can never be wrapped in parentheses). */
+  let is_recognized_media_type = name =>
+    switch (String.lowercase_ascii(name)) {
+    | "all"
+    | "print"
+    | "screen"
+    | "speech" => true
+    | _ => false
+    };
+
+  /* Splits one type-bearing, single OR-branch (`branch_has_media_type`
+     already true for it) into (a comparison key for its exact type
+     prefix, the feature-chain tokens after its own `'and'`) - `None` when
+     the leading idents aren't exactly one recognized type (bare, or
+     `only`-prefixed), or when there is no `and <chain>` to fold a
+     negation into (a bare `@media screen` has no feature condition -
+     `branch_has_media_type`'s "no correct form" reasoning again).
+
+     A `not`-prefixed type is explicitly EXCLUDED (`words` containing
+     "not" always returns `None`), unlike `only` - `not` negates the
+     WHOLE query (type and condition together, per spec), so `not screen
+     and (A) and (not (B))` does NOT reduce to "A-but-not-B" the way the
+     bare-type case does: De Morgan turns the leading `not` into an OR
+     across the whole expression, so the appended `(not (B))` term ends
+     up OR'd at the top level instead of scoped inside the original AND,
+     so the earlier rule fires in cases where neither original rule
+     should apply. `only` has no such problem (a no-op in every browser
+     that matters), so `only
+     screen and (A) and (not (B))` reduces exactly like the bare-type
+     case.
+
+     Two branches with the SAME key (`rewrite_media_prelude_siblings`
+     groups on it) share the exact same `only`/type combination, so
+     appending `and (not (<other's chain>))` after EITHER's own chain
+     stays a single, valid `<media-condition-without-or>` for that shared
+     type. */
+  let split_type_prefix_and_chain =
+      (branch: component_value_list)
+      : option((string, component_value_list, component_value_list)) => {
+    let rec collect = (words, prefix_toks, tokens) =>
+      switch (tokens) {
+      | [(Whitespace, _) as tok, ...rest] =>
+        collect(words, [tok, ...prefix_toks], rest)
+      | [(Ident(kw), _), ...rest] when String.lowercase_ascii(kw) == "and" =>
+        Some((words, List.rev(prefix_toks), drop_leading_whitespace(rest)))
+      | [(Ident(word), _) as tok, ...rest] =>
+        collect(
+          [String.lowercase_ascii(word), ...words],
+          [tok, ...prefix_toks],
+          rest,
+        )
+      | [] => Some((words, List.rev(prefix_toks), []))
+      | _ => None /* a Paren_block (or anything else) before any `and`:
+                     not a type prefix at all */
+      };
+    switch (collect([], [], branch)) {
+    | None => None
+    | Some((words_rev, prefix_toks, chain)) =>
+      let words = List.rev(words_rev);
+      let type_words = List.filter(w => w != "only", words);
+      switch (type_words, chain) {
+      | ([ty], [_, ..._])
+          when is_recognized_media_type(ty) && !List.mem("not", words) =>
+        Some((
+          String.concat(" ", words),
+          trim_whitespace(prefix_toks),
+          chain,
+        ))
+      | _ => None
+      };
+    };
+  };
+
+  /* `current`, made safe to extend with further ` and (...)` terms. Every
+     MQ4 shape except a bare, unwrapped `not <condition>` already is: a
+     single parenthesized feature or an `and`-chain of them is already a
+     `<media-and>`/`<media-in-parens>`, which the grammar lets grow with
+     more `and <media-in-parens>` terms directly. A bare `<media-not>` is
+     not - it has no `and`-continuation of its own - so wrap it in one
+     fresh pair of parens first, turning it into a `<media-in-parens>` (a
+     valid, if trivial, one-element and-chain) before anything is
+     appended. */
+  let ensure_and_chainable =
+      (branch: component_value_list): component_value_list =>
+    switch (branch) {
+    | [(Ident(name), _), ..._] when String.lowercase_ascii(name) == "not" => [
+        (Paren_block(branch), Ppxlib.Location.none),
+      ]
+    | branch => branch
+    };
+
+  /* The logical negation of one later OR-branch, as a term ready to append
+     directly after ` and ` (i.e. already a valid `<media-in-parens>` -
+     `branch_has_media_type` guarantees the branch itself is a bare
+     `<media-condition>`, never a media type, by the time this runs). Two
+     shapes:
+     - already `not <rest>`: double negation cancels - `rest` is whatever
+       the author originally wrapped the `not` around, already a valid
+       `<media-in-parens>` on its own (a `<media-not>`'s operand always is),
+       so it is reused verbatim with no extra wrap.
+     - anything else (one parenthesized feature, or an `and`-chain of
+       several): the negation is `not <that>`, which is a `<media-not>` -
+       itself a `<media-condition>`, not yet a `<media-in-parens>` - so the
+       WHOLE `not <that>` is wrapped in one fresh pair of parens:
+       `(not (min-width: 900px))`, or `(not ((min-width: 768px) and
+       (max-width: 1279px)))` when `<that>` is itself a multi-term chain
+       needing its own inner wrap first to become one `<media-in-parens>`
+       for `not` to apply to. */
+  let negate_as_and_term =
+      (branch: component_value_list): component_value_list => {
+    let loc =
+      switch (branch) {
+      | [(_, l), ..._] => l
+      | [] => Ppxlib.Location.none
+      };
+    switch (branch) {
+    | [(Ident(name), _), ...rest]
+        when String.lowercase_ascii(name) == "not" => [
+        (Paren_block(trim_whitespace(rest)), loc),
+      ]
+    | [(Paren_block(_), _) as single] => [
+        (
+          Paren_block([(Ident("not"), loc), (Whitespace, loc), single]),
+          loc,
+        ),
+      ]
+    | _ => [
+        (
+          Paren_block([
+            (Ident("not"), loc),
+            (Whitespace, loc),
+            (Paren_block(branch), loc),
+          ]),
+          loc,
+        ),
+      ]
+    };
+  };
+
+  let join_with_commas =
+      (branches: list(component_value_list)): component_value_list =>
+    switch (branches) {
+    | [] => []
+    | [first, ...rest] =>
+      List.fold_left(
+        (acc, branch) =>
+          acc
+          @ [
+            (Delim(Delimiter_comma), Ppxlib.Location.none),
+            (Whitespace, Ppxlib.Location.none),
+          ]
+          @ branch,
+        first,
+        rest,
+      )
+    };
+
+  let and_join = (a, b) =>
+    a
+    @ [
+      (Whitespace, Ppxlib.Location.none),
+      (Ident("and"), Ppxlib.Location.none),
+      (Whitespace, Ppxlib.Location.none),
+    ]
+    @ b;
+
+  /* `current AND (not later1) AND (not later2)...`, De Morgan-distributed
+     into every OR-branch of `current` independently (mirrors StyleX's
+     `combineMediaQueryWithNegations`, `~/.librarian/github.com/facebook/stylex`),
+     each negation wrapped in its own parens (`(not (...))`, never a bare
+     `and not (...)` - invalid MQ4, `not` only starts a whole condition).
+     `later` are the ORIGINAL (not previously rewritten) preludes of every
+     strictly-later group member that covers `current`'s longhands - a
+     3+-way group chains against all of them, not just its neighbor.
+
+     `~type_prefix`: for a same-type group (`split_type_prefix_and_chain`),
+     `current`/`later` are already just the shared-type members' own
+     feature chains (no comma, no type) - split/rejoin-by-comma is then a
+     no-op, so the same steps produce `<chain> and (not (...))...`, and
+     the untouched type prefix is prepended once at the end. */
+  let negate_prelude_chain =
+      (
+        ~type_prefix: option(component_value_list),
+        ~current: component_value_list,
+        ~later: list(component_value_list),
+      )
+      : component_value_list => {
+    let not_terms =
+      later
+      |> List.concat_map(prelude =>
+           split_top_level_commas(prelude) |> List.map(negate_as_and_term)
+         );
+    let negated =
+      current
+      |> split_top_level_commas
+      |> List.map(ensure_and_chainable)
+      |> List.map(branch => List.fold_left(and_join, branch, not_terms))
+      |> join_with_commas;
+    switch (type_prefix) {
+    | None => negated
+    | Some(prefix) => and_join(prefix, negated)
+    };
+  };
+
+  /* Stable grouping by structural key, first-seen order - `n` is always a
+     block's own at-rule count (small), so the linear scan per insert costs
+     nothing worth a hashtable for. */
+  let group_by_key = (key_of, items) => {
+    let groups = ref([]);
+    items
+    |> List.iter(item => {
+         let k = key_of(item);
+         switch (
+           List.find_opt(((existing_key, _)) => existing_key == k, groups^)
+         ) {
+         | Some((_, members)) => members := [item, ...members^]
+         | None => groups := groups^ @ [(k, ref([item]))]
+         };
+       });
+    groups^ |> List.map(((_, members)) => List.rev(members^));
+  };
+
+  /* `Plain`: no media type anywhere in the prelude (every OR-branch) - the
+     original, StyleX-equivalent path. `Typed`: a SINGLE branch (no
+     top-level comma) that is exactly `['not'|'only']? <type> 'and'
+     <chain>` for one recognized type (`screen` is by far the most common
+     in practice) - carries the comparison key (so only an EXACT same
+     `not`/`only`/type combination groups together, see
+     `split_type_prefix_and_chain`'s doc), the original prefix tokens (for
+     verbatim reuse) and the chain tokens (the only part ever negated). A
+     comma list mixing a typed and an untyped branch, or two different
+     types, classifies as neither and is excluded entirely (`None`) -
+     mixed or other types stay untouched. */
+  type media_kind =
+    | Plain
+    | Typed(string, component_value_list, component_value_list);
+
+  let classify_media_query =
+      (prelude: component_value_list): option(media_kind) =>
+    switch (split_top_level_commas(prelude)) {
+    | [branch] when !branch_has_media_type(branch) => Some(Plain)
+    | [branch] =>
+      switch (split_type_prefix_and_chain(branch)) {
+      | Some((key, prefix, chain)) => Some(Typed(key, prefix, chain))
+      | None => None
+      }
+    | branches =>
+      List.for_all(b => !branch_has_media_type(b), branches)
+        ? Some(Plain) : None
+    };
+
+  let media_kind_key = kind =>
+    switch (kind) {
+    | Plain => ""
+    | Typed(key, _, _) => "typed:" ++ key
+    };
+
+  /* What this member contributes if it is used as a LATER negation
+     source: `Plain`'s is its whole (possibly multi-branch) prelude,
+     fed to `negate_prelude_chain`'s own per-branch splitting; `Typed`'s
+     is just its chain (already known single-branch), fed straight to
+     `negate_as_and_term`. Same representation type either way
+     (`component_value_list`), so both the safety check and the "what do
+     later members contribute" step read uniformly below. */
+  let later_representation = (kind, prelude) =>
+    switch (kind) {
+    | Plain => prelude
+    | Typed(_, _, chain) => chain
+    };
+
+  let is_safe_as_later = (kind, repr) =>
+    switch (kind) {
+    | Plain => query_is_negation_safe(repr)
+    | Typed(_, _, _) => chain_is_negation_safe(repr)
+    };
+
+  /* Keyed by PHYSICAL identity of the prelude's own `with_loc` pair, not
+     its source location: `rewrite_media_conditions` and `atomize_rules`
+     both walk the SAME tree (nothing is rebuilt in between - see
+     `rewrite_media_prelude_siblings`'s own doc), so the exact same
+     `at_rule.prelude` value is read on both sides, and physical equality
+     can never collide, unlike a location - which two different preludes
+     COULD share (a synthetic/ghost location, or any future code path
+     that copies one at-rule's location onto another's prelude, the way
+     `Selector_nesting.join_media` does for nested-`@media`-in-`@media`
+     flattening on the unrelated `[%styled.global]` path). `Hashtbl.hash`
+     is only ever used as a bucketing hint here (cheap and always
+     terminates - these preludes are a handful of tokens), never as the
+     actual equality check. */
+  module Media_rewrite_table =
+    Hashtbl.Make({
+      type t = with_loc(component_value_list);
+      let equal = (a, b) => a === b;
+      let hash = Hashtbl.hash;
+    });
+
+  /* One rule-list level (siblings): find every classifiable `@media`
+     at-rule, group by (target, family, !important, media_kind), and for
+     every member that a later member of its group covers, record a
+     rewritten prelude, keyed by that member's OWN (pre-rewrite) prelude value -
+     `atomize_rules` looks this up when it builds the atom, using the
+     rewritten text for the class hash and the printed rule while
+     `Slot_key.of_atom` still sees the ORIGINAL, un-rewritten prelude for
+     `CSS.merge`'s context (the rewrite is block-local ordering, invisible
+     to a merge call site elsewhere - the class an atom gets must not
+     depend on what its own block's siblings happened to need). Preludes
+     are never mutated in place, so nested levels are found by walking the
+     SAME original tree `rewrite_media_conditions` was given - see there.
+     Non-candidates (base declarations, `@supports`/`@container`,
+     unclassifiable `@media`, singleton groups) get no table entry and
+     stay exactly as authored. */
+  let rewrite_media_prelude_siblings =
+      (
+        media_rewrites: Media_rewrite_table.t(component_value_list),
+        rules: list(rule),
+      ) => {
+    let candidates =
+      rules
+      |> List.filter_map(r =>
+           switch (r) {
+           | At_rule({ name: (n, _), prelude, _ } as ar)
+               when
+                 String.lowercase_ascii(n) == "media"
+                 && !component_value_list_has_interpolation(fst(prelude)) =>
+             switch (
+               media_atom_slot(ar),
+               classify_media_query(fst(prelude)),
+             ) {
+             | (Some(slot), Some(kind)) => Some((ar, slot, kind))
+             | _ => None
+             }
+           | _ => None
+           }
+         );
+    let groups =
+      group_by_key(
+        ((_, slot: Slot_key.t, kind)) =>
+          (
+            slot.context.selector,
+            slot.context.important,
+            slot.family,
+            media_kind_key(kind),
+          ),
+        candidates,
+      );
+    groups
+    |> List.iter(members =>
+         switch (members) {
+         | []
+         | [_] => () /* nothing else in this (target, family, kind) to negate against */
+         | members =>
+           /* Each member paired with the later members that cover all of
+              its longhands (`Slot_key.removes`, the same test `CSS.merge`
+              uses). A later member that sets other longhands, or only
+              some of them, does not hide the earlier rule in plain CSS
+              either, so it is no negation source: negating against it
+              would drop the earlier rule's other longhands where both
+              conditions match. */
+           let indexed =
+             List.mapi(
+               (idx, (ar: at_rule, slot: Slot_key.t, kind)) =>
+                 (
+                   idx,
+                   ar,
+                   slot,
+                   kind,
+                   later_representation(kind, fst(ar.prelude)),
+                 ),
+               members,
+             );
+           let with_sources =
+             indexed
+             |> List.map(((idx, ar, slot, kind, _)) =>
+                  (
+                    ar,
+                    kind,
+                    indexed
+                    |> List.filter_map(((later_idx, _, later_slot, _, repr)) =>
+                         later_idx > idx
+                         && Slot_key.removes(~former=slot, ~latter=later_slot)
+                           ? Some(repr) : None
+                       ),
+                  )
+                );
+           /* If any negation source can resolve to "unknown" (see
+              `query_is_negation_safe`'s doc), negating ANY member of this
+              group can turn an earlier, always-applying rule into one
+              that never applies: leave the WHOLE group untouched rather
+              than negate against the safe sources only and silently
+              accept a narrower, harder-to-audit gap. */
+           let (_, _, group_kind) = List.hd(members);
+           let sources_are_safe =
+             with_sources
+             |> List.for_all(((_, _, later)) =>
+                  List.for_all(is_safe_as_later(group_kind), later)
+                );
+           if (sources_are_safe) {
+             with_sources
+             |> List.iter(((ar: at_rule, kind, later)) =>
+                  if (later != []) {
+                    let new_prelude =
+                      switch (kind) {
+                      | Plain =>
+                        negate_prelude_chain(
+                          ~type_prefix=None,
+                          ~current=fst(ar.prelude),
+                          ~later,
+                        )
+                      | Typed(_, prefix, chain) =>
+                        negate_prelude_chain(
+                          ~type_prefix=Some(prefix),
+                          ~current=chain,
+                          ~later,
+                        )
+                      };
+                    Media_rewrite_table.replace(
+                      media_rewrites,
+                      ar.prelude,
+                      new_prelude,
+                    );
+                  }
+                );
+           };
+         }
+       );
+  };
+
+  /* Applies the sibling rewrite at every nesting level independently
+     (mirrors StyleX's "a nested object gets its own independent
+     sibling-rewrite pass one depth down"): a `@media` block's own inner
+     rules, or a nested selector's block, can have their own sibling
+     `@media` groups one level deeper. Walks the ORIGINAL tree only - see
+     `rewrite_media_prelude_siblings`'s doc for why nothing is rebuilt
+     here. */
+  let rec rewrite_media_conditions =
+          (
+            media_rewrites: Media_rewrite_table.t(component_value_list),
+            rules: list(rule),
+          ) => {
+    rewrite_media_prelude_siblings(media_rewrites, rules);
+    List.iter(recurse_media_children(media_rewrites), rules);
+  }
+  and recurse_media_children = (media_rewrites, r: rule) =>
+    switch (r) {
+    | Declaration(_) => ()
+    | Style_rule({ block: (inner, _), _ }) =>
+      rewrite_media_conditions(media_rewrites, inner)
+    | At_rule({ block: Rule_list((inner, _)), _ })
+    | At_rule({ block: Stylesheet((inner, _)), _ }) =>
+      rewrite_media_conditions(media_rewrites, inner)
+    | At_rule({ block: Empty, _ }) => ()
+    };
+
   let atomize_rules =
-      (~source_position_start, ~label=?, rules: list(rule))
+      (
+        ~source_position_start,
+        ~media_rewrites: Media_rewrite_table.t(component_value_list),
+        rules: list(rule),
+      )
       : list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
@@ -870,8 +1775,8 @@ module Css_transform = {
       |> List.rev;
     };
 
-    /* Wrap a same-property `Declaration` group (see
-       `group_declarations_by_property`) as one atom. No parent:
+    /* Wrap a same-family `Declaration` group (see
+       `group_declarations_by_family`) as one atom. No parent:
        singleton keeps the historical bare `Declaration` atom (hash
        stability); a group becomes `& { ... }` (`&` resolves to the
        className). With a parent: one `Style_rule(parent){group}` atom
@@ -881,15 +1786,17 @@ module Css_transform = {
       | None =>
         switch (decls) {
         | [decl] =>
+          let bare_rule = Declaration(decl);
           let decl_string = render_declaration(decl);
           let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, decl_string);
-          [(className, namespace, Declaration(decl))];
+            Hash_class.class_and_namespace(
+              ~slot=Slot_key.of_atom(bare_rule),
+              decl_string,
+            );
+          [(className, namespace, bare_rule)];
         | decls =>
           let group_string =
             decls |> List.map(render_declaration) |> String.concat("");
-          let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, group_string);
           let style_rule =
             Style_rule({
               prelude: (
@@ -902,6 +1809,11 @@ module Css_transform = {
               ),
               loc: Ppxlib.Location.none,
             });
+          let (className, namespace) =
+            Hash_class.class_and_namespace(
+              ~slot=Slot_key.of_atom(style_rule),
+              group_string,
+            );
           [(className, namespace, style_rule)];
         }
       | Some(parent_selectors) =>
@@ -938,7 +1850,10 @@ module Css_transform = {
               });
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
-              Hash_class.class_and_namespace(~label?, rule_string);
+              Hash_class.class_and_namespace(
+                ~slot=Slot_key.of_atom(style_rule),
+                rule_string,
+              );
             (className, namespace, style_rule);
           },
           parent_selectors,
@@ -946,14 +1861,14 @@ module Css_transform = {
       };
     };
 
-    /* Atomize one block's rules: same-property declarations group into a
-       single atom (see `group_declarations_by_property`); everything
+    /* Atomize one block's rules: same-family declarations group into a
+       single atom (see `group_declarations_by_family`); everything
        else atomizes rule by rule. */
     let rec extract_atomic_rules_from_block =
             (~parent_prelude=?, rules: list(rule))
             : list((string, string, rule)) =>
       rules
-      |> group_declarations_by_property
+      |> group_declarations_by_family
       |> List.concat_map(
            fun
            | Declaration_group(decls) =>
@@ -1063,23 +1978,49 @@ module Css_transform = {
            carries the full selector chain. The Declaration arm above turns
            a bare Declaration with a parent into a Style_rule, which is what
            lets `.a .b { @media (...) { color: red } }` render correctly as
-           `@media (...) { .css-X .a .b { color:red } }`. */
+           `@media (...) { .a-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
+          /* The media rewrite (`rewrite_media_conditions`) records a
+             replacement prelude keyed by THIS at-rule's own (pre-rewrite)
+             prelude value (physical identity, see `Media_rewrite_table`'s
+             doc), if its block-local siblings required one. The
+             replacement drives the class hash and the printed rule -
+             that's the whole point, so two blocks disagreeing on order
+             mint different classes - but `Slot_key.of_atom` below must
+             still see the ORIGINAL prelude: it feeds `CSS.merge`'s
+             context equality, which has nothing to do with this block's
+             own sibling `@media` rules and must not silently change
+             because of them (see this function's own doc). */
+          let effective_prelude =
+            switch (Media_rewrite_table.find_opt(media_rewrites, prelude)) {
+            | Some(rewritten_tokens) => (rewritten_tokens, snd(prelude))
+            | None => prelude
+            };
           extract_atomic_rules_from_block(~parent_prelude?, rules)
           |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
+                 At_rule({
+                   name: (name, name_loc),
+                   prelude: effective_prelude,
+                   block: Rule_list(([inner_rule], rule_loc)),
+                   loc,
+                 });
+               let wrapped_string = render_rule(wrapped);
+               let context_source =
                  At_rule({
                    name: (name, name_loc),
                    prelude,
                    block: Rule_list(([inner_rule], rule_loc)),
                    loc,
                  });
-               let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
-                 Hash_class.class_and_namespace(~label?, wrapped_string);
+                 Hash_class.class_and_namespace(
+                   ~slot=Slot_key.of_atom(context_source),
+                   wrapped_string,
+                 );
                (new_className, new_namespace, wrapped);
-             })
+             });
         };
       };
     };
@@ -1136,96 +2077,213 @@ module Css_transform = {
         ~file,
         ~scope: list(string),
         ~opens: list(list(string)),
+        ~locals: list(Local_selector_environment.local),
         ~source_position_start,
-        ~label=?,
         rule_list: rule_list,
       ) => {
     let ctx = {
       file,
       scope,
       opens,
+      locals,
       source_position_start,
       dynamic_vars: ref([]),
     };
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
+    /* Resolve selector-class references before atomizing (see
+       `resolve_rule_selectors`'s own comment) so an atom's hash reflects
+       the RESOLVED selector, not a local binding name that can mean a
+       different binding in every file that uses it. */
+    let selector_resolved_rules =
+      List.map(resolve_rule_selectors(ctx), rules);
+    /* Media condition ordering (see `rewrite_media_conditions`'s own
+       doc): computed before `atomize_rules` so a rewritten `@media`
+       condition is available for its atom's class name, but the tree
+       itself is untouched - `atomize_rules` looks up `media_rewrites` to
+       keep `Slot_key.of_atom`'s merge context on the ORIGINAL prelude. */
+    let media_rewrites: Media_rewrite_table.t(component_value_list) =
+      Media_rewrite_table.create(8);
+    rewrite_media_conditions(media_rewrites, selector_resolved_rules);
+    let atomic_rules =
+      atomize_rules(
+        ~source_position_start,
+        ~media_rewrites,
+        selector_resolved_rules,
+      );
 
-    /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class `css-<B>-<label>` and var namespace
-       `css-<B>` (label-free) shared across base/`:hover`/`@media`. Both derive
-       from the same bundle content, so identical bundles dedup to identical
-       rules + vars and different bundles never collide, preserving the
-       cross-module atomic invariant (see Hash_class.ml) and `CSS.merge`.
+    /* Selective atomization: of a block's SINGLETON interpolating atoms
+       (`atom_has_value_interpolation` - a multi-declaration group from
+       `group_declarations_by_family`'s leaf-overlap pass is never a
+       candidate here, see `atom_declaration`'s own doc: it already shares
+       one namespace for whatever it groups), only those that reference the
+       SAME `$(name)` source path as another one actually need to share
+       anything - one variable, one inline custom property for that value
+       across base/`:hover`/`@media` (see Hash_class.ml). Two atoms that
+       merely both happen to interpolate, but different, unrelated paths,
+       do not: `color: $(a); background-color: $(b);` used to force both
+       into one bundle for no reason neither value needed.
 
-       Static declarations keep their own per-content atom class (still shared
-       across blocks). A block with no interpolation produces no bundle and is
+       Grouped by shared path with union-find - same technique
+       `group_declarations_by_family` already uses for leaf overlap,
+       transitively: an atom interpolating two paths (`border: $(a) solid
+       $(b);`) bridges both into one group, same reasoning a declaration
+       bridging two leaf sets does there. A group of exactly one atom is
+       not a bundle at all: it already got a real, structural slot-keyed
+       class from `atomize_rules` above (via `Hash_class.class_and_namespace`
+       / `Slot_key.of_atom`, same path a static atom uses), so it merges
+       normally like any other atom - `CSS.merge` only stays blind to an
+       atom that genuinely shares its class with an unrelated sibling, not
+       to every interpolated declaration on principle. A group of two or
+       more gets today's bundle mechanism (class `_in_<B>`/var namespace
+       `css-<B>` - same bundle content hash, different literal prefix, see
+       Hash_class.ml's "Class vs. namespace prefixes"), scoped to that
+       group's own members only, so a block can now mint more than one
+       independent bundle.
+
+       Static declarations keep their own per-content atom class (still
+       shared across blocks). A block with no interpolation, or where no
+       two interpolating atoms share a path, mints no bundle at all and is
        byte-for-byte identical to the pre-bundle output. */
-    let bundle =
-      switch (
-        atomic_rules
-        |> List.filter_map(((_cn, _ns, rule)) =>
-             atom_has_value_interpolation(rule)
-               ? Some(render_rule(rule)) : None
-           )
-      ) {
-      | [] => None
-      | seeds =>
-        Some(
-          Hash_class.class_and_namespace(~label?, String.concat("", seeds)),
-        )
+    let interpolating_atoms =
+      atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.filter(((_i, (_cn, _ns, rule))) =>
+           atom_has_value_interpolation(rule)
+         )
+      |> Array.of_list;
+    let interpolating_count = Array.length(interpolating_atoms);
+    let paths_of = i => {
+      let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[i];
+      switch (atom_declaration(rule)) {
+      | Some(decl) => declaration_interpolation_paths(decl)
+      | None => [] /* unreachable: atom_has_value_interpolation implies Some */
       };
-
-    let (shipped_rev, classes_rev, atom_infos_rev) =
-      List.fold_left(
-        (
-          (shipped_acc, classes_acc, atom_infos_acc),
-          (className, var_namespace, rule),
-        ) => {
-          let (effective_class, effective_namespace, dedup_key) =
-            switch (bundle) {
-            | Some((bundle_class, bundle_namespace))
-                when atom_has_value_interpolation(rule) => (
-                bundle_class,
-                bundle_namespace,
-                None /* content-keyed: many bundle rules share one class */,
-              )
-            | _ => (className, var_namespace, Some(className))
-            };
-
-          let processed =
-            lower_atom(
-              ctx,
-              ~effective_class,
-              ~effective_namespace,
-              ~loc,
-              rule,
-            )
-            |> List.map(r => (dedup_key, r));
-
-          let classes_acc =
-            List.mem(effective_class, classes_acc)
-              ? classes_acc : [effective_class, ...classes_acc];
-
-          /* Record the atom's `&`-locality and the vars it references (scanned
-             from rendered text so cross-atom dedup can't hide a reference), for
-             the inherits:false decision below. */
-          let atom_local = atom_is_ampersand_local(rule);
-          let referenced =
-            processed
-            |> List.concat_map(((_key, r)) =>
-                 custom_property_names_in_text(render_rule(r))
-               );
-
-          (
-            List.rev_append(processed, shipped_acc),
-            classes_acc,
-            [(atom_local, referenced), ...atom_infos_acc],
+    };
+    let paths = Array.init(interpolating_count, paths_of);
+    /* Union-find over positions [0, interpolating_count) - path-compressed,
+       no union-by-rank (a block's interpolating-atom count is always
+       small). Connects i and j when their path sets intersect. */
+    let parent = Array.init(interpolating_count, i => i);
+    let rec find = i =>
+      if (parent[i] == i) {
+        i;
+      } else {
+        let root = find(parent[i]);
+        parent[i] = root;
+        root;
+      };
+    let union = (i, j) => {
+      let (ri, rj) = (find(i), find(j));
+      if (ri != rj) {
+        parent[max(ri, rj)] = min(ri, rj);
+      };
+    };
+    for (i in 0 to interpolating_count - 1) {
+      for (j in i + 1 to interpolating_count - 1) {
+        if (List.exists(p => List.mem(p, paths[j]), paths[i])) {
+          union(i, j);
+        };
+      };
+    };
+    let members_by_root: Hashtbl.t(int, ref(list(int))) =
+      Hashtbl.create(8);
+    for (i in 0 to interpolating_count - 1) {
+      let root = find(i);
+      switch (Hashtbl.find_opt(members_by_root, root)) {
+      | Some(members) => members := [i, ...members^]
+      | None => Hashtbl.add(members_by_root, root, ref([i]))
+      };
+    };
+    /* Only a root with 2+ members mints a bundle; a singleton root's atom
+       keeps the real class `atomic_rules` already gave it (no entry here). */
+    let bundle_by_atomic_index: Hashtbl.t(int, (string, string)) =
+      Hashtbl.create(8);
+    Hashtbl.iter(
+      (_root, members) =>
+        switch (List.rev(members^)) {
+        | []
+        | [_] => ()
+        | member_positions =>
+          let seeds =
+            member_positions
+            |> List.map(k => {
+                 let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[k];
+                 render_rule(rule);
+               });
+          let bundle_class_and_namespace =
+            Hash_class.bundle_class_and_namespace(String.concat("", seeds));
+          List.iter(
+            k => {
+              let (atomic_index, _) = interpolating_atoms[k];
+              Hashtbl.replace(
+                bundle_by_atomic_index,
+                atomic_index,
+                bundle_class_and_namespace,
+              );
+            },
+            member_positions,
           );
         },
-        ([], [], []),
-        atomic_rules,
-      );
+      members_by_root,
+    );
+
+    let (shipped_rev, classes_rev, atom_infos_rev) =
+      atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.fold_left(
+           (
+             (shipped_acc, classes_acc, atom_infos_acc),
+             (i, (className, var_namespace, rule)),
+           ) => {
+             let (effective_class, effective_namespace, dedup_key) =
+               switch (Hashtbl.find_opt(bundle_by_atomic_index, i)) {
+               | Some((bundle_class, bundle_namespace)) => (
+                   bundle_class,
+                   bundle_namespace,
+                   None /* content-keyed: many bundle rules share one class */,
+                 )
+               | None => (className, var_namespace, Some(className))
+               };
+
+             let processed =
+               lower_atom(
+                 ctx,
+                 ~effective_class,
+                 ~effective_namespace,
+                 ~loc,
+                 rule,
+               )
+               |> List.map(r =>
+                    (
+                      dedup_key,
+                      r,
+                      Sort_key.of_rule(~class_name=effective_class, r),
+                    )
+                  );
+
+             let classes_acc =
+               List.mem(effective_class, classes_acc)
+                 ? classes_acc : [effective_class, ...classes_acc];
+
+             /* Record the atom's `&`-locality and the vars it references
+                (scanned from rendered text so cross-atom dedup can't hide a
+                reference), for the inherits:false decision below. */
+             let atom_local = atom_is_ampersand_local(rule);
+             let referenced =
+               processed
+               |> List.concat_map(((_key, r, _sort_key)) =>
+                    custom_property_names_in_text(render_rule(r))
+                  );
+
+             (
+               List.rev_append(processed, shipped_acc),
+               classes_acc,
+               [(atom_local, referenced), ...atom_infos_acc],
+             );
+           },
+           ([], [], []),
+         );
 
     let atom_infos = atom_infos_rev;
     let dynamic_vars_final = List.rev(ctx.dynamic_vars^);
@@ -1256,25 +2314,58 @@ module Css_transform = {
   };
 };
 
-/* Empty `[%css {||}]` bound to a named `let` mints a deterministic
-   class handle (`css-<hash-of-empty>-<label>`) so consumers can
-   resolve `&.$(name)` against it. No `[@@@css ...]` is emitted —
-   there's no rule to write. Anonymous (`_`) and statement-position
-   bindings return `[]`, preserving the historical `CSS.make("", [])`
-   shape. */
-let mint_empty_class = (~label) =>
-  switch (label) {
-  | Some(name) when name != "_" => [Hash_class.class_name(~label=name, "")]
-  | _ => []
+/* Per-compilation-unit occurrence counter for identity classes, keyed by
+   (scope, name). A repeated (scope, name) - e.g. two functions each with
+   their own `let a = [%css ...]` - would otherwise mint the same identity
+   for two unrelated bindings; the occurrence count breaks the tie. Cleared
+   in `get()`, at the same point every other per-CU accumulator resets. */
+let identity_occurrences: Hashtbl.t((string, string), int) =
+  Hashtbl.create(64);
+
+let next_identity_occurrence = (~scope: list(string), ~name: string) => {
+  let key = (String.concat(".", scope), name);
+  let next =
+    1 + Option.value(Hashtbl.find_opt(identity_occurrences, key), ~default=0);
+  Hashtbl.replace(identity_occurrences, key, next);
+  next;
+};
+
+/* The identity class for a named binding (see `Hash_class.identity_class`).
+   `None` for an anonymous (`_`) or statement-position binding: it cannot be
+   referenced cross-module, so it needs no stable handle. Independent of
+   `--minify` - unlike the historical label suffix, the identity is never
+   dropped in production, which is what lets an empty named binding still
+   resolve `&.$(name)` under `--minify` (see documents/css-extraction.md). */
+let identity_of_name = (~main_module, ~scope, ~name: option(string)) =>
+  switch (name) {
+  | Some(n) when n != "_" =>
+    let occurrence = next_identity_occurrence(~scope, ~name=n);
+    Some(
+      Hash_class.identity_class(
+        ~module_name=main_module,
+        ~scope,
+        ~name=n,
+        ~occurrence,
+      ),
+    );
+  | _ => None
+  };
+
+let classes_with_identity = (~identity, atomClasses) =>
+  switch (identity) {
+  | Some(cid) => [cid, ...atomClasses]
+  | None => atomClasses
   };
 
 let push =
     (
       ~file,
+      ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~locals: list(Local_selector_environment.local),
       ~source_position_start,
-      ~label=?,
+      ~name: option(string),
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
   let (shipped_rules, binding_classes, dynamic_vars, safe_inherits_false_vars) =
@@ -1282,8 +2373,8 @@ let push =
       ~file,
       ~scope,
       ~opens,
+      ~locals,
       ~source_position_start,
-      ~label?,
       declarations,
     );
 
@@ -1291,18 +2382,25 @@ let push =
      and content are 1:1). Bundle rules carry `None` and key by rendered content,
      since many share one bundle class and class-name keying would drop all but
      the first. */
-  List.iter(
-    ((dedup_key, rule)) => {
-      let rendered_css = render_prefixed_rule(rule);
-      let key =
-        switch (dedup_key) {
-        | Some(className) => className
-        | None => rendered_css
-        };
-      Buffer.add_rule(key, rendered_css);
-    },
-    shipped_rules,
-  );
+  let rule_positions =
+    List.map(
+      ((dedup_key, rule, sort_key)) => {
+        let rendered_css = render_prefixed_rule(rule);
+        let key =
+          switch (dedup_key) {
+          | Some(className) => className
+          | None => rendered_css
+          };
+        Buffer.add_rule(
+          key,
+          {
+            Css_extraction.text: rendered_css,
+            key: sort_key,
+          },
+        );
+      },
+      shipped_rules,
+    );
 
   /* Register each `&`-local var with @property{inherits:false} so a value change
      invalidates only the element, not its subtree. `syntax:"*"` accepts any
@@ -1318,13 +2416,22 @@ let push =
     safe_inherits_false_vars,
   );
 
-  let classNames =
-    switch (binding_classes) {
-    | [] => mint_empty_class(~label)
-    | _ => binding_classes
-    };
+  let identity = identity_of_name(~main_module, ~scope, ~name);
 
-  (classNames, dynamic_vars);
+  ignore(
+    Blocks.record({
+      Blocks.line: source_position_start.pos_lnum,
+      identity,
+      classes:
+        String.concat(
+          " ",
+          classes_with_identity(~identity, binding_classes),
+        ),
+      rules: rule_positions,
+    }),
+  );
+
+  (identity, binding_classes, dynamic_vars);
 };
 
 let push_keyframe =
@@ -1344,6 +2451,7 @@ let push_keyframe =
       file,
       scope,
       opens,
+      locals: [],
       source_position_start,
       dynamic_vars: ref([]),
     };
@@ -1376,7 +2484,15 @@ let push_keyframe =
 
   let rendered_keyframe = render_prefixed_rule(At_rule(at_rule));
 
-  Buffer.add_rule(keyframe_name, rendered_keyframe);
+  ignore(
+    Buffer.add_rule(
+      keyframe_name,
+      {
+        Css_extraction.text: rendered_keyframe,
+        key: None,
+      },
+    ),
+  );
 
   (keyframe_name, List.rev(ctx.dynamic_vars^));
 };
@@ -1413,6 +2529,7 @@ let push_global =
       file,
       scope,
       opens,
+      locals: [],
       source_position_start,
       dynamic_vars: ref([]),
     };
@@ -1483,9 +2600,71 @@ let push_global =
   List.rev(ctx.dynamic_vars^);
 };
 
+/* The classes of a [%css] already lowered to `CSS.make("<classes>", ...)`,
+   without the `label:` marker. */
+let lowered_classes = (expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_apply(
+      { pexp_desc: Pexp_ident({ txt: Ldot(Lident("CSS"), "make"), _ }), _ },
+      [
+        (
+          Nolabel,
+          { pexp_desc: Pexp_constant(Pconst_string(classes, _, _)), _ },
+        ),
+        ..._,
+      ],
+    ) =>
+    Some(
+      String.split_on_char(' ', classes)
+      |> List.filter(token => !String.starts_with(~prefix="label:", token))
+      |> String.concat(" "),
+    )
+  | _ => None
+  };
+
+let lowered_identity = expr =>
+  Option.bind(lowered_classes(expr), Blocks.identity_of_classes);
+
+/* A merge argument, resolved to a block of this file or to another module's
+   binding: a [%css] binding name, or an inline [%css] already lowered to
+   `CSS.make("<classes>", ...)`. */
+let merge_operand = (~file, ~scope, ~opens, ~locals, expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_ident({ txt: lid, _ }) =>
+    switch (
+      Local_selector_environment.resolve_class_ref(
+        ~file,
+        ~scope,
+        ~opens,
+        ~locals,
+        String.concat(".", Ppxlib.Longident.flatten_exn(lid)),
+      )
+    ) {
+    | Some(Local_selector_environment.Local(class_name)) =>
+      Blocks.of_identity(class_name)
+      |> Option.map(index => Css_extraction.Block(index))
+    | Some(Local_selector_environment.Cross_module(longident)) =>
+      Some(Css_extraction.Binding(longident))
+    | None => None
+    }
+  | _ =>
+    Option.bind(lowered_classes(expr), Blocks.of_classes)
+    |> Option.map(index => Css_extraction.Block(index))
+  };
+
+let record_merge = (~line, ~file, ~scope, ~opens, ~locals, arguments) =>
+  switch (
+    List.filter_map(merge_operand(~file, ~scope, ~opens, ~locals), arguments)
+  ) {
+  | [_, _, ..._] as operands => Blocks.record_merge(~line, operands)
+  | _ => ()
+  };
+
 let get = () => {
   let rules = Buffer.get_rules();
+  let (blocks, merges) = Blocks.drain();
   Buffer.clear();
   Local_selector_environment.clear();
-  rules;
+  Hashtbl.clear(identity_occurrences);
+  (rules, blocks, merges);
 };

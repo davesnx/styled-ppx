@@ -10,26 +10,43 @@ merged styles cannot overwrite each other.
   $ refmt --parse ml --print re output.ml
   [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
   [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6);}"];
   [@css
-    ".css-10a6meq-clickable:hover{background-color:var(--backgroundColor-7yjmr3);}"
+    (
+      "._a_390004vrad{background-color:var(--backgroundColor-ov3le6);}",
+      "_a_390004vrad",
+      "0,1,0 own",
+      "117",
+      4,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_qyw7u3900046meq:hover{background-color:var(--backgroundColor-7yjmr3);}",
+      "_a_qyw7u3900046meq",
+      "0,2,0 own",
+      "117",
+      4,
+      false,
+    )
   ];
   [@css.bindings
     [
-      ("Output.common", "css-160vrad-common"),
-      ("Output.clickable", "css-10a6meq-clickable"),
+      ("Output.common", "_id_cpi3ld", "_a_390004vrad"),
+      ("Output.clickable", "_id_htvdst", "_a_qyw7u3900046meq"),
     ]
   ];
+  [@css.blocks [(2, "_id_cpi3ld", [2]), (6, "_id_htvdst", [3])]];
   let common = backgroundColor =>
     CSS.make(
-      "css-160vrad-common",
+      "label:common _id_cpi3ld _a_390004vrad",
       [
         ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "css-10a6meq-clickable",
+      "label:clickable _id_htvdst _a_qyw7u3900046meq",
       [
         ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
       ],

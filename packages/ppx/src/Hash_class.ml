@@ -20,7 +20,8 @@
    ------------------
    [hash] is murmur2, the same algorithm emotion uses, so the class names
    styled-ppx mints line up with the wider CSS-in-JS ecosystem and with the
-   runtime's own hashing. Every identifier here is `<prefix>-<murmur2(...)>`.
+   runtime's own hashing. Every identifier here ends in murmur2 output (the
+   families are listed below).
 
    Separator
    ---------
@@ -31,32 +32,60 @@
 
    The emitted identifier families
    -------------------------------
-     class name   `css-<hash(content)>[-<label>]`          (class_name)
+     class name   `_a_<context?><family><mask?><value>`    (class_and_namespace,
+                  or `_a_<hash(content)>` via Class_format.slot_class)
+                  for a rule shape with no {!Slot_key.t}
+                  (should not happen for a real atom - see
+                  {!class_of_content})
+     bundle       `_in_<hash(content)>`                    (bundle_class_and_namespace,
+                                                             via Class_format.bundle_class)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
-                  the label-free identity of an atom; the seed for its vars
-     variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
+                  NOT the class name (see "Class vs. namespace prefixes"
+                  below) - the same hash input, but its own literal
+                  prefix never changes; the seed for its vars
+     variable     `<name>-<hash(namespace \0 path \0 type_key)>`  (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
-     keyframes    `keyframe-<hash(body)>`                  (keyframe_name)
+     identity     `_id_<hash(module \0 scope \0 name [\0 occurrence])>`
+                                                           (identity_class)
+                  build-independent handle for a named binding; never a
+                  path or dune library name
+     keyframes    `_k_<hash(body)>`                        (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
      scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
+
+   No hash takes a library name, a physical path or a build flag. A native
+   library and its Melange twin compile the same source under two dune
+   library names; they must mint identical classes so server markup and
+   the client stylesheet agree. Two different libraries that mint the
+   same class are caught by `styled-ppx.generate`'s collision check, which
+   sees every library of an app in its one run.
 
    The atomic invariant this module protects
    ------------------------------------------
    Atomic CSS requires "one class name <=> one exact declaration body". The
-   class name already honours that - it is a pure hash of the rendered
-   declaration. The *variable* substituted into that declaration must honour
-   it too: otherwise two modules that emit the byte-identical
-   `.css-<h>-header{background-color:var(--...)}` rule can disagree on the
-   `var(--...)` target, and an element that sets one variable ends up matched
-   by a rule that reads the other -> undefined custom property -> missing
-   style.
+   class name already honours that - its VALUE field is a pure hash of the
+   rendered declaration, unique within its (context, family[, mask]) bucket
+   (see {!Class_format}'s doc comment; two atoms in different buckets never
+   need to be told apart by the value field alone, since the bucket fields
+   already differ). The *variable* substituted into that declaration must
+   honour the same invariant too: otherwise two modules that emit the
+   byte-identical `._a_<h>-header{background-color:var(--...)}` rule can
+   disagree on the `var(--...)` target, and an element that sets one
+   variable ends up matched by a rule that reads the other -> undefined
+   custom property -> missing style.
 
    [class_and_namespace] therefore derives the variable namespace from the
-   atom's *own content* - the same string that backs the class name, with the
-   `-<label>` suffix stripped. That makes every variable a pure function of
-   the declaration content, independent of the binding's label, its sibling
-   declarations, the file, and the scope. Identical declarations get identical
-   class names AND identical variables everywhere they appear.
+   atom's *own content* alone, via {!namespace_of_content} - deliberately
+   NOT from the class name's context/family/mask fields, even though both
+   are computed from the same atom. A namespace that also varied with the
+   slot would still satisfy the invariant, but would needlessly rename a
+   variable whenever the SAME rendered content happened to land in a
+   different (context, family[, mask]) bucket - the invariant only
+   requires "same content -> same variable", not "same slot -> same
+   variable". That makes every variable a pure function of the rendered
+   atom content, independent of the enclosing binding, its sibling
+   declarations, the file, and the scope. Identical rendered atoms get
+   identical class names AND identical variables everywhere they appear.
 
    [scoped_namespace] is the deliberate exception. Keyframes and
    [%styled.global] blocks are not atomized: they carry their own explicit
@@ -84,13 +113,29 @@
    *should* yield identical variables (that is the cross-build invariant we
    want), and differing content is already separated by the rules hash.
 
+   Class vs. namespace prefixes
+   -----------------------------
+   [class_of_content]'s prefix ([_a_]) and [namespace_of_content]'s prefix
+   ([css-]) differ, and must go on differing: [namespace_of_content] is a
+   hash *input* to [variable] (see [nul_join [namespace; path; type_key]]
+   above), so changing its literal string would silently rename every
+   already-shipped `var(--...)` custom property for no reason - only the
+   class's own presentation needs a prefix a reader recognizes, not the
+   seed every variable name is a pure function of. [identity_class] and
+   [keyframe_name] carry no such downstream hash consumer (each result is
+   a leaf identifier, never fed into another hash - see their own doc
+   comments), so their prefixes ([_id_], [_k_]) are free to be whatever is
+   most readable.
+
    Stability contract
    ------------------
    These formats are an on-disk contract. Changing a prefix, the separator,
    the hash function, or the field order rewrites EVERY class and variable
    name, which invalidates the cram snapshots and any already-shipped
-   stylesheet. Keep them in lockstep with the runtime's `css-` / `var-`
-   scheme. *)
+   stylesheet. [namespace_of_content]'s prefix is pinned harder than the
+   rest: it is a hash input, not just a display string, so it may never
+   change without also accepting that every existing `var(--...)` name
+   changes with it. *)
 
 let hash = Murmur2.default
 
@@ -99,51 +144,50 @@ let nul_join parts = String.concat "\000" parts
 
 (* -- Class names and the atom namespace -------------------------------- *)
 
-(* The label-free identity of an atom: `css-<hash(content)>`. This is the
-   seed for the atom's interpolation variables, so a variable stays a pure
-   function of the declaration content regardless of the binding's label
-   (see the invariant in the header). *)
+(* The variable-namespace seed. Literal prefix pinned to [css-] forever -
+   see "Class vs. namespace prefixes" above; never rename this one. *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
-(* A CSS identifier admits only `[A-Za-z0-9_-]` (ignoring escapes and
-   non-ASCII). OCaml binding names are wider - notably the trailing prime in
-   idiomatic names like [inputView'] - so embedding the label verbatim can
-   emit an unmatchable selector (`.css-<hash>-inputView'`, where the `'` is an
-   illegal identifier character). We drop every CSS-unsafe character rather
-   than backslash-escape it: the returned string backs BOTH the emitted
-   `.css-...-label{}` selector AND the runtime `className`, and an escape
-   (`'` -> `\'`) would land literally in the `class` attribute while the
-   selector matched the unescaped `'`, so the two would never meet. The label
-   is a purely cosmetic debug suffix, so stripping loses nothing structural. *)
-let css_safe_label name =
-  let buffer = Buffer.create (String.length name) in
-  String.iter
-    (fun c ->
-      match c with
-      | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-' ->
-        Buffer.add_char buffer c
-      | _ -> ())
-    name;
-  Buffer.contents buffer
+(* Fallback class name for {!class_and_namespace} - a plain hash of the
+   content, same input as the namespace, only the presentation prefix
+   differs (see "Class vs. namespace prefixes"). Reached only when there is no
+   {!Slot_key.t} at all, which in practice never happens for a real atom
+   (see {!Slot_key.of_atom}'s own doc: it returns [None] only for a rule
+   shape [atomize_rules] never actually produces). *)
+let class_of_content content = Printf.sprintf "_a_%s" (hash content)
 
-(* An atom's class name and its namespace, from a single content hash. The
-   class name is `<namespace>-<label>` (or just the namespace for an
-   anonymous binding, or a label that is empty once sanitized); the namespace
-   is label-free on purpose. Returns [(class_name, namespace)]. *)
-let class_and_namespace ?label content =
-  let namespace = namespace_of_content content in
+(* An atom's class name and its namespace, from a single content hash - two
+   different literal strings sharing one hash input (see the header's
+   "atomic invariant"). [namespace] (the var(--...) seed) is the plain
+   content hash; it must stay independent of the merge-key data (see the
+   header's "Stability contract"). [class_name] carries the merge-key data
+   instead ({!Class_format.slot_class}'s context/family/mask/value fields),
+   built from the atom's {!Slot_key.t} - the caller's own [Slot_key.of_atom]
+   on the exact same rule value [content] renders (see its doc for why that
+   shape match matters).
+
+   This is [Css_file.re]'s non-bundle path: a two-or-more-declaration bundle
+   mints its class through {!bundle_class_and_namespace} below. *)
+let class_and_namespace ~slot content =
+  let var_namespace = namespace_of_content content in
   let class_name =
-    match label with
-    | Some name ->
-      (match css_safe_label name with
-      | "" -> namespace
-      | safe -> Printf.sprintf "%s-%s" namespace safe)
-    | None -> namespace
+    match slot with
+    | Some (s : Slot_key.t) -> Class_format.slot_class s content
+    | None -> class_of_content content
   in
-  class_name, namespace
+  class_name, var_namespace
 
-(* Just the class name: `css-<hash(content)>[-<label>]`. *)
-let class_name ?label content = fst (class_and_namespace ?label content)
+(* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
+   from one content hash), for [Css_file.re]'s bundle path specifically: the
+   CLASS half gets the [_in_] prefix (see [Class_format.bundle_class]) so
+   `generate`'s atom-class collision check can recognize a bundle atom and
+   treat it as opaque - never dropped, never dropping another atom, never
+   flagged as a collision even though several different declarations from
+   one binding share it by design. The NAMESPACE half is
+   [namespace_of_content], `css-<hash>`, the seed of every interpolation
+   variable's name (see the header's "atomic invariant"). *)
+let bundle_class_and_namespace content =
+  Class_format.bundle_class content, namespace_of_content content
 
 (* -- Interpolation variables ------------------------------------------- *)
 
@@ -225,9 +269,38 @@ let scoped_namespace ~kind ~module_name ~scope ~rendered_rules =
   let rules_key = String.concat "\n" rendered_rules in
   nul_join [ kind; module_name; scope_key; hash rules_key ]
 
-(* `@keyframes` name from its rendered body: `keyframe-<hash(body)>`. *)
-let keyframe_name rendered_body =
-  Printf.sprintf "keyframe-%s" (hash rendered_body)
+(* `@keyframes` name from its rendered body: `_k_<hash(body)>`. A leaf
+   identifier - its variable namespace comes from [scoped_namespace]
+   instead (module + scope + rendered-rules, not this string), so renaming
+   this prefix cannot rename any `var(--...)` name. A valid CSS
+   <custom-ident>: starts with `_`, which is a valid identifier-start
+   character, so it needs no escaping in the `@keyframes` name, the
+   `animation-name` value that references it, or the runtime
+   [CSS.Types.AnimationName] that carries it dynamically. *)
+let keyframe_name rendered_body = Printf.sprintf "_k_%s" (hash rendered_body)
 
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
+
+(* The build-independent identity class for a named binding:
+   `_id_<hash(module_name \0 scope \0 name [\0 occurrence])>`.
+   A leaf identifier, never fed into another hash, so renaming this prefix
+   cannot rename any `var(--...)` name. Inputs are deliberately the ones an
+   author writes, never a physical path or dune library name (those differ
+   between native and Melange builds of the same source - see the header
+   note on [module]). Two libraries that share a module basename and a
+   binding name therefore share an identity; `styled-ppx.generate` reports
+   that as an identity collision when both feed its run (see
+   documents/css-extraction.md, "Identity classes"). [module_name] is the
+   compilation-unit module name (as in [scoped_namespace]); [scope] is the
+   enclosing submodule path; [name] is the binding name or `[%styled.<tag>]`
+   module name. [occurrence] is folded into the hash only when greater than 1,
+   so a name seen exactly once keeps a stable identity independent of whether
+   a later occurrence of the same (scope, name) ever appears. *)
+let identity_class ~module_name ~scope ~name ~occurrence =
+  let scope_key = String.concat "." scope in
+  let parts = [ module_name; scope_key; name ] in
+  let parts =
+    if occurrence > 1 then parts @ [ string_of_int occurrence ] else parts
+  in
+  Printf.sprintf "_id_%s" (hash (nul_join parts))

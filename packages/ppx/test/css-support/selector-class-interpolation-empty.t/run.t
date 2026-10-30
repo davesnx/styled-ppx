@@ -19,44 +19,107 @@ to every consumer.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-The empty binding `active` mints `css-0-active` (hash of empty + label).
-No `[@@@css ...]` is emitted for it — there's nothing to write. The
-consumer `container`'s nested rule keeps the `.css-0-active` qualifier,
-so `background: blue` only applies when the class is actually present
-on the element.
+The empty binding `active` mints only its identity class (`id-...`,
+independent of content - see `Hash_class.identity_class`); its
+`class_string` in `[@@@css.bindings ...]` is `""` and no `[@@@css ...]`
+rule is emitted for it. The consumer `container`'s nested rule keeps a
+`.id-...` qualifier, so `background: blue` only applies when the class
+is actually present on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1443u2l-container{background:red;}"];
-  [@css ".css-g57662-container.css-0-active{background:blue;}"];
-  [@css ".css-q5fqw0-card{padding:1rem;}"];
-  [@css ".css-19ehxda-card.css-0-selected{border-color:blue;}"];
-  [@css ".css-17nqvvb-card.css-0-highlighted{background:yellow;}"];
-  [@css ".css-k008qs-panel{display:flex;}"];
-  [@css ".css-62yfsj-panel .css-0-actionButton{color:black;}"];
+  [@css
+    ("._a_393u2l{background:red;}", "_a_393u2l", "0,1,0 own", "117", 511, false)
+  ];
+  [@css
+    (
+      "._a_dp7m3390ev8._id_djcvv9{background:blue;}",
+      "_a_dp7m3390ev8",
+      "0,2,0 own",
+      "117",
+      511,
+      false,
+    )
+  ];
+  [@css
+    ("._a_94fqw0{padding:1rem;}", "_a_94fqw0", "0,1,0 own", "328", 15, false)
+  ];
+  [@css
+    (
+      "._a_kbodp3h0ef5hi8t._id_1nlj7be{border-color:blue;}",
+      "_a_kbodp3h0ef5hi8t",
+      "0,2,0 own",
+      "125",
+      18689,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_r1su339tl93._id_79qigv{background:yellow;}",
+      "_a_r1su339tl93",
+      "0,2,0 own",
+      "117",
+      511,
+      false,
+    )
+  ];
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_gmy164etpbt ._id_g2b8cb{color:black;}",
+      "_a_gmy164etpbt",
+      "0,2,0 & ._id_g2b8cb",
+      "158",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
-      ("Input.active", "css-0-active"),
-      ("Input.container", "css-1443u2l-container css-g57662-container"),
-      ("Input.selected", "css-0-selected"),
-      ("Input.highlighted", "css-0-highlighted"),
-      ("Input.card", "css-q5fqw0-card css-19ehxda-card css-17nqvvb-card"),
-      ("Input.actionButton", "css-0-actionButton"),
-      ("Input.panel", "css-k008qs-panel css-62yfsj-panel"),
+      ("Input.active", "_id_djcvv9", ""),
+      ("Input.container", "_id_ls0dio", "_a_393u2l _a_dp7m3390ev8"),
+      ("Input.selected", "_id_1nlj7be", ""),
+      ("Input.highlighted", "_id_79qigv", ""),
+      (
+        "Input.card",
+        "_id_10ieij6",
+        "_a_94fqw0 _a_kbodp3h0ef5hi8t _a_r1su339tl93",
+      ),
+      ("Input.actionButton", "_id_g2b8cb", ""),
+      ("Input.panel", "_id_1w26e1r", "_a_5r08qs _a_gmy164etpbt"),
+    ]
+  ];
+  [@css.blocks
+    [
+      (15, "_id_djcvv9", []),
+      (18, "_id_ls0dio", [0, 1]),
+      (31, "_id_1nlj7be", []),
+      (32, "_id_79qigv", []),
+      (35, "_id_10ieij6", [2, 3, 4]),
+      (51, "_id_g2b8cb", []),
+      (54, "_id_1w26e1r", [5, 6]),
     ]
   ];
   
-  let active = CSS.make("css-0-active", []);
+  let active = CSS.make("label:active _id_djcvv9", []);
   
-  let container = CSS.make("css-1443u2l-container css-g57662-container", []);
+  let container =
+    CSS.make("label:container _id_ls0dio _a_393u2l _a_dp7m3390ev8", []);
   
-  let selected = CSS.make("css-0-selected", []);
-  let highlighted = CSS.make("css-0-highlighted", []);
+  let selected = CSS.make("label:selected _id_1nlj7be", []);
+  let highlighted = CSS.make("label:highlighted _id_79qigv", []);
   
-  let card = CSS.make("css-q5fqw0-card css-19ehxda-card css-17nqvvb-card", []);
+  let card =
+    CSS.make(
+      "label:card _id_10ieij6 _a_94fqw0 _a_kbodp3h0ef5hi8t _a_r1su339tl93",
+      [],
+    );
   
-  let actionButton = CSS.make("css-0-actionButton", []);
+  let actionButton = CSS.make("label:actionButton _id_g2b8cb", []);
   
-  let panel = CSS.make("css-k008qs-panel css-62yfsj-panel", []);
+  let panel = CSS.make("label:panel _id_1w26e1r _a_5r08qs _a_gmy164etpbt", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 

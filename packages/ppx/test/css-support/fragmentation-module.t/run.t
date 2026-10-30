@@ -15,79 +15,372 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1ungwd0{break-before:auto;}"];
-  [@css ".css-ogsw5z{break-before:avoid;}"];
-  [@css ".css-1z0e3mx{break-before:avoid-page;}"];
-  [@css ".css-1mxu2iv{break-before:page;}"];
-  [@css ".css-1aeacmv{break-before:left;}"];
-  [@css ".css-18ps0v2{break-before:right;}"];
-  [@css ".css-1pnefcv{break-before:recto;}"];
-  [@css ".css-7swwqb{break-before:verso;}"];
-  [@css ".css-19gaz7b{break-before:avoid-column;}"];
-  [@css ".css-u4inlv{break-before:column;}"];
-  [@css ".css-1ubwpn3{break-before:avoid-region;}"];
-  [@css ".css-1ynbno4{break-before:region;}"];
-  [@css ".css-130801c{break-after:auto;}"];
-  [@css ".css-5lf7vs{break-after:avoid;}"];
-  [@css ".css-1p857zp{break-after:avoid-page;}"];
-  [@css ".css-1hobk6r{break-after:page;}"];
-  [@css ".css-1d6ekzp{break-after:left;}"];
-  [@css ".css-14w5qvb{break-after:right;}"];
-  [@css ".css-414tvf{break-after:recto;}"];
-  [@css ".css-1d0k4gz{break-after:verso;}"];
-  [@css ".css-7qiwkw{break-after:avoid-column;}"];
-  [@css ".css-h5l3j6{break-after:column;}"];
-  [@css ".css-1rayot9{break-after:avoid-region;}"];
-  [@css ".css-11198ro{break-after:region;}"];
-  [@css ".css-167fnl3{break-inside:auto;}"];
-  [@css ".css-1ybn7nl{break-inside:avoid;}"];
-  [@css ".css-c51xo4{break-inside:avoid-page;}"];
-  [@css ".css-1d67h5w{break-inside:avoid-column;}"];
-  [@css ".css-1a1pnax{break-inside:avoid-region;}"];
   [@css
-    ".css-1iwipz1{-webkit-box-decoration-break:slice;box-decoration-break:slice;}"
+    (
+      "._a_43gwd0{break-before:auto;}",
+      "_a_43gwd0",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
   ];
   [@css
-    ".css-10thfn{-webkit-box-decoration-break:clone;box-decoration-break:clone;}"
+    (
+      "._a_43sw5z{break-before:avoid;}",
+      "_a_43sw5z",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
   ];
-  [@css ".css-wb262r{orphans:1;}"];
-  [@css ".css-1wd85qu{orphans:2;}"];
-  [@css ".css-h7q94c{widows:1;}"];
-  [@css ".css-15vmc20{widows:2;}"];
+  [@css
+    (
+      "._a_43e3mx{break-before:avoid-page;}",
+      "_a_43e3mx",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43u2iv{break-before:page;}",
+      "_a_43u2iv",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43acmv{break-before:left;}",
+      "_a_43acmv",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43s0v2{break-before:right;}",
+      "_a_43s0v2",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43efcv{break-before:recto;}",
+      "_a_43efcv",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43wwqb{break-before:verso;}",
+      "_a_43wwqb",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43az7b{break-before:avoid-column;}",
+      "_a_43az7b",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43inlv{break-before:column;}",
+      "_a_43inlv",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43wpn3{break-before:avoid-region;}",
+      "_a_43wpn3",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_43bno4{break-before:region;}",
+      "_a_43bno4",
+      "0,1,0 own",
+      "147",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_42801c{break-after:auto;}", "_a_42801c", "0,1,0 own", "146", 1, false)
+  ];
+  [@css
+    (
+      "._a_42f7vs{break-after:avoid;}",
+      "_a_42f7vs",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4257zp{break-after:avoid-page;}",
+      "_a_4257zp",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_42bk6r{break-after:page;}", "_a_42bk6r", "0,1,0 own", "146", 1, false)
+  ];
+  [@css
+    ("._a_42ekzp{break-after:left;}", "_a_42ekzp", "0,1,0 own", "146", 1, false)
+  ];
+  [@css
+    (
+      "._a_425qvb{break-after:right;}",
+      "_a_425qvb",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_424tvf{break-after:recto;}",
+      "_a_424tvf",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_42k4gz{break-after:verso;}",
+      "_a_42k4gz",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_42iwkw{break-after:avoid-column;}",
+      "_a_42iwkw",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_42l3j6{break-after:column;}",
+      "_a_42l3j6",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_42yot9{break-after:avoid-region;}",
+      "_a_42yot9",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4298ro{break-after:region;}",
+      "_a_4298ro",
+      "0,1,0 own",
+      "146",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_44fnl3{break-inside:auto;}",
+      "_a_44fnl3",
+      "0,1,0 own",
+      "148",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_44n7nl{break-inside:avoid;}",
+      "_a_44n7nl",
+      "0,1,0 own",
+      "148",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_441xo4{break-inside:avoid-page;}",
+      "_a_441xo4",
+      "0,1,0 own",
+      "148",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_447h5w{break-inside:avoid-column;}",
+      "_a_447h5w",
+      "0,1,0 own",
+      "148",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_44pnax{break-inside:avoid-region;}",
+      "_a_44pnax",
+      "0,1,0 own",
+      "148",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3sipz1{-webkit-box-decoration-break:slice;box-decoration-break:slice;}",
+      "_a_3sipz1",
+      "0,1,0 own",
+      "136",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3sthfn{-webkit-box-decoration-break:clone;box-decoration-break:clone;}",
+      "_a_3sthfn",
+      "0,1,0 own",
+      "136",
+      1,
+      false,
+    )
+  ];
+  [@css ("._a_8o262r{orphans:1;}", "_a_8o262r", "0,1,0 own", "312", 1, false)];
+  [@css ("._a_8o85qu{orphans:2;}", "_a_8o85qu", "0,1,0 own", "312", 1, false)];
+  [@css ("._a_ebq94c{widows:1;}", "_a_ebq94c", "0,1,0 own", "515", 1, false)];
+  [@css ("._a_ebmc20{widows:2;}", "_a_ebmc20", "0,1,0 own", "515", 1, false)];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
+      (10, "", [8]),
+      (11, "", [9]),
+      (12, "", [10]),
+      (13, "", [11]),
+      (14, "", [12]),
+      (15, "", [13]),
+      (16, "", [14]),
+      (17, "", [15]),
+      (18, "", [16]),
+      (19, "", [17]),
+      (20, "", [18]),
+      (21, "", [19]),
+      (22, "", [20]),
+      (23, "", [21]),
+      (24, "", [22]),
+      (25, "", [23]),
+      (26, "", [24]),
+      (27, "", [25]),
+      (28, "", [26]),
+      (29, "", [27]),
+      (30, "", [28]),
+      (31, "", [29]),
+      (32, "", [30]),
+      (33, "", [31]),
+      (34, "", [32]),
+      (36, "", [33]),
+      (37, "", [34]),
+    ]
+  ];
   
-  CSS.make("css-1ungwd0", []);
-  CSS.make("css-ogsw5z", []);
-  CSS.make("css-1z0e3mx", []);
-  CSS.make("css-1mxu2iv", []);
-  CSS.make("css-1aeacmv", []);
-  CSS.make("css-18ps0v2", []);
-  CSS.make("css-1pnefcv", []);
-  CSS.make("css-7swwqb", []);
-  CSS.make("css-19gaz7b", []);
-  CSS.make("css-u4inlv", []);
-  CSS.make("css-1ubwpn3", []);
-  CSS.make("css-1ynbno4", []);
-  CSS.make("css-130801c", []);
-  CSS.make("css-5lf7vs", []);
-  CSS.make("css-1p857zp", []);
-  CSS.make("css-1hobk6r", []);
-  CSS.make("css-1d6ekzp", []);
-  CSS.make("css-14w5qvb", []);
-  CSS.make("css-414tvf", []);
-  CSS.make("css-1d0k4gz", []);
-  CSS.make("css-7qiwkw", []);
-  CSS.make("css-h5l3j6", []);
-  CSS.make("css-1rayot9", []);
-  CSS.make("css-11198ro", []);
-  CSS.make("css-167fnl3", []);
-  CSS.make("css-1ybn7nl", []);
-  CSS.make("css-c51xo4", []);
-  CSS.make("css-1d67h5w", []);
-  CSS.make("css-1a1pnax", []);
-  CSS.make("css-1iwipz1", []);
-  CSS.make("css-10thfn", []);
-  CSS.make("css-wb262r", []);
-  CSS.make("css-1wd85qu", []);
+  CSS.make("_a_43gwd0", []);
+  CSS.make("_a_43sw5z", []);
+  CSS.make("_a_43e3mx", []);
+  CSS.make("_a_43u2iv", []);
+  CSS.make("_a_43acmv", []);
+  CSS.make("_a_43s0v2", []);
+  CSS.make("_a_43efcv", []);
+  CSS.make("_a_43wwqb", []);
+  CSS.make("_a_43az7b", []);
+  CSS.make("_a_43inlv", []);
+  CSS.make("_a_43wpn3", []);
+  CSS.make("_a_43bno4", []);
+  CSS.make("_a_42801c", []);
+  CSS.make("_a_42f7vs", []);
+  CSS.make("_a_4257zp", []);
+  CSS.make("_a_42bk6r", []);
+  CSS.make("_a_42ekzp", []);
+  CSS.make("_a_425qvb", []);
+  CSS.make("_a_424tvf", []);
+  CSS.make("_a_42k4gz", []);
+  CSS.make("_a_42iwkw", []);
+  CSS.make("_a_42l3j6", []);
+  CSS.make("_a_42yot9", []);
+  CSS.make("_a_4298ro", []);
+  CSS.make("_a_44fnl3", []);
+  CSS.make("_a_44n7nl", []);
+  CSS.make("_a_441xo4", []);
+  CSS.make("_a_447h5w", []);
+  CSS.make("_a_44pnax", []);
+  CSS.make("_a_3sipz1", []);
+  CSS.make("_a_3sthfn", []);
+  CSS.make("_a_8o262r", []);
+  CSS.make("_a_8o85qu", []);
   
-  CSS.make("css-h7q94c", []);
-  CSS.make("css-15vmc20", []);
+  CSS.make("_a_ebq94c", []);
+  CSS.make("_a_ebmc20", []);

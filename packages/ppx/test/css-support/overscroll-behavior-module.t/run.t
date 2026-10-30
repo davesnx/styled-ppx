@@ -15,52 +15,296 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1btho3a{overscroll-behavior:contain;}"];
-  [@css ".css-1dl7j1d{overscroll-behavior:none;}"];
-  [@css ".css-15jukkc{overscroll-behavior:auto;}"];
-  [@css ".css-1o4xxxe{overscroll-behavior:contain contain;}"];
-  [@css ".css-kjypmu{overscroll-behavior:none contain;}"];
-  [@css ".css-12vmwul{overscroll-behavior:auto contain;}"];
-  [@css ".css-5pbl4h{overscroll-behavior:contain none;}"];
-  [@css ".css-1s8anq6{overscroll-behavior:none none;}"];
-  [@css ".css-14myhlg{overscroll-behavior:auto none;}"];
-  [@css ".css-1j49kl3{overscroll-behavior:contain auto;}"];
-  [@css ".css-ioifvx{overscroll-behavior:none auto;}"];
-  [@css ".css-13smixw{overscroll-behavior:auto auto;}"];
-  [@css ".css-1t5zttn{overscroll-behavior-x:contain;}"];
-  [@css ".css-crzrzr{overscroll-behavior-x:none;}"];
-  [@css ".css-uhjltw{overscroll-behavior-x:auto;}"];
-  [@css ".css-1oysund{overscroll-behavior-y:contain;}"];
-  [@css ".css-1n0t8de{overscroll-behavior-y:none;}"];
-  [@css ".css-seyb72{overscroll-behavior-y:auto;}"];
-  [@css ".css-1vnsm2h{overscroll-behavior-inline:contain;}"];
-  [@css ".css-f8iqqo{overscroll-behavior-inline:none;}"];
-  [@css ".css-p5kyxi{overscroll-behavior-inline:auto;}"];
-  [@css ".css-urqfuu{overscroll-behavior-block:contain;}"];
-  [@css ".css-d8iw13{overscroll-behavior-block:none;}"];
-  [@css ".css-ylunay{overscroll-behavior-block:auto;}"];
+  [@css
+    (
+      "._a_8zho3a{overscroll-behavior:contain;}",
+      "_a_8zho3a",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8z7j1d{overscroll-behavior:none;}",
+      "_a_8z7j1d",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zukkc{overscroll-behavior:auto;}",
+      "_a_8zukkc",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zxxxe{overscroll-behavior:contain contain;}",
+      "_a_8zxxxe",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zypmu{overscroll-behavior:none contain;}",
+      "_a_8zypmu",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zmwul{overscroll-behavior:auto contain;}",
+      "_a_8zmwul",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zbl4h{overscroll-behavior:contain none;}",
+      "_a_8zbl4h",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zanq6{overscroll-behavior:none none;}",
+      "_a_8zanq6",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zyhlg{overscroll-behavior:auto none;}",
+      "_a_8zyhlg",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8z9kl3{overscroll-behavior:contain auto;}",
+      "_a_8z9kl3",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zifvx{overscroll-behavior:none auto;}",
+      "_a_8zifvx",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_8zmixw{overscroll-behavior:auto auto;}",
+      "_a_8zmixw",
+      "0,1,0 own",
+      "323",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_92zttn{overscroll-behavior-x:contain;}",
+      "_a_92zttn",
+      "0,1,0 own",
+      "326",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_92zrzr{overscroll-behavior-x:none;}",
+      "_a_92zrzr",
+      "0,1,0 own",
+      "326",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_92jltw{overscroll-behavior-x:auto;}",
+      "_a_92jltw",
+      "0,1,0 own",
+      "326",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_93sund{overscroll-behavior-y:contain;}",
+      "_a_93sund",
+      "0,1,0 own",
+      "327",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_93t8de{overscroll-behavior-y:none;}",
+      "_a_93t8de",
+      "0,1,0 own",
+      "327",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_93yb72{overscroll-behavior-y:auto;}",
+      "_a_93yb72",
+      "0,1,0 own",
+      "327",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_91sm2h{overscroll-behavior-inline:contain;}",
+      "_a_91sm2h",
+      "0,1,0 own",
+      "325",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_91iqqo{overscroll-behavior-inline:none;}",
+      "_a_91iqqo",
+      "0,1,0 own",
+      "325",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_91kyxi{overscroll-behavior-inline:auto;}",
+      "_a_91kyxi",
+      "0,1,0 own",
+      "325",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_90qfuu{overscroll-behavior-block:contain;}",
+      "_a_90qfuu",
+      "0,1,0 own",
+      "324",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_90iw13{overscroll-behavior-block:none;}",
+      "_a_90iw13",
+      "0,1,0 own",
+      "324",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_90unay{overscroll-behavior-block:auto;}",
+      "_a_90unay",
+      "0,1,0 own",
+      "324",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
+      (10, "", [8]),
+      (11, "", [9]),
+      (12, "", [10]),
+      (13, "", [11]),
+      (14, "", [12]),
+      (15, "", [13]),
+      (16, "", [14]),
+      (17, "", [15]),
+      (18, "", [16]),
+      (19, "", [17]),
+      (20, "", [18]),
+      (21, "", [19]),
+      (22, "", [20]),
+      (23, "", [21]),
+      (24, "", [22]),
+      (25, "", [23]),
+    ]
+  ];
   
-  CSS.make("css-1btho3a", []);
-  CSS.make("css-1dl7j1d", []);
-  CSS.make("css-15jukkc", []);
-  CSS.make("css-1o4xxxe", []);
-  CSS.make("css-kjypmu", []);
-  CSS.make("css-12vmwul", []);
-  CSS.make("css-5pbl4h", []);
-  CSS.make("css-1s8anq6", []);
-  CSS.make("css-14myhlg", []);
-  CSS.make("css-1j49kl3", []);
-  CSS.make("css-ioifvx", []);
-  CSS.make("css-13smixw", []);
-  CSS.make("css-1t5zttn", []);
-  CSS.make("css-crzrzr", []);
-  CSS.make("css-uhjltw", []);
-  CSS.make("css-1oysund", []);
-  CSS.make("css-1n0t8de", []);
-  CSS.make("css-seyb72", []);
-  CSS.make("css-1vnsm2h", []);
-  CSS.make("css-f8iqqo", []);
-  CSS.make("css-p5kyxi", []);
-  CSS.make("css-urqfuu", []);
-  CSS.make("css-d8iw13", []);
-  CSS.make("css-ylunay", []);
+  CSS.make("_a_8zho3a", []);
+  CSS.make("_a_8z7j1d", []);
+  CSS.make("_a_8zukkc", []);
+  CSS.make("_a_8zxxxe", []);
+  CSS.make("_a_8zypmu", []);
+  CSS.make("_a_8zmwul", []);
+  CSS.make("_a_8zbl4h", []);
+  CSS.make("_a_8zanq6", []);
+  CSS.make("_a_8zyhlg", []);
+  CSS.make("_a_8z9kl3", []);
+  CSS.make("_a_8zifvx", []);
+  CSS.make("_a_8zmixw", []);
+  CSS.make("_a_92zttn", []);
+  CSS.make("_a_92zrzr", []);
+  CSS.make("_a_92jltw", []);
+  CSS.make("_a_93sund", []);
+  CSS.make("_a_93t8de", []);
+  CSS.make("_a_93yb72", []);
+  CSS.make("_a_91sm2h", []);
+  CSS.make("_a_91iqqo", []);
+  CSS.make("_a_91kyxi", []);
+  CSS.make("_a_90qfuu", []);
+  CSS.make("_a_90iw13", []);
+  CSS.make("_a_90unay", []);

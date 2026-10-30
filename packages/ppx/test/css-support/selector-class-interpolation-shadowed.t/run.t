@@ -12,20 +12,43 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-14ksm7b-foo{color:blue;}"];
-  [@css ".css-191lhl1-bar.css-14ksm7b-foo{font-weight:bold;}"];
+`refmt` picks CRLF line ends when the first newline byte of its input (here
+the binary AST) follows a `\r` byte, which can happen by chance in the
+marshalled AST; `tr` keeps the output stable:
+
+  $ dune describe pp ./input.re | tr -d '\r' | sed '1,/^];$/d'
+  [@css ("._a_4ekvmb{color:red;}", "_a_4ekvmb", "0,1,0 own", "158", 1, false)];
+  [@css ("._a_4esm7b{color:blue;}", "_a_4esm7b", "0,1,0 own", "158", 1, false)];
+  [@css
+    (
+      "._a_a6upz655m9sbqr7._id_1tr6yta{font-weight:bold;}",
+      "_a_a6upz655m9sbqr7",
+      "0,2,0 own",
+      "221",
+      262144,
+      false,
+    )
+  ];
   [@css.bindings
-    [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
+    [
+      ("Input.foo", "_id_1tr6yta", "_a_4esm7b"),
+      ("Input.bar", "_id_1wtvg3d", "_a_a6upz655m9sbqr7"),
+    ]
+  ];
+  [@css.blocks
+    [
+      (5, "_id_eealdg", [0]),
+      (8, "_id_1tr6yta", [1]),
+      (10, "_id_1wtvg3d", [2]),
+    ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("label:foo _id_eealdg _a_4ekvmb", []);
   let _ = foo;
   
-  let foo = CSS.make("css-14ksm7b-foo", []);
+  let foo = CSS.make("label:foo _id_1tr6yta _a_4esm7b", []);
   
-  let bar = CSS.make("css-191lhl1-bar", []);
+  let bar = CSS.make("label:bar _id_1wtvg3d _a_a6upz655m9sbqr7", []);
   
   let _ = (foo, bar);
 

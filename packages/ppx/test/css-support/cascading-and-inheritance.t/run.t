@@ -15,12 +15,37 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1v7yg6i{color:unset;}"];
-  [@css ".css-1uehh2p{font-weight:unset;}"];
-  [@css ".css-kh6y3o{background-image:unset;}"];
-  [@css ".css-1oovyp6{width:unset;}"];
+  [@css
+    ("._a_4eyg6i{color:unset;}", "_a_4eyg6i", "0,1,0 own", "158", 1, false)
+  ];
+  [@css
+    (
+      "._a_655m9shh2p{font-weight:unset;}",
+      "_a_655m9shh2p",
+      "0,1,0 own",
+      "221",
+      262144,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3900086y3o{background-image:unset;}",
+      "_a_3900086y3o",
+      "0,1,0 own",
+      "117",
+      8,
+      false,
+    )
+  ];
+  [@css
+    ("._a_ecvyp6{width:unset;}", "_a_ecvyp6", "0,1,0 own", "516", 1, false)
+  ];
+  [@css.blocks
+    [(2, "", [0]), (3, "", [1]), (4, "", [2]), (5, "", [3])]
+  ];
   
-  CSS.make("css-1v7yg6i", []);
-  CSS.make("css-1uehh2p", []);
-  CSS.make("css-kh6y3o", []);
-  CSS.make("css-1oovyp6", []);
+  CSS.make("_a_4eyg6i", []);
+  CSS.make("_a_655m9shh2p", []);
+  CSS.make("_a_3900086y3o", []);
+  CSS.make("_a_ecvyp6", []);

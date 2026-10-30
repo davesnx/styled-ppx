@@ -26,6 +26,8 @@ let registry : (kind * packed_rule) list =
       Properties.BaselineSource.entries;
       Properties.BlockSize.entries;
       Properties.BlockOverflow.entries;
+      Properties.BlockStep.entries;
+      Properties.Bookmark.entries;
       Properties.Border.entries;
       Properties.Bottom.entries;
       Properties.Box.entries;
@@ -64,6 +66,7 @@ let registry : (kind * packed_rule) list =
       Properties.Font.entries;
       Properties.ForcedColorAdjust.entries;
       Properties.Gap.entries;
+      Properties.GapRule.entries;
       Properties.Glyph.entries;
       Properties.Grid.entries;
       Properties.HangingPunctuation.entries;
@@ -74,6 +77,7 @@ let registry : (kind * packed_rule) list =
       Properties.Hyphens.entries;
       Properties.Ime.entries;
       Properties.Image.entries;
+      Properties.ImageAnimation.entries;
       Properties.InitialLetter.entries;
       Properties.InitialLetterAlign.entries;
       Properties.InlineSize.entries;
@@ -87,6 +91,7 @@ let registry : (kind * packed_rule) list =
       Properties.LetterSpacing.entries;
       Properties.LightingColor.entries;
       Properties.Line.entries;
+      Properties.LineGrid.entries;
       Properties.Layout.entries;
       Properties.ListProperties.entries;
       Properties.Margin.entries;
@@ -122,11 +127,13 @@ let registry : (kind * packed_rule) list =
       Properties.R.entries;
       Properties.ReadingFlow.entries;
       Properties.ReadingOrder.entries;
+      Properties.Regions.entries;
       Properties.Rest.entries;
       Properties.Resize.entries;
       Properties.Right.entries;
       Properties.Rotate.entries;
       Properties.RowGap.entries;
+      Properties.RowRule.entries;
       Properties.Ruby.entries;
       Properties.Rx.entries;
       Properties.Ry.entries;
@@ -134,6 +141,7 @@ let registry : (kind * packed_rule) list =
       Properties.Scroll.entries;
       Properties.Shape.entries;
       Properties.Size.entries;
+      Properties.SpatialNavigation.entries;
       Properties.SpeakAs.entries;
       Properties.StopColor.entries;
       Properties.StopOpacity.entries;
@@ -161,6 +169,7 @@ let registry : (kind * packed_rule) list =
       Properties.Widows.entries;
       Properties.Width.entries;
       Properties.WillChange.entries;
+      Properties.WindowDrag.entries;
       Properties.WordBreak.entries;
       Properties.WordWrap.entries;
       Properties.WordSpacing.entries;
@@ -179,20 +188,27 @@ let () =
       let css_name =
         match kind with
         | Property name -> name
+        | Shorthand (name, _) -> name
+        | Alias (name, _) -> name
         | Value name -> name
         | Function name -> name
         | Media_query name -> name
       in
       let key =
         match kind with
-        (* Properties use prefixed keys to avoid collisions with values. *)
-        | Property _ -> "property_" ^ css_name
+        (* Properties use prefixed keys to avoid collisions with values. A
+           shorthand or an alias is still a property for this purpose - both
+           share the same key namespace as every other property. *)
+        | Property _ | Shorthand _ | Alias _ -> "property_" ^ css_name
         | Value _ | Function _ | Media_query _ -> css_name
       in
       Hashtbl.replace registry_tbl key (kind, rule))
     registry
 
-let is_property_kind = function Property _ -> true | _ -> false
+let is_property_kind = function
+  | Property _ | Shorthand _ | Alias _ -> true
+  | _ -> false
+
 let is_value_kind = function Value _ -> true | _ -> false
 let is_function_kind = function Function _ -> true | _ -> false
 let is_media_query_kind = function Media_query _ -> true | _ -> false
@@ -245,7 +261,7 @@ let () =
   List.iter
     (fun (kind, rule) ->
       match kind with
-      | Property name ->
+      | Property name | Shorthand (name, _) | Alias (name, _) ->
         Hashtbl.replace property_registry name (pack_property rule)
       | _ -> ())
     registry
@@ -260,6 +276,46 @@ let find_property_packed_with_wildcard (name : string) : packed_property option
 
 let property_names () : string list =
   Hashtbl.fold (fun name _ acc -> name :: acc) property_registry []
+
+(* --- Shorthand query API ---------------------------------------------- *)
+
+let is_shorthand (name : string) : bool =
+  match Hashtbl.find_opt registry_tbl ("property_" ^ name) with
+  | Some (Shorthand _, _) -> true
+  | _ -> false
+
+let direct_longhands (name : string) : string list option =
+  match Hashtbl.find_opt registry_tbl ("property_" ^ name) with
+  | Some (Shorthand (_, longhands), _) -> Some longhands
+  | _ -> None
+
+let shorthands () : (string * string list) list =
+  Hashtbl.fold
+    (fun _key (kind, _rule) acc ->
+      match kind with
+      | Shorthand (name, longhands) -> (name, longhands) :: acc
+      | _ -> acc)
+    registry_tbl []
+
+(* --- Alias query API ---------------------------------------------------- *)
+
+let is_alias (name : string) : bool =
+  match Hashtbl.find_opt registry_tbl ("property_" ^ name) with
+  | Some (Alias _, _) -> true
+  | _ -> false
+
+let canonical_name_of (name : string) : string option =
+  match Hashtbl.find_opt registry_tbl ("property_" ^ name) with
+  | Some (Alias (_, canonical), _) -> Some canonical
+  | _ -> None
+
+let aliases () : (string * string) list =
+  Hashtbl.fold
+    (fun _key (kind, _rule) acc ->
+      match kind with
+      | Alias (name, canonical) -> (name, canonical) :: acc
+      | _ -> acc)
+    registry_tbl []
 
 let suggest_property_name (name : string) : string option =
   property_names () |> Levenshtein.find_closest_match name

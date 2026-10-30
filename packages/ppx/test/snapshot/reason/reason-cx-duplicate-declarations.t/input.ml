@@ -1,6 +1,10 @@
-(* Same-property declarations within one block group into a single atom
-   so the winner is decided by intra-atom source order (emotion parity),
-   not by stylesheet position of independently-hashed atoms. *)
+(* Declarations whose longhands overlap, within one block, group into
+   a single atom so the winner is decided by intra-atom source order
+   (emotion parity), not by stylesheet position of independently-hashed
+   atoms. Most examples below repeat one property; `shorthandReset` mixes
+   a shorthand with its own longhand instead - see
+   `reason-family-atoms.t` for grouping across properties as the main
+   subject. *)
 
 (* Last occurrence wins: blue (used to split into two atoms where
    stylesheet position - first-mint-wins dedup - picked the winner). *)
@@ -14,17 +18,18 @@ let fallback = [%css "display: -webkit-box; display: flex"]
    the LAST color's position; margin stays its own atom. *)
 let interleaved = [%css "color: blue; margin: 0; color: red"]
 
-(* Last-occurrence anchoring: an equal-specificity rule written BETWEEN
-   the duplicates must stay before the group, or it would beat the final
-   duplicate. Authored cascade when the media matches: blue, green, red
-   -> red wins. (First-occurrence anchoring hoisted {blue;red} above the
-   media rule, letting green win.) *)
+(* Emotion order: the block's declarations, then its nested rules. The
+   color group {blue;red} comes before the media rule, so when the media
+   matches, green wins, as emotion prints this block. *)
 let mediaInterleaved =
   [%css "color: blue; @media (min-width: 600px) { color: green; } color: red"]
 
-(* Shorthand reset stays authored: the margin group (ending in
-   margin: 10px) anchors after margin-top, so the final shorthand resets
-   the longhand, as written. *)
+(* margin and margin-top overlap on margin-top, so all three
+   declarations - shorthand, longhand, shorthand again - group into ONE
+   atom, in author order. The final `margin: 10px` resets `margin-top`
+   because it is the last declaration in that one rule, the same way any
+   repeated property resolves - not because of where two separate atoms
+   happen to land in the stylesheet. *)
 let shorthandReset = [%css "margin: 0; margin-top: 5px; margin: 10px"]
 
 (* Groups under a nested selector keep the parent chain. *)
@@ -37,7 +42,7 @@ let twice = [%css "&:hover { color: red; } &:hover { color: red; }"]
 (* Custom properties are case-sensitive: --Foo and --foo don't group. *)
 let custom = [%css "--Foo: 1px; --foo: 2px"]
 
-(* Cross-binding: sharing the single-declaration atom (css-tokvmb-x for
+(* Cross-binding: sharing the single-declaration atom (a-tokvmb, for
    color:red) can no longer flip the winner - B's duplicate pair is a
    self-contained group with its own hash. *)
 module A = struct

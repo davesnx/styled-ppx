@@ -15,37 +15,146 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1er335o{fill-rule:nonzero;}"];
-  [@css ".css-1uqje6q{fill-rule:evenodd;}"];
-  [@css ".css-h01axr{fill-opacity:0.5;}"];
-  [@css ".css-1p4mbij{fill-opacity:45%;}"];
-  [@css ".css-stfno8{stroke-width:0;}"];
-  [@css ".css-7hbqje{stroke-width:1px;}"];
-  [@css ".css-11bssim{stroke-width:25%;}"];
-  [@css ".css-16f3u6b{stroke-linecap:butt;}"];
-  [@css ".css-1me96vv{stroke-linecap:round;}"];
-  [@css ".css-1j4dlez{stroke-linecap:square;}"];
-  [@css ".css-8vbou6{stroke-linejoin:miter;}"];
-  [@css ".css-1t1cl19{stroke-linejoin:bevel;}"];
-  [@css ".css-8mzojx{stroke-linejoin:round;}"];
-  [@css ".css-1a477up{stroke-miterlimit:4;}"];
+  [@css
+    (
+      "._a_5y335o{fill-rule:nonzero;}",
+      "_a_5y335o",
+      "0,1,0 own",
+      "214",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_5yje6q{fill-rule:evenodd;}",
+      "_a_5yje6q",
+      "0,1,0 own",
+      "214",
+      1,
+      false,
+    )
+  ];
+  [@css
+    ("._a_5x1axr{fill-opacity:0.5;}", "_a_5x1axr", "0,1,0 own", "213", 1, false)
+  ];
+  [@css
+    ("._a_5xmbij{fill-opacity:45%;}", "_a_5xmbij", "0,1,0 own", "213", 1, false)
+  ];
+  [@css
+    ("._a_c1fno8{stroke-width:0;}", "_a_c1fno8", "0,1,0 own", "433", 1, false)
+  ];
+  [@css
+    ("._a_c1bqje{stroke-width:1px;}", "_a_c1bqje", "0,1,0 own", "433", 1, false)
+  ];
+  [@css
+    ("._a_c1ssim{stroke-width:25%;}", "_a_c1ssim", "0,1,0 own", "433", 1, false)
+  ];
+  [@css
+    (
+      "._a_bx3u6b{stroke-linecap:butt;}",
+      "_a_bx3u6b",
+      "0,1,0 own",
+      "429",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bx96vv{stroke-linecap:round;}",
+      "_a_bx96vv",
+      "0,1,0 own",
+      "429",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bxdlez{stroke-linecap:square;}",
+      "_a_bxdlez",
+      "0,1,0 own",
+      "429",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bybou6{stroke-linejoin:miter;}",
+      "_a_bybou6",
+      "0,1,0 own",
+      "430",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bycl19{stroke-linejoin:bevel;}",
+      "_a_bycl19",
+      "0,1,0 own",
+      "430",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_byzojx{stroke-linejoin:round;}",
+      "_a_byzojx",
+      "0,1,0 own",
+      "430",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bz77up{stroke-miterlimit:4;}",
+      "_a_bz77up",
+      "0,1,0 own",
+      "431",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (7, "", [0]),
+      (8, "", [1]),
+      (62, "", [2]),
+      (63, "", [3]),
+      (69, "", [4]),
+      (70, "", [5]),
+      (71, "", [6]),
+      (75, "", [7]),
+      (76, "", [8]),
+      (77, "", [9]),
+      (80, "", [10]),
+      (81, "", [11]),
+      (82, "", [12]),
+      (87, "", [13]),
+    ]
+  ];
   
-  CSS.make("css-1er335o", []);
-  CSS.make("css-1uqje6q", []);
+  CSS.make("_a_5y335o", []);
+  CSS.make("_a_5yje6q", []);
   
-  CSS.make("css-h01axr", []);
-  CSS.make("css-1p4mbij", []);
+  CSS.make("_a_5x1axr", []);
+  CSS.make("_a_5xmbij", []);
   
-  CSS.make("css-stfno8", []);
-  CSS.make("css-7hbqje", []);
-  CSS.make("css-11bssim", []);
+  CSS.make("_a_c1fno8", []);
+  CSS.make("_a_c1bqje", []);
+  CSS.make("_a_c1ssim", []);
   
-  CSS.make("css-16f3u6b", []);
-  CSS.make("css-1me96vv", []);
-  CSS.make("css-1j4dlez", []);
+  CSS.make("_a_bx3u6b", []);
+  CSS.make("_a_bx96vv", []);
+  CSS.make("_a_bxdlez", []);
   
-  CSS.make("css-8vbou6", []);
-  CSS.make("css-1t1cl19", []);
-  CSS.make("css-8mzojx", []);
+  CSS.make("_a_bybou6", []);
+  CSS.make("_a_bycl19", []);
+  CSS.make("_a_byzojx", []);
   
-  CSS.make("css-1a477up", []);
+  CSS.make("_a_bz77up", []);

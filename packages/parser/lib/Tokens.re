@@ -23,6 +23,8 @@ type token =
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
+  | CDO // <CDO-token> "<!--"
+  | CDC // <CDC-token> "-->"
   | WS // <whitespace-token>
   | COLON // <colon-token>
   | DOUBLE_COLON // <double-colon-token>
@@ -247,6 +249,8 @@ let humanize =
   | NUMBER(n) => float_to_string(n)
   | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
   | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
+  | CDO => "<!--"
+  | CDC => "-->"
   | WS => " "
   | COLON => ":"
   | DOUBLE_COLON => "::"
@@ -296,4 +300,6 @@ let to_debug =
   | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
   | INTERPOLATION((v, _)) => Printf.sprintf("INTERPOLATION('%s')", v)
   | DELIM(s) => Printf.sprintf("DELIM('%s')", s)
+  | CDO => "CDO"
+  | CDC => "CDC"
   | WS => "WS";

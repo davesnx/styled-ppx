@@ -5,26 +5,66 @@ verbatim - no Cascading.toString wrap.
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --colorStr-t58soe{syntax:\"*\";inherits:false;}"];
-  [@css "@property --colorStr-11d7je1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --plainStr-1cgr13y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --plainStr-vbhzka{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-13tu4ef{syntax:\"*\";inherits:false;}"];
-  [@css ".css-14o54yy-row{--color-link:var(--colorStr-t58soe);}"];
-  [@css ".css-10nqctf-theme{--color-link:var(--colorStr-11d7je1);}"];
-  [@css ".css-10nqctf-theme{--spacing:var(--plainStr-1cgr13y);}"];
-  [@css ".css-zwwqpt-dyn{--token:var(--value-13tu4ef);}"];
+  [@css
+    (
+      "._a_zy7gz1zq54yy{--color-link:var(--colorStr-t58soe);}",
+      "_a_zy7gz1zq54yy",
+      "0,1,0 own",
+      "-c451772630",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_zy4gc55zkohh{--spacing:var(--plainStr-vbhzka);}",
+      "_a_zy4gc55zkohh",
+      "0,1,0 own",
+      "-c269305127",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_zyqed1fpwqpt{--token:var(--value-13tu4ef);}",
+      "_a_zyqed1fpwqpt",
+      "0,1,0 own",
+      "-c1596243589",
+      1,
+      false,
+    )
+  ];
   [@css.bindings
     [
-      ("Output.row", "css-14o54yy-row"),
-      ("Output.theme", "css-10nqctf-theme"),
-      ("Output.dyn", "css-zwwqpt-dyn"),
+      ("Output.row", "_id_3o3lvw", "_a_zy7gz1zq54yy"),
+      ("Output.theme", "_id_1s07ooq", "_a_zy7gz1zq54yy _a_zy4gc55zkohh"),
+      ("Output.dyn", "_id_1gnvnw7", "_a_zyqed1fpwqpt"),
+    ]
+  ];
+  [@css.blocks
+    [
+      (3, "_id_3o3lvw", [3]),
+      (7, "_id_1s07ooq", [3, 4]),
+      (11, "_id_1gnvnw7", [5]),
     ]
   ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
   let plainStr = "10px";
-  let row = CSS.make("css-14o54yy-row", [("--colorStr-t58soe", colorStr)]);
+  let row =
+    CSS.make(
+      "label:row _id_3o3lvw _a_zy7gz1zq54yy",
+      [("--colorStr-t58soe", colorStr)],
+    );
   let theme =
     CSS.make(
-      "css-10nqctf-theme",
-      [("--colorStr-11d7je1", colorStr), ("--plainStr-1cgr13y", plainStr)],
+      "label:theme _id_1s07ooq _a_zy7gz1zq54yy _a_zy4gc55zkohh",
+      [("--colorStr-t58soe", colorStr), ("--plainStr-vbhzka", plainStr)],
     );
-  let dyn = value => CSS.make("css-zwwqpt-dyn", [("--value-13tu4ef", value)]);
+  let dyn = value =>
+    CSS.make(
+      "label:dyn _id_1gnvnw7 _a_zyqed1fpwqpt",
+      [("--value-13tu4ef", value)],
+    );

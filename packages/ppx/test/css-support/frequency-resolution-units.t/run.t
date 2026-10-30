@@ -15,25 +15,93 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-11tobub{image-rendering:auto;}"];
-  [@css ".css-1e7m01f{image-rendering:crisp-edges;}"];
-  [@css ".css-fjhmlf{image-rendering:pixelated;}"];
   [@css
-    ".css-25toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}"
+    (
+      "._a_6tobub{image-rendering:auto;}",
+      "_a_6tobub",
+      "0,1,0 own",
+      "245",
+      1,
+      false,
+    )
   ];
   [@css
-    ".css-knsfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}"
+    (
+      "._a_6tm01f{image-rendering:crisp-edges;}",
+      "_a_6tm01f",
+      "0,1,0 own",
+      "245",
+      1,
+      false,
+    )
   ];
   [@css
-    ".css-9l0k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
+    (
+      "._a_6thmlf{image-rendering:pixelated;}",
+      "_a_6thmlf",
+      "0,1,0 own",
+      "245",
+      1,
+      false,
+    )
   ];
-  [@css ".css-ihfchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
+  [@css
+    (
+      "._a_390008toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}",
+      "_a_390008toi3",
+      "0,1,0 own",
+      "117",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_390008sfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}",
+      "_a_390008sfyn",
+      "0,1,0 own",
+      "117",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_3900080k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}",
+      "_a_3900080k4n",
+      "0,1,0 own",
+      "117",
+      8,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_390008fchh{background-image:image-set(\"cat.png\" 37dpcm);}",
+      "_a_390008fchh",
+      "0,1,0 own",
+      "117",
+      8,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (5, "", [0]),
+      (6, "", [1]),
+      (7, "", [2]),
+      (10, "", [3]),
+      (11, "", [4]),
+      (12, "", [5]),
+      (13, "", [6]),
+    ]
+  ];
   
-  CSS.make("css-11tobub", []);
-  CSS.make("css-1e7m01f", []);
-  CSS.make("css-fjhmlf", []);
+  CSS.make("_a_6tobub", []);
+  CSS.make("_a_6tm01f", []);
+  CSS.make("_a_6thmlf", []);
   
-  CSS.make("css-25toi3", []);
-  CSS.make("css-knsfyn", []);
-  CSS.make("css-9l0k4n", []);
-  CSS.make("css-ihfchh", []);
+  CSS.make("_a_390008toi3", []);
+  CSS.make("_a_390008sfyn", []);
+  CSS.make("_a_3900080k4n", []);
+  CSS.make("_a_390008fchh", []);

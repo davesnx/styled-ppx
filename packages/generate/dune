@@ -1,7 +1,19 @@
 (executable
  (name generate)
  (public_name styled-ppx.generate)
- (modules generate)
- (libraries styled-ppx css_extraction ppxlib ppxlib.astlib)
+ (modules generate order merge_key)
+ (libraries
+  css_extraction
+  class_format
+  slot_key
+  ppxlib
+  ppxlib.astlib
+  compiler-libs.common)
  (preprocess
   (pps ppxlib.metaquot)))
+
+; Merge_key is CSS.merge's rule; its runtime library needs server-reason-react,
+; so the source is copied, as the melange runtime does.
+
+(copy_files#
+ (files ../runtime/native/shared/Merge_key.ml))

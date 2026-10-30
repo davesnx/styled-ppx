@@ -16,41 +16,223 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".css-1majsr1{-webkit-print-color-adjust:economy;color-adjust:economy;}"
+    (
+      "._a_4fjsr1{-webkit-print-color-adjust:economy;color-adjust:economy;}",
+      "_a_4fjsr1",
+      "0,1,0 own",
+      "159",
+      1,
+      false,
+    )
   ];
-  [@css ".css-1i8uoce{-webkit-print-color-adjust:exact;color-adjust:exact;}"];
-  [@css ".css-k2jaoo{forced-color-adjust:auto;}"];
-  [@css ".css-9og3m8{forced-color-adjust:none;}"];
-  [@css ".css-1aesf9s{forced-color-adjust:preserve-parent-color;}"];
-  [@css ".css-14rmdkq{color-scheme:normal;}"];
-  [@css ".css-1bo0ddm{color-scheme:light;}"];
-  [@css ".css-ed8a77{color-scheme:dark;}"];
-  [@css ".css-ujor4h{color-scheme:light dark;}"];
-  [@css ".css-4hsghk{color-scheme:dark light;}"];
-  [@css ".css-1nd6avj{color-scheme:only light;}"];
-  [@css ".css-p0bop6{color-scheme:light only;}"];
-  [@css ".css-16p24tl{color-scheme:light light;}"];
-  [@css ".css-1uyd4nr{color-scheme:dark dark;}"];
-  [@css ".css-1y02q1k{color-scheme:light purple;}"];
-  [@css ".css-eqcn74{color-scheme:purple dark interesting;}"];
-  [@css ".css-5yh2ut{color-scheme:none;}"];
-  [@css ".css-1ge6jec{color-scheme:light none;}"];
+  [@css
+    (
+      "._a_4fuoce{-webkit-print-color-adjust:exact;color-adjust:exact;}",
+      "_a_4fuoce",
+      "0,1,0 own",
+      "159",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6ejaoo{forced-color-adjust:auto;}",
+      "_a_6ejaoo",
+      "0,1,0 own",
+      "230",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6eg3m8{forced-color-adjust:none;}",
+      "_a_6eg3m8",
+      "0,1,0 own",
+      "230",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_6esf9s{forced-color-adjust:preserve-parent-color;}",
+      "_a_6esf9s",
+      "0,1,0 own",
+      "230",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jmdkq{color-scheme:normal;}",
+      "_a_4jmdkq",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4j0ddm{color-scheme:light;}",
+      "_a_4j0ddm",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4j8a77{color-scheme:dark;}",
+      "_a_4j8a77",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jor4h{color-scheme:light dark;}",
+      "_a_4jor4h",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jsghk{color-scheme:dark light;}",
+      "_a_4jsghk",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4j6avj{color-scheme:only light;}",
+      "_a_4j6avj",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jbop6{color-scheme:light only;}",
+      "_a_4jbop6",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4j24tl{color-scheme:light light;}",
+      "_a_4j24tl",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jd4nr{color-scheme:dark dark;}",
+      "_a_4jd4nr",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4j2q1k{color-scheme:light purple;}",
+      "_a_4j2q1k",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jcn74{color-scheme:purple dark interesting;}",
+      "_a_4jcn74",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4jh2ut{color-scheme:none;}",
+      "_a_4jh2ut",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_4j6jec{color-scheme:light none;}",
+      "_a_4j6jec",
+      "0,1,0 own",
+      "163",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+      (7, "", [5]),
+      (8, "", [6]),
+      (9, "", [7]),
+      (10, "", [8]),
+      (11, "", [9]),
+      (12, "", [10]),
+      (13, "", [11]),
+      (14, "", [12]),
+      (15, "", [13]),
+      (16, "", [14]),
+      (17, "", [15]),
+      (18, "", [16]),
+      (19, "", [17]),
+    ]
+  ];
   
-  CSS.make("css-1majsr1", []);
-  CSS.make("css-1i8uoce", []);
-  CSS.make("css-k2jaoo", []);
-  CSS.make("css-9og3m8", []);
-  CSS.make("css-1aesf9s", []);
-  CSS.make("css-14rmdkq", []);
-  CSS.make("css-1bo0ddm", []);
-  CSS.make("css-ed8a77", []);
-  CSS.make("css-ujor4h", []);
-  CSS.make("css-4hsghk", []);
-  CSS.make("css-1nd6avj", []);
-  CSS.make("css-p0bop6", []);
-  CSS.make("css-16p24tl", []);
-  CSS.make("css-1uyd4nr", []);
-  CSS.make("css-1y02q1k", []);
-  CSS.make("css-eqcn74", []);
-  CSS.make("css-5yh2ut", []);
-  CSS.make("css-1ge6jec", []);
+  CSS.make("_a_4fjsr1", []);
+  CSS.make("_a_4fuoce", []);
+  CSS.make("_a_6ejaoo", []);
+  CSS.make("_a_6eg3m8", []);
+  CSS.make("_a_6esf9s", []);
+  CSS.make("_a_4jmdkq", []);
+  CSS.make("_a_4j0ddm", []);
+  CSS.make("_a_4j8a77", []);
+  CSS.make("_a_4jor4h", []);
+  CSS.make("_a_4jsghk", []);
+  CSS.make("_a_4j6avj", []);
+  CSS.make("_a_4jbop6", []);
+  CSS.make("_a_4j24tl", []);
+  CSS.make("_a_4jd4nr", []);
+  CSS.make("_a_4j2q1k", []);
+  CSS.make("_a_4jcn74", []);
+  CSS.make("_a_4jh2ut", []);
+  CSS.make("_a_4j6jec", []);

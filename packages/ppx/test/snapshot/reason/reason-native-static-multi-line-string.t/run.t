@@ -1,16 +1,23 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-k008qs-MultiLineStrings{display:flex;}"];
-  [@css ".css-1tyndxa-MultiLineStrings{justify-content:center;}"];
-  [@css.bindings
-    [
-      (
-        "Output.MultiLineStrings",
-        "css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings",
-      ),
-    ]
+  [@css
+    ("._a_5r08qs{display:flex;}", "_a_5r08qs", "0,1,0 own", "207", 1, false)
   ];
+  [@css
+    (
+      "._a_9h0002ndxa{justify-content:center;}",
+      "_a_9h0002ndxa",
+      "0,1,0 own",
+      "341",
+      2,
+      false,
+    )
+  ];
+  [@css.bindings
+    [("Output.MultiLineStrings", "_id_110ofj1", "_a_5r08qs _a_9h0002ndxa")]
+  ];
+  [@css.blocks [(2, "_id_110ofj1", [0, 1])]];
   module MultiLineStrings: {
     type makeProps;
     let make: makeProps => React.element;
@@ -969,7 +976,10 @@
       | None => ""
       };
     let styles =
-      CSS.make("css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings", []);
+      CSS.make(
+        "label:MultiLineStrings _id_110ofj1 _a_5r08qs _a_9h0002ndxa",
+        [],
+      );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

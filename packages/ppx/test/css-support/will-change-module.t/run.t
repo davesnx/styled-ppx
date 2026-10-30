@@ -15,12 +15,51 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1i4dt3q{will-change:scroll-position;}"];
-  [@css ".css-ef3vel{will-change:contents;}"];
-  [@css ".css-1x5bobx{will-change:transform;}"];
-  [@css ".css-6fxfnd{will-change:top, left;}"];
+  [@css
+    (
+      "._a_eddt3q{will-change:scroll-position;}",
+      "_a_eddt3q",
+      "0,1,0 own",
+      "517",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_ed3vel{will-change:contents;}",
+      "_a_ed3vel",
+      "0,1,0 own",
+      "517",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_edbobx{will-change:transform;}",
+      "_a_edbobx",
+      "0,1,0 own",
+      "517",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_edxfnd{will-change:top, left;}",
+      "_a_edxfnd",
+      "0,1,0 own",
+      "517",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [(2, "", [0]), (3, "", [1]), (4, "", [2]), (5, "", [3])]
+  ];
   
-  CSS.make("css-1i4dt3q", []);
-  CSS.make("css-ef3vel", []);
-  CSS.make("css-1x5bobx", []);
-  CSS.make("css-6fxfnd", []);
+  CSS.make("_a_eddt3q", []);
+  CSS.make("_a_ed3vel", []);
+  CSS.make("_a_edbobx", []);
+  CSS.make("_a_edxfnd", []);

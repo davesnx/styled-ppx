@@ -1,7 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css.bindings [("Output.SelfClosingElement", "css-0-SelfClosingElement")]];
+  [@css.bindings [("Output.SelfClosingElement", "_id_1r15l57", "")]];
+  [@css.blocks [(1, "_id_1r15l57", [])]];
   module SelfClosingElement = {
     [@deriving abstract]
     [@warning "-69"]
@@ -985,7 +986,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("css-0-SelfClosingElement", []);
+    let styles = CSS.make("label:SelfClosingElement _id_1r15l57", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

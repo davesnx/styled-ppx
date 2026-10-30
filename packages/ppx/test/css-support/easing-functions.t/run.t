@@ -15,12 +15,51 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-duudp6{transition-timing-function:steps(2, jump-start);}"];
-  [@css ".css-2tegan{transition-timing-function:steps(2, jump-end);}"];
-  [@css ".css-1qfsz2c{transition-timing-function:steps(1, jump-both);}"];
-  [@css ".css-1m48w8e{transition-timing-function:steps(2, jump-none);}"];
+  [@css
+    (
+      "._a_dm000gudp6{transition-timing-function:steps(2, jump-start);}",
+      "_a_dm000gudp6",
+      "0,1,0 own",
+      "490",
+      16,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dm000gegan{transition-timing-function:steps(2, jump-end);}",
+      "_a_dm000gegan",
+      "0,1,0 own",
+      "490",
+      16,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dm000gsz2c{transition-timing-function:steps(1, jump-both);}",
+      "_a_dm000gsz2c",
+      "0,1,0 own",
+      "490",
+      16,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_dm000g8w8e{transition-timing-function:steps(2, jump-none);}",
+      "_a_dm000g8w8e",
+      "0,1,0 own",
+      "490",
+      16,
+      false,
+    )
+  ];
+  [@css.blocks
+    [(2, "", [0]), (3, "", [1]), (4, "", [2]), (5, "", [3])]
+  ];
   
-  CSS.make("css-duudp6", []);
-  CSS.make("css-2tegan", []);
-  CSS.make("css-1qfsz2c", []);
-  CSS.make("css-1m48w8e", []);
+  CSS.make("_a_dm000gudp6", []);
+  CSS.make("_a_dm000gegan", []);
+  CSS.make("_a_dm000gsz2c", []);
+  CSS.make("_a_dm000g8w8e", []);

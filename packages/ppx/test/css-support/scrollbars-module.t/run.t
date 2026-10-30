@@ -15,14 +15,68 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1uqp1bd{scrollbar-color:auto;}"];
-  [@css ".css-1xd6oa{scrollbar-color:red blue;}"];
-  [@css ".css-1tn07g6{scrollbar-width:auto;}"];
-  [@css ".css-osrmx3{scrollbar-width:thin;}"];
-  [@css ".css-1y6rjsx{scrollbar-width:none;}"];
+  [@css
+    (
+      "._a_b9p1bd{scrollbar-color:auto;}",
+      "_a_b9p1bd",
+      "0,1,0 own",
+      "405",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_b9d6oa{scrollbar-color:red blue;}",
+      "_a_b9d6oa",
+      "0,1,0 own",
+      "405",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bh07g6{scrollbar-width:auto;}",
+      "_a_bh07g6",
+      "0,1,0 own",
+      "413",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bhrmx3{scrollbar-width:thin;}",
+      "_a_bhrmx3",
+      "0,1,0 own",
+      "413",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_bhrjsx{scrollbar-width:none;}",
+      "_a_bhrjsx",
+      "0,1,0 own",
+      "413",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+    ]
+  ];
   
-  CSS.make("css-1uqp1bd", []);
-  CSS.make("css-1xd6oa", []);
-  CSS.make("css-1tn07g6", []);
-  CSS.make("css-osrmx3", []);
-  CSS.make("css-1y6rjsx", []);
+  CSS.make("_a_b9p1bd", []);
+  CSS.make("_a_b9d6oa", []);
+  CSS.make("_a_bh07g6", []);
+  CSS.make("_a_bhrmx3", []);
+  CSS.make("_a_bhrjsx", []);

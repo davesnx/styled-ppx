@@ -1,10 +1,9 @@
-(* `let inner = [%css ...] in inner` is a local binding inside a function
-   body — it must not leak `inner` into the cross-module bindings index.
+(* `let inner = [%css ...] in inner` is a local binding — it must not leak
+   `inner` into the cross-module bindings index.
 
    The CSS for the inner cx2 still gets emitted (so the runtime works),
-   but `Module.inner` is not registered. The runtime expansion at the
-   top-level `let outer = ...` site is what consumers see, and that's
-   what gets recorded in the bindings index. *)
+   but neither `Module.inner` nor `Module.outer` is registered: the [%css]
+   belongs to the local `inner`, not to `outer`. *)
 
 let outer =
   let inner = [%css {| color: red; |}] in

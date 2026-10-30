@@ -1,13 +1,13 @@
 Regression guard: the SAME [%keyframe] compiled from two different file paths
-must mint the SAME `keyframe-…` name and the SAME internal `var(--…)` names.
+must mint the SAME `k-…` name and the SAME internal `var(--…)` names.
 
 [%keyframe] shares the `Hash_class.scoped_namespace` recipe with
 [%styled.global], so it carries the identical cross-build invariant. The
 internal height variables are namespaced on the compilation-unit module name
 (`Anim_Css`), not the physical path; the keyframe name is then content-hashed
 from the already-substituted body, so once the vars agree the name agrees too.
-The runtime `CSS.Types.AnimationName.make ~vars:[…] "keyframe-X"` therefore
-references the same names the statically extracted `@keyframes keyframe-X`
+The runtime `CSS.Types.AnimationName.make ~vars:[…] "k-X"` therefore
+references the same names the statically extracted `@keyframes k-X`
 block defines, regardless of which toolchain/path compiled it.
 
 Before the fix the physical path was folded into the namespace, so
@@ -30,7 +30,7 @@ defines, and the PPX output is byte-identical across both paths:
 
   $ refmt --parse ml --print re native/Anim_Css.ml
   [@css
-    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"
+    "@keyframes _k_t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"
   ];
   let h0 = `px(0);
   let h1 = `px(100);
@@ -40,6 +40,6 @@ defines, and the PPX output is byte-identical across both paths:
         ("--h0-hftwzv", CSS.Types.Height.toString(h0)),
         ("--h1-14y9cfq", CSS.Types.Height.toString(h1)),
       ],
-      "keyframe-t5c4er",
+      "_k_t5c4er",
     );
   $ diff native/Anim_Css.ml js/Anim_Css.ml

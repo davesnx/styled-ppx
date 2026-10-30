@@ -15,14 +15,61 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1g93gy9{display:ruby;}"];
-  [@css ".css-1jsb5b1{display:ruby-base;}"];
-  [@css ".css-7miprk{display:ruby-text;}"];
-  [@css ".css-5ep41v{display:ruby-base-container;}"];
-  [@css ".css-o1juuf{display:ruby-text-container;}"];
+  [@css
+    ("._a_5r3gy9{display:ruby;}", "_a_5r3gy9", "0,1,0 own", "207", 1, false)
+  ];
+  [@css
+    (
+      "._a_5rb5b1{display:ruby-base;}",
+      "_a_5rb5b1",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_5riprk{display:ruby-text;}",
+      "_a_5riprk",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_5rp41v{display:ruby-base-container;}",
+      "_a_5rp41v",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css
+    (
+      "._a_5rjuuf{display:ruby-text-container;}",
+      "_a_5rjuuf",
+      "0,1,0 own",
+      "207",
+      1,
+      false,
+    )
+  ];
+  [@css.blocks
+    [
+      (2, "", [0]),
+      (3, "", [1]),
+      (4, "", [2]),
+      (5, "", [3]),
+      (6, "", [4]),
+    ]
+  ];
   
-  CSS.make("css-1g93gy9", []);
-  CSS.make("css-1jsb5b1", []);
-  CSS.make("css-7miprk", []);
-  CSS.make("css-5ep41v", []);
-  CSS.make("css-o1juuf", []);
+  CSS.make("_a_5r3gy9", []);
+  CSS.make("_a_5rb5b1", []);
+  CSS.make("_a_5riprk", []);
+  CSS.make("_a_5rp41v", []);
+  CSS.make("_a_5rjuuf", []);

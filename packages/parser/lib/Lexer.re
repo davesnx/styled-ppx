@@ -848,6 +848,8 @@ let rec consume_token = lexbuf => {
   | ";" => Ok(SEMI_COLON)
   | "&" => Ok(DELIM("&"))
   | "*" => Ok(DELIM("*"))
+  | "<!--" => Ok(CDO)
+  | "-->" => Ok(CDC)
   | "<=" => Ok(DELIM("<="))
   | ">=" => Ok(DELIM(">="))
   | "<" => Ok(DELIM("<"))
