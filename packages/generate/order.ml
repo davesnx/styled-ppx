@@ -96,13 +96,43 @@ let without_open_scopes ~(shadows : string -> bool) =
       super#signature (keep items)
   end
 
-exception Cuts
-
-let cuts_any ~(shadows : string -> bool) (structure : Ppxlib.structure) =
-  let check = function Some head when shadows head -> raise Cuts | _ -> () in
-  let finder =
+(** The modules the structure defines (by [module], [module rec], a signature,
+    [let module], a functor parameter or [(module M)]), and whether an open or
+    include names a module that [shadows] or that the structure defined before
+    it. *)
+let scan_opens ~(shadows : string -> bool) (structure : Ppxlib.structure) :
+  (string, unit) Hashtbl.t * bool =
+  let defined = Hashtbl.create 16 in
+  let cuts = ref false in
+  let define = function
+    | Some name -> Hashtbl.replace defined name ()
+    | None -> ()
+  in
+  let check = function
+    | Some head when shadows head || Hashtbl.mem defined head -> cuts := true
+    | _ -> ()
+  in
+  let scanner =
     object
       inherit Ppxlib.Ast_traverse.iter as super
+
+      method! module_binding m =
+        define m.pmb_name.txt;
+        super#module_binding m
+
+      method! module_declaration m =
+        define m.pmd_name.txt;
+        super#module_declaration m
+
+      method! functor_parameter p =
+        (match p with Named ({ txt; _ }, _) -> define txt | Unit -> ());
+        super#functor_parameter p
+
+      method! expression e =
+        (match e.pexp_desc with
+        | Pexp_letmodule ({ txt; _ }, _, _) -> define txt
+        | _ -> ());
+        super#expression e
 
       method! open_declaration o =
         check (module_expr_head o.popen_expr);
@@ -123,22 +153,28 @@ let cuts_any ~(shadows : string -> bool) (structure : Ppxlib.structure) =
       method! pattern p =
         (match p.ppat_desc with
         | Ppat_open ({ txt; _ }, _) -> check (Some (longident_head txt))
+        | Ppat_unpack { txt; _ } -> define txt
         | _ -> ());
         super#pattern p
     end
   in
-  match finder#structure structure with () -> false | exception Cuts -> true
+  scanner#structure structure;
+  defined, !cuts
 
 (** {!references}, and those of its names that occur outside the scope of every
-    open of a module that [shadows]. After [open M], a bare [N] may be the
-    submodule [M.N]; when [M] is one of the input modules, [M.N] may be a module
-    of the input set, so [N] alone cannot name a module of another library. *)
+    open of a module that [shadows] or that the structure defines. After
+    [open M], a bare [N] may be the submodule [M.N]; when [M] is an input module
+    or a module of this file, [N] alone cannot name a module of another library.
+    A module of this file counts even though [Depend] tracks its submodules: a
+    cut scope drops the submodules it defines. *)
 let references_and_outside_opens ~shadows (structure : Ppxlib.structure) :
   string list * string list =
   let all = references structure in
-  if cuts_any ~shadows structure then
+  match scan_opens ~shadows structure with
+  | defined, true ->
+    let shadows name = shadows name || Hashtbl.mem defined name in
     all, references ((without_open_scopes ~shadows)#structure structure)
-  else all, all
+  | _, false -> all, all
 
 (** The line of the first longident whose head is each referenced module name,
     for diagnostics. *)

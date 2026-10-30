@@ -94,7 +94,8 @@
 - [FIX] `styled-ppx.generate`: when block and merge orders form a cycle over atom rules, the cut now drops only edges on the cycle. Before, a rule that only waited on the cycle could be cut: it lost its own order (a hovered, disabled element got the `:disabled` color), and its block was named in the warning (@davesnx)
 - [FIX] A `let` bound to `[%css]` inside a function body now counts as a binding: `CSS.merge`/`+++` on it adds a `[@@@css.merges]` entry, and `$(x)` resolves to its identity class. It hides a top-level binding of the same name. Other local variables still shadow and add no edge (@davesnx)
 - [FIX] A top-level binding is registered for `$(M.x)` only when a `[%css]` in its expression is not under a function-local `let`. Before, a function such as `let top = () => { let side = [%css ...]; ... }` was registered with the identity of its last local `[%css]`, so `$(M.top)` silently matched that local's elements. It now fails with the "does not resolve" error (@davesnx)
-- [PERF] `styled-ppx.generate` uses a larger minor heap and space overhead: 6.6 s to 4.6 s on 6,273 Ahrefs monorepo files (@davesnx)
+- [FIX] `styled-ppx.generate`: an open of a module defined earlier in the same file (`Feature.[ BrandRadar.x ]`) hides the names in its scope, as an open of an input module does. When that module opened an input module before defining a submodule, the submodule's name made a false library edge and could close a library cycle (@davesnx)
+- [PERF] `styled-ppx.generate` sets a larger minor heap (4M words) and `space_overhead` 200: on 6,273 Ahrefs monorepo files, about 6.5 s to 5 s with OCaml 5.4 (@davesnx)
 
 ## 0.61.0
 

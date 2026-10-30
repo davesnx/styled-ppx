@@ -414,13 +414,18 @@ file in library `L1` becomes a library edge `L1 -> L2` when:
 
 Anything else (zero or multiple candidates either way) means no edge.
 
-A reference in the scope of an open of an input module does not count
-here (`Order.references_outside_opens`). After `open M`, `include M`,
+A reference in the scope of an open of an input module, or of a module
+that the same file defines earlier, does not count here
+(`Order.references_and_outside_opens`). After `open M`, `include M`,
 `let open M in`, or inside `M.( ... )`, a bare `X` may be the submodule
 `M.X`; `ocamldep` cannot tell, and dune drops such names because `X` is not
 in the library's dependency closure, which generate does not know. So
 `open Tooltips; ProjectBoost.x` in one library never makes an edge to an
-unrelated library that has its own top-level `ProjectBoost`. An open of a
+unrelated library that has its own top-level `ProjectBoost`. The same goes
+for `Feature.[ BrandRadar.x ]` when the file defines `module Feature` with a
+submodule `BrandRadar` after an `open Tooltips`: that cut drops the
+definition of `BrandRadar` too, so the open of `Feature` must hide the
+name. An open of a
 module that is not an input file (`Stdlib`, `Belt`, an external `Prelude`)
 cannot supply a module of the run, so it cuts nothing: `open Stdlib;
 Reset.init()` still orders the library after `reset`. Neither does an open

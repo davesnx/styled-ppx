@@ -909,7 +909,7 @@ let order_atom_rules ~(orders : (string * int list list) list)
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
-  (* Measured on 6,273 Ahrefs monorepo files: 6.6 s to 4.6 s, 268 to 294 MB. *)
+  (* Measured on 6,273 Ahrefs monorepo files with OCaml 5.4: 6.6 s to 4.6 s. *)
   Gc.set
     { (Gc.get ()) with minor_heap_size = 4 * 1024 * 1024; space_overhead = 200 };
   Logger.info "output file: %s"
