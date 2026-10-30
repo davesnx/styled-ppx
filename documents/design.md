@@ -288,6 +288,9 @@ Resolution rules (identical to `[%css]`):
   seen yet (forward ref) or doesn't exist in a known local selector
   path, the PPX raises a clear diagnostic at the interpolation's source
   location.
+- A function parameter or local variable hides a top-level binding of
+  the same name. A local `let name = [%css ...]` resolves to that local's
+  own identity class; any other local is an error.
 - Cross-module `$(M.binding)` is recorded in `Cross_module_refs` and
   embedded as a sentinel string; the aggregator resolves it at link
   time. If `M.binding` isn't a `[%css]` binding the aggregator fails

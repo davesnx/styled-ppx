@@ -20,25 +20,47 @@ let references (structure : Ppxlib.structure) : string list =
   Depend.add_implementation Depend.String.Map.empty compiler_structure;
   Depend.String.Set.elements !Depend.free_structure_names
 
-(** The structure with every open scope cut out: the body of [M.( ... )] and
-    [let open M in ...], the pattern under [M.( ... )], and every item after a
-    structure-level or signature-level [open] or [include]. The opened module
-    itself stays. *)
-let without_open_scopes =
+let rec longident_head : Ppxlib.Longident.t -> string = function
+  | Lident name -> name
+  | Ldot (prefix, _) | Lapply (prefix, _) -> longident_head prefix
+
+let rec module_expr_head (m : Ppxlib.module_expr) =
+  match m.pmod_desc with
+  | Pmod_ident { txt; _ } -> Some (longident_head txt)
+  | Pmod_apply (m, _) | Pmod_apply_unit m | Pmod_constraint (m, _) ->
+    module_expr_head m
+  | _ -> None
+
+let rec module_type_head (m : Ppxlib.module_type) =
+  match m.pmty_desc with
+  | Pmty_ident { txt; _ } | Pmty_alias { txt; _ } -> Some (longident_head txt)
+  | Pmty_typeof m -> module_expr_head m
+  | Pmty_with (m, _) -> module_type_head m
+  | _ -> None
+
+(** The structure with every open scope of a module that [shadows] cut out: the
+    body of [M.( ... )] and [let open M in ...], the pattern under [M.( ... )],
+    and every item after a structure-level or signature-level [open] or
+    [include]. The opened module itself stays. An open of any other module stays
+    whole: compiler-libs [Depend] already tracks the modules a [struct ... end]
+    binds. *)
+let without_open_scopes ~(shadows : string -> bool) =
   let loc = Ppxlib.Location.none in
+  let cuts = function Some head -> shadows head | None -> false in
   object
     inherit Ppxlib.Ast_traverse.map as super
 
     method! expression e =
       match e.pexp_desc with
-      | Pexp_open (declaration, _) ->
+      | Pexp_open (declaration, _)
+        when cuts (module_expr_head declaration.popen_expr) ->
         super#expression
           { e with pexp_desc = Pexp_open (declaration, [%expr ()]) }
       | _ -> super#expression e
 
     method! pattern p =
       match p.ppat_desc with
-      | Ppat_open (lid, _) ->
+      | Ppat_open (lid, _) when shadows (longident_head lid.txt) ->
         {
           p with
           ppat_desc = Ppat_open (lid, Ppxlib.Ast_builder.Default.ppat_any ~loc);
@@ -48,29 +70,75 @@ let without_open_scopes =
     method! structure items =
       let rec keep = function
         | [] -> []
-        | ({ Ppxlib.pstr_desc = Pstr_open _ | Pstr_include _; _ } as item) :: _
-          ->
-          [ item ]
-        | item :: rest -> item :: keep rest
+        | item :: rest ->
+          let head =
+            match item.Ppxlib.pstr_desc with
+            | Pstr_open o -> module_expr_head o.popen_expr
+            | Pstr_include i -> module_expr_head i.pincl_mod
+            | _ -> None
+          in
+          if cuts head then [ item ] else item :: keep rest
       in
       super#structure (keep items)
 
     method! signature items =
       let rec keep = function
         | [] -> []
-        | ({ Ppxlib.psig_desc = Psig_open _ | Psig_include _; _ } as item) :: _
-          ->
-          [ item ]
-        | item :: rest -> item :: keep rest
+        | item :: rest ->
+          let head =
+            match item.Ppxlib.psig_desc with
+            | Psig_open o -> Some (longident_head o.popen_expr.txt)
+            | Psig_include i -> module_type_head i.pincl_mod
+            | _ -> None
+          in
+          if cuts head then [ item ] else item :: keep rest
       in
       super#signature (keep items)
   end
 
-(** The module names of {!references} that occur outside any open scope. After
-    [open M], a bare [N] may be the submodule [M.N], so only these names can
-    name a module of another library. *)
-let references_outside_opens (structure : Ppxlib.structure) : string list =
-  references (without_open_scopes#structure structure)
+exception Cuts
+
+let cuts_any ~(shadows : string -> bool) (structure : Ppxlib.structure) =
+  let check = function Some head when shadows head -> raise Cuts | _ -> () in
+  let finder =
+    object
+      inherit Ppxlib.Ast_traverse.iter as super
+
+      method! open_declaration o =
+        check (module_expr_head o.popen_expr);
+        super#open_declaration o
+
+      method! open_description o =
+        check (Some (longident_head o.popen_expr.txt));
+        super#open_description o
+
+      method! include_declaration i =
+        check (module_expr_head i.pincl_mod);
+        super#include_declaration i
+
+      method! include_description i =
+        check (module_type_head i.pincl_mod);
+        super#include_description i
+
+      method! pattern p =
+        (match p.ppat_desc with
+        | Ppat_open ({ txt; _ }, _) -> check (Some (longident_head txt))
+        | _ -> ());
+        super#pattern p
+    end
+  in
+  match finder#structure structure with () -> false | exception Cuts -> true
+
+(** {!references}, and those of its names that occur outside the scope of every
+    open of a module that [shadows]. After [open M], a bare [N] may be the
+    submodule [M.N]; when [M] is one of the input modules, [M.N] may be a module
+    of the input set, so [N] alone cannot name a module of another library. *)
+let references_and_outside_opens ~shadows (structure : Ppxlib.structure) :
+  string list * string list =
+  let all = references structure in
+  if cuts_any ~shadows structure then
+    all, references ((without_open_scopes ~shadows)#structure structure)
+  else all, all
 
 (** The line of the first longident whose head is each referenced module name,
     for diagnostics. *)
@@ -108,8 +176,8 @@ let first_lines (structure : Ppxlib.structure) : (string * int) list =
 (** Strongly connected components (Tarjan). Maps each of [nodes] to the index of
     its component; two keys share an index exactly when each can reach the
     other. [edges k] must return only keys from [nodes]. *)
-let components ~(nodes : string list) ~(edges : string -> string list) :
-  (string, int) Hashtbl.t =
+let components ~(nodes : 'a list) ~(edges : 'a -> 'a list) : ('a, int) Hashtbl.t
+    =
   let index = Hashtbl.create (List.length nodes) in
   let low = Hashtbl.create (List.length nodes) in
   let on_stack = Hashtbl.create (List.length nodes) in

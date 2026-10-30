@@ -119,6 +119,11 @@ module Blocks = {
   let of_identity = identity =>
     find(block => block.identity == Some(identity));
   let of_classes = classes => find(block => block.classes == classes);
+  let identity_of_classes = classes =>
+    List.find_map(
+      block => block.classes == classes ? block.identity : None,
+      blocks^,
+    );
 
   let record_merge = (~line, operands) =>
     merges := [Css_extraction.merge(~line, ~operands), ...merges^];
@@ -201,7 +206,7 @@ module Css_transform = {
     file: string,
     scope: list(string),
     opens: list(list(string)),
-    locals: list(string),
+    locals: list(Local_selector_environment.local),
     source_position_start: Lexing.position,
     dynamic_vars: ref(list(dynamic_var)),
   };
@@ -646,7 +651,7 @@ module Css_transform = {
      otherwise two files with the same local binding name and the same
      nested selector (e.g. `& > div:not(:last-child).$(row)`) render
      identical unresolved text and mint the SAME atom class even though
-     `row` resolves to a different `id-` class in each file, which
+     `row` resolves to a different `_id_` class in each file, which
      `styled-ppx.generate`'s atom-class-collision check then rightly rejects
      (same class, different final CSS).
 
@@ -2072,7 +2077,7 @@ module Css_transform = {
         ~file,
         ~scope: list(string),
         ~opens: list(list(string)),
-        ~locals: list(string),
+        ~locals: list(Local_selector_environment.local),
         ~source_position_start,
         rule_list: rule_list,
       ) => {
@@ -2130,10 +2135,11 @@ module Css_transform = {
        normally like any other atom - `CSS.merge` only stays blind to an
        atom that genuinely shares its class with an unrelated sibling, not
        to every interpolated declaration on principle. A group of two or
-       more gets today's bundle mechanism (class `in-<B>`/var namespace
+       more gets today's bundle mechanism (class `_in_<B>`/var namespace
        `css-<B>` - same bundle content hash, different literal prefix, see
-       Hash_class.ml's "Prefix rename"), scoped to that group's own members
-       only, so a block can now mint more than one independent bundle.
+       Hash_class.ml's "Class vs. namespace prefixes"), scoped to that
+       group's own members only, so a block can now mint more than one
+       independent bundle.
 
        Static declarations keep their own per-content atom class (still
        shared across blocks). A block with no interpolation, or where no
@@ -2357,7 +2363,7 @@ let push =
       ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
-      ~locals: list(string),
+      ~locals: list(Local_selector_environment.local),
       ~source_position_start,
       ~name: option(string),
       declarations: Styled_ppx_css_parser.Ast.rule_list,
@@ -2594,6 +2600,31 @@ let push_global =
   List.rev(ctx.dynamic_vars^);
 };
 
+/* The classes of a [%css] already lowered to `CSS.make("<classes>", ...)`,
+   without the `label:` marker. */
+let lowered_classes = (expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_apply(
+      { pexp_desc: Pexp_ident({ txt: Ldot(Lident("CSS"), "make"), _ }), _ },
+      [
+        (
+          Nolabel,
+          { pexp_desc: Pexp_constant(Pconst_string(classes, _, _)), _ },
+        ),
+        ..._,
+      ],
+    ) =>
+    Some(
+      String.split_on_char(' ', classes)
+      |> List.filter(token => !String.starts_with(~prefix="label:", token))
+      |> String.concat(" "),
+    )
+  | _ => None
+  };
+
+let lowered_identity = expr =>
+  Option.bind(lowered_classes(expr), Blocks.identity_of_classes);
+
 /* A merge argument, resolved to a block of this file or to another module's
    binding: a [%css] binding name, or an inline [%css] already lowered to
    `CSS.make("<classes>", ...)`. */
@@ -2616,22 +2647,9 @@ let merge_operand = (~file, ~scope, ~opens, ~locals, expr: Ppxlib.expression) =>
       Some(Css_extraction.Binding(longident))
     | None => None
     }
-  | Pexp_apply(
-      { pexp_desc: Pexp_ident({ txt: Ldot(Lident("CSS"), "make"), _ }), _ },
-      [
-        (
-          Nolabel,
-          { pexp_desc: Pexp_constant(Pconst_string(classes, _, _)), _ },
-        ),
-        ..._,
-      ],
-    ) =>
-    String.split_on_char(' ', classes)
-    |> List.filter(token => !String.starts_with(~prefix="label:", token))
-    |> String.concat(" ")
-    |> Blocks.of_classes
+  | _ =>
+    Option.bind(lowered_classes(expr), Blocks.of_classes)
     |> Option.map(index => Css_extraction.Block(index))
-  | _ => None
   };
 
 let record_merge = (~line, ~file, ~scope, ~opens, ~locals, arguments) =>

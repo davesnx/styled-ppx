@@ -25,14 +25,22 @@ let resolve_local_module_path:
   (~file: string, ~scope: list(string), list(string)) =>
   option(list(string));
 
-/** The variables [pattern] binds. */
-let bound_names: Ppxlib.pattern => list(string);
+/** A variable bound inside a top-level binding. [identity] is the identity
+    class of a local `let` bound to [%css]; [None] for any other variable. */
+type local = {
+  name: string,
+  identity: option(string),
+};
+
+/** The variables [pattern] binds, none of them bound to [%css]. */
+let bound_locals: Ppxlib.pattern => list(local);
 
 /** What a `$(path)` or merge argument names: a class registered earlier in
     this file, or a binding of another module (its longident, aliases
-    expanded). [None] when [path] names neither, or when it is an
-    unqualified name in [locals]: a function parameter or local variable
-    that shadows any binding of that name. Records nothing. */
+    expanded). An unqualified name in [locals] shadows any binding of that
+    name: it resolves to the local's identity class, or to [None] when the
+    local is not bound to [%css]. [None] also when [path] names nothing.
+    Records nothing. */
 type class_ref =
   | Local(string)
   | Cross_module(string);
@@ -42,7 +50,7 @@ let resolve_class_ref:
     ~file: string,
     ~scope: list(string),
     ~opens: list(list(string)),
-    ~locals: list(string),
+    ~locals: list(local),
     string
   ) =>
   option(class_ref);
@@ -52,7 +60,7 @@ let resolve_selector_class_ref:
     ~file: string,
     ~scope: list(string),
     ~opens: list(list(string)),
-    ~locals: list(string),
+    ~locals: list(local),
     ~loc: Ppxlib.Location.t,
     string
   ) =>

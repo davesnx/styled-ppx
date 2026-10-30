@@ -20,7 +20,8 @@
    ------------------
    [hash] is murmur2, the same algorithm emotion uses, so the class names
    styled-ppx mints line up with the wider CSS-in-JS ecosystem and with the
-   runtime's own hashing. Every identifier here is `<prefix>-<murmur2(...)>`.
+   runtime's own hashing. Every identifier here ends in murmur2 output (the
+   families are listed below).
 
    Separator
    ---------
@@ -42,7 +43,7 @@
                   NOT the class name (see "Class vs. namespace prefixes"
                   below) - the same hash input, but its own literal
                   prefix never changes; the seed for its vars
-     variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
+     variable     `<name>-<hash(namespace \0 path \0 type_key)>`  (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
      identity     `_id_<hash(module \0 scope \0 name [\0 occurrence])>`
                                                            (identity_class)
@@ -144,12 +145,12 @@ let nul_join parts = String.concat "\000" parts
 (* -- Class names and the atom namespace -------------------------------- *)
 
 (* The variable-namespace seed. Literal prefix pinned to [css-] forever -
-   see "Prefix rename" above; never rename this one. *)
+   see "Class vs. namespace prefixes" above; never rename this one. *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
 (* Fallback class name for {!class_and_namespace} - a plain hash of the
    content, same input as the namespace, only the presentation prefix
-   differs (see "Prefix rename"). Reached only when there is no
+   differs (see "Class vs. namespace prefixes"). Reached only when there is no
    {!Slot_key.t} at all, which in practice never happens for a real atom
    (see {!Slot_key.of_atom}'s own doc: it returns [None] only for a rule
    shape [atomize_rules] never actually produces). *)

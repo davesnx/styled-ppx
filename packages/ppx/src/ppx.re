@@ -211,11 +211,10 @@ let css_error_expr = (~payload_loc) => {
 
 /* [name] is the registry name (the top-level binding, or the styled module
    name) - always what cross-module `$(M.name)` refs and the longident use.
-   [identity] is the binding's identity class, computed by `Css_file.push`
-   from the *local* label (which, for a function-local rebinding, differs
-   from [name] - see documents/css-extraction.md's "Css_bindings" section); `None` for
-   an anonymous/`_` local binding, in which case there is nothing to
-   register or index. */
+   A [%css] under a function-local `let` has no registry name: that local
+   names it, not the top-level binding. [identity] is the binding's identity
+   class, computed by `Css_file.push`; `None` for an anonymous/`_` binding,
+   in which case there is nothing to register or index. */
 let record_css_binding =
     (~file, ~main_module, ~scope, ~name, ~identity, ~atomClasses) =>
   switch (identity) {
@@ -685,15 +684,17 @@ and merge_chain = (expr: Ppxlib.expression) =>
 
 /* [locals] are the variables bound inside the top-level binding at the
    current point (function parameters, local lets, pattern variables): a
-   `$(x)` or merge argument naming one of them does not refer to a [%css]
-   binding of that name. */
+   `$(x)` or merge argument naming one of them does not refer to a top-level
+   [%css] binding of that name. A local `let` bound to [%css] resolves to
+   its own identity class instead. */
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
-  let rec map_with = (~label_name, ~locals, expr) => {
+  let rec map_with = (~label_name, ~registry_name, ~locals, expr) => {
     let in_scope = (bound, expr) =>
-      map_with(~label_name, ~locals=bound @ locals, expr);
+      map_with(~label_name, ~registry_name, ~locals=bound @ locals, expr);
     let map_case = (~outer=[], case: Ppxlib.case) => {
-      let bound = Local_selector_environment.bound_names(case.pc_lhs) @ outer;
+      let bound =
+        Local_selector_environment.bound_locals(case.pc_lhs) @ outer;
       {
         ...case,
         pc_guard: Option.map(in_scope(bound), case.pc_guard),
@@ -736,7 +737,7 @@ let map_css_expressions =
               ~opens,
               ~locals,
               ~label_name,
-              ~registry_name=top_binding,
+              ~registry_name,
               payload,
             )
           | None => css_error_expr(~payload_loc=expr.pexp_loc)
@@ -779,7 +780,7 @@ let map_css_expressions =
                       },
                       ...params_rev,
                     ],
-                    Local_selector_environment.bound_names(pattern) @ bound,
+                    Local_selector_environment.bound_locals(pattern) @ bound,
                   )
                 | Pparam_newtype(_) => ([param, ...params_rev], bound)
                 },
@@ -827,7 +828,7 @@ let map_css_expressions =
                 self#expression(high),
                 direction,
                 in_scope(
-                  Local_selector_environment.bound_names(pattern),
+                  Local_selector_environment.bound_locals(pattern),
                   body,
                 ),
               ),
@@ -840,7 +841,7 @@ let map_css_expressions =
           let bound =
             List.concat_map(
               (op: Ppxlib.binding_op) =>
-                Local_selector_environment.bound_names(op.pbop_pat),
+                Local_selector_environment.bound_locals(op.pbop_pat),
               [let_, ...ands],
             );
           {
@@ -853,36 +854,58 @@ let map_css_expressions =
               }),
           };
         | Pexp_let(rec_flag, bindings, body) =>
-          let bound =
-            List.concat_map(
-              (binding: Ppxlib.value_binding) =>
-                Local_selector_environment.bound_names(binding.pvb_pat),
-              bindings,
-            );
           let binding_locals =
             switch (rec_flag) {
-            | Recursive => bound @ locals
+            | Recursive =>
+              List.concat_map(
+                (binding: Ppxlib.value_binding) =>
+                  Local_selector_environment.bound_locals(binding.pvb_pat),
+                bindings,
+              )
+              @ locals
             | Nonrecursive => locals
             };
           let bindings =
             List.map(
               (binding: Ppxlib.value_binding) => {
-                let label_name =
+                let (label_name, registry_name) =
                   switch (binding_name_from_pat(binding.pvb_pat)) {
-                  | Some(name) when !is_generated_binder(name) => Some(name)
+                  | Some(name) when !is_generated_binder(name) => (
+                      Some(name),
+                      None,
+                    )
                   | Some(_)
-                  | None => label_name
+                  | None => (label_name, registry_name)
                   };
                 {
                   ...binding,
                   pvb_expr:
                     map_with(
                       ~label_name,
+                      ~registry_name,
                       ~locals=binding_locals,
                       binding.pvb_expr,
                     ),
                 };
               },
+              bindings,
+            );
+          let bound =
+            List.concat_map(
+              (binding: Ppxlib.value_binding) =>
+                switch (
+                  binding_name_from_pat(binding.pvb_pat),
+                  Css_file.lowered_identity(binding.pvb_expr),
+                ) {
+                | (Some(name), Some(identity)) => [
+                    {
+                      Local_selector_environment.name,
+                      identity: Some(identity),
+                    },
+                  ]
+                | _ =>
+                  Local_selector_environment.bound_locals(binding.pvb_pat)
+                },
               bindings,
             );
           {
@@ -894,7 +917,12 @@ let map_css_expressions =
     };
     mapper#expression(expr);
   };
-  map_with(~label_name=top_binding, ~locals=[], expr);
+  map_with(
+    ~label_name=top_binding,
+    ~registry_name=top_binding,
+    ~locals=[],
+    expr,
+  );
 };
 
 let module_path_from_expr = (expr: Ppxlib.module_expr): option(list(string)) =>

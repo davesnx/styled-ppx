@@ -11,7 +11,7 @@
     Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
     global index mapping [longident -> identity]. The PPX itself populates these
     payloads with the fully-qualified longident ([["M.Css.marker"]]), the
-    binding's build-independent identity class (a `id-...` handle, see
+    binding's build-independent identity class (an `_id_...` handle, see
     [Hash_class.identity_class] in the PPX), and its atomized class string (kept
     only as a content fingerprint for collision detection — see [Index]), so the
     generator only has to read them — it does not re-derive module names from
@@ -174,7 +174,7 @@ type input = {
   merges : Css_extraction.merge list;
 }
 
-let extract_structure ~filename ~idx structure : input =
+let extract_structure ~shadows ~filename ~idx structure : input =
   let rules = ref [] in
   let refs = ref [] in
   let env = ref None in
@@ -251,6 +251,9 @@ let extract_structure ~filename ~idx structure : input =
           (Printf.sprintf "merge at line %d names a block this file lacks"
              merge.merge_line))
     !merges;
+  let references, references_outside_opens =
+    Order.references_and_outside_opens ~shadows structure
+  in
   {
     filename;
     rules = List.rev !rules;
@@ -258,8 +261,8 @@ let extract_structure ~filename ~idx structure : input =
     env = !env;
     library = !library;
     protocol_errors = List.rev !protocol_errors;
-    references = Order.references structure;
-    references_outside_opens = Order.references_outside_opens structure;
+    references;
+    references_outside_opens;
     reference_lines = Order.first_lines structure;
     blocks = List.rev !blocks;
     merges = List.rev !merges;
@@ -823,10 +826,12 @@ let order_atom_rules ~(orders : (string * int list list) list)
      first. So a rule stays at its definition position unless an edge pulls
      it earlier, ahead of a rule it must precede. *)
   let succ = Array.make n [] in
+  let follows = Array.make n [] in
   let pending = Array.make n 0 in
   Hashtbl.iter
     (fun (i, j) _ ->
       succ.(j) <- i :: succ.(j);
+      follows.(i) <- j :: follows.(i);
       pending.(i) <- pending.(i) + 1)
     edges;
   let priority i = ((if (key i).descendant then 0 else 1) * n) + i in
@@ -857,20 +862,33 @@ let order_atom_rules ~(orders : (string * int list list) list)
       ready := Ready.remove p !ready;
       place (if p >= n then p - n else p)
     | None ->
-      (* A cycle. Place the rule that waits on the fewest edges, then the
-         latest by priority, and drop the edges it waits on. *)
-      let best = ref (-1) in
-      for i = 0 to n - 1 do
-        if
-          (not placed.(i))
-          && (!best < 0
-             || compare
-                  (pending.(i), -priority i)
-                  (pending.(!best), -priority !best)
-                < 0)
-        then best := i
-      done;
-      let i = !best in
+      (* A cycle. Among the rules that wait only on rules of their own cycle
+         (strongly connected component), place the one that waits on the
+         fewest edges, then the latest by priority, and drop the edges it
+         waits on. *)
+      let unplaced =
+        List.filter (fun i -> not placed.(i)) (List.init n Fun.id)
+      in
+      let waits_on i = List.filter (fun j -> not placed.(j)) follows.(i) in
+      let component = Order.components ~nodes:unplaced ~edges:waits_on in
+      let on_cycle i =
+        let own = Hashtbl.find component i in
+        List.for_all (fun j -> Hashtbl.find component j = own) (waits_on i)
+      in
+      let i =
+        List.filter on_cycle unplaced
+        |> List.fold_left
+             (fun best i ->
+               if
+                 best < 0
+                 || compare
+                      (pending.(i), -priority i)
+                      (pending.(best), -priority best)
+                    < 0
+               then i
+               else best)
+             (-1)
+      in
       let names =
         Hashtbl.fold
           (fun (from, to_) name acc ->
@@ -891,10 +909,18 @@ let order_atom_rules ~(orders : (string * int list list) list)
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
+  (* Measured on 6,273 Ahrefs monorepo files: 6.6 s to 4.6 s, 268 to 294 MB. *)
+  Gc.set
+    { (Gc.get ()) with minor_heap_size = 4 * 1024 * 1024; space_overhead = 200 };
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
   let in_library_modules = List.map module_of_filename input_files in
+  let input_modules = Hashtbl.create (List.length in_library_modules) in
+  List.iter
+    (fun name -> Hashtbl.replace input_modules name ())
+    in_library_modules;
+  let is_input_module = Hashtbl.mem input_modules in
   let inputs =
     List.filter_map
       (fun filename ->
@@ -902,7 +928,9 @@ let run ~output_file ~order input_files =
           failwith "Extracting from .css files is not supported yet";
         match read_structure filename with
         | None -> None
-        | Some structure -> Some (extract_structure ~filename ~idx structure))
+        | Some structure ->
+          Some
+            (extract_structure ~shadows:is_input_module ~filename ~idx structure))
       input_files
   in
   let inputs =

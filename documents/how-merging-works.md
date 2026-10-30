@@ -264,9 +264,12 @@ share a class depends on which one the browser loads first
   that order (`packages/generate/test/merge-bundle-longhands.t`); see the
   next limit for one it can not resolve.
 - **A merge the ppx can not resolve.** Merge edges need both arguments to
-  name a `[%css]` block the ppx can see: a binding, or an inline `[%css]`.
-  A function call (`merge(base, variant(x))`, the `card` example above), a
-  function parameter, or a binding inside a function body gives no edge.
+  name a `[%css]` block the ppx can see: a binding (top-level, or a `let`
+  inside a function body bound directly to `[%css]`), or an inline
+  `[%css]` (`packages/ppx/test/css-support/local-css-binding.t`). A
+  function call (`merge(base, variant(x))`, the `card` example above), a
+  function parameter, or a local variable bound to anything else
+  (`let x = y`) gives no edge.
   Then, when no block orders the two competing rules, definition order
   decides: `b`'s rule wins only if its first definition (anywhere in the
   app, an atom shared with another binding included) comes after `a`'s.

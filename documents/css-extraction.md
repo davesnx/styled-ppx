@@ -340,8 +340,9 @@ ordered structure pass computes the longident from the compilation unit
 name + current submodule path + the enclosing top-level value name
 (`[%css]`) or module name (`[%styled.<tag>]`); the identity comes from
 `Css_file.push` (see "Identity classes" below), computed from the
-*local* binding label, which for a function-local rebinding differs from
-the longident's top-level name. `Css_bindings.record` is then called
+binding's label. A `[%css]` under a function-local `let` is not exported:
+that local names it, not the top-level binding. `Css_bindings.record` is
+then called
 with all three. Last-write-wins on duplicates within a CU (matches
 `Local_selector_environment` shadowing semantics).
 
@@ -413,13 +414,19 @@ file in library `L1` becomes a library edge `L1 -> L2` when:
 
 Anything else (zero or multiple candidates either way) means no edge.
 
-Only a reference outside every open scope counts here
-(`Order.references_outside_opens`). After `open M`, `include M`,
+A reference in the scope of an open of an input module does not count
+here (`Order.references_outside_opens`). After `open M`, `include M`,
 `let open M in`, or inside `M.( ... )`, a bare `X` may be the submodule
 `M.X`; `ocamldep` cannot tell, and dune drops such names because `X` is not
 in the library's dependency closure, which generate does not know. So
 `open Tooltips; ProjectBoost.x` in one library never makes an edge to an
-unrelated library that has its own top-level `ProjectBoost`
+unrelated library that has its own top-level `ProjectBoost`. An open of a
+module that is not an input file (`Stdlib`, `Belt`, an external `Prelude`)
+cannot supply a module of the run, so it cuts nothing: `open Stdlib;
+Reset.init()` still orders the library after `reset`. Neither does an open
+of a wrapped library's alias module: its submodules are that library's
+files, so a bare `X` under it is either one of those files (an edge to that
+library, or no edge when another library also has `X`) or the outer `X`
 (`packages/generate/test/library-order-open-scope.t`).
 
 **Module level.** Inside a library, a file's rules come after the rules of
@@ -625,9 +632,10 @@ must precede.
 rules in opposite directions: a warning names both (`block <longident>` or
 `block <file:line>`, `merge at <file:line>`), both edges are dropped, and
 the pair keeps definition order (`block-order-pseudo-class.t`). A
-longer cycle is cut at the rule that waits on the fewest edges, with a
-warning naming the blocks and merges whose order it drops
-(`ordered-sheet-cycle.t`).
+longer cycle is cut at a rule that waits only on rules of its own cycle
+(strongly connected component), the one that waits on the fewest edges,
+with a warning naming the blocks and merges whose order it drops. A rule
+that only waits on a cycle keeps its edges (`ordered-sheet-cycle.t`).
 
 **Not used, by measurement (2026-10-20).** #616's base-before-conditional
 tier, shorthand depth as a global key, and the fixed at-rule and
@@ -964,7 +972,10 @@ Two libraries that each have a module with the same basename and a
 binding with the same name share an identity. Run one
 `styled-ppx.generate` per app: it sees both and reports an identity
 collision when their CSS differs (see "Identity collision" under
-Resolve). Rename the module or the binding in one of them. The dune
+Resolve). Rename the module or the binding in one of them. When their CSS
+is the same, `generate` reports nothing and both bindings keep one `_id_`
+class, so a `$(Button.root)` selector in one library also matches the
+other library's elements. The dune
 `library-name` cookie never reaches a hash; the ppx writes it only into
 `[@@@css.config]`, where `styled-ppx.generate` reads it to group modules
 for dependency order (`packages/ppx/test/css-support/library-twin-same-classes.t`).

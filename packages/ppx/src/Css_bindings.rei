@@ -4,7 +4,7 @@
     class_string)] entry here. The longident is the fully-qualified path
     users would write to reference the binding from another module (e.g.
     ["M.Css.marker"]); the identity is the binding's build-independent
-    `cid-` class (see [Hash_class.identity_class]) — `$(binding)` selector
+    `_id_` class (see [Hash_class.identity_class]) — `$(binding)` selector
     references resolve to this, verbatim; the class string is the
     space-separated list of atomized class names the PPX minted for it,
     kept as a content fingerprint so the aggregator can tell a legitimate

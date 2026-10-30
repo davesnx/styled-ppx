@@ -1129,7 +1129,7 @@ let extractedDynamicStyles =
           ~locals=
             List.concat_map(
               ((_, _, pattern, _, _, _)) =>
-                Local_selector_environment.bound_names(pattern),
+                Local_selector_environment.bound_locals(pattern),
               labeledArguments,
             ),
           ~source_position_start,

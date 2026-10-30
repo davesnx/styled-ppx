@@ -223,6 +223,11 @@ type class_ref =
   | Local(string)
   | Cross_module(string);
 
+type local = {
+  name: string,
+  identity: option(string),
+};
+
 let bound_names = (pattern: Ppxlib.pattern): list(string) => {
   let collector = {
     as _;
@@ -238,19 +243,36 @@ let bound_names = (pattern: Ppxlib.pattern): list(string) => {
   collector#pattern(pattern, []);
 };
 
+let bound_locals = pattern =>
+  List.map(
+    name =>
+      {
+        name,
+        identity: None,
+      },
+    bound_names(pattern),
+  );
+
+let find_local = (~locals, path_str) =>
+  String.contains(path_str, '.')
+    ? None : List.find_opt(local => local.name == path_str, locals);
+
 let resolve_class_ref =
     (
       ~file: string,
       ~scope: list(string),
       ~opens: list(list(string)),
-      ~locals: list(string),
+      ~locals: list(local),
       path_str: string,
     ) =>
-  switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
-  | _ when !String.contains(path_str, '.') && List.mem(path_str, locals) =>
-    None
-  | Some(className) => Some(Local(className))
-  | None
+  switch (
+    find_local(~locals, path_str),
+    lookup_local_class_ref(~file, ~scope, ~opens, path_str),
+  ) {
+  | (Some({ identity, _ }), _) =>
+    Option.map(className => Local(className), identity)
+  | (None, Some(className)) => Some(Local(className))
+  | (None, None)
       when
         String.contains(path_str, '.')
         && !ref_matches_local_module(~file, ~scope, ~opens, path_str) =>
@@ -267,7 +289,7 @@ let resolve_class_ref =
       )
     | _ => Some(Cross_module(path_str))
     };
-  | None => None
+  | (None, None) => None
   };
 
 let resolve_selector_class_ref =
@@ -275,7 +297,7 @@ let resolve_selector_class_ref =
       ~file: string,
       ~scope: list(string),
       ~opens: list(list(string)),
-      ~locals: list(string),
+      ~locals: list(local),
       ~loc,
       path_str: string,
     ) => {
@@ -284,7 +306,7 @@ let resolve_selector_class_ref =
   | Some(Cross_module(longident)) =>
     Cross_module_refs.record(~file, ~longident, ~loc);
     Cross_module_refs.sentinel(longident);
-  | None when List.mem(path_str, locals) =>
+  | None when find_local(~locals, path_str) != None =>
     Ppxlib.Location.raise_errorf(
       ~loc,
       "Selector interpolation `$(%s)` names a function parameter or local variable, not a [%%css] binding.\n- To reference the [%%css] binding `%s`, rename the local variable.\n- Otherwise, use [%%cx] for runtime substitution.",
