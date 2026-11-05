@@ -1258,7 +1258,7 @@ module Css_transform = {
 
 /* Empty `[%css {||}]` bound to a named `let` mints a class handle
    (`Hash_class.marker_class`) so consumers can resolve `&.$(name)` against
-   it. Its hash does not depend on `~label`, which is off in production.
+   it.
    No `[@@@css ...]` is emitted — there's no rule to write. Anonymous (`_`)
    and statement-position bindings return `[]`, preserving the historical
    `CSS.make("", [])` shape. */

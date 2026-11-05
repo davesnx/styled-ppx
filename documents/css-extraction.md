@@ -106,7 +106,7 @@ space-separated list of atomized class names the PPX produced.
 
 ```ocaml
 [@@@css.bindings
-  [("M.marker", "css-0-marker");
+  [("M.marker", "css-xb6hrn-marker");
    ("M.Css.active", "css-tokvmb-active");
    ("M.layout", "css-k008qs-layout css-1tyndxa-layout")]]
 ```
