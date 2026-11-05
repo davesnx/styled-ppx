@@ -1105,6 +1105,7 @@ let extractedDynamicStyles =
     (
       ~loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~moduleName,
@@ -1122,9 +1123,11 @@ let extractedDynamicStyles =
       let (classNames, dynamic_vars) =
         Css_file.push(
           ~file,
+          ~main_module,
           ~scope,
           ~opens,
           ~source_position_start,
+          ~binding_name=moduleName,
           ~label=moduleName,
           rule_list,
         );
@@ -1190,6 +1193,7 @@ let dynamicExtractedComponent =
     (
       ~loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~htmlTag,
@@ -1210,6 +1214,7 @@ let dynamicExtractedComponent =
     extractedDynamicStyles(
       ~loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~moduleName,

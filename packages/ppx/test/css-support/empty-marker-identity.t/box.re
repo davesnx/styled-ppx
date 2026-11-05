@@ -1,0 +1,1 @@
+module Box = [%styled.div {||}];
