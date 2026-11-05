@@ -45,10 +45,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-i9gxme-_sidebar{flex-grow:1;}"];
   [@css ".css-r6z5ec-_sidebar{z-index:1;}"];
   [@css ".css-tjsoaq-_sidebar{transition:all 200ms ease 0ms;}"];
-  [@css ".css-145l4ca-_sidebar.css-0-_sidebarClosed{min-width:0;}"];
-  [@css ".css-1oluo0q-_sidebar.css-0-_sidebarClosed{max-width:0;}"];
-  [@css ".css-2io1ml-_sidebar.css-0-_sidebarClosed{opacity:0;}"];
-  [@css ".css-1k938xr-_sidebar.css-0-_sidebarClosed{overflow:hidden;}"];
+  [@css ".css-145l4ca-_sidebar.css-148lz04-_sidebarClosed{min-width:0;}"];
+  [@css ".css-1oluo0q-_sidebar.css-148lz04-_sidebarClosed{max-width:0;}"];
+  [@css ".css-2io1ml-_sidebar.css-148lz04-_sidebarClosed{opacity:0;}"];
+  [@css ".css-1k938xr-_sidebar.css-148lz04-_sidebarClosed{overflow:hidden;}"];
   [@css ".css-keq5th-_checkbox{transition:transform 0.3s !important;}"];
   [@css
     ".css-1hwm8mm-_transitions{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
@@ -66,7 +66,7 @@ If this test fail means that the module is not in sync with the ppx
         "css-1mx0ppg-_tabTextFirst css-1bp0v5z-_tabTextFirst",
       ),
       ("Input._tabText", "css-1nzxk4v-_tabText"),
-      ("Input._sidebarClosed", "css-0-_sidebarClosed"),
+      ("Input._sidebarClosed", "css-148lz04-_sidebarClosed"),
       (
         "Input._sidebar",
         "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-145l4ca-_sidebar css-1oluo0q-_sidebar css-2io1ml-_sidebar css-1k938xr-_sidebar",
@@ -126,7 +126,7 @@ If this test fail means that the module is not in sync with the ppx
       ],
     );
   
-  let _sidebarClosed = CSS.make("css-0-_sidebarClosed", []);
+  let _sidebarClosed = CSS.make("css-148lz04-_sidebarClosed", []);
   
   let _sidebar =
     CSS.make(

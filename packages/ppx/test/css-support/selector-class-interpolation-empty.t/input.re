@@ -7,7 +7,7 @@
    chain. Otherwise the `&.$(name)` qualifier silently collapses and
    the rule applies unconditionally — a miscompile.
 
-   The synthetic class is `css-<hash-of-empty>-<binding>` and NO
+   The synthetic class is `css-<hash(module, scope, binding)>-<binding>` and NO
    `[@@@css ...]` rule is emitted for the empty class itself: there's
    nothing to write. The class only appears in the *consumer*'s
    compound selector and in the `CSS.make` className string. */
@@ -25,8 +25,7 @@ let container = [%css
 ];
 
 /* Two empty bindings in the same file mint distinct classNames because
-   the binding label is part of the format, even though the hash
-   prefix is the same (it's hashed against the empty body). */
+   the binding name is part of the hash input. */
 
 let selected = [%css {||}];
 let highlighted = [%css {||}];

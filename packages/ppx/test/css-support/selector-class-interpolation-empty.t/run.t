@@ -19,42 +19,43 @@ to every consumer.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-The empty binding `active` mints `css-0-active` (hash of empty + label).
+The empty binding `active` mints `css-babivq-active` (hash of module, scope
+and binding name, then the label).
 No `[@@@css ...]` is emitted for it — there's nothing to write. The
-consumer `container`'s nested rule keeps the `.css-0-active` qualifier,
+consumer `container`'s nested rule keeps the `.css-babivq-active` qualifier,
 so `background: blue` only applies when the class is actually present
 on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-1443u2l-container{background:red;}"];
-  [@css ".css-g57662-container.css-0-active{background:blue;}"];
+  [@css ".css-g57662-container.css-babivq-active{background:blue;}"];
   [@css ".css-q5fqw0-card{padding:1rem;}"];
-  [@css ".css-19ehxda-card.css-0-selected{border-color:blue;}"];
-  [@css ".css-17nqvvb-card.css-0-highlighted{background:yellow;}"];
+  [@css ".css-19ehxda-card.css-2v8kj1-selected{border-color:blue;}"];
+  [@css ".css-17nqvvb-card.css-1fl51yv-highlighted{background:yellow;}"];
   [@css ".css-k008qs-panel{display:flex;}"];
-  [@css ".css-62yfsj-panel .css-0-actionButton{color:black;}"];
+  [@css ".css-62yfsj-panel .css-1azu0vx-actionButton{color:black;}"];
   [@css.bindings
     [
-      ("Input.active", "css-0-active"),
+      ("Input.active", "css-babivq-active"),
       ("Input.container", "css-1443u2l-container css-g57662-container"),
-      ("Input.selected", "css-0-selected"),
-      ("Input.highlighted", "css-0-highlighted"),
+      ("Input.selected", "css-2v8kj1-selected"),
+      ("Input.highlighted", "css-1fl51yv-highlighted"),
       ("Input.card", "css-q5fqw0-card css-19ehxda-card css-17nqvvb-card"),
-      ("Input.actionButton", "css-0-actionButton"),
+      ("Input.actionButton", "css-1azu0vx-actionButton"),
       ("Input.panel", "css-k008qs-panel css-62yfsj-panel"),
     ]
   ];
   
-  let active = CSS.make("css-0-active", []);
+  let active = CSS.make("css-babivq-active", []);
   
   let container = CSS.make("css-1443u2l-container css-g57662-container", []);
   
-  let selected = CSS.make("css-0-selected", []);
-  let highlighted = CSS.make("css-0-highlighted", []);
+  let selected = CSS.make("css-2v8kj1-selected", []);
+  let highlighted = CSS.make("css-1fl51yv-highlighted", []);
   
   let card = CSS.make("css-q5fqw0-card css-19ehxda-card css-17nqvvb-card", []);
   
-  let actionButton = CSS.make("css-0-actionButton", []);
+  let actionButton = CSS.make("css-1azu0vx-actionButton", []);
   
   let panel = CSS.make("css-k008qs-panel css-62yfsj-panel", []);
   
