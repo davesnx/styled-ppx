@@ -1,2 +1,4 @@
 packages/property-class/core/css_cover.ml
 packages/property-class/core/css_property_table.ml
+packages/property-class/core/css_cover_data.ml
+packages/property-class/core/test/cover_reference.ml

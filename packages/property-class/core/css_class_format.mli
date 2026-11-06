@@ -1,8 +1,8 @@
-type prop =
+type prop = Css_class_decode.prop =
   | Id of string
   | Name of string
 
-type decoded =
+type decoded = Css_class_decode.decoded =
   | Atom of {
       prop : prop;
       ctx : string;

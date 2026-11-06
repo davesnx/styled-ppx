@@ -4,7 +4,7 @@
  (libraries Css_grammar))
 
 (rule
- (targets property_table.gen cover.gen)
+ (targets property_table.gen cover.gen data.gen reference.gen)
  (deps
   gen_tables.ts
   registry_names.txt
@@ -19,11 +19,17 @@
    --table-out
    property_table.gen
    --cover-out
-   cover.gen)))
+   cover.gen
+   --data-out
+   data.gen
+   --reference-out
+   reference.gen)))
 
 (rule
  (alias test-property-class)
  (action
   (progn
    (diff ../core/css_property_table.ml property_table.gen)
-   (diff ../core/css_cover.ml cover.gen))))
+   (diff ../core/css_cover.ml cover.gen)
+   (diff ../core/css_cover_data.ml data.gen)
+   (diff ../core/test/cover_reference.ml reference.gen))))

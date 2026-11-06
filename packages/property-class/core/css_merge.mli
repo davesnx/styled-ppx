@@ -14,16 +14,7 @@ val merge : string -> string -> string
     token occurs later. Tokens keep their order and are joined by one space. *)
 val normalize : string -> string
 
-(** String primitives that a runtime may replace. [String.sub] and
-    [String.concat] copy through [Bytes], which is slow in Melange. *)
-module type Text = sig
-  val sub : string -> int -> int -> string
-  val concat : string -> string list -> string
-end
+module type Text = Css_merge_core.Text
+module type S = Css_merge_core.S
 
-module type S = sig
-  val merge : string -> string -> string
-  val normalize : string -> string
-end
-
-module Make (_ : Text) : S
+module Make : functor (_ : Text) -> S

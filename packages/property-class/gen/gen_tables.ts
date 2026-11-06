@@ -19,6 +19,8 @@ const registryPath = here("registry_names.txt");
 const tablePath = here("../core/css_property_table.ml");
 const tableOut = arg("--table-out", tablePath);
 const coverOut = arg("--cover-out", here("../core/css_cover.ml"));
+const dataOut = arg("--data-out", here("../core/css_cover_data.ml"));
+const referenceOut = arg("--reference-out", here("../core/test/cover_reference.ml"));
 
 const maxNames = 1295;
 const universal = "all";
@@ -112,28 +114,41 @@ const intArray = (xs: number[]): string => `[| ${xs.join("; ")} |]`;
 
 const table = `${header}let names =\n  [|\n${names.map((n) => `    ${ocamlString(n)};\n`).join("")}  |]\n`;
 
-const cover = `${header}open Css_class_format
+const packed = (() => {
+  let previousId = 0;
+  const entries: string[] = [];
+  leaves.forEach((set, i) => {
+    if (set.length === 1 && set[0] === i) return;
+    let previous = i;
+    const deltas = set.map((leaf) => {
+      const d = leaf - previous;
+      previous = leaf;
+      return (d >= 0 ? 2 * d : -2 * d - 1).toString(36);
+    });
+    entries.push(`${(i - previousId).toString(36)}=${deltas.join(",")}`);
+    previousId = i;
+  });
+  return entries.join(" ");
+})();
 
-let leaf_table : int array array =
+const data = `${header}let count = ${names.length}
+let universal = ${universalIndex}
+let packed = ${ocamlString(packed)}
+`;
+
+const reference = `${header}let leaf_table : int array array =
   [|
 ${leaves.map((l) => `    ${intArray(l)};\n`).join("")}  |]
 
 let family_table : int array = ${intArray(families)}
+`;
 
-let lookup : (string * int) array =
+const cover = `${header}let lookup : (string * int) array =
   [|
 ${lookup.map(([n, i]) => `    (${ocamlString(n)}, ${i});\n`).join("")}  |]
 
 let digit n = if n < 10 then Char.chr (48 + n) else Char.chr (87 + n)
 let id_of_index i = String.init 2 (fun k -> digit (if k = 0 then i / 36 else i mod 36))
-
-let value_of_digit c = if c <= '9' then Char.code c - 48 else Char.code c - 87
-
-let index_of_id id =
-  if String.length id <> 2 then -1
-  else
-    let i = (value_of_digit id.[0] * 36) + value_of_digit id.[1] in
-    if i >= 0 && i < Array.length leaf_table then i else -1
 
 let id_of_name name =
   let name = String.lowercase_ascii name in
@@ -149,25 +164,38 @@ let id_of_name name =
   in
   search 0 (Array.length lookup - 1)
 
-let leaves = function
+let index_of_id id =
+  let value c = if c <= '9' then Char.code c - 48 else Char.code c - 87 in
+  let is_base36 c = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') in
+  if String.length id <> 2 || not (is_base36 id.[0] && is_base36 id.[1]) then -1
+  else
+    let i = (value id.[0] * 36) + value id.[1] in
+    if i < Css_leaves.count then i else -1
+
+let leaves : Css_class_format.prop -> Css_class_format.prop list = function
   | Name _ as p -> [ p ]
   | Id id as p ->
     let i = index_of_id id in
     if i < 0 then [ p ]
-    else List.map (fun j -> Id (id_of_index j)) (Array.to_list leaf_table.(i))
+    else
+      List.map
+        (fun j -> Css_class_format.Id (id_of_index j))
+        (Array.to_list (Css_leaves.leaf_indices i))
 
-let size = function
+let size : Css_class_format.prop -> int = function
   | Name _ -> 1
   | Id id ->
     let i = index_of_id id in
-    if i < 0 then 1 else Array.length leaf_table.(i)
+    if i < 0 then 1 else Array.length (Css_leaves.leaf_indices i)
 
-let family = function
+let family : Css_class_format.prop -> int = function
   | Name _ -> -1
   | Id id ->
     let i = index_of_id id in
-    if i < 0 then -1 else family_table.(i)
+    if i < 0 then -1 else Css_leaves.family_of_index i
 `;
 
 writeFileSync(tableOut, table);
 writeFileSync(coverOut, cover);
+writeFileSync(dataOut, data);
+writeFileSync(referenceOut, reference);

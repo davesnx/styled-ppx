@@ -201,6 +201,27 @@ let checksum names =
 
 let cover_tests =
   [
+    case "the compact table decodes to the generated leaves and families"
+      (fun () ->
+      Alcotest.(check int)
+        "rows"
+        (Array.length Cover_reference.leaf_table)
+        Css_leaves.count;
+      Alcotest.(check int)
+        "family rows"
+        (Array.length Cover_reference.family_table)
+        Css_leaves.count;
+      Array.iteri
+        (fun i expected ->
+          Alcotest.(check (array int))
+            (Printf.sprintf "leaves %d" i)
+            expected
+            (Css_leaves.leaf_indices i);
+          Alcotest.(check int)
+            (Printf.sprintf "family %d" i)
+            Cover_reference.family_table.(i)
+            (Css_leaves.family_of_index i))
+        Cover_reference.leaf_table);
     case "every table row resolves to its own id" (fun () ->
       Array.iteri
         (fun i name ->

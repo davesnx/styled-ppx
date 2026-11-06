@@ -19,7 +19,7 @@ let make className vars : styles =
   in
   className, loop (ReactDOM.Style.make ()) vars
 
-module Class_merge = Css_merge.Make (struct
+module Class_merge = Css_merge_core.Make (struct
   let sub s pos len = Js.String.slice ~start:pos ~end_:(pos + len) s
   let concat sep parts = Js.Array.join ~sep (Array.of_list parts)
 end)
