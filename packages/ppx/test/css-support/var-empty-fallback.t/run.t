@@ -16,15 +16,73 @@ rejecting nothing where a comma isn't present at all.
 
   $ dune build
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-9e8w5r{color:var(--x);}"];
-  [@css ".css-dy0bz1{color:var(--x,);}"];
-  [@css ".css-13rxf5k{color:var(--x, );}"];
-  [@css ".css-1lvcyrh{margin:var(--m, 1px 2px);}"];
-  [@css ".css-fjens4{color:var(--x, var(--y,));}"];
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css.atoms
+    [
+      (
+        "_a7feP5DlB",
+        ["._a7feP5DlB{color:var(--x);}"],
+        1,
+        0,
+        1,
+        [("value", "eP5DlB", "val\\07f\\0& | \\0color:var(--x)")],
+      ),
+      (
+        "_a7fM17PPE",
+        ["._a7fM17PPE{color:var(--x,);}"],
+        1,
+        0,
+        1,
+        [("value", "M17PPE", "val\\07f\\0& | \\0color:var(--x,)")],
+      ),
+      (
+        "_a7fKXck9M",
+        ["._a7fKXck9M{color:var(--x, );}"],
+        1,
+        0,
+        1,
+        [("value", "KXck9M", "val\\07f\\0& | \\0color:var(--x, )")],
+      ),
+      (
+        "_act1VKqwV",
+        ["._act1VKqwV{margin:var(--m, 1px 2px);}"],
+        1,
+        0,
+        4,
+        [("value", "1VKqwV", "val\\0ct\\0& | \\0margin:var(--m, 1px 2px)")],
+      ),
+      (
+        "_a7f6C_vUz",
+        ["._a7f6C_vUz{color:var(--x, var(--y,));}"],
+        1,
+        0,
+        1,
+        [("value", "6C_vUz", "val\\07f\\0& | \\0color:var(--x, var(--y,))")],
+      ),
+    ]
+  ];
   
-  CSS.make("css-9e8w5r", []);
-  CSS.make("css-dy0bz1", []);
-  CSS.make("css-13rxf5k", []);
-  CSS.make("css-1lvcyrh", []);
-  CSS.make("css-fjens4", []);
+  CSS.make("_a7feP5DlB", []);
+  CSS.make("_a7fM17PPE", []);
+  CSS.make("_a7fKXck9M", []);
+  CSS.make("_act1VKqwV", []);
+  CSS.make("_a7f6C_vUz", []);

@@ -4,43 +4,151 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --color-17hzlne{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-4fgdvo{syntax:\"*\";inherits:false;}"];
-  [@css
-    ".css-3pj70v-selfSibling + .css-3pj70v-selfSibling{color:var(--color-17hzlne);}"
+  [@css "@property --color-1kscdr{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-1sq79ge{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_c7f90BSi4GDd8Ba",
+        [
+          "._c7f90BSi4GDd8Ba._i9ny0-MqX + ._c7f90BSi4GDd8Ba._i9ny0-MqX{color:var(--color-1kscdr);}",
+        ],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "90BSi4", "ctx\\0& + & | "),
+          (
+            "value",
+            "GDd8Ba",
+            "val\\07f\\0& + & | \\0color:$(color)\\0owner:_i9ny0-MqX",
+          ),
+        ],
+      ),
+      (
+        "_c7fc0Atcp5w7SCV",
+        [".x + ._c7fc0Atcp5w7SCV{color:var(--color-1sq79ge);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "c0Atcp", "ctx\\0.x + & | "),
+          ("value", "5w7SCV", "val\\07f\\0.x + & | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_c7fgaOpD4_wBZlV",
+        ["._c7fgaOpD4_wBZlV > * + *{color:var(--color-4n1qif);}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "gaOpD4", "ctx\\0& > * + * | "),
+          ("value", "_wBZlV", "val\\07f\\0& > * + * | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_c5ksFnj_7XXaSqU",
+        ["._c5ksFnj_7XXaSqU .child{border-color:var(--color-17mpju5);}"],
+        0,
+        1,
+        4,
+        [
+          ("ctx", "sFnj_7", "ctx\\0& .child | "),
+          ("value", "XXaSqU", "val\\05k\\0& .child | \\0border-color:$(color)"),
+        ],
+      ),
+      (
+        "_c7f3Us9-0JI-o84",
+        ["._c7f3Us9-0JI-o84 + .x{color:red;}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "3Us9-0", "ctx\\0& + .x | "),
+          ("value", "JI-o84", "val\\07f\\0& + .x | \\0color:red"),
+        ],
+      ),
+      (
+        "_i9ny0-MqX",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i9ny0-MqX", "bind\\0\\0Output\\0\\0selfSibling\\00")],
+      ),
+      (
+        "_iUkkgy1aO",
+        [],
+        1,
+        0,
+        0,
+        [
+          (
+            "id",
+            "_iUkkgy1aO",
+            "bind\\0\\0Output\\0\\0siblingBeforeAmpersand\\00",
+          ),
+        ],
+      ),
+      (
+        "_iZ4GdsIN_",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iZ4GdsIN_", "bind\\0\\0Output\\0\\0childThenSibling\\00")],
+      ),
+      (
+        "_iIjlCg7wy",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iIjlCg7wy", "bind\\0\\0Output\\0\\0descendant\\00")],
+      ),
+      (
+        "_izyKagm15",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_izyKagm15", "bind\\0\\0Output\\0\\0literalSibling\\00")],
+      ),
+    ]
   ];
-  [@css ".x + .css-c001uz-siblingBeforeAmpersand{color:var(--color-4fgdvo);}"];
-  [@css ".css-zcel0e-childThenSibling > * + *{color:var(--color-tqid89);}"];
-  [@css ".css-v0ydxg-descendant .child{border-color:var(--color-133cflr);}"];
-  [@css ".css-1w5oqj4-literalSibling + .x{color:red;}"];
   [@css.bindings
     [
-      ("Output.selfSibling", "css-3pj70v-selfSibling"),
-      ("Output.siblingBeforeAmpersand", "css-c001uz-siblingBeforeAmpersand"),
-      ("Output.childThenSibling", "css-zcel0e-childThenSibling"),
-      ("Output.descendant", "css-v0ydxg-descendant"),
-      ("Output.literalSibling", "css-1w5oqj4-literalSibling"),
+      ("Output.selfSibling", "_i9ny0-MqX _c7f90BSi4GDd8Ba", "_i9ny0-MqX"),
+      (
+        "Output.siblingBeforeAmpersand",
+        "_iUkkgy1aO _c7fc0Atcp5w7SCV",
+        "_iUkkgy1aO",
+      ),
+      ("Output.childThenSibling", "_iZ4GdsIN_ _c7fgaOpD4_wBZlV", "_iZ4GdsIN_"),
+      ("Output.descendant", "_iIjlCg7wy _c5ksFnj_7XXaSqU", "_iIjlCg7wy"),
+      ("Output.literalSibling", "_izyKagm15 _c7f3Us9-0JI-o84", "_izyKagm15"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let selfSibling =
     CSS.make(
-      "css-3pj70v-selfSibling",
-      [("--color-17hzlne", CSS.Types.Color.toString(color))],
+      "_i9ny0-MqX _c7f90BSi4GDd8Ba",
+      [("--color-1kscdr", CSS.Types.Color.toString(color))],
     );
   let siblingBeforeAmpersand =
     CSS.make(
-      "css-c001uz-siblingBeforeAmpersand",
-      [("--color-4fgdvo", CSS.Types.Color.toString(color))],
+      "_iUkkgy1aO _c7fc0Atcp5w7SCV",
+      [("--color-1sq79ge", CSS.Types.Color.toString(color))],
     );
   let childThenSibling =
     CSS.make(
-      "css-zcel0e-childThenSibling",
-      [("--color-tqid89", CSS.Types.Color.toString(color))],
+      "_iZ4GdsIN_ _c7fgaOpD4_wBZlV",
+      [("--color-4n1qif", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "css-v0ydxg-descendant",
-      [("--color-133cflr", CSS.Types.Color.toString(color))],
+      "_iIjlCg7wy _c5ksFnj_7XXaSqU",
+      [("--color-17mpju5", CSS.Types.Color.toString(color))],
     );
-  let literalSibling = CSS.make("css-1w5oqj4-literalSibling", []);
+  let literalSibling = CSS.make("_izyKagm15 _c7f3Us9-0JI-o84", []);

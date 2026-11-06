@@ -1,20 +1,67 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-16tzllb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-11zsw44{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-1e15k1a{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1oz3n15-StringInterpolation{color:var(--var-16tzllb);}"];
-  [@css
-    ".css-1oz3n15-StringInterpolation{background-color:var(--black-11zsw44);}"
+  [@css "@property --var-44anc2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --black-1p8u2nz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --black-1hwgk23{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fKppdmO",
+        ["._a7fKppdmO{color:var(--var-44anc2);}"],
+        1,
+        0,
+        1,
+        [("value", "KppdmO", "val\\07f\\0& | \\0color:$(Theme.var)")],
+      ),
+      (
+        "_a4l-1m_VI",
+        ["._a4l-1m_VI{background-color:var(--black-1p8u2nz);}"],
+        1,
+        0,
+        1,
+        [("value", "-1m_VI", "val\\04l\\0& | \\0background-color:$(black)")],
+      ),
+      (
+        "_a5kIlaFNh",
+        ["._a5kIlaFNh{border-color:var(--black-1hwgk23);}"],
+        1,
+        0,
+        4,
+        [
+          (
+            "value",
+            "IlaFNh",
+            "val\\05k\\0& | \\0border-color:$(Theme.Border.black)",
+          ),
+        ],
+      ),
+      (
+        "_a9f0DQt2Z",
+        ["._a9f0DQt2Z{display:block;}"],
+        1,
+        0,
+        1,
+        [("value", "0DQt2Z", "val\\09f\\0& | \\0display:block")],
+      ),
+      (
+        "_iwNj0Ow9K",
+        [],
+        1,
+        0,
+        0,
+        [
+          ("id", "_iwNj0Ow9K", "bind\\0\\0Output\\0\\0StringInterpolation\\00"),
+        ],
+      ),
+    ]
   ];
-  [@css ".css-1oz3n15-StringInterpolation{border-color:var(--black-1e15k1a);}"];
-  [@css ".css-13o7eu2-StringInterpolation{display:block;}"];
   [@css.bindings
     [
       (
         "Output.StringInterpolation",
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "_iwNj0Ow9K _a7fKppdmO _a4l-1m_VI _a5kIlaFNh _a9f0DQt2Z",
+        "_iwNj0Ow9K",
       ),
     ]
   ];
@@ -1010,15 +1057,18 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "_iwNj0Ow9K _a7fKppdmO _a4l-1m_VI _a5kIlaFNh _a9f0DQt2Z",
         [
-          ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
-          ("--black-11zsw44", CSS.Types.Color.toString(black)),
-          ("--black-1e15k1a", CSS.Types.Color.toString(Theme.Border.black)),
+          ("--var-44anc2", CSS.Types.Color.toString(Theme.var)),
+          ("--black-1p8u2nz", CSS.Types.Color.toString(black)),
+          ("--black-1hwgk23", CSS.Types.Color.toString(Theme.Border.black)),
         ],
       );
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

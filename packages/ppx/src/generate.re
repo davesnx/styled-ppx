@@ -324,13 +324,17 @@ let newProps = (~loc) => {
   Helper.Vb.mk(~loc, valueName, value);
 };
 
-/* let className = fst(styles) ++ props.className; */
+/* let className = CSS.className(CSS.merge(styles, CSS.make(props.className, []))); */
 let className = (~loc, expr) => {
   let classNameProp = propItem(~loc, "className");
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr fst([%e expr]) ++ getOrEmpty([%e classNameProp])],
+    [%expr
+      CSS.className(
+        CSS.merge([%e expr], CSS.make(getOrEmpty([%e classNameProp]), [])),
+      )
+    ],
   );
 };
 
@@ -342,7 +346,7 @@ let style = (~loc, expr) =>
   );
 
 /*
-  let className = styles ++ props.className;
+  let className = CSS.className(CSS.merge(styles, CSS.make(props.className, [])));
   let newProps = Object.assign({}, props, stylesObject);
   createVariadicElement(finalHtmlTag, newProps);
  */
@@ -1108,7 +1112,7 @@ let extractedDynamicStyles =
       ~main_module,
       ~scope,
       ~opens,
-      ~moduleName,
+      ~binding_id,
       ~onClassNames,
       ~functionExpr,
       ~labeledArguments,
@@ -1127,8 +1131,7 @@ let extractedDynamicStyles =
           ~scope,
           ~opens,
           ~source_position_start,
-          ~binding_name=moduleName,
-          ~label=moduleName,
+          ~binding_id?,
           rule_list,
         );
       onClassNames(classNames);
@@ -1198,7 +1201,7 @@ let dynamicExtractedComponent =
       ~opens,
       ~htmlTag,
       ~label,
-      ~moduleName,
+      ~binding_id,
       ~defaultValue,
       ~param,
       ~body,
@@ -1217,7 +1220,7 @@ let dynamicExtractedComponent =
       ~main_module,
       ~scope,
       ~opens,
-      ~moduleName,
+      ~binding_id,
       ~onClassNames,
       ~functionExpr,
       ~labeledArguments,

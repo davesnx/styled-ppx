@@ -1,16 +1,50 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-1uix7by{syntax:\"*\";inherits:false;}"];
-  [@css "@property --id-1ks2xuv{syntax:\"*\";inherits:false;}"];
-  [@css ".css-fhnx1u-DynamicComponent{color:var(--var-1uix7by);}"];
-  [@css ".css-k008qs-DynamicComponent{display:flex;}"];
-  [@css ".css-fhnx1u-DynamicComponent{background-color:var(--id-1ks2xuv);}"];
+  [@css "@property --var-1ev2lds{syntax:\"*\";inherits:false;}"];
+  [@css "@property --id-hujuj{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fHU-PgS",
+        ["._a7fHU-PgS{color:var(--var-1ev2lds);}"],
+        1,
+        0,
+        1,
+        [("value", "HU-PgS", "val\\07f\\0& | \\0color:$(var)")],
+      ),
+      (
+        "_a9fMU0SCS",
+        ["._a9fMU0SCS{display:flex;}"],
+        1,
+        0,
+        1,
+        [("value", "MU0SCS", "val\\09f\\0& | \\0display:flex")],
+      ),
+      (
+        "_a4lxusIcp",
+        ["._a4lxusIcp{background-color:var(--id-hujuj);}"],
+        1,
+        0,
+        1,
+        [("value", "xusIcp", "val\\04l\\0& | \\0background-color:$(id)")],
+      ),
+      (
+        "_ibfK39YZn",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ibfK39YZn", "bind\\0\\0Output\\0\\0DynamicComponent\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
     [
       (
         "Output.DynamicComponent",
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
+        "_ibfK39YZn _a7fHU-PgS _a9fMU0SCS _a4lxusIcp",
+        "_ibfK39YZn",
       ),
     ]
   ];
@@ -1005,16 +1039,20 @@
       "Object.assign";
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
+        "_ibfK39YZn _a7fHU-PgS _a9fMU0SCS _a4lxusIcp",
         [
-          ("--var-1uix7by", CSS.Types.Color.toString(var)),
-          ("--id-1ks2xuv", CSS.Types.Color.toString(id)),
+          ("--var-1ev2lds", CSS.Types.Color.toString(var)),
+          ("--id-hujuj", CSS.Types.Color.toString(id)),
         ],
       );
     let make = (props: makeProps('id, 'var)) => {
       let className =
-        fst(styles(~id=idGet(props), ~var=varGet(props), ()))
-        ++ getOrEmpty(classNameGet(props))
+        CSS.className(
+          CSS.merge(
+            styles(~id=idGet(props), ~var=varGet(props), ()),
+            CSS.make(getOrEmpty(classNameGet(props)), []),
+          ),
+        )
       and style = snd(styles(~id=idGet(props), ~var=varGet(props), ()));
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

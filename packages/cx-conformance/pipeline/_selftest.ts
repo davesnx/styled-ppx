@@ -31,7 +31,7 @@ export const selftestCases: Case[] = [
   {
     ...base,
     id: "selftest-twice",
-    title: "the same interpolated block merged twice repeats the custom property natively",
+    title: "the same interpolated block merged twice sets the custom property once on both platforms",
     blocks: { a: "color: $(tone);" },
     vars: { tone: { css: "#00f", reason: "CSS.blue" } },
     tree: [{ id: "x", merge: ["a", "a"] }],
@@ -65,7 +65,8 @@ async function main(): Promise<void> {
   });
   assert.match(reversed.html, /class="[^"]+"/);
   await assert.rejects(ppx.render(selftestCases[4]!, { x: ["a"] }), (e) => e instanceof CandidateError && e.kind === "compile");
-  await assert.rejects(ppx.render(selftestCases[3]!, { x: ["a", "a"] }), (e) => e instanceof CandidateError && e.kind === "hydration");
+  const twice = await ppx.render(selftestCases[3]!, { x: ["a", "a"] });
+  assert.equal(twice.html.match(/--tone-/g)?.length, 1);
   await ppx.close();
 }
 

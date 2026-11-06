@@ -19,31 +19,101 @@ carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-14kiwtd-_test .\\31 a{color:red;}"];
-  [@css ".css-10mby7r-_test .-\\31 a{color:red;}"];
-  [@css ".css-1vlbr1m-_test #\\31 a{color:red;}"];
-  [@css ".css-1klhelx-_test .a\\.b{color:red;}"];
-  [@css ".css-1jd2wma-_test .foo\\:bar{color:red;}"];
-  [@css ".css-67142b-_test .a\\/b{color:red;}"];
-  [@css ".css-nxfkpb-_test .foo\\ bar{color:red;}"];
-  [@css ".css-r5hrsz-_test .héllo{color:red;}"];
-  [@css ".css-hufzp0-_test .foo:not(.a\\.b){color:red;}"];
-  [@css ".css-1x6t703{--custom\\ prop:red;}"];
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css.atoms
+    [
+      (
+        "_bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34",
+        [
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .\\31 a{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .-\\31 a{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 #\\31 a{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .a\\.b{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .foo\\:bar{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .a\\/b{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .foo\\ bar{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .héllo{color:red;}",
+          "._bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34 .foo:not(.a\\.b){color:red;}",
+        ],
+        0,
+        1,
+        9,
+        [
+          ("ctx", "9DCaxS", "ctx\\0& .\\\\31 a | "),
+          ("ctx", "z9ZcNq", "ctx\\0& .-\\\\31 a | "),
+          ("ctx", "4thBrR", "ctx\\0& #\\\\31 a | "),
+          ("ctx", "GASMLv", "ctx\\0& .a\\\\.b | "),
+          ("ctx", "ZI_QqY", "ctx\\0& .foo\\\\:bar | "),
+          ("ctx", "I60X2v", "ctx\\0& .a\\\\/b | "),
+          ("ctx", "CL1Wdp", "ctx\\0& .foo\\\\ bar | "),
+          ("ctx", "K-gtrS", "ctx\\0& .héllo | "),
+          ("ctx", "TJNzGw", "ctx\\0& .foo:not(.a\\\\.b) | "),
+          (
+            "value",
+            "E0mZ34",
+            "bval\\0& .\\\\31 a | \\07f\\0color:red\\0& .-\\\\31 a | \\07f\\0color:red\\0& #\\\\31 a | \\07f\\0color:red\\0& .a\\\\.b | \\07f\\0color:red\\0& .foo\\\\:bar | \\07f\\0color:red\\0& .a\\\\/b | \\07f\\0color:red\\0& .foo\\\\ bar | \\07f\\0color:red\\0& .héllo | \\07f\\0color:red\\0& .foo:not(.a\\\\.b) | \\07f\\0color:red",
+          ),
+        ],
+      ),
+      (
+        "_xMLN4WT000000pC72Dd",
+        ["._xMLN4WT000000pC72Dd{--custom\\ prop:red;}"],
+        1,
+        0,
+        1,
+        [
+          ("name", "MLN4WT", "name\\0--custom\\\\ prop"),
+          (
+            "value",
+            "pC72Dd",
+            "val\\0--custom\\\\ prop\\0& | \\0--custom\\\\ prop:red",
+          ),
+        ],
+      ),
+      (
+        "_iXV5XLuz3",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iXV5XLuz3", "bind\\0\\0Input\\0\\0_test\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
     [
       (
         "Input._test",
-        "css-14kiwtd-_test css-10mby7r-_test css-1vlbr1m-_test css-1klhelx-_test css-1jd2wma-_test css-67142b-_test css-nxfkpb-_test css-r5hrsz-_test css-hufzp0-_test",
+        "_iXV5XLuz3 _bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34",
+        "_iXV5XLuz3",
       ),
     ]
   ];
   let _test =
     CSS.make(
-      "css-14kiwtd-_test css-10mby7r-_test css-1vlbr1m-_test css-1klhelx-_test css-1jd2wma-_test css-67142b-_test css-nxfkpb-_test css-r5hrsz-_test css-hufzp0-_test",
+      "_iXV5XLuz3 _bAJ7f9DCaxS7fz9ZcNq7f4thBrR7fGASMLv7fZI_QqY7fI60X2v7fCL1Wdp7fK-gtrS7fTJNzGwE0mZ34",
       [],
     );
   
-  CSS.make("css-1x6t703", []);
+  CSS.make("_xMLN4WT000000pC72Dd", []);
 
   $ dune build

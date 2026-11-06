@@ -3,8 +3,8 @@
 
    Expected behavior:
    - `className: option(string)` is part of `makeProps`. The generated
-     `make` concatenates the styled-component class with the user's
-     `className` via the `getOrEmpty` helper (with a leading space).
+     `make` merges the styled-component styles with the user's `className`
+     through `CSS.merge`, wrapped as `CSS.make(getOrEmpty(className), [])`.
    - `style: option(ReactDOM.Style.t)` is part of `makeProps` and is
      forwarded unchanged via `assign2(Js.Obj.empty(), Obj.magic(props), ...)`.
      The `stylesObject` only overrides `className` and `ref`, so the user's

@@ -1,8 +1,27 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-tokvmb-Box{color:red;}"];
-  [@css.bindings [("Output.Box", "css-tokvmb-Box")]];
+  [@css.atoms
+    [
+      (
+        "_a7fadbhEW",
+        ["._a7fadbhEW{color:red;}"],
+        1,
+        0,
+        1,
+        [("value", "adbhEW", "val\\07f\\0& | \\0color:red")],
+      ),
+      (
+        "_ipAbtA9yg",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ipAbtA9yg", "bind\\0\\0Output\\0\\0Box\\00")],
+      ),
+    ]
+  ];
+  [@css.bindings [("Output.Box", "_ipAbtA9yg _a7fadbhEW", "_ipAbtA9yg")]];
   module Box: {
     type makeProps;
     let make: makeProps => React.element;
@@ -960,9 +979,12 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.make("css-tokvmb-Box", []);
+    let styles = CSS.make("_ipAbtA9yg _a7fadbhEW", []);
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(props.className)
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(props.className), [])),
+        )
       and style = snd(styles);
       React.createElement(
         switch (props.as_) {

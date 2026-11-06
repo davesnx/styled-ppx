@@ -14,41 +14,154 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
-  [@css ".css-1vf0mg9-buttonLoadingAnimation{background-size:1rem 1rem;}"];
-  [@css
-    ".css-rj3gnv-buttonLoadingAnimation{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
   ];
-  [@css ".css-f9xk9e-colorAccent{background-color:blue;}"];
-  [@css
-    ".css-1eo9rnb-colorAccent:disabled:not(.css-1eo9rnb-colorAccent.css-1vf0mg9-buttonLoadingAnimation.css-rj3gnv-buttonLoadingAnimation){background-color:gray;}"
+  [@css.atoms
+    [
+      (
+        "_a7fadbhEW",
+        ["._a7fadbhEW{color:red;}"],
+        1,
+        0,
+        1,
+        [("value", "adbhEW", "val\\07f\\0& | \\0color:red")],
+      ),
+      (
+        "_c7fdO-1AgybFZur",
+        ["._c7fdO-1AgybFZur._iBZ5mNPO7{color:blue;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "dO-1Ag", "ctx\\0&._iBZ5mNPO7 | "),
+          ("value", "ybFZur", "val\\07f\\0&._iBZ5mNPO7 | \\0color:blue"),
+        ],
+      ),
+      (
+        "_a4sAsdUoO",
+        ["._a4sAsdUoO{background-size:1rem 1rem;}"],
+        1,
+        0,
+        1,
+        [("value", "AsdUoO", "val\\04s\\0& | \\0background-size:1rem 1rem")],
+      ),
+      (
+        "_a3yJsnQ5K",
+        [
+          "._a3yJsnQ5K{-webkit-animation-duration:1000ms;animation-duration:1000ms;}",
+        ],
+        1,
+        0,
+        1,
+        [("value", "JsnQ5K", "val\\03y\\0& | \\0animation-duration:1000ms")],
+      ),
+      (
+        "_a4lL-g7De",
+        ["._a4lL-g7De{background-color:blue;}"],
+        1,
+        0,
+        1,
+        [("value", "L-g7De", "val\\04l\\0& | \\0background-color:blue")],
+      ),
+      (
+        "_c4lIPzgdEr2ua5Q",
+        [
+          "._c4lIPzgdEr2ua5Q:disabled:not(._c4lIPzgdEr2ua5Q._iyLizOWmY){background-color:gray;}",
+        ],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "IPzgdE", "ctx\\0&:disabled:not(&._iyLizOWmY) | "),
+          (
+            "value",
+            "r2ua5Q",
+            "val\\04l\\0&:disabled:not(&._iyLizOWmY) | \\0background-color:gray",
+          ),
+        ],
+      ),
+      (
+        "_iBZ5mNPO7",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBZ5mNPO7", "bind\\0\\0Input\\0\\0foo\\00")],
+      ),
+      (
+        "_iBEU_scOh",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBEU_scOh", "bind\\0\\0Input\\0\\0bar\\00")],
+      ),
+      (
+        "_iyLizOWmY",
+        [],
+        1,
+        0,
+        0,
+        [
+          (
+            "id",
+            "_iyLizOWmY",
+            "bind\\0\\0Input\\0\\0buttonLoadingAnimation\\00",
+          ),
+        ],
+      ),
+      (
+        "_iiNP0E9Ud",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iiNP0E9Ud", "bind\\0\\0Input\\0\\0colorAccent\\00")],
+      ),
+    ]
   ];
   [@css.bindings
     [
-      ("Input.foo", "css-tokvmb-foo"),
-      ("Input.bar", "css-11o9qin-bar"),
+      ("Input.foo", "_iBZ5mNPO7 _a7fadbhEW", "_iBZ5mNPO7"),
+      ("Input.bar", "_iBEU_scOh _c7fdO-1AgybFZur", "_iBEU_scOh"),
       (
         "Input.buttonLoadingAnimation",
-        "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
+        "_iyLizOWmY _a4sAsdUoO _a3yJsnQ5K",
+        "_iyLizOWmY",
       ),
-      ("Input.colorAccent", "css-f9xk9e-colorAccent css-1eo9rnb-colorAccent"),
+      (
+        "Input.colorAccent",
+        "_iiNP0E9Ud _a4lL-g7De _c4lIPzgdEr2ua5Q",
+        "_iiNP0E9Ud",
+      ),
     ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("_iBZ5mNPO7 _a7fadbhEW", []);
   
-  let bar = CSS.make("css-11o9qin-bar", []);
+  let bar = CSS.make("_iBEU_scOh _c7fdO-1AgybFZur", []);
   
-  let buttonLoadingAnimation =
-    CSS.make(
-      "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
-      [],
-    );
+  let buttonLoadingAnimation = CSS.make("_iyLizOWmY _a4sAsdUoO _a3yJsnQ5K", []);
   
-  let colorAccent =
-    CSS.make("css-f9xk9e-colorAccent css-1eo9rnb-colorAccent", []);
+  let colorAccent = CSS.make("_iiNP0E9Ud _a4lL-g7De _c4lIPzgdEr2ua5Q", []);
   
   let _ = (foo, bar, buttonLoadingAnimation, colorAccent);
 

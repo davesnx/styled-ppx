@@ -7,7 +7,7 @@ let dynamicExtractedComponent:
     ~opens: list(list(string)),
     ~htmlTag: string,
     ~label: Ppxlib.arg_label,
-    ~moduleName: string,
+    ~binding_id: option(string),
     ~defaultValue: option(Ppxlib.expression),
     ~param: Ppxlib.pattern,
     ~body: Ppxlib.expression,

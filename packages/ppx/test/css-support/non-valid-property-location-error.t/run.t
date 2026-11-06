@@ -19,5 +19,24 @@ If this test fail means that the module is not in sync with the ppx
   Error: Unknown property 'heightx'. Did you mean 'height'?
   [1]
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
   [%ocaml.error "Unknown property 'heightx'. Did you mean 'height'?"];

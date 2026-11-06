@@ -1,183 +1,81 @@
 (* Hash_class
    ==========
 
-   Single source of truth for every *hashed identifier* that styled-ppx's
-   static-extraction pipeline emits - the atomic class names, the variable
-   namespaces, the `var(--...)` custom-property names, the occurrence
-   suffixes, and the `@keyframes` / `[%styled.global]` keys.
-
-   Before this module those recipes were scattered across `Css_file.re` (the
-   class hash near the top, the `var(--...)` hash next to it, the keyframe
-   name ~1000 lines down, the global key just below). Because the *class
-   name* and the *variable baked inside that class* were computed far apart
-   from different inputs, it was easy for them to drift out of sync - exactly
-   the bug that emitted `.css-8rqac1-header{background-color:var(--var-...)}`
-   rules that disagreed on their variable across modules, leaving elements
-   pointing at undefined custom properties. Keeping the recipes side by side
-   makes the invariants below auditable in one place.
-
-   The hash primitive
-   ------------------
-   [hash] is murmur2, the same algorithm emotion uses, so the class names
-   styled-ppx mints line up with the wider CSS-in-JS ecosystem and with the
-   runtime's own hashing. Every identifier here is `<prefix>-<murmur2(...)>`.
+   Single source of truth for the identifiers that the static-extraction
+   pipeline mints: atom classes, binding ids, interpolation variables,
+   keyframe names and global keys.
 
    Separator
    ---------
-   Composite hash inputs are joined with NUL ('\000') instead of a printable
-   character so that, e.g., ["a"; "bc"] and ["ab"; "c"] cannot hash to the
-   same value. NUL never appears in CSS source, selectors, or OCaml module
-   paths, so it is an unambiguous field separator.
+   Composite hash inputs are joined with NUL ('\000') so that ["a"; "bc"] and
+   ["ab"; "c"] cannot hash to the same value. NUL never appears in CSS source,
+   selectors, or OCaml module paths.
 
-   The emitted identifier families
-   -------------------------------
-     class name   `css-<hash(content)>[-<label>]`          (class_name)
-     marker       `css-<hash(marker \0 module \0 scope \0 name)>[-<label>]`
-                  an empty [%css] binding, which has no content to hash
-                                                           (marker_class)
-     namespace    `css-<hash(content)>`                    (namespace_of_content)
-                  the label-free identity of an atom; the seed for its vars
-     variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
-     occurrence   `<variable>_<n>` when a name repeats in one declaration
-     keyframes    `keyframe-<hash(body)>`                  (keyframe_name)
-     global key   `global-<hash(rule)>`                    (global_key)
+   Identifier families
+   -------------------
      atom class   `_a|_c|_x|_b<ids><hash64>`               (atom_class)
      binding id   `_i<hash64(bind \0 library \0 module \0 scope \0 name \0 n)>`
                                                            (binding_id)
-     scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
+     variable     `<prefix>-<murmur2(namespace \0 path \0 type_key)>` (variable)
+     occurrence   `<variable>_<n>` when a name repeats in one declaration
+     keyframes    `keyframe-<murmur2(body)>`               (keyframe_name)
+     global key   `global-<murmur2(rule)>`                 (global_key)
+     scoped ns    `<kind> \0 <module> \0 <scope> \0 <murmur2(rules)>`
+                                                           (scoped_namespace)
 
-   The atomic invariant this module protects
-   ------------------------------------------
-   Atomic CSS requires "one class name <=> one exact declaration body". The
-   class name already honours that - it is a pure hash of the rendered
-   declaration. The *variable* substituted into that declaration must honour
-   it too: otherwise two modules that emit the byte-identical
-   `.css-<h>-header{background-color:var(--...)}` rule can disagree on the
-   `var(--...)` target, and an element that sets one variable ends up matched
-   by a rule that reads the other -> undefined custom property -> missing
-   style.
-
-   [class_and_namespace] therefore derives the variable namespace from the
-   atom's *own content* - the same string that backs the class name, with the
-   `-<label>` suffix stripped. That makes every variable a pure function of
-   the declaration content, independent of the binding's label, its sibling
-   declarations, the file, and the scope. Identical declarations get identical
-   class names AND identical variables everywhere they appear.
-
-   [scoped_namespace] is the deliberate exception. Keyframes and
-   [%styled.global] blocks are not atomized: they carry their own explicit
-   names / selectors, so their variables are namespaced by
-   kind + module + scope + rendered-rules instead of by a single atom's
-   content. They are therefore not subject to the cross-module class/var
-   collision above.
+   The variable namespace of an atom is its class token, so a variable is a
+   pure function of the atom. Keyframes and [%styled.global] blocks are not
+   atomized; their variables are namespaced by [scoped_namespace].
 
    The [module] component is the compilation-unit module name (the source
    file's basename, capitalized - see [ppx.re]'s [module_name_of_file]), NOT
-   the physical file path. This is what protects the cross-BUILD invariant:
-   one module is routinely compiled twice from different paths - Dune
-   `copy_files` into a Melange build dir, vendoring, or a native (SSR) build
-   and a Melange (client) build of the same shared stylesheet. When this was
-   keyed on the path, those builds minted DIFFERENT `var(--...)` names for the
-   same global/keyframe declaration: the static rule extracted by one build
-   referenced a custom property the other build's runtime `:root{}` binding
-   never defined, so the declaration silently fell back to its initial value.
-   The module name is identical across all of those paths (`copy_files`
-   preserves the basename, and the name is taken from the source filename, so
-   it ignores Dune library wrapping), so both builds now agree. [scope] (the
-   enclosing submodule path) and [hash(rendered_rules)] keep distinct blocks
-   apart within a project. Two distinct compilation units that share a
-   basename would share a namespace; that is benign - identical content
-   *should* yield identical variables (that is the cross-build invariant we
-   want), and differing content is already separated by the rules hash.
+   the physical file path. One module is routinely compiled twice from
+   different paths (Dune `copy_files` into a Melange build dir, vendoring, a
+   native SSR build and a Melange client build). The module name is identical
+   across all of those paths, so both builds mint the same names.
 
    Stability contract
    ------------------
    These formats are an on-disk contract. Changing a prefix, the separator,
-   the hash function, or the field order rewrites EVERY class and variable
+   the hash function, or the field order rewrites every class and variable
    name, which invalidates the cram snapshots and any already-shipped
-   stylesheet. Keep them in lockstep with the runtime's `css-` / `var-`
-   scheme. *)
+   stylesheet. *)
 
 let hash = Murmur2.default
 
 (* NUL-join the fields of a composite hash input (see "Separator" above). *)
 let nul_join parts = String.concat "\000" parts
-
-(* -- Class names and the atom namespace -------------------------------- *)
-
-(* The label-free identity of an atom: `css-<hash(content)>`. This is the
-   seed for the atom's interpolation variables, so a variable stays a pure
-   function of the declaration content regardless of the binding's label
-   (see the invariant in the header). *)
-let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
-
-(* A CSS identifier admits only `[A-Za-z0-9_-]` (ignoring escapes and
-   non-ASCII). OCaml binding names are wider - notably the trailing prime in
-   idiomatic names like [inputView'] - so embedding the label verbatim can
-   emit an unmatchable selector (`.css-<hash>-inputView'`, where the `'` is an
-   illegal identifier character). We drop every CSS-unsafe character rather
-   than backslash-escape it: the returned string backs BOTH the emitted
-   `.css-...-label{}` selector AND the runtime `className`, and an escape
-   (`'` -> `\'`) would land literally in the `class` attribute while the
-   selector matched the unescaped `'`, so the two would never meet. The label
-   is a purely cosmetic debug suffix, so stripping loses nothing structural. *)
-let css_safe_label name =
-  let buffer = Buffer.create (String.length name) in
-  String.iter
-    (fun c ->
-      match c with
-      | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-' ->
-        Buffer.add_char buffer c
-      | _ -> ())
-    name;
-  Buffer.contents buffer
-
-(* An atom's class name and its namespace, from a single content hash. The
-   class name is `<namespace>-<label>` (or just the namespace for an
-   anonymous binding, or a label that is empty once sanitized); the namespace
-   is label-free on purpose. Returns [(class_name, namespace)]. *)
-let class_and_namespace ?label content =
-  let namespace = namespace_of_content content in
-  let class_name =
-    match label with
-    | Some name ->
-      (match css_safe_label name with
-      | "" -> namespace
-      | safe -> Printf.sprintf "%s-%s" namespace safe)
-    | None -> namespace
-  in
-  class_name, namespace
-
-(* Just the class name: `css-<hash(content)>[-<label>]`. *)
-let class_name ?label content = fst (class_and_namespace ?label content)
-
-(* An empty marker's class. Every empty body has the same content, so the
-   identity is the binding's position instead: the compilation-unit module
-   name (path-independent, as in [scoped_namespace]), the submodule path and
-   the binding name. The input contains NUL, which no rendered rule does, so
-   it never equals an atom's content. *)
-let marker_class ?label ~module_name ~scope name =
-  class_name ?label
-    (nul_join [ "marker"; module_name; String.concat "." scope; name ])
-
 let atom_class unit_ = Property_class_mint.Mint.token unit_
 
+let binding_id_input ~library ~module_name ~scope ~name ~occurrence =
+  nul_join
+    [
+      "bind";
+      library;
+      module_name;
+      String.concat "." scope;
+      name;
+      string_of_int occurrence;
+    ]
+
 (* [occurrence] separates bindings that share [scope] and [name] (shadowing).
-   [module_name] is path-independent, as in [marker_class]. *)
+   [module_name] is path-independent, as in [scoped_namespace]. *)
 let binding_id ~library ~module_name ~scope ~name ~occurrence =
-  let input =
-    nul_join
-      [
-        "bind";
-        library;
-        module_name;
-        String.concat "." scope;
-        name;
-        string_of_int occurrence;
-      ]
-  in
+  let input = binding_id_input ~library ~module_name ~scope ~name ~occurrence in
   Property_class_core.Css_class_format.encode_binding_id
     (Property_class_mint.Hash64.chars (Property_class_mint.Hash64.hash input) 8)
+
+(* The hash input of [binding_id], NUL and backslash escaped as in
+   [Property_class_mint.Mint.hashes]. *)
+let binding_id_source ~library ~module_name ~scope ~name ~occurrence =
+  let buf = Buffer.create 64 in
+  String.iter
+    (function
+      | '\\' -> Buffer.add_string buf "\\\\"
+      | '\000' -> Buffer.add_string buf "\\0"
+      | c -> Buffer.add_char buf c)
+    (binding_id_input ~library ~module_name ~scope ~name ~occurrence);
+  Buffer.contents buf
 
 (* -- Interpolation variables ------------------------------------------- *)
 

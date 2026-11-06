@@ -19,22 +19,97 @@ and "Rule not found in registry: webkit-mask-box-repeat".
 
   $ dune build
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-oh9l4c{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}"
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
   ];
-  [@css
-    ".css-1kr95w2{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}"
-  ];
-  [@css
-    ".css-vnsa3w{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}"
-  ];
-  [@css
-    ".css-1dg3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
+  [@css.atoms
+    [
+      (
+        "_a4hlwq_Fs",
+        [
+          "._a4hlwq_Fs{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}",
+        ],
+        1,
+        0,
+        9,
+        [
+          (
+            "value",
+            "lwq_Fs",
+            "val\\04h\\0& | \\0background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue))",
+          ),
+        ],
+      ),
+      (
+        "_a4hOf6ivS",
+        [
+          "._a4hOf6ivS{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}",
+        ],
+        1,
+        0,
+        9,
+        [
+          (
+            "value",
+            "Of6ivS",
+            "val\\04h\\0& | \\0background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red))",
+          ),
+        ],
+      ),
+      (
+        "_a2nuC6gRR",
+        [
+          "._a2nuC6gRR{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}",
+        ],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "uC6gRR",
+            "val\\02n\\0& | \\0-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch",
+          ),
+        ],
+      ),
+      (
+        "_a2nwJnqCe",
+        [
+          "._a2nwJnqCe{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}",
+        ],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "wJnqCe",
+            "val\\02n\\0& | \\0-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat",
+          ),
+        ],
+      ),
+    ]
   ];
   
-  CSS.make("css-oh9l4c", []);
-  CSS.make("css-1kr95w2", []);
+  CSS.make("_a4hlwq_Fs", []);
+  CSS.make("_a4hOf6ivS", []);
   
-  CSS.make("css-vnsa3w", []);
-  CSS.make("css-1dg3brk", []);
+  CSS.make("_a2nuC6gRR", []);
+  CSS.make("_a2nwJnqCe", []);

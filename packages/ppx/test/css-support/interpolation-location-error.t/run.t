@@ -60,13 +60,51 @@ If this test fail means that the module is not in sync with the ppx
          The second variant type does not allow tag(s) `gri
   [1]
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --grid-1sb4gse{syntax:\"*\";inherits:false;}"];
-  [@css ".css-48ak65-a{display:var(--grid-1sb4gse);}"];
-  [@css.bindings [("Input.a", "css-48ak65-a")]];
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css "@property --grid-w2gxnr{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a9fXV7aDK",
+        ["._a9fXV7aDK{display:var(--grid-w2gxnr);}"],
+        1,
+        0,
+        1,
+        [("value", "XV7aDK", "val\\09f\\0& | \\0display:$(grid)")],
+      ),
+      (
+        "_i48HNyA_r",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i48HNyA_r", "bind\\0\\0Input\\0\\0a\\00")],
+      ),
+    ]
+  ];
+  [@css.bindings [("Input.a", "_i48HNyA_r _a9fXV7aDK", "_i48HNyA_r")]];
   let grid = `gri;
   let a =
     CSS.make(
-      "css-48ak65-a",
-      [("--grid-1sb4gse", CSS.Types.Display.toString(grid))],
+      "_i48HNyA_r _a9fXV7aDK",
+      [("--grid-w2gxnr", CSS.Types.Display.toString(grid))],
     );

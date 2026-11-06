@@ -1,13 +1,40 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-k008qs-MultiLineStrings{display:flex;}"];
-  [@css ".css-1tyndxa-MultiLineStrings{justify-content:center;}"];
+  [@css.atoms
+    [
+      (
+        "_a9fMU0SCS",
+        ["._a9fMU0SCS{display:flex;}"],
+        1,
+        0,
+        1,
+        [("value", "MU0SCS", "val\\09f\\0& | \\0display:flex")],
+      ),
+      (
+        "_ac7XuxEQv",
+        ["._ac7XuxEQv{justify-content:center;}"],
+        1,
+        0,
+        1,
+        [("value", "XuxEQv", "val\\0c7\\0& | \\0justify-content:center")],
+      ),
+      (
+        "_i6vlcoCSX",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i6vlcoCSX", "bind\\0\\0Output\\0\\0MultiLineStrings\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
     [
       (
         "Output.MultiLineStrings",
-        "css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings",
+        "_i6vlcoCSX _a9fMU0SCS _ac7XuxEQv",
+        "_i6vlcoCSX",
       ),
     ]
   ];
@@ -994,10 +1021,12 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles =
-      CSS.make("css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings", []);
+    let styles = CSS.make("_i6vlcoCSX _a9fMU0SCS _ac7XuxEQv", []);
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

@@ -70,8 +70,15 @@ let normalize_selector selector =
     ^ String.concat "" (List.map (fun p -> ":" ^ p) pseudos)
   | _ -> selector
 
+let normalize_scope scope =
+  match String.index_opt scope '\000' with
+  | None -> normalize_selector scope
+  | Some i ->
+    normalize_selector (String.sub scope 0 i)
+    ^ String.sub scope i (String.length scope - i)
+
 let key { scope; conditions; important } =
   String.concat " | "
-    (normalize_selector scope
+    (normalize_scope scope
      :: List.sort String.compare (List.map normalize_condition conditions)
     @ [ (if important then "!important" else "") ])

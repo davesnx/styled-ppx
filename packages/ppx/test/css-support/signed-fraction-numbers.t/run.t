@@ -25,14 +25,71 @@ it does not change how numbers render.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1dmpxco{margin:-0.5px;}"];
-  [@css ".css-15u1kc6{margin:0.5px;}"];
-  [@css ".css-1edr2ev{transition:opacity 0.3s ease -0.1s;}"];
-  [@css ".css-bvktvb{top:-5px;}"];
-  CSS.make("css-1dmpxco", []);
-  CSS.make("css-15u1kc6", []);
-  CSS.make("css-1edr2ev", []);
-  CSS.make("css-bvktvb", []);
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css.atoms
+    [
+      (
+        "_actIrWqKA",
+        ["._actIrWqKA{margin:-0.5px;}"],
+        1,
+        0,
+        4,
+        [("value", "IrWqKA", "val\\0ct\\0& | \\0margin:-0.5px")],
+      ),
+      (
+        "_actd3s-SP",
+        ["._actd3s-SP{margin:0.5px;}"],
+        1,
+        0,
+        4,
+        [("value", "d3s-SP", "val\\0ct\\0& | \\0margin:0.5px")],
+      ),
+      (
+        "_amaxg6Ltf",
+        ["._amaxg6Ltf{transition:opacity 0.3s ease -0.1s;}"],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "xg6Ltf",
+            "val\\0ma\\0& | \\0transition:opacity 0.3s ease -0.1s",
+          ),
+        ],
+      ),
+      (
+        "_am46EcT7N",
+        ["._am46EcT7N{top:-5px;}"],
+        1,
+        0,
+        1,
+        [("value", "6EcT7N", "val\\0m4\\0& | \\0top:-5px")],
+      ),
+    ]
+  ];
+  CSS.make("_actIrWqKA", []);
+  CSS.make("_actd3s-SP", []);
+  CSS.make("_amaxg6Ltf", []);
+  CSS.make("_am46EcT7N", []);
 
   $ dune build

@@ -35,7 +35,7 @@ let dev = {
 
 let env = {
   flag: "--env",
-  doc: " Preset over the individual flags: \"development\" enables --dev marker classes and keeps the readable -<label> suffix on class names; \"production\" enables --minify (drops label suffixes and minifies CSS) and disables dev markers.",
+  doc: " Preset over the individual flags: \"development\" enables --dev marker classes; \"production\" enables --minify and disables dev markers.",
   value: None,
   defaultValue: "development",
 };

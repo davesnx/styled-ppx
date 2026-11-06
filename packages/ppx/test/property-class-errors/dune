@@ -1,0 +1,20 @@
+; The error output holds an excerpt of the refmt-generated input.ml, which refmt
+; prints through the host compiler's Pprintast. Layout differs between OCaml
+; versions, so these run only on OCaml 5.4.
+
+(cram
+ (alias test-property-class)
+ (enabled_if
+  (>= %{ocaml_version} 5.4.0))
+ (deps
+  %{exe:../standalone.exe}
+  %{bin:refmt}
+  (package styled-ppx)))
+
+; Keep the alias defined on compilers where the cram tests are disabled.
+
+(rule
+ (alias test-property-class)
+ (enabled_if
+  (< %{ocaml_version} 5.4.0))
+ (action (progn)))

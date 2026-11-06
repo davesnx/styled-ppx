@@ -37,8 +37,8 @@ let twice = [%css "&:hover { color: red; } &:hover { color: red; }"]
 (* Custom properties are case-sensitive: --Foo and --foo don't group. *)
 let custom = [%css "--Foo: 1px; --foo: 2px"]
 
-(* Cross-binding: sharing the single-declaration atom (css-tokvmb-x for
-   color:red) can no longer flip the winner - B's duplicate pair is a
+(* Cross-binding: sharing the single-declaration atom (for color:red) can no
+   longer flip the winner - B's duplicate pair is a
    self-contained group with its own hash. *)
 module A = struct
   let x = [%css "color: red"]

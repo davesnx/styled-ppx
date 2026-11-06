@@ -12,7 +12,7 @@ registered because their value is not known at PPX time.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  $ dune describe pp ./input.re
   File "input.re", line 5, characters 6-12:
   5 |   &.$(marker) { color: blue; }
             ^^^^^^
@@ -20,6 +20,7 @@ registered because their value is not known at PPX time.
   - If `marker` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `marker` is a computed string, inline the class name literally.
   - Otherwise, use [%cx] for runtime substitution.
+  [1]
 
   $ dune build
   File "input.re", line 5, characters 6-12:

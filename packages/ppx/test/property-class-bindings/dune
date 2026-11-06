@@ -1,0 +1,26 @@
+(cram
+ (alias test-property-class-bindings)
+ (enabled_if
+  (>= %{ocaml_version} 5.4.0))
+ (deps
+  %{exe:../standalone.exe}
+  (package styled-ppx)))
+
+; Keep the alias defined on compilers where the cram tests are disabled, so
+; `make test` can request it on every CI leg without hitting "alias is empty".
+
+(rule
+ (alias test-property-class-bindings)
+ (enabled_if
+  (< %{ocaml_version} 5.4.0))
+ (action (progn)))
+
+; The cram tests compile a project with the inner dune, whose profile decides
+; how the compiler prints type paths (dev adds -short-paths). CI exports
+; DUNE_PROFILE=release, so pin the inner build to dev to keep the snapshots
+; the same locally and on CI.
+
+(env
+ (_
+  (env-vars
+   (DUNE_PROFILE dev))))

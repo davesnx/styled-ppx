@@ -1,14 +1,41 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-17zksex{syntax:\"*\";inherits:false;}"];
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
-  [@css ".css-13o7eu2-DynamicComponent{display:block;}"];
+  [@css "@property --var-1ev2lds{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fHU-PgS",
+        ["._a7fHU-PgS{color:var(--var-1ev2lds);}"],
+        1,
+        0,
+        1,
+        [("value", "HU-PgS", "val\\07f\\0& | \\0color:$(var)")],
+      ),
+      (
+        "_a9f0DQt2Z",
+        ["._a9f0DQt2Z{display:block;}"],
+        1,
+        0,
+        1,
+        [("value", "0DQt2Z", "val\\09f\\0& | \\0display:block")],
+      ),
+      (
+        "_ibfK39YZn",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ibfK39YZn", "bind\\0\\0Output\\0\\0DynamicComponent\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
     [
       (
         "Output.DynamicComponent",
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
+        "_ibfK39YZn _a7fHU-PgS _a9f0DQt2Z",
+        "_ibfK39YZn",
       ),
     ]
   ];
@@ -1001,13 +1028,17 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
-        [("--var-17zksex", CSS.Types.Color.toString(var))],
+        "_ibfK39YZn _a7fHU-PgS _a9f0DQt2Z",
+        [("--var-1ev2lds", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {
       let className =
-        fst(styles(~var=varGet(props), ()))
-        ++ getOrEmpty(classNameGet(props))
+        CSS.className(
+          CSS.merge(
+            styles(~var=varGet(props), ()),
+            CSS.make(getOrEmpty(classNameGet(props)), []),
+          ),
+        )
       and style = snd(styles(~var=varGet(props), ()));
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

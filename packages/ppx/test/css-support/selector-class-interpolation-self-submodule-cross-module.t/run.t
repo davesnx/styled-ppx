@@ -13,22 +13,82 @@ as an external path unless another enclosing `Css` module exists.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-59bkuc-wrapper.\000Css.marker\000{color:blue;}"];
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css.atoms
+    [
+      (
+        "_a7fadbhEW",
+        ["._a7fadbhEW{color:red;}"],
+        1,
+        0,
+        1,
+        [("value", "adbhEW", "val\\07f\\0& | \\0color:red")],
+      ),
+      (
+        "_c7fnrNh_plAq-7K",
+        ["._c7fnrNh_plAq-7K.\000Css.marker\000{color:blue;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "nrNh_p", "ctx\\0&.$(Css.marker)\\0module:Input | "),
+          (
+            "value",
+            "lAq-7K",
+            "val\\07f\\0&.$(Css.marker)\\0module:Input | \\0color:blue\\0module:Input",
+          ),
+        ],
+      ),
+      (
+        "_ixRBiAnCL",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ixRBiAnCL", "bind\\0\\0Input\\0Css\\0marker\\00")],
+      ),
+      (
+        "_i2tmrgooJ",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i2tmrgooJ", "bind\\0\\0Input\\0Css\\0wrapper\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
     [
-      ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.Css.wrapper", "css-59bkuc-wrapper"),
+      ("Input.Css.marker", "_ixRBiAnCL _a7fadbhEW", "_ixRBiAnCL"),
+      ("Input.Css.wrapper", "_i2tmrgooJ _c7fnrNh_plAq-7K", "_i2tmrgooJ"),
     ]
   ];
   [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
   let _ = Css.marker;
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("_ixRBiAnCL _a7fadbhEW", []);
   
-    let wrapper = CSS.make("css-59bkuc-wrapper", []);
+    let wrapper = CSS.make("_i2tmrgooJ _c7fnrNh_plAq-7K", []);
   };
   
   let _ = (Css.marker, Css.wrapper);

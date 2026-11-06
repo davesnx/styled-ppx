@@ -14,53 +14,322 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1btho3a{overscroll-behavior:contain;}"];
-  [@css ".css-1dl7j1d{overscroll-behavior:none;}"];
-  [@css ".css-15jukkc{overscroll-behavior:auto;}"];
-  [@css ".css-1o4xxxe{overscroll-behavior:contain contain;}"];
-  [@css ".css-kjypmu{overscroll-behavior:none contain;}"];
-  [@css ".css-12vmwul{overscroll-behavior:auto contain;}"];
-  [@css ".css-5pbl4h{overscroll-behavior:contain none;}"];
-  [@css ".css-1s8anq6{overscroll-behavior:none none;}"];
-  [@css ".css-14myhlg{overscroll-behavior:auto none;}"];
-  [@css ".css-1j49kl3{overscroll-behavior:contain auto;}"];
-  [@css ".css-ioifvx{overscroll-behavior:none auto;}"];
-  [@css ".css-13smixw{overscroll-behavior:auto auto;}"];
-  [@css ".css-1t5zttn{overscroll-behavior-x:contain;}"];
-  [@css ".css-crzrzr{overscroll-behavior-x:none;}"];
-  [@css ".css-uhjltw{overscroll-behavior-x:auto;}"];
-  [@css ".css-1oysund{overscroll-behavior-y:contain;}"];
-  [@css ".css-1n0t8de{overscroll-behavior-y:none;}"];
-  [@css ".css-seyb72{overscroll-behavior-y:auto;}"];
-  [@css ".css-1vnsm2h{overscroll-behavior-inline:contain;}"];
-  [@css ".css-f8iqqo{overscroll-behavior-inline:none;}"];
-  [@css ".css-p5kyxi{overscroll-behavior-inline:auto;}"];
-  [@css ".css-urqfuu{overscroll-behavior-block:contain;}"];
-  [@css ".css-d8iw13{overscroll-behavior-block:none;}"];
-  [@css ".css-ylunay{overscroll-behavior-block:auto;}"];
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css.atoms
+    [
+      (
+        "_afs3HGsVm",
+        ["._afs3HGsVm{overscroll-behavior:contain;}"],
+        1,
+        0,
+        2,
+        [("value", "3HGsVm", "val\\0fs\\0& | \\0overscroll-behavior:contain")],
+      ),
+      (
+        "_afsgqgRJu",
+        ["._afsgqgRJu{overscroll-behavior:none;}"],
+        1,
+        0,
+        2,
+        [("value", "gqgRJu", "val\\0fs\\0& | \\0overscroll-behavior:none")],
+      ),
+      (
+        "_afsvYdnIe",
+        ["._afsvYdnIe{overscroll-behavior:auto;}"],
+        1,
+        0,
+        2,
+        [("value", "vYdnIe", "val\\0fs\\0& | \\0overscroll-behavior:auto")],
+      ),
+      (
+        "_afs2uiAGj",
+        ["._afs2uiAGj{overscroll-behavior:contain contain;}"],
+        1,
+        0,
+        2,
+        [
+          (
+            "value",
+            "2uiAGj",
+            "val\\0fs\\0& | \\0overscroll-behavior:contain contain",
+          ),
+        ],
+      ),
+      (
+        "_afsKZxNq4",
+        ["._afsKZxNq4{overscroll-behavior:none contain;}"],
+        1,
+        0,
+        2,
+        [
+          (
+            "value",
+            "KZxNq4",
+            "val\\0fs\\0& | \\0overscroll-behavior:none contain",
+          ),
+        ],
+      ),
+      (
+        "_afsWpHKRn",
+        ["._afsWpHKRn{overscroll-behavior:auto contain;}"],
+        1,
+        0,
+        2,
+        [
+          (
+            "value",
+            "WpHKRn",
+            "val\\0fs\\0& | \\0overscroll-behavior:auto contain",
+          ),
+        ],
+      ),
+      (
+        "_afsEoyFfb",
+        ["._afsEoyFfb{overscroll-behavior:contain none;}"],
+        1,
+        0,
+        2,
+        [
+          (
+            "value",
+            "EoyFfb",
+            "val\\0fs\\0& | \\0overscroll-behavior:contain none",
+          ),
+        ],
+      ),
+      (
+        "_afsJ6N5wV",
+        ["._afsJ6N5wV{overscroll-behavior:none none;}"],
+        1,
+        0,
+        2,
+        [
+          ("value", "J6N5wV", "val\\0fs\\0& | \\0overscroll-behavior:none none"),
+        ],
+      ),
+      (
+        "_afs3A6tZS",
+        ["._afs3A6tZS{overscroll-behavior:auto none;}"],
+        1,
+        0,
+        2,
+        [
+          ("value", "3A6tZS", "val\\0fs\\0& | \\0overscroll-behavior:auto none"),
+        ],
+      ),
+      (
+        "_afsXFuZKv",
+        ["._afsXFuZKv{overscroll-behavior:contain auto;}"],
+        1,
+        0,
+        2,
+        [
+          (
+            "value",
+            "XFuZKv",
+            "val\\0fs\\0& | \\0overscroll-behavior:contain auto",
+          ),
+        ],
+      ),
+      (
+        "_afs9lpDPx",
+        ["._afs9lpDPx{overscroll-behavior:none auto;}"],
+        1,
+        0,
+        2,
+        [
+          ("value", "9lpDPx", "val\\0fs\\0& | \\0overscroll-behavior:none auto"),
+        ],
+      ),
+      (
+        "_afs28oIJ3",
+        ["._afs28oIJ3{overscroll-behavior:auto auto;}"],
+        1,
+        0,
+        2,
+        [
+          ("value", "28oIJ3", "val\\0fs\\0& | \\0overscroll-behavior:auto auto"),
+        ],
+      ),
+      (
+        "_afv1Bovlx",
+        ["._afv1Bovlx{overscroll-behavior-x:contain;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "1Bovlx", "val\\0fv\\0& | \\0overscroll-behavior-x:contain"),
+        ],
+      ),
+      (
+        "_afvrsVaMx",
+        ["._afvrsVaMx{overscroll-behavior-x:none;}"],
+        1,
+        0,
+        1,
+        [("value", "rsVaMx", "val\\0fv\\0& | \\0overscroll-behavior-x:none")],
+      ),
+      (
+        "_afvAygEEm",
+        ["._afvAygEEm{overscroll-behavior-x:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "AygEEm", "val\\0fv\\0& | \\0overscroll-behavior-x:auto")],
+      ),
+      (
+        "_afwq7a-l-",
+        ["._afwq7a-l-{overscroll-behavior-y:contain;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "q7a-l-", "val\\0fw\\0& | \\0overscroll-behavior-y:contain"),
+        ],
+      ),
+      (
+        "_afw6ec9iI",
+        ["._afw6ec9iI{overscroll-behavior-y:none;}"],
+        1,
+        0,
+        1,
+        [("value", "6ec9iI", "val\\0fw\\0& | \\0overscroll-behavior-y:none")],
+      ),
+      (
+        "_afwDqp9xq",
+        ["._afwDqp9xq{overscroll-behavior-y:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "Dqp9xq", "val\\0fw\\0& | \\0overscroll-behavior-y:auto")],
+      ),
+      (
+        "_afugrDCVn",
+        ["._afugrDCVn{overscroll-behavior-inline:contain;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "grDCVn",
+            "val\\0fu\\0& | \\0overscroll-behavior-inline:contain",
+          ),
+        ],
+      ),
+      (
+        "_afu0QkTTm",
+        ["._afu0QkTTm{overscroll-behavior-inline:none;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "0QkTTm",
+            "val\\0fu\\0& | \\0overscroll-behavior-inline:none",
+          ),
+        ],
+      ),
+      (
+        "_afuhLDahx",
+        ["._afuhLDahx{overscroll-behavior-inline:auto;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "hLDahx",
+            "val\\0fu\\0& | \\0overscroll-behavior-inline:auto",
+          ),
+        ],
+      ),
+      (
+        "_aft_zHR-t",
+        ["._aft_zHR-t{overscroll-behavior-block:contain;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "_zHR-t",
+            "val\\0ft\\0& | \\0overscroll-behavior-block:contain",
+          ),
+        ],
+      ),
+      (
+        "_aftCD9stT",
+        ["._aftCD9stT{overscroll-behavior-block:none;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "CD9stT",
+            "val\\0ft\\0& | \\0overscroll-behavior-block:none",
+          ),
+        ],
+      ),
+      (
+        "_aftcncaaM",
+        ["._aftcncaaM{overscroll-behavior-block:auto;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "cncaaM",
+            "val\\0ft\\0& | \\0overscroll-behavior-block:auto",
+          ),
+        ],
+      ),
+    ]
+  ];
   
-  CSS.make("css-1btho3a", []);
-  CSS.make("css-1dl7j1d", []);
-  CSS.make("css-15jukkc", []);
-  CSS.make("css-1o4xxxe", []);
-  CSS.make("css-kjypmu", []);
-  CSS.make("css-12vmwul", []);
-  CSS.make("css-5pbl4h", []);
-  CSS.make("css-1s8anq6", []);
-  CSS.make("css-14myhlg", []);
-  CSS.make("css-1j49kl3", []);
-  CSS.make("css-ioifvx", []);
-  CSS.make("css-13smixw", []);
-  CSS.make("css-1t5zttn", []);
-  CSS.make("css-crzrzr", []);
-  CSS.make("css-uhjltw", []);
-  CSS.make("css-1oysund", []);
-  CSS.make("css-1n0t8de", []);
-  CSS.make("css-seyb72", []);
-  CSS.make("css-1vnsm2h", []);
-  CSS.make("css-f8iqqo", []);
-  CSS.make("css-p5kyxi", []);
-  CSS.make("css-urqfuu", []);
-  CSS.make("css-d8iw13", []);
-  CSS.make("css-ylunay", []);
+  CSS.make("_afs3HGsVm", []);
+  CSS.make("_afsgqgRJu", []);
+  CSS.make("_afsvYdnIe", []);
+  CSS.make("_afs2uiAGj", []);
+  CSS.make("_afsKZxNq4", []);
+  CSS.make("_afsWpHKRn", []);
+  CSS.make("_afsEoyFfb", []);
+  CSS.make("_afsJ6N5wV", []);
+  CSS.make("_afs3A6tZS", []);
+  CSS.make("_afsXFuZKv", []);
+  CSS.make("_afs9lpDPx", []);
+  CSS.make("_afs28oIJ3", []);
+  CSS.make("_afv1Bovlx", []);
+  CSS.make("_afvrsVaMx", []);
+  CSS.make("_afvAygEEm", []);
+  CSS.make("_afwq7a-l-", []);
+  CSS.make("_afw6ec9iI", []);
+  CSS.make("_afwDqp9xq", []);
+  CSS.make("_afugrDCVn", []);
+  CSS.make("_afu0QkTTm", []);
+  CSS.make("_afuhLDahx", []);
+  CSS.make("_aft_zHR-t", []);
+  CSS.make("_aftCD9stT", []);
+  CSS.make("_aftcncaaM", []);

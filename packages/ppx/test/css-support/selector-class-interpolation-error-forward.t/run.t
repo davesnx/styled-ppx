@@ -12,7 +12,7 @@ current site) error cleanly. Users can fix by reordering bindings.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  $ dune describe pp ./input.re
   File "input.re", line 8, characters 6-7:
   8 |   &.$(b) { color: red; }
             ^
@@ -20,6 +20,7 @@ current site) error cleanly. Users can fix by reordering bindings.
   - If `b` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `b` is a computed string, inline the class name literally.
   - Otherwise, use [%cx] for runtime substitution.
+  [1]
 
   $ dune build
   File "input.re", line 8, characters 6-7:

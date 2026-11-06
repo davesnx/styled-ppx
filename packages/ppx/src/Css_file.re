@@ -19,6 +19,8 @@ type dynamic_var = {
   loc: Ppxlib.Location.t /* file location of the expression inside `$()` */
 };
 
+module Atomize = Property_class_mint.Atomize;
+
 let render_rule = Styled_ppx_css_parser.Render.rule;
 let render_prefixed_rule = Css_autoprefixer.render_rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
@@ -47,6 +49,22 @@ module Buffer = {
       Hashtbl.add(target.seen, className, ());
       target.rules = [(className, cssText), ...target.rules];
     };
+
+  let atoms_seen: Hashtbl.t(string, unit) = Hashtbl.create(256);
+  let accumulated_atoms: ref(list(Css_extraction.atom)) = ref([]);
+
+  let add_atom = (atom: Css_extraction.atom) =>
+    if (!Hashtbl.mem(atoms_seen, atom.cls)) {
+      Hashtbl.add(atoms_seen, atom.cls, ());
+      accumulated_atoms := [atom, ...accumulated_atoms^];
+    };
+
+  let take_atoms = () => {
+    let atoms = List.rev(accumulated_atoms^);
+    accumulated_atoms := [];
+    Hashtbl.reset(atoms_seen);
+    atoms;
+  };
 
   let add_rule = add_to(accumulated_rules);
   let add_global_rule = add_to(global_rules);
@@ -124,6 +142,7 @@ module Css_transform = {
     opens: list(list(string)),
     source_position_start: Lexing.position,
     dynamic_vars: ref(list(dynamic_var)),
+    role: string,
   };
 
   let to_file_loc = (ctx, relative_loc) =>
@@ -166,38 +185,6 @@ module Css_transform = {
      here — we only inspect the declaration value. */
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
-
-  /* The single declaration an atom carries: bare (top-level), nested under a
-     selector (`Style_rule`), or under an at-rule. None for an atom with no
-     declaration body (e.g. an empty at-rule). */
-  let rec atom_declaration = (rule: rule): option(declaration) =>
-    switch (rule) {
-    | Declaration(decl) => Some(decl)
-    | Style_rule({ block: (rules, _), _ }) =>
-      switch (rules) {
-      | [inner] => atom_declaration(inner)
-      | _ => None
-      }
-    | At_rule({ block, _ }) =>
-      switch (block) {
-      | Rule_list((rules, _))
-      | Stylesheet((rules, _)) =>
-        switch (rules) {
-        | [inner] => atom_declaration(inner)
-        | _ => None
-        }
-      | Empty => None
-      }
-    };
-
-  /* True when the atom's declaration interpolates a runtime value. Such atoms
-     are bundled (one shared class + var namespace) rather than atomized, so the
-     same value across base/`:hover`/`@media` collapses to one custom property. */
-  let atom_has_value_interpolation = (rule: rule): bool =>
-    switch (atom_declaration(rule)) {
-    | Some(decl) => declaration_has_value_interpolation(decl)
-    | None => false
-    };
 
   /* @property{inherits:false} support for `&`-local interpolation vars. A
      non-inheriting custom property does not reach descendants, so changing it
@@ -602,7 +589,7 @@ module Css_transform = {
       let css_var_name =
         Hash_class.variable_for_occurrence(
           ~namespace=var_namespace,
-          ~type_key=var_type_key(var_type),
+          ~type_key=ctx.role ++ var_type_key(var_type),
           ~occurrence=occurrence_index,
           ~total=total_occurrences,
           var_name,
@@ -774,68 +761,99 @@ module Css_transform = {
     );
   };
 
-  /* Same-property declarations of a block group into ONE atom so the
-     winner is decided by intra-atom source order (emotion parity) —
-     fallback pairs like `display: -webkit-box; display: flex` stay
-     together; splitting them would let stylesheet position pick the
-     winner. Groups anchor at the LAST occurrence (a group cascades like
-     its last member; first-anchoring would hoist duplicates past
-     intervening rules). Singletons keep the historical atom shape and
-     hash. */
-  type block_item =
-    | Declaration_group(list(declaration))
-    | Nested_rule(rule);
-
-  /* Property names are case-insensitive; custom properties (`--*`) are
-     case-sensitive. */
-  let declaration_group_key = ({ name: (name, _), _ }: declaration) =>
-    if (String.length(name) >= 2 && String.sub(name, 0, 2) == "--") {
-      name;
-    } else {
-      String.lowercase_ascii(name);
-    };
-
-  let group_declarations_by_property = (rules: list(rule)): list(block_item) => {
-    /* Pass 1: collect declarations per key + each key's last index. */
-    let decls_by_key: Hashtbl.t(string, ref(list(declaration))) =
-      Hashtbl.create(8);
-    let last_index_by_key: Hashtbl.t(string, int) = Hashtbl.create(8);
-    List.iteri(
-      (index, rule) =>
-        switch (rule) {
-        | Declaration(decl) =>
-          let key = declaration_group_key(decl);
-          switch (Hashtbl.find_opt(decls_by_key, key)) {
-          | Some(group) => group := [decl, ...group^]
-          | None => Hashtbl.add(decls_by_key, key, ref([decl]))
-          };
-          Hashtbl.replace(last_index_by_key, key, index);
-        | _ => ()
-        },
-      rules,
-    );
-    /* Pass 2: emit each group at its last occurrence. */
-    List.mapi(
-      (index, rule) =>
-        switch (rule) {
-        | Declaration(decl) =>
-          let key = declaration_group_key(decl);
-          if (Hashtbl.find(last_index_by_key, key) == index) {
-            let group = Hashtbl.find(decls_by_key, key);
-            [Declaration_group(List.rev(group^))];
-          } else {
-            [];
-          };
-        | rule => [Nested_rule(rule)]
-        },
-      rules,
-    )
-    |> List.concat;
+  type flat = {
+    at_rules: list(at_rule),
+    scope: selector,
+    scope_loc: Ppxlib.Location.t,
+    decl: declaration,
   };
 
+  let self_selector = SimpleSelector(Ampersand);
+
+  let condition_of_at_rule =
+      ({ name: (name, _), prelude: (values, _), _ }: at_rule) =>
+    "@"
+    ++ String.lowercase_ascii(name)
+    ++ " "
+    ++ Styled_ppx_css_parser.Render.component_value_list(
+         Styled_ppx_css_parser.Render.strip_leading_whitespace(values),
+       );
+
+  let declaration_text = (decl: declaration) => {
+    let rendered = render_declaration(decl);
+    String.sub(rendered, 0, String.length(rendered) - 1);
+  };
+
+  let sentinel_to_reference = rendered => {
+    let out = Stdlib.Buffer.create(String.length(rendered));
+    let opened = ref(false);
+    String.iter(
+      c =>
+        if (c == '\000') {
+          Stdlib.Buffer.add_string(out, opened^ ? ")" : "$(");
+          opened := ! opened^;
+        } else {
+          Stdlib.Buffer.add_char(out, c);
+        },
+      rendered,
+    );
+    Stdlib.Buffer.contents(out);
+  };
+
+  let strip_groups = (~opening, ~closing, ~barred, text) => {
+    let length = String.length(text);
+    let out = Stdlib.Buffer.create(length);
+    let rec find = index =>
+      if (index >= length) {
+        None;
+      } else if (text.[index] == closing) {
+        Some(index);
+      } else if (barred(text.[index])) {
+        None;
+      } else {
+        find(index + 1);
+      };
+    let rec scan = index =>
+      if (index < length) {
+        if (text.[index] == opening) {
+          switch (find(index + 1)) {
+          | Some(close) => scan(close + 1)
+          | None =>
+            Stdlib.Buffer.add_char(out, text.[index]);
+            scan(index + 1);
+          };
+        } else {
+          Stdlib.Buffer.add_char(out, text.[index]);
+          scan(index + 1);
+        };
+      };
+    scan(0);
+    Stdlib.Buffer.contents(out);
+  };
+
+  let is_sibling_scope = scope =>
+    scope
+    |> strip_groups(~opening='(', ~closing=')', ~barred=c =>
+         c == '(' || c == ')'
+       )
+    |> strip_groups(~opening='[', ~closing=']', ~barred=_ => false)
+    |> String.map(c => c == '~' ? '+' : c)
+    |> String.split_on_char('+')
+    |> (
+      parts => {
+        let rec scan = (seen, parts) =>
+          switch (parts) {
+          | [] => false
+          | [part, ...rest] =>
+            let has = String.contains(part, '&');
+            seen && has || scan(seen || has, rest);
+          };
+        scan(false, parts);
+      }
+    );
+
   let atomize_rules =
-      (~source_position_start, ~label=?, rules: list(rule))
-      : list((string, string, rule)) => {
+      (ctx, ~source_position_start, rules: list(rule)): list(flat) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
        `::pseudo`, and descendant combinators all resolve correctly. The
@@ -870,102 +888,72 @@ module Css_transform = {
       |> List.rev;
     };
 
-    /* Wrap a same-property `Declaration` group (see
-       `group_declarations_by_property`) as one atom. No parent:
-       singleton keeps the historical bare `Declaration` atom (hash
-       stability); a group becomes `& { ... }` (`&` resolves to the
-       className). With a parent: one `Style_rule(parent){group}` atom
-       per parent selector. */
-    let wrap_declaration_group_under_parent = (~parent_prelude=?, decls) => {
+    let with_explicit_self = sel =>
+      transform_selector(
+        ctx,
+        Styled_ppx_css_parser.Selector_nesting.compute_new_prefix(
+          ~prefix=Some(self_selector),
+          sel,
+        ),
+      );
+
+    let flat_declaration = (~parent_prelude=?, decl) =>
       switch (parent_prelude) {
-      | None =>
-        switch (decls) {
-        | [decl] =>
-          let decl_string = render_declaration(decl);
-          let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, decl_string);
-          [(className, namespace, Declaration(decl))];
-        | decls =>
-          let group_string =
-            decls |> List.map(render_declaration) |> String.concat("");
-          let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, group_string);
-          let style_rule =
-            Style_rule({
-              prelude: (
-                [(SimpleSelector(Ampersand), Ppxlib.Location.none)],
-                Ppxlib.Location.none,
-              ),
-              block: (
-                List.map(decl => Declaration(decl), decls),
-                Ppxlib.Location.none,
-              ),
-              loc: Ppxlib.Location.none,
-            });
-          [(className, namespace, style_rule)];
-        }
+      | None => [
+          {
+            at_rules: [],
+            scope: self_selector,
+            scope_loc: Ppxlib.Location.none,
+            decl,
+          },
+        ]
       | Some(parent_selectors) =>
-        /* Computed once: depends on the declarations, not on which parent
-           selector they pair with. */
-        let interpolated_property =
-          decls
-          |> List.find_opt(declaration_has_value_interpolation)
-          |> Option.map((decl: declaration) => fst(decl.name));
         List.map(
           ((parent_sel, parent_loc)) => {
-            switch (interpolated_property) {
-            | Some(property)
-                when
-                  Styled_ppx_css_parser.Selector_nesting.subject_escapes_ampersand_subtree(
-                    parent_sel,
-                  ) =>
+            if (declaration_has_value_interpolation(decl)
+                && Styled_ppx_css_parser.Selector_nesting.subject_escapes_ampersand_subtree(
+                     parent_sel,
+                   )) {
               raise_subtree_escaping_interpolation_error(
                 ~loc=parent_loc,
                 ~source_position_start,
-                ~property,
+                ~property=fst(decl.name),
                 parent_sel,
-              )
-            | _ => ()
+              );
             };
-            let style_rule =
-              Style_rule({
-                prelude: ([(parent_sel, parent_loc)], parent_loc),
-                block: (
-                  List.map(decl => Declaration(decl), decls),
-                  Ppxlib.Location.none,
-                ),
-                loc: Ppxlib.Location.none,
-              });
-            let rule_string = render_rule(style_rule);
-            let (className, namespace) =
-              Hash_class.class_and_namespace(~label?, rule_string);
-            (className, namespace, style_rule);
+            {
+              at_rules: [],
+              scope: with_explicit_self(parent_sel),
+              scope_loc: parent_loc,
+              decl,
+            };
           },
           parent_selectors,
-        );
+        )
       };
-    };
 
-    /* Atomize one block's rules: same-property declarations group into a
-       single atom (see `group_declarations_by_property`); everything
-       else atomizes rule by rule. */
     let rec extract_atomic_rules_from_block =
-            (~parent_prelude=?, rules: list(rule))
-            : list((string, string, rule)) =>
-      rules
-      |> group_declarations_by_property
-      |> List.concat_map(
-           fun
-           | Declaration_group(decls) =>
-             wrap_declaration_group_under_parent(~parent_prelude?, decls)
-           | Nested_rule(rule) =>
-             extract_atomic_rules(~parent_prelude?, rule),
-         )
-    and extract_atomic_rules =
-        (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
+            (~parent_prelude=?, rules: list(rule)): list(flat) => {
+      /* stylis, which @emotion/css cx uses, prints a block's own declarations
+         before its nested rules, whatever their source order. */
+      let (declarations, nested) =
+        List.partition(
+          rule =>
+            switch (rule) {
+            | Declaration(_) => true
+            | Style_rule(_)
+            | At_rule(_) => false
+            },
+          rules,
+        );
+      List.concat_map(
+        extract_atomic_rules(~parent_prelude?),
+        declarations @ nested,
+      );
+    }
+    and extract_atomic_rules = (~parent_prelude=?, rule: rule): list(flat) => {
       switch (rule) {
-      | Declaration(decl) =>
-        wrap_declaration_group_under_parent(~parent_prelude?, [decl])
+      | Declaration(decl) => flat_declaration(~parent_prelude?, decl)
 
       | Style_rule({
           prelude: (child_selectors, _),
@@ -1007,7 +995,7 @@ module Css_transform = {
           rules,
         );
 
-      | At_rule({ name: (name, name_loc), prelude, block, loc }) =>
+      | At_rule({ name: (name, name_loc), prelude: _, block, loc: _ } as at) =>
         /* Only conditional group rules can be atomized (the condition
            distributes over the block). Everything else errors like the
            runtime path — splitting @font-face/@keyframes/@property or
@@ -1053,33 +1041,18 @@ module Css_transform = {
             ),
           )
 
-        /* Both Rule_list and Stylesheet payloads are atomized the same way:
-           recurse into the inner rules, then re-wrap each atom in a fresh
-           `At_rule(... Rule_list ...)`. We normalize Stylesheet → Rule_list
-           on output because each atom carries exactly one inner rule.
-
-           The accumulated parent prelude is threaded through so that any
+        /* The accumulated parent prelude is threaded through so that any
            Style_rule (or bare Declaration) nested inside an at-rule still
-           carries the full selector chain. The Declaration arm above turns
-           a bare Declaration with a parent into a Style_rule, which is what
-           lets `.a .b { @media (...) { color: red } }` render correctly as
-           `@media (...) { .css-X .a .b { color:red } }`. */
-        | Rule_list((rules, rule_loc))
-        | Stylesheet((rules, rule_loc)) =>
+           carries the full selector chain. */
+        | Rule_list((rules, _))
+        | Stylesheet((rules, _)) =>
           extract_atomic_rules_from_block(~parent_prelude?, rules)
-          |> List.map(((_className, _namespace, inner_rule)) => {
-               let wrapped =
-                 At_rule({
-                   name: (name, name_loc),
-                   prelude,
-                   block: Rule_list(([inner_rule], rule_loc)),
-                   loc,
-                 });
-               let wrapped_string = render_rule(wrapped);
-               let (new_className, new_namespace) =
-                 Hash_class.class_and_namespace(~label?, wrapped_string);
-               (new_className, new_namespace, wrapped);
-             })
+          |> List.map(flat =>
+               {
+                 ...flat,
+                 at_rules: [at, ...flat.at_rules],
+               }
+             )
         };
       };
     };
@@ -1087,58 +1060,56 @@ module Css_transform = {
     extract_atomic_rules_from_block(~parent_prelude=?None, rules);
   };
 
-  /* Lower a single atom into its concrete CSS rules, resolving `&` /
-     descendant nesting against [effective_class] and substituting
-     interpolations under [effective_namespace]. A bare `Declaration` atom is
-     wrapped under `.effective_class`; nested / at-rule atoms run through
-     `Transform.run`. */
-  let lower_atom = (ctx, ~effective_class, ~effective_namespace, ~loc, rule) => {
-    let single_rule_list = ([rule], loc);
-    let transformed =
-      switch (rule) {
-      | Declaration(decl) =>
-        let wrapped =
-          Style_rule({
-            prelude: (
-              [
-                (
-                  CompoundSelector({
-                    type_selector: None,
-                    subclass_selectors: [Class(effective_class)],
-                    pseudo_selectors: [],
-                  }),
-                  Ppxlib.Location.none,
-                ),
-              ],
-              Ppxlib.Location.none,
-            ),
-            block: ([Declaration(decl)], Ppxlib.Location.none),
-            loc: Ppxlib.Location.none,
-          });
-        [wrapped];
+  let wrap_in_at_rules = (at_rules, inner) =>
+    List.fold_right(
+      (at: at_rule, inner) =>
+        At_rule({
+          ...at,
+          block: Rule_list(([inner], Ppxlib.Location.none)),
+        }),
+      at_rules,
+      inner,
+    );
 
-      | Style_rule(_)
-      | At_rule(_) =>
-        Styled_ppx_css_parser.Transform.run(
-          ~className=effective_class,
-          single_rule_list,
-        )
-      };
-
-    transformed
-    |> List.map(r =>
-         transform_rule(ctx, ~var_namespace=effective_namespace, r)
-       );
+  let lower_run = (ctx, ~classes, ~namespace, flats) => {
+    let first = List.hd(flats);
+    let style_rule =
+      Style_rule({
+        prelude: (
+          [(first.scope, Ppxlib.Location.none)],
+          Ppxlib.Location.none,
+        ),
+        block: (
+          List.map(flat => Declaration(flat.decl), flats),
+          Ppxlib.Location.none,
+        ),
+        loc: Ppxlib.Location.none,
+      });
+    let written = wrap_in_at_rules(first.at_rules, style_rule);
+    let prefix =
+      CompoundSelector({
+        type_selector: None,
+        subclass_selectors: List.map(c => Class(c), classes),
+        pseudo_selectors: [],
+      });
+    let lowered =
+      Styled_ppx_css_parser.Resolve.flatten_rules(
+        ~prefix=Some(prefix),
+        ~media=None,
+        [written],
+      )
+      |> List.map(r => transform_rule(ctx, ~var_namespace=namespace, r));
+    (written, lowered);
   };
 
   let transform_rule_list =
       (
         ~file,
+        ~main_module,
         ~scope: list(string),
         ~opens: list(list(string)),
         ~source_position_start,
-        ~label=?,
-        ~binding_id as _binding_id=?,
+        ~binding_id=?,
         rule_list: rule_list,
       ) => {
     let ctx = {
@@ -1147,88 +1118,150 @@ module Css_transform = {
       opens,
       source_position_start,
       dynamic_vars: ref([]),
+      role: "",
     };
-    let (rules, loc) = rule_list;
+    let (rules, _loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
+    let flats = atomize_rules(ctx, ~source_position_start, rules);
 
-    /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class `css-<B>-<label>` and var namespace
-       `css-<B>` (label-free) shared across base/`:hover`/`@media`. Both derive
-       from the same bundle content, so identical bundles dedup to identical
-       rules + vars and different bundles never collide, preserving the
-       cross-module atomic invariant (see Hash_class.ml) and `CSS.merge`.
+    let to_decl = (flat): (Atomize.decl, flat) => {
+      let rendered = Styled_ppx_css_parser.Render.selector(flat.scope);
+      let scope_text = sentinel_to_reference(rendered);
+      let unresolved_reference = String.contains(rendered, '\000');
+      let sibling = is_sibling_scope(scope_text);
+      let owner =
+        switch (sibling, binding_id) {
+        | (true, Some(id)) => "\000owner:" ++ id
+        | (true, None) =>
+          Ppxlib.Location.raise_errorf(
+            ~loc=to_file_loc(ctx, flat.scope_loc),
+            "The selector `%s` matches a sibling of the same component, so it needs a binding id. Write it in a named `let` binding.",
+            scope_text,
+          )
+        | (false, _) => ""
+        };
+      let referencing_module =
+        unresolved_reference ? "\000module:" ++ main_module : "";
+      let context: Atomize.context = {
+        scope: scope_text ++ referencing_module,
+        conditions: List.map(condition_of_at_rule, flat.at_rules),
+        important: fst(flat.decl.important),
+      };
+      (
+        {
+          context,
+          prop: fst(flat.decl.name),
+          text: declaration_text(flat.decl) ++ referencing_module ++ owner,
+        },
+        flat,
+      );
+    };
+    let entries = List.map(to_decl, flats);
+    let units = Atomize.units(List.map(fst, entries));
 
-       Static declarations keep their own per-content atom class (still shared
-       across blocks). A block with no interpolation produces no bundle and is
-       byte-for-byte identical to the pre-bundle output. */
-    let bundle =
-      switch (
-        atomic_rules
-        |> List.filter_map(((_cn, _ns, rule)) =>
-             atom_has_value_interpolation(rule)
-               ? Some(render_rule(rule)) : None
-           )
-      ) {
-      | [] => None
-      | seeds =>
-        Some(
-          Hash_class.class_and_namespace(~label?, String.concat("", seeds)),
+    let rec group_runs = (acc, items) =>
+      switch (items, acc) {
+      | ([], _) =>
+        List.rev_map(((key, run)) => (key, List.rev(run)), acc)
+      | ([(piece, flat), ...rest], [(key, run), ...earlier])
+          when
+            key == Property_class_mint.Context_key.key(piece.Atomize.context) =>
+        group_runs([(key, [(piece, flat), ...run]), ...earlier], rest)
+      | ([(piece, flat), ...rest], _) =>
+        group_runs(
+          [
+            (
+              Property_class_mint.Context_key.key(piece.Atomize.context),
+              [(piece, flat)],
+            ),
+            ...acc,
+          ],
+          rest,
         )
       };
 
-    let (shipped_rev, classes_rev, atom_infos_rev) =
+    let (atoms_rev, tokens_rev, atom_infos_rev) =
       List.fold_left(
-        (
-          (shipped_acc, classes_acc, atom_infos_acc),
-          (className, var_namespace, rule),
-        ) => {
-          let (effective_class, effective_namespace, dedup_key) =
-            switch (bundle) {
-            | Some((bundle_class, bundle_namespace))
-                when atom_has_value_interpolation(rule) => (
-                bundle_class,
-                bundle_namespace,
-                None /* content-keyed: many bundle rules share one class */,
-              )
-            | _ => (className, var_namespace, Some(className))
-            };
-
-          let processed =
-            lower_atom(
-              ctx,
-              ~effective_class,
-              ~effective_namespace,
-              ~loc,
-              rule,
-            )
-            |> List.map(r => (dedup_key, r));
-
-          let classes_acc =
-            List.mem(effective_class, classes_acc)
-              ? classes_acc : [effective_class, ...classes_acc];
-
-          /* Record the atom's `&`-locality and the vars it references (scanned
-             from rendered text so cross-atom dedup can't hide a reference), for
-             the inherits:false decision below. */
-          let atom_local = atom_is_ampersand_local(rule);
-          let referenced =
-            processed
-            |> List.concat_map(((_key, r)) =>
-                 custom_property_names_in_text(render_rule(r))
-               );
-
+        ((atoms_acc, tokens_acc, infos_acc), unit_: Atomize.unit_) => {
+          let token = Hash_class.atom_class(unit_);
+          let pieces =
+            List.map(
+              piece => (piece, List.assq(piece, entries)),
+              unit_.pieces,
+            );
+          let runs = group_runs([], pieces);
+          let (rules_rev, infos_acc) =
+            List.fold_left(
+              ((rules_acc, infos_acc), (_key, run)) => {
+                let (first_piece, _) = List.hd(run);
+                let role =
+                  Atomize.tier(first_piece.Atomize.context) == 0
+                    ? "down" : "own";
+                let classes =
+                  switch (binding_id) {
+                  | Some(id) when is_sibling_scope(first_piece.context.scope) => [
+                      token,
+                      id,
+                    ]
+                  | _ => [token]
+                  };
+                let (written, lowered) =
+                  lower_run(
+                    {
+                      ...ctx,
+                      role,
+                    },
+                    ~classes,
+                    ~namespace=token,
+                    List.map(snd, run),
+                  );
+                let referenced =
+                  lowered
+                  |> List.concat_map(r =>
+                       custom_property_names_in_text(render_rule(r))
+                     );
+                (
+                  List.rev_append(
+                    List.map(render_prefixed_rule, lowered),
+                    rules_acc,
+                  ),
+                  [
+                    (atom_is_ampersand_local(written), referenced),
+                    ...infos_acc,
+                  ],
+                );
+              },
+              ([], infos_acc),
+              runs,
+            );
+          let atom: Css_extraction.atom = {
+            cls: token,
+            rules: List.rev(rules_rev),
+            tier: unit_.tier,
+            conds: unit_.conds,
+            cover: unit_.cover,
+            hashes:
+              List.map(
+                (h: Property_class_mint.Mint.hashed) =>
+                  {
+                    Css_extraction.kind: h.kind,
+                    token: h.token,
+                    source: h.source,
+                  },
+                Property_class_mint.Mint.hashes(unit_),
+              ),
+          };
           (
-            List.rev_append(processed, shipped_acc),
-            classes_acc,
-            [(atom_local, referenced), ...atom_infos_acc],
+            [atom, ...atoms_acc],
+            List.mem(token, tokens_acc)
+              ? tokens_acc : [token, ...tokens_acc],
+            infos_acc,
           );
         },
         ([], [], []),
-        atomic_rules,
+        units,
       );
 
-    let atom_infos = atom_infos_rev;
     let dynamic_vars_final = List.rev(ctx.dynamic_vars^);
 
     /* A var registers @property{inherits:false} iff its type supports it and
@@ -1240,7 +1273,7 @@ module Css_transform = {
                && List.for_all(
                     ((atom_local, referenced)) =>
                       atom_local || !List.mem(name, referenced),
-                    atom_infos,
+                    atom_infos_rev,
                   )) {
              Some(name);
            } else {
@@ -1249,32 +1282,13 @@ module Css_transform = {
          );
 
     (
-      List.rev(shipped_rev),
-      List.rev(classes_rev),
+      List.rev(atoms_rev),
+      List.rev(tokens_rev),
       dynamic_vars_final,
       safe_inherits_false_vars,
     );
   };
 };
-
-/* Empty `[%css {||}]` bound to a named `let` mints a class handle
-   (`Hash_class.marker_class`) so consumers can resolve `&.$(name)` against
-   it.
-   No `[@@@css ...]` is emitted — there's no rule to write. Anonymous (`_`)
-   and statement-position bindings return `[]`, preserving the historical
-   `CSS.make("", [])` shape. */
-let mint_empty_class = (~main_module, ~scope, ~binding_name, ~label) =>
-  switch (binding_name) {
-  | Some(name) when name != "_" => [
-      Hash_class.marker_class(
-        ~label?,
-        ~module_name=main_module,
-        ~scope,
-        name,
-      ),
-    ]
-  | _ => []
-  };
 
 let push =
     (
@@ -1283,38 +1297,21 @@ let push =
       ~scope: list(string),
       ~opens: list(list(string)),
       ~source_position_start,
-      ~binding_name=?,
-      ~label=?,
       ~binding_id=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
-  let (shipped_rules, binding_classes, dynamic_vars, safe_inherits_false_vars) =
+  let (atoms, tokens, dynamic_vars, safe_inherits_false_vars) =
     Css_transform.transform_rule_list(
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~source_position_start,
-      ~label?,
       ~binding_id?,
       declarations,
     );
 
-  /* Ship every rule, deduped by its key. Static atoms key by class name (class
-     and content are 1:1). Bundle rules carry `None` and key by rendered content,
-     since many share one bundle class and class-name keying would drop all but
-     the first. */
-  List.iter(
-    ((dedup_key, rule)) => {
-      let rendered_css = render_prefixed_rule(rule);
-      let key =
-        switch (dedup_key) {
-        | Some(className) => className
-        | None => rendered_css
-        };
-      Buffer.add_rule(key, rendered_css);
-    },
-    shipped_rules,
-  );
+  List.iter(Buffer.add_atom, atoms);
 
   /* Register each `&`-local var with @property{inherits:false} so a value change
      invalidates only the element, not its subtree. `syntax:"*"` accepts any
@@ -1331,9 +1328,9 @@ let push =
   );
 
   let classNames =
-    switch (binding_classes) {
-    | [] => mint_empty_class(~main_module, ~scope, ~binding_name, ~label)
-    | _ => binding_classes
+    switch (binding_id) {
+    | Some(id) => [id, ...tokens]
+    | None => tokens
     };
 
   (classNames, dynamic_vars);
@@ -1358,6 +1355,7 @@ let push_keyframe =
       opens,
       source_position_start,
       dynamic_vars: ref([]),
+      role: "",
     };
   let var_namespace =
     Hash_class.scoped_namespace(
@@ -1427,6 +1425,7 @@ let push_global =
       opens,
       source_position_start,
       dynamic_vars: ref([]),
+      role: "",
     };
 
   let rec reject_parentless_ampersand = rule =>
@@ -1495,7 +1494,7 @@ let push_global =
   List.rev(ctx.dynamic_vars^);
 };
 
-let get_atoms = (): list(Css_extraction.atom) => [];
+let get_atoms = (): list(Css_extraction.atom) => Buffer.take_atoms();
 
 let get = () => {
   let rules = Buffer.get_rules();

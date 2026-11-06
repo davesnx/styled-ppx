@@ -86,6 +86,13 @@ let context_tests =
       assert_string
         (Context_key.normalize_selector "&:nth-child(2):hover:active")
         "&:nth-child(2):active:hover");
+    case "a NUL-separated tail is part of the key and not normalized" (fun () ->
+      assert_string
+        (key (ctx "&:hover:focus\000module:A"))
+        (key (ctx "&:focus:hover\000module:A"));
+      assert (
+        key (ctx "&.$(M.m)\000module:A") <> key (ctx "&.$(M.m)\000module:B"));
+      assert (key (ctx "&.$(M.m)\000module:A") <> key (ctx "&.$(M.m)")));
     case "pseudo-classes are not sorted across a pseudo-element" (fun () ->
       List.iter
         (fun s -> assert_string (Context_key.normalize_selector s) s)

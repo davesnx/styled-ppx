@@ -1,19 +1,15 @@
 Regression guard for the CSS custom-property hash collision in [%css] static
 extraction (the /dashboard "header renders with no background" bug).
 
-Two modules in different files share the *identical* interpolated
-declaration `background-color: $(Color.Background.Alt.box)` under the same
-`header` label, differing only in one sibling declaration (`display: flex`
-vs `padding: 8px`).
+Two modules in different files share the identical interpolated declaration
+`background-color: $(Color.Background.Alt.box)` under the same `header` name,
+differing only in one sibling declaration (`display: flex` vs `padding: 8px`).
 
 Atomic CSS requires the invariant "one class name <=> one exact declaration
-body". The class name is a pure hash of the declaration content
-(`generate_class_from_content`), so both modules mint the same atom for the
-shared declaration. The substituted `var(--...)` name must be a pure function
-of that same content too (`class_and_namespace`, Css_file.re), NOT of the
-binding's sibling declarations or label. Before the fix the var was hashed
-from the sibling class-name join, so the two modules disagreed on the
-variable baked into that identical atom -> a class/var mismatch.
+body". The class name is a hash of the declaration, so both modules mint the
+same atom for the shared declaration. The substituted `var(--...)` name is a
+function of that atom's class token, so both modules agree on the variable
+baked into that atom.
 
   $ refmt --parse re --print ml a.re > a.ml
   $ ../../standalone.exe --impl a.ml -o a.ml
@@ -25,38 +21,102 @@ same `var(--...)` target despite the differing sibling, and each module's
 runtime binding sets that same custom property:
 
   $ refmt --parse ml --print re a.ml
-  [@css "@property --box-11ifi3f{syntax:\"*\";inherits:false;}"];
-  [@css ".css-8rqac1-header{background-color:var(--box-11ifi3f);}"];
-  [@css ".css-k008qs-header{display:flex;}"];
-  [@css.bindings [("A.header", "css-8rqac1-header css-k008qs-header")]];
+  [@css "@property --box-26a144{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a4lVB3cAy",
+        ["._a4lVB3cAy{background-color:var(--box-26a144);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "VB3cAy",
+            "val\\04l\\0& | \\0background-color:$(Color.Background.Alt.box)",
+          ),
+        ],
+      ),
+      (
+        "_a9fMU0SCS",
+        ["._a9fMU0SCS{display:flex;}"],
+        1,
+        0,
+        1,
+        [("value", "MU0SCS", "val\\09f\\0& | \\0display:flex")],
+      ),
+      (
+        "_iB4wLVlH_",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iB4wLVlH_", "bind\\0\\0A\\0\\0header\\00")],
+      ),
+    ]
+  ];
+  [@css.bindings
+    [("A.header", "_iB4wLVlH_ _a4lVB3cAy _a9fMU0SCS", "_iB4wLVlH_")]
+  ];
   let header =
     CSS.make(
-      "css-8rqac1-header css-k008qs-header",
-      [("--box-11ifi3f", CSS.Types.Color.toString(Color.Background.Alt.box))],
+      "_iB4wLVlH_ _a4lVB3cAy _a9fMU0SCS",
+      [("--box-26a144", CSS.Types.Color.toString(Color.Background.Alt.box))],
     );
   $ refmt --parse ml --print re b.ml
-  [@css "@property --box-11ifi3f{syntax:\"*\";inherits:false;}"];
-  [@css ".css-8rqac1-header{background-color:var(--box-11ifi3f);}"];
-  [@css ".css-hpgf8j-header{padding:8px;}"];
-  [@css.bindings [("B.header", "css-8rqac1-header css-hpgf8j-header")]];
+  [@css "@property --box-26a144{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a4lVB3cAy",
+        ["._a4lVB3cAy{background-color:var(--box-26a144);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "VB3cAy",
+            "val\\04l\\0& | \\0background-color:$(Color.Background.Alt.box)",
+          ),
+        ],
+      ),
+      (
+        "_afy3_uoZc",
+        ["._afy3_uoZc{padding:8px;}"],
+        1,
+        0,
+        4,
+        [("value", "3_uoZc", "val\\0fy\\0& | \\0padding:8px")],
+      ),
+      (
+        "_iJMijd8Gp",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iJMijd8Gp", "bind\\0\\0B\\0\\0header\\00")],
+      ),
+    ]
+  ];
+  [@css.bindings
+    [("B.header", "_iJMijd8Gp _a4lVB3cAy _afy3_uoZc", "_iJMijd8Gp")]
+  ];
   let header =
     CSS.make(
-      "css-8rqac1-header css-hpgf8j-header",
-      [("--box-11ifi3f", CSS.Types.Color.toString(Color.Background.Alt.box))],
+      "_iJMijd8Gp _a4lVB3cAy _afy3_uoZc",
+      [("--box-26a144", CSS.Types.Color.toString(Color.Background.Alt.box))],
     );
 
-Aggregating both modules into one stylesheet dedupes by the FULL rule text
-(generate.ml:280). Because both modules now emit a byte-identical
-`css-8rqac1-header` rule, dedup collapses them to one -> the selector appears
-exactly once with the variable every `header` element actually sets. Before
-the fix the two rules had different bodies, both survived, and the cascade
-left one module's element referencing an undefined variable (missing
-background).
+Aggregating both modules into one stylesheet dedupes by class. Both modules emit
+the same atom with the same variable, so its rule appears exactly once and every
+`header` element sets the variable that the rule reads.
 
   $ styled-ppx.generate a.ml b.ml > styles.css
   $ cat styles.css
   /* This file is generated by styled-ppx, do not edit manually */
-  @property --box-11ifi3f{syntax:"*";inherits:false;}
-  .css-8rqac1-header{background-color:var(--box-11ifi3f);}
-  .css-k008qs-header{display:flex;}
-  .css-hpgf8j-header{padding:8px;}
+  @property --box-26a144{syntax:"*";inherits:false;}
+  ._afy3_uoZc{padding:8px;}
+  ._a4lVB3cAy{background-color:var(--box-26a144);}
+  ._a9fMU0SCS{display:flex;}

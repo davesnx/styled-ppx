@@ -7,8 +7,8 @@
    chain. Otherwise the `&.$(name)` qualifier silently collapses and
    the rule applies unconditionally — a miscompile.
 
-   The synthetic class is `css-<hash(module, scope, binding)>-<binding>` and NO
-   `[@@@css ...]` rule is emitted for the empty class itself: there's
+   The synthetic class is the binding id `_i<hash(module, scope, binding)>` and NO
+   rule is emitted for the empty class itself: there's
    nothing to write. The class only appears in the *consumer*'s
    compound selector and in the `CSS.make` className string. */
 

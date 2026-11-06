@@ -14,75 +14,413 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-106lko4{mix-blend-mode:normal;}"];
-  [@css ".css-yyvjpz{mix-blend-mode:multiply;}"];
-  [@css ".css-g6k0am{mix-blend-mode:screen;}"];
-  [@css ".css-jqzyj4{mix-blend-mode:overlay;}"];
-  [@css ".css-1hwt403{mix-blend-mode:darken;}"];
-  [@css ".css-1ywm2bs{mix-blend-mode:lighten;}"];
-  [@css ".css-28haz0{mix-blend-mode:color-dodge;}"];
-  [@css ".css-1aiw6n1{mix-blend-mode:color-burn;}"];
-  [@css ".css-1bgzgq9{mix-blend-mode:hard-light;}"];
-  [@css ".css-183ndlc{mix-blend-mode:soft-light;}"];
-  [@css ".css-xl54fr{mix-blend-mode:difference;}"];
-  [@css ".css-1yabobq{mix-blend-mode:exclusion;}"];
-  [@css ".css-1htuj9e{mix-blend-mode:hue;}"];
-  [@css ".css-1e9qzf6{mix-blend-mode:saturation;}"];
-  [@css ".css-1mv0k1i{mix-blend-mode:color;}"];
-  [@css ".css-10szft{mix-blend-mode:luminosity;}"];
-  [@css ".css-139jmn5{isolation:auto;}"];
-  [@css ".css-13cnam7{isolation:isolate;}"];
-  [@css ".css-qf0fcc{background-blend-mode:normal;}"];
-  [@css ".css-10bwb0u{background-blend-mode:multiply;}"];
-  [@css ".css-89mqbu{background-blend-mode:screen;}"];
-  [@css ".css-129kb0h{background-blend-mode:overlay;}"];
-  [@css ".css-vlejn3{background-blend-mode:darken;}"];
-  [@css ".css-1gtgoey{background-blend-mode:lighten;}"];
-  [@css ".css-1p2yjd5{background-blend-mode:color-dodge;}"];
-  [@css ".css-cz39ay{background-blend-mode:color-burn;}"];
-  [@css ".css-hxbqd8{background-blend-mode:hard-light;}"];
-  [@css ".css-1fze5j0{background-blend-mode:soft-light;}"];
-  [@css ".css-dw2r9t{background-blend-mode:difference;}"];
-  [@css ".css-1l0nlb2{background-blend-mode:exclusion;}"];
-  [@css ".css-1way3l6{background-blend-mode:hue;}"];
-  [@css ".css-12toyo7{background-blend-mode:saturation;}"];
-  [@css ".css-1o4xi8v{background-blend-mode:color;}"];
-  [@css ".css-909g5x{background-blend-mode:luminosity;}"];
-  [@css ".css-m4l4fq{background-blend-mode:normal, multiply;}"];
+  $ dune describe pp ./input.re
+  [@ocaml.ppx.context
+    {
+      tool_name: "ppx_driver",
+      include_dirs: [],
+      hidden_include_dirs: [],
+      load_path: ([], []),
+      open_modules: [],
+      for_package: None,
+      debug: false,
+      use_threads: false,
+      use_vmthreads: false,
+      recursive_types: false,
+      principal: false,
+      no_alias_deps: false,
+      unboxed_types: false,
+      unsafe_string: false,
+      cookies: [],
+    }
+  ];
+  [@css.atoms
+    [
+      (
+        "_aeteqeUz0",
+        ["._aeteqeUz0{mix-blend-mode:normal;}"],
+        1,
+        0,
+        1,
+        [("value", "eqeUz0", "val\\0et\\0& | \\0mix-blend-mode:normal")],
+      ),
+      (
+        "_aetQPc0NP",
+        ["._aetQPc0NP{mix-blend-mode:multiply;}"],
+        1,
+        0,
+        1,
+        [("value", "QPc0NP", "val\\0et\\0& | \\0mix-blend-mode:multiply")],
+      ),
+      (
+        "_aetXZdEOL",
+        ["._aetXZdEOL{mix-blend-mode:screen;}"],
+        1,
+        0,
+        1,
+        [("value", "XZdEOL", "val\\0et\\0& | \\0mix-blend-mode:screen")],
+      ),
+      (
+        "_aetvjUBPf",
+        ["._aetvjUBPf{mix-blend-mode:overlay;}"],
+        1,
+        0,
+        1,
+        [("value", "vjUBPf", "val\\0et\\0& | \\0mix-blend-mode:overlay")],
+      ),
+      (
+        "_aetM4fBao",
+        ["._aetM4fBao{mix-blend-mode:darken;}"],
+        1,
+        0,
+        1,
+        [("value", "M4fBao", "val\\0et\\0& | \\0mix-blend-mode:darken")],
+      ),
+      (
+        "_aet6KNhTt",
+        ["._aet6KNhTt{mix-blend-mode:lighten;}"],
+        1,
+        0,
+        1,
+        [("value", "6KNhTt", "val\\0et\\0& | \\0mix-blend-mode:lighten")],
+      ),
+      (
+        "_aetI3H05b",
+        ["._aetI3H05b{mix-blend-mode:color-dodge;}"],
+        1,
+        0,
+        1,
+        [("value", "I3H05b", "val\\0et\\0& | \\0mix-blend-mode:color-dodge")],
+      ),
+      (
+        "_aetZM93Dr",
+        ["._aetZM93Dr{mix-blend-mode:color-burn;}"],
+        1,
+        0,
+        1,
+        [("value", "ZM93Dr", "val\\0et\\0& | \\0mix-blend-mode:color-burn")],
+      ),
+      (
+        "_aetJBIqsM",
+        ["._aetJBIqsM{mix-blend-mode:hard-light;}"],
+        1,
+        0,
+        1,
+        [("value", "JBIqsM", "val\\0et\\0& | \\0mix-blend-mode:hard-light")],
+      ),
+      (
+        "_aet5hGv7l",
+        ["._aet5hGv7l{mix-blend-mode:soft-light;}"],
+        1,
+        0,
+        1,
+        [("value", "5hGv7l", "val\\0et\\0& | \\0mix-blend-mode:soft-light")],
+      ),
+      (
+        "_aetn4MHje",
+        ["._aetn4MHje{mix-blend-mode:difference;}"],
+        1,
+        0,
+        1,
+        [("value", "n4MHje", "val\\0et\\0& | \\0mix-blend-mode:difference")],
+      ),
+      (
+        "_aetqagnnP",
+        ["._aetqagnnP{mix-blend-mode:exclusion;}"],
+        1,
+        0,
+        1,
+        [("value", "qagnnP", "val\\0et\\0& | \\0mix-blend-mode:exclusion")],
+      ),
+      (
+        "_aetZUtM0B",
+        ["._aetZUtM0B{mix-blend-mode:hue;}"],
+        1,
+        0,
+        1,
+        [("value", "ZUtM0B", "val\\0et\\0& | \\0mix-blend-mode:hue")],
+      ),
+      (
+        "_aetLjw0WG",
+        ["._aetLjw0WG{mix-blend-mode:saturation;}"],
+        1,
+        0,
+        1,
+        [("value", "Ljw0WG", "val\\0et\\0& | \\0mix-blend-mode:saturation")],
+      ),
+      (
+        "_aetF0nNYJ",
+        ["._aetF0nNYJ{mix-blend-mode:color;}"],
+        1,
+        0,
+        1,
+        [("value", "F0nNYJ", "val\\0et\\0& | \\0mix-blend-mode:color")],
+      ),
+      (
+        "_aetg2Sjcm",
+        ["._aetg2Sjcm{mix-blend-mode:luminosity;}"],
+        1,
+        0,
+        1,
+        [("value", "g2Sjcm", "val\\0et\\0& | \\0mix-blend-mode:luminosity")],
+      ),
+      (
+        "_ac6Tw-ysp",
+        ["._ac6Tw-ysp{isolation:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "Tw-ysp", "val\\0c6\\0& | \\0isolation:auto")],
+      ),
+      (
+        "_ac6Sc-4_I",
+        ["._ac6Sc-4_I{isolation:isolate;}"],
+        1,
+        0,
+        1,
+        [("value", "Sc-4_I", "val\\0c6\\0& | \\0isolation:isolate")],
+      ),
+      (
+        "_a4jsfXRnO",
+        ["._a4jsfXRnO{background-blend-mode:normal;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "sfXRnO", "val\\04j\\0& | \\0background-blend-mode:normal"),
+        ],
+      ),
+      (
+        "_a4jo7JHmi",
+        ["._a4jo7JHmi{background-blend-mode:multiply;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "o7JHmi",
+            "val\\04j\\0& | \\0background-blend-mode:multiply",
+          ),
+        ],
+      ),
+      (
+        "_a4jEPTu-u",
+        ["._a4jEPTu-u{background-blend-mode:screen;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "EPTu-u", "val\\04j\\0& | \\0background-blend-mode:screen"),
+        ],
+      ),
+      (
+        "_a4j0PNSB8",
+        ["._a4j0PNSB8{background-blend-mode:overlay;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "0PNSB8", "val\\04j\\0& | \\0background-blend-mode:overlay"),
+        ],
+      ),
+      (
+        "_a4jlnGVlq",
+        ["._a4jlnGVlq{background-blend-mode:darken;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "lnGVlq", "val\\04j\\0& | \\0background-blend-mode:darken"),
+        ],
+      ),
+      (
+        "_a4j-QbNgV",
+        ["._a4j-QbNgV{background-blend-mode:lighten;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "-QbNgV", "val\\04j\\0& | \\0background-blend-mode:lighten"),
+        ],
+      ),
+      (
+        "_a4jb0xiRH",
+        ["._a4jb0xiRH{background-blend-mode:color-dodge;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "b0xiRH",
+            "val\\04j\\0& | \\0background-blend-mode:color-dodge",
+          ),
+        ],
+      ),
+      (
+        "_a4j0DXzDG",
+        ["._a4j0DXzDG{background-blend-mode:color-burn;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "0DXzDG",
+            "val\\04j\\0& | \\0background-blend-mode:color-burn",
+          ),
+        ],
+      ),
+      (
+        "_a4jP0slMf",
+        ["._a4jP0slMf{background-blend-mode:hard-light;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "P0slMf",
+            "val\\04j\\0& | \\0background-blend-mode:hard-light",
+          ),
+        ],
+      ),
+      (
+        "_a4joDmhw7",
+        ["._a4joDmhw7{background-blend-mode:soft-light;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "oDmhw7",
+            "val\\04j\\0& | \\0background-blend-mode:soft-light",
+          ),
+        ],
+      ),
+      (
+        "_a4j-CLKEU",
+        ["._a4j-CLKEU{background-blend-mode:difference;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "-CLKEU",
+            "val\\04j\\0& | \\0background-blend-mode:difference",
+          ),
+        ],
+      ),
+      (
+        "_a4j6RG8OZ",
+        ["._a4j6RG8OZ{background-blend-mode:exclusion;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "6RG8OZ",
+            "val\\04j\\0& | \\0background-blend-mode:exclusion",
+          ),
+        ],
+      ),
+      (
+        "_a4jJYBzZT",
+        ["._a4jJYBzZT{background-blend-mode:hue;}"],
+        1,
+        0,
+        1,
+        [("value", "JYBzZT", "val\\04j\\0& | \\0background-blend-mode:hue")],
+      ),
+      (
+        "_a4jF64ckX",
+        ["._a4jF64ckX{background-blend-mode:saturation;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "F64ckX",
+            "val\\04j\\0& | \\0background-blend-mode:saturation",
+          ),
+        ],
+      ),
+      (
+        "_a4jlFh0PY",
+        ["._a4jlFh0PY{background-blend-mode:color;}"],
+        1,
+        0,
+        1,
+        [("value", "lFh0PY", "val\\04j\\0& | \\0background-blend-mode:color")],
+      ),
+      (
+        "_a4jSZsr0j",
+        ["._a4jSZsr0j{background-blend-mode:luminosity;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "SZsr0j",
+            "val\\04j\\0& | \\0background-blend-mode:luminosity",
+          ),
+        ],
+      ),
+      (
+        "_a4j1pAAe3",
+        ["._a4j1pAAe3{background-blend-mode:normal, multiply;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "1pAAe3",
+            "val\\04j\\0& | \\0background-blend-mode:normal, multiply",
+          ),
+        ],
+      ),
+    ]
+  ];
   
-  CSS.make("css-106lko4", []);
-  CSS.make("css-yyvjpz", []);
-  CSS.make("css-g6k0am", []);
-  CSS.make("css-jqzyj4", []);
-  CSS.make("css-1hwt403", []);
-  CSS.make("css-1ywm2bs", []);
-  CSS.make("css-28haz0", []);
-  CSS.make("css-1aiw6n1", []);
-  CSS.make("css-1bgzgq9", []);
-  CSS.make("css-183ndlc", []);
-  CSS.make("css-xl54fr", []);
-  CSS.make("css-1yabobq", []);
-  CSS.make("css-1htuj9e", []);
-  CSS.make("css-1e9qzf6", []);
-  CSS.make("css-1mv0k1i", []);
-  CSS.make("css-10szft", []);
-  CSS.make("css-139jmn5", []);
-  CSS.make("css-13cnam7", []);
-  CSS.make("css-qf0fcc", []);
-  CSS.make("css-10bwb0u", []);
-  CSS.make("css-89mqbu", []);
-  CSS.make("css-129kb0h", []);
-  CSS.make("css-vlejn3", []);
-  CSS.make("css-1gtgoey", []);
-  CSS.make("css-1p2yjd5", []);
-  CSS.make("css-cz39ay", []);
-  CSS.make("css-hxbqd8", []);
-  CSS.make("css-1fze5j0", []);
-  CSS.make("css-dw2r9t", []);
-  CSS.make("css-1l0nlb2", []);
-  CSS.make("css-1way3l6", []);
-  CSS.make("css-12toyo7", []);
-  CSS.make("css-1o4xi8v", []);
-  CSS.make("css-909g5x", []);
-  CSS.make("css-m4l4fq", []);
+  CSS.make("_aeteqeUz0", []);
+  CSS.make("_aetQPc0NP", []);
+  CSS.make("_aetXZdEOL", []);
+  CSS.make("_aetvjUBPf", []);
+  CSS.make("_aetM4fBao", []);
+  CSS.make("_aet6KNhTt", []);
+  CSS.make("_aetI3H05b", []);
+  CSS.make("_aetZM93Dr", []);
+  CSS.make("_aetJBIqsM", []);
+  CSS.make("_aet5hGv7l", []);
+  CSS.make("_aetn4MHje", []);
+  CSS.make("_aetqagnnP", []);
+  CSS.make("_aetZUtM0B", []);
+  CSS.make("_aetLjw0WG", []);
+  CSS.make("_aetF0nNYJ", []);
+  CSS.make("_aetg2Sjcm", []);
+  CSS.make("_ac6Tw-ysp", []);
+  CSS.make("_ac6Sc-4_I", []);
+  CSS.make("_a4jsfXRnO", []);
+  CSS.make("_a4jo7JHmi", []);
+  CSS.make("_a4jEPTu-u", []);
+  CSS.make("_a4j0PNSB8", []);
+  CSS.make("_a4jlnGVlq", []);
+  CSS.make("_a4j-QbNgV", []);
+  CSS.make("_a4jb0xiRH", []);
+  CSS.make("_a4j0DXzDG", []);
+  CSS.make("_a4jP0slMf", []);
+  CSS.make("_a4joDmhw7", []);
+  CSS.make("_a4j-CLKEU", []);
+  CSS.make("_a4j6RG8OZ", []);
+  CSS.make("_a4jJYBzZT", []);
+  CSS.make("_a4jF64ckX", []);
+  CSS.make("_a4jlFh0PY", []);
+  CSS.make("_a4jSZsr0j", []);
+  CSS.make("_a4j1pAAe3", []);
