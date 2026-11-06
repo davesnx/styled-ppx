@@ -14,26 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
 
-  $ dune describe pp ./input.re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      hidden_include_dirs: [],
-      load_path: ([], []),
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      no_alias_deps: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --lineAlpha-1sh9rrm{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-1n4cbat{syntax:\"*\";inherits:false;}"];
   [@css "@property --selectedMuted-1eqw3q8{syntax:\"*\";inherits:false;}"];

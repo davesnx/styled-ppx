@@ -14,26 +14,7 @@ a CSS rule.
   >  (preprocess (pps styled-ppx -- --dev)))
   > EOF
 
-  $ dune describe pp ./input.re
-  [@ocaml.ppx.context
-    {
-      tool_name: "ppx_driver",
-      include_dirs: [],
-      hidden_include_dirs: [],
-      load_path: ([], []),
-      open_modules: [],
-      for_package: None,
-      debug: false,
-      use_threads: false,
-      use_vmthreads: false,
-      recursive_types: false,
-      principal: false,
-      no_alias_deps: false,
-      unboxed_types: false,
-      unsafe_string: false,
-      cookies: [],
-    }
-  ];
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css.atoms
     [
       (
