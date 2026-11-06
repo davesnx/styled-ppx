@@ -105,6 +105,15 @@ test: build
 		make --no-print-directory $${target} || status=1; \
 	done; exit $$status
 
+CX_DIR = packages/cx-conformance
+CX = node --experimental-strip-types --no-warnings $(CX_DIR)/src/main.ts
+
+.PHONY: test-cx
+test-cx: ## Run the cx conformance suite (model, and ppx when present); not part of "make test"
+	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	$(CX) --self-test
+	$(CX) --candidate model,ppx
+
 # Demo
 
 .PHONY: demo-static

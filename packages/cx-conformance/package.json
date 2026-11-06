@@ -1,0 +1,22 @@
+{
+  "name": "cx-conformance",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --no-warnings src/main.ts",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@emotion/css": "11.13.5",
+    "playwright-core": "1.64.1",
+    "stylis": "4.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "@types/stylis": "4.2.7",
+    "typescript": "5.9.3"
+  }
+}
