@@ -51,24 +51,29 @@ let id_at s pos =
 
 let decode_bundle token width =
   let count = (symbol_index token.[2] * 64) + symbol_index token.[3] in
+  let value_at = width - 6 in
+  let rec cells k pos acc =
+    if k = count then if pos = value_at then Some (List.rev acc) else None
+    else if pos + 8 > value_at then None
+    else if token.[pos] = 'z' && token.[pos + 1] = 'z' then
+      if pos + 14 <= value_at && symbols_at token (pos + 2) 12 then
+        cells (k + 1) (pos + 14)
+          ((Name (String.sub token (pos + 2) 6), String.sub token (pos + 8) 6)
+          :: acc)
+      else None
+    else if id_at token pos && symbols_at token (pos + 2) 6 then
+      cells (k + 1) (pos + 8)
+        ((Id (String.sub token pos 2), String.sub token (pos + 2) 6) :: acc)
+    else None
+  in
   if
     count < 1
-    || width <> 10 + (8 * count)
     || (not (symbols_at token 2 2))
-    || not (symbols_at token (width - 6) 6)
+    || not (symbols_at token value_at 6)
   then Foreign
   else (
-    let rec cells k acc =
-      if k < 0 then Some acc
-      else (
-        let pos = 4 + (8 * k) in
-        if id_at token pos && symbols_at token (pos + 2) 6 then
-          cells (k - 1)
-            ((Id (String.sub token pos 2), String.sub token (pos + 2) 6) :: acc)
-        else None)
-    in
-    match cells (count - 1) [] with
-    | Some cells -> Bundle { cells; value = String.sub token (width - 6) 6 }
+    match cells 0 4 [] with
+    | Some cells -> Bundle { cells; value = String.sub token value_at 6 }
     | None -> Foreign)
 
 let decode token =
@@ -136,7 +141,11 @@ let encode_bundle ~cells ~value =
         check_id id;
         Buffer.add_string buf id;
         Buffer.add_string buf ctx
-      | Name _ -> invalid_arg "Css_class_format.bundle cell property")
+      | Name name ->
+        check_symbols "name" name 6;
+        Buffer.add_string buf "zz";
+        Buffer.add_string buf name;
+        Buffer.add_string buf ctx)
     cells;
   Buffer.add_string buf value;
   Buffer.contents buf

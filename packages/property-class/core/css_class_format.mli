@@ -23,7 +23,10 @@ val plain_ctx : string
 val decode : string -> decoded
 
 val encode_atom : prop:prop -> ctx:string -> value:string -> string
+
+(** A cell is [pid2 ctx6], or [zz name6 ctx6] for a [Name]. *)
 val encode_bundle : cells:(prop * string) list -> value:string -> string
+
 val encode_binding_id : string -> string
 
 (** Splits on spaces and drops empty tokens. *)

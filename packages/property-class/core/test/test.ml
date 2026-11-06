@@ -89,6 +89,20 @@ let format_tests =
             (Format_.decode (bundle n))
             (Bundle { cells = cells n; value = "Xk3_9w" }))
         [ 1; 2; 3; 63; 64; 65; 4095 ]);
+    case "bundles with name cells round trip" (fun () ->
+      let mixed =
+        [
+          Format_.Id "0a", "3fQ-zT";
+          Format_.Name "a-B_c9", "3fQ-zT";
+          Format_.Id "0b", "000000";
+          Format_.Name "zzzzzz", "000000";
+        ]
+      in
+      let token = Format_.encode_bundle ~cells:mixed ~value:"Xk3_9w" in
+      Alcotest.(check int) "width" (10 + 8 + 14 + 8 + 14) (String.length token);
+      Alcotest.(check bool) "identifier" true (is_identifier token);
+      check ~__POS__ decoded (Format_.decode token)
+        (Bundle { cells = mixed; value = "Xk3_9w" }));
     case "binding id round trips" (fun () ->
       check ~__POS__ decoded (Format_.decode binding) (Binding_id "aB3_-zZ9"));
     case "every minted token is a CSS identifier that starts with an underscore"
@@ -126,6 +140,11 @@ let format_tests =
           "_bAB0a3fQ-zT0b3fQ-zTXk3_9";
           "_bACzz3fQ-zT0b3fQ-zTXk3_9w";
           "_bAC0a3fQ-zT0b3fQ-z.Xk3_9w";
+          "_bABzz3fQ-zT0b3fQ-zTXk3_9w";
+          "_bABzz3fQ-zTXk3_9w";
+          "_bABzz3fQ-zT0b3fQ-zTXk3_9";
+          "_bAC0azz3fQ-zTXk3_9w";
+          "_bABzz3fQ-z.0b3fQ-zTXk3_9w";
         ]);
     case "tokens" (fun () ->
       Alcotest.(check (list string))
@@ -152,8 +171,8 @@ let format_tests =
       rejects "no cells" (fun () ->
         Format_.encode_bundle ~cells:[] ~value:"Xk3_9w");
       rejects "too many cells" (fun () -> bundle 4096);
-      rejects "name cell" (fun () ->
-        Format_.encode_bundle ~cells:[ Name "abcdef", "3fQ-zT" ] ~value:"Xk3_9w");
+      rejects "short name cell" (fun () ->
+        Format_.encode_bundle ~cells:[ Name "abc", "3fQ-zT" ] ~value:"Xk3_9w");
       rejects "short binding id" (fun () -> Format_.encode_binding_id "abc"));
   ]
 

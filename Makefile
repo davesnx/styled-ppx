@@ -112,6 +112,20 @@ gen-property-class: ## Regenerate the property table and cover tables
 CX_DIR = packages/cx-conformance
 CX = node --experimental-strip-types --no-warnings $(CX_DIR)/src/main.ts
 
+UNITS_GEN = node --experimental-strip-types --no-warnings packages/property-class/gen/export_units.ts
+UNITS_FIXTURE = packages/property-class/gen/units_fixture.json
+
+.PHONY: gen-property-class-units
+gen-property-class-units: ## Regenerate the atomize fixture from the cx model
+	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	$(UNITS_GEN) $(UNITS_FIXTURE)
+
+.PHONY: test-property-class-units
+test-property-class-units: ## Check the atomize fixture against the cx model; not part of "make test"
+	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	$(UNITS_GEN) _build/units_fixture.check.json
+	diff $(UNITS_FIXTURE) _build/units_fixture.check.json
+
 .PHONY: test-cx
 test-cx: ## Run the cx conformance suite (model, and ppx when present); not part of "make test"
 	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
