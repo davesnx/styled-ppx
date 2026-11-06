@@ -184,7 +184,7 @@ probed at widths 1024, 750 and 500, with and without `:hover`. Up to 12
 orders per case.
 
 Shapes are labelled with the issue or decision that accepts them (RT-01,
-RT-05, RT-06, decision 14). `OPEN` and `NEW` shapes are not accepted. A
+RT-05, RT-06, decisions 14 and 15). `NEW` and `OPEN` shapes are not accepted. A
 `& > *` failure counts as decision 14 only when the child carries a block the
 parent also carries; any other descendant failure is `NEW`.
 

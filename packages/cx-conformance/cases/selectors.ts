@@ -141,7 +141,7 @@ const all: Case[] = [
     blocks: { s: "& + &{margin-top:10px;}", x: "color:red;" },
     tree: [{ id: "p", merge: [], children: [{ id: "s1", merge: ["s"] }, { id: "s2", merge: ["s", "x"] }] }],
     probes: [{ el: "s2", props: ["margin-top"] }],
-    expect: knownFail("RT-11", "residual after decision 11: `&` resolves to the binding id, but both siblings carry the binding `s`; cx matches only siblings with the same merged class, and here the merged classes differ"),
+    expect: knownFail("decision-16", "`& + &` means this component next to itself: both siblings carry the binding `s`; cx matches only siblings with the same merged class, and here the merged classes differ"),
   },
   {
     id: "selectors-29",
@@ -159,7 +159,7 @@ const all: Case[] = [
     blocks: { s: "& ~ &{margin-top:10px;}", x: "color:red;" },
     tree: [{ id: "p", merge: [], children: [{ id: "s1", merge: ["s", "x"] }, { id: "m", merge: [] }, { id: "s2", merge: ["s"] }] }],
     probes: [{ el: "s2", props: ["margin-top"] }],
-    expect: knownFail("RT-11", "residual after decision 11: both siblings carry the binding `s`; cx needs the same merged class on both"),
+    expect: knownFail("decision-16", "`& + &` means this component next to itself: both siblings carry the binding `s`; cx needs the same merged class on both"),
   },
   {
     id: "selectors-31",

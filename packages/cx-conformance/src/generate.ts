@@ -190,7 +190,7 @@ const shapes = {
   partial: "RT-01, accepted (decision 6): partial coverage across operands (like T04-T06)",
   logical: "RT-06, accepted (decision 9): logical vs physical longhands (like T19-T21)",
   conditions: "RT-05, accepted (decision 7): overlapping conditions from different operands (like T29-T31)",
-  bundleResidual: "OPEN (RT-22 residual): a later operand overrides one context of an in-block bundle; the rest of the bundle stays and its sheet position against the later atom is fixed",
+  bundleResidual: "decision 15, accepted 2026-11-06: a later operand overrides one context of an in-block bundle; the rest of the bundle stays at a fixed sheet position",
   inBlockConditions: "overlapping conditions in one block (like T35)",
   inBlockShadow: "one block, one context: a later shorthand does not drop an earlier longhand of the same block",
   unknown: "NEW: no known shape",

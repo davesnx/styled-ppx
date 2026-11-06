@@ -65,9 +65,17 @@ const roleCase: Case = {
   probes: [{ el: "ce" }],
 };
 
-async function varRoles(suite: Suite, mode: "roles" | "one-name"): Promise<{ margin: string; padding: string }> {
-  const rendered = await makeModel({ ...modelOptions(suite.cover), vars: mode }).render(roleCase, {});
-  const html = rendered.html.replace(/(id="ce"[^>]*style=")(--cxv-g(?:-d)?):8px/, "$1$2:99px");
+const selfCase: Case = {
+  ...roleCase,
+  id: "rt12-self",
+  title: "the child is the same binding with another value",
+  blocks: { p: "padding-top:$(g); & > *{margin-top:$(g);}" },
+  tree: [{ id: "pe", merge: ["p"], children: [{ id: "ce", merge: ["p"] }] }],
+};
+
+async function varRoles(suite: Suite, mode: "roles" | "one-name", c: Case = roleCase): Promise<{ margin: string; padding: string }> {
+  const rendered = await makeModel({ ...modelOptions(suite.cover), vars: mode }).render(c, {});
+  const html = rendered.html.replace(/(id="ce"[^>]*style=")([^"]*)/, (_, head: string, style: string) => head + style.replaceAll("8px", "99px"));
   const [reading] = await suite.prober.read({ css: rendered.css, html }, [
     { el: "ce", viewport: defaultViewport, state: [], props: ["margin-top", "padding-top"], pseudos: [] },
   ]);
@@ -106,5 +114,10 @@ export async function selfTest(suite: Suite): Promise<number> {
   );
   const oneName = await varRoles(suite, "one-name");
   check(oneName.margin !== "8px", `one var name per property (no roles): margin-top ${oneName.margin}, must differ from 8px`);
+  const self = await varRoles(suite, "roles", selfCase);
+  check(
+    self.margin === "99px" && self.padding === "99px",
+    `decision 17 (accepted difference; cx gives margin-top 8px): component in itself with another value: margin-top ${self.margin}, padding-top ${self.padding}`,
+  );
   return ok ? 0 : 1;
 }

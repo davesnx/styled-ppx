@@ -1,5 +1,5 @@
 import type { Case } from "../src/case.ts";
-import { M1, merge } from "./lib/build.ts";
+import { M1, knownFail, merge } from "./lib/build.ts";
 
 const all: Case[] = [
   merge("groups-01", "display fallback group vs later display", ["display:-webkit-box;display:flex;", "display:grid;"], ["display"], {
@@ -44,6 +44,10 @@ const all: Case[] = [
   }),
   merge("groups-14", "one block: partial-overlap group, then a merge that covers half of it", ["border-top:1px solid red;border-color:blue;", "border-top:2px dashed green;"], ["border-top-color", "border-left-color", "border-top-style"], {
     why: "A grouped multi-property atom meets a later operand that covers only part of it. The key of a grouped atom (several property ids) is undefined in the design.",
+  }),
+  merge("groups-15", "bundle residual: a later operand overrides one context of an in-block bundle", ["@media (min-width:700px){flex-grow:5;} &:hover{flex:1;}", "@media (min-width:700px){flex:1;}"], ["flex-grow"], {
+    why: "Block a has overlapping rules in two contexts, so it is one bundle class. b sets one of the two contexts. The bundle cannot lose one rule; the rest stays at a fixed sheet position against b's atom, so one merge order differs from cx (generator seed 1, shrunk).",
+    expect: knownFail("decision-15", "a bundle cannot be dropped in part; its remaining rule keeps a fixed sheet position against the later atom, so one merge order differs from cx"),
   }),
 ];
 

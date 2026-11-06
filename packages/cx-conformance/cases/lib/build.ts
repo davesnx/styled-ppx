@@ -3,7 +3,7 @@ import type { Case, El, Expect, Probe, PseudoState, Viewport } from "../../src/c
 export const M1 = "@media (min-width:1px)";
 export const M2 = "@media (min-width:2px)";
 
-const accepted: Record<string, number> = { "RT-01": 6, "RT-05": 7, "RT-04": 8, "RT-06": 9, "decision-14": 14 };
+const accepted: Record<string, number> = { "RT-01": 6, "RT-05": 7, "RT-04": 8, "RT-06": 9, "decision-14": 14, "decision-15": 15, "decision-16": 16 };
 
 export const knownFail = (issue: string, reason: string): Expect => ({
   kind: "known-fail",
