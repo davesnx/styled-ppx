@@ -1,0 +1,24 @@
+(rule
+ (target native.out)
+ (action
+  (with-stdout-to
+   %{target}
+   (run %{exe:native/main.exe}))))
+
+(rule
+ (target melange.out)
+ (deps
+  (alias melange/all)
+  (source_tree %{project_root}/demo/melange/node_modules))
+ (action
+  (with-stdout-to
+   %{target}
+   (setenv
+    NODE_PATH
+    %{project_root}/demo/melange/node_modules
+    (run node melange/out/packages/runtime/test/parity/melange/main.js)))))
+
+(rule
+ (alias test-runtime)
+ (action
+  (diff native.out melange.out)))

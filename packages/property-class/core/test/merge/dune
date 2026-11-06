@@ -1,0 +1,11 @@
+(test
+ (name merge_test)
+ (flags
+  (:standard -open Alcotest_extra))
+ (libraries property_class_core alcotest alcotest_extra))
+
+(rule
+ (alias test-property-class)
+ (deps merge_test.exe)
+ (action
+  (run %{deps})))

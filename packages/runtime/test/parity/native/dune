@@ -1,0 +1,5 @@
+(copy_files ../vectors.ml)
+
+(executable
+ (name main)
+ (libraries styled-ppx.native server-reason-react.reactDom))

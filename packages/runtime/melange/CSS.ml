@@ -19,8 +19,13 @@ let make className vars : styles =
   in
   className, loop (ReactDOM.Style.make ()) vars
 
+module Class_merge = Css_merge.Make (struct
+  let sub s pos len = Js.String.slice ~start:pos ~end_:(pos + len) s
+  let concat sep parts = Js.Array.join ~sep (Array.of_list parts)
+end)
+
 let merge (styles1 : styles) (styles2 : styles) =
-  let className = Js.String.trim (fst styles1 ^ " " ^ fst styles2) in
+  let className = Class_merge.merge (fst styles1) (fst styles2) in
   let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
   className, style
 

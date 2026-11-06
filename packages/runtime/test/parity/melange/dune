@@ -1,0 +1,9 @@
+(copy_files ../vectors.ml)
+
+(melange.emit
+ (target out)
+ (modules main vectors)
+ (libraries styled-ppx.melange reason-react)
+ (module_systems commonjs)
+ (preprocess
+  (pps melange.ppx)))

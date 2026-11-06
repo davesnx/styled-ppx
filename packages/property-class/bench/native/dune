@@ -1,0 +1,5 @@
+(copy_files ../bench.ml)
+
+(executable
+ (name bench)
+ (libraries styled-ppx.native))
