@@ -38,10 +38,6 @@ Partially. The extraction pipeline and `[%css]` work anywhere, and `CSS.classNam
 
 Yes: server-reason-react renders your components to an HTML string, and your server serves it plus the static `styles.css`. See the [native guide](/getting-started/native) for a Dream handler example.
 
-## Why did my class names change between builds?
-
-They shouldn't have, unless something real changed: hashes are content-addressed from the CSS text (plus the main module name for interpolation variables). Names change exactly when the styles change, when a binding is renamed (the cosmetic `-label` suffix only), or when the ppx `--minify` flag differs between the builds you're comparing. Dev and prod names differ only by that label suffix; the hash is identical.
-
 ## Can I extract the CSS for only part of my project?
 
 Yes, through the generate rule's `deps`: the stylesheet contains exactly the rules found in the files you glob. The caveat is cross-module selector references: they must resolve within the files passed to the rule. Per-route CSS splitting is not built in.

@@ -63,6 +63,8 @@ jobs:
 
       - name: Test
         run: make test
+        env:
+          CX_CHROMIUM: ${{ runner.os == 'macOS' && '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' || '/usr/bin/google-chrome' }}
 
       - name: Format
         if: matrix.ocaml-compiler == '5.4.0'

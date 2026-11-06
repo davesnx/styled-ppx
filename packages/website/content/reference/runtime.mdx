@@ -21,7 +21,7 @@ Every `[%css]{:reason}` block evaluates to a `CSS.styles` value: the generated c
 | --- | --- | --- |
 | `CSS.className` | `styles => string{:reason}` | The space-separated class names, for a `className` attribute |
 | `CSS.styles` | `styles => ReactDOM.Style.t{:reason}` | The inline custom-property values, for a `style` attribute |
-| `CSS.merge` | `(styles, styles) => styles{:reason}` | Combine two values: concatenates classNames, merges vars |
+| `CSS.merge` | `(styles, styles) => styles{:reason}` | Combine two values |
 | `CSS.empty` | `styles{:reason}` | The neutral element: no classes, no vars |
 
 In JSX you rarely need `className`/`styles` directly: the `styles` attribute is rewritten by the ppx into both.
@@ -54,7 +54,7 @@ let app' = <div className=(CSS.className card) style=(CSS.styles card) />
 
 `CSS.styles` values are ordinary values: store them in records, return them from functions, pattern match over them. Composition is just programming: there is no styling DSL to learn.
 
-`CSS.merge(a, b)` concatenates the class names of both sides and combines their custom-property vars. It is associative, and `CSS.empty` is its neutral element, which makes it the natural "no styles" branch of a conditional:
+`CSS.merge(a, b)` is associative, and `CSS.empty` is its neutral element, which makes it the natural "no styles" branch of a conditional:
 
 ```reason
 let button = [%css "padding: 8px 16px"];
@@ -71,34 +71,6 @@ let highlight = [%css "outline: 2px solid"]
 
 let styles = CSS.merge button (if active then highlight else CSS.empty)
 ```
-
-### Which declaration wins
-
-If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
-
-Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only source position matters.
-
-```reason
-let danger = [%css "background-color: red"];  /* defined FIRST */
-let button = [%css "background-color: gray"]; /* defined second */
-
-/* Both of these render a GRAY background: button's atom
-   comes later in the stylesheet, so it wins the tie. */
-<div styles={CSS.merge(button, danger)} />;
-<div styles={CSS.merge(danger, button)} />;
-```
-
-```mlx
-let danger = [%css "background-color: red"]  (* defined FIRST *)
-let button = [%css "background-color: gray"] (* defined second *)
-
-(* Both of these render a GRAY background: button's atom
-   comes later in the stylesheet, so it wins the tie. *)
-let a = <div styles=(CSS.merge button danger) />
-let b = <div styles=(CSS.merge danger button) />
-```
-
-The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
 
 ### Patterns
 
@@ -165,12 +137,9 @@ let%component make ?(styles = CSS.empty) ~children () =
   <div styles=(CSS.merge base_styles styles)> children </div>
 ```
 
-Merging the caller's value combines its vars and class names; remember that for *conflicting properties* the caller's declarations win only if they're defined later in source than `baseStyles` (see above), or if they target different properties.
-
 ### Anti-patterns
 
 - **Don't concatenate class names by hand.** `CSS.className(a) ++ " " ++ CSS.className(b)` silently drops the custom-property vars that `CSS.merge` would carry, so interpolated values stop applying.
-- **Don't rely on merge order for overrides.** See "Which declaration wins".
 
 ## Values
 

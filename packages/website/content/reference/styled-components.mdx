@@ -107,12 +107,6 @@ let app =
   />
 ```
 
-The resultant HTML contains the generated atomic class names (one per declaration) plus the className passed by props:
-
-```html
-<input class="css-1qbcma3-Input css-tokvmb-Input css-8i02mp-Input css-1ru12dh-Input extra-classname" maxlength="255" placeholder="Enter your name...">
-```
-
 ### Derive styles from props
 
 `styled.{{tag}}` can also be defined by a function returning the CSS string. The function's labelled arguments become props on the component, on top of all the props from the element:

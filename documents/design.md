@@ -80,9 +80,8 @@ extraction:
 the enclosing `let`-binding name (recovered by the ordered structure pass in
 `ppx.re`, which walks bindings in source order) is mapped to the list of class
 names that atomization produced. Later `[%css]` blocks in the same file resolve
-`&.$(name)` and similar selector interpolations against that environment,
-fanning a multi-declaration source binding into a chained compound selector
-(`&.cssA.cssB`). Unresolved local references (undefined or forward) raise a
+`&.$(name)` and similar selector interpolations against that environment.
+Unresolved local references (undefined or forward) raise a
 clear PPX error; cross-module references are recorded in `Cross_module_refs`
 and resolved by the aggregator (see `documents/css-extraction.md`).
 
@@ -257,8 +256,7 @@ module Theme = [%styled.global {|
   /* Bare $(name) - resolves to a class type-selector */
   body $(card) { line-height: 1.5; }
 
-  /* .$(name) - class-position; multi-decl bindings fan out into a
-     compound chain (.atom1.atom2). */
+  /* .$(name) - class-position. */
   .$(card).$(active) { color: white; }
 
   /* Combinators, pseudo, attribute selectors, comma lists, nesting,

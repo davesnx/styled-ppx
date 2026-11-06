@@ -101,7 +101,7 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
 .PHONY: test
 test: build
-	@status=0; for target in $(TEST_TARGETS); do \
+	@status=0; for target in $(TEST_TARGETS) test-property-class-units test-cx; do \
 		make --no-print-directory $${target} || status=1; \
 	done; exit $$status
 
@@ -121,14 +121,16 @@ gen-property-class-units: ## Regenerate the atomize fixture from the cx model
 	$(UNITS_GEN) $(UNITS_FIXTURE)
 
 .PHONY: test-property-class-units
-test-property-class-units: ## Check the atomize fixture against the cx model; not part of "make test"
+test-property-class-units: ## Check the atomize fixture against the cx model
 	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	@mkdir -p _build
 	$(UNITS_GEN) _build/units_fixture.check.json
 	diff $(UNITS_FIXTURE) _build/units_fixture.check.json
 
 .PHONY: test-cx
-test-cx: ## Run the cx conformance suite (model, and ppx when present); not part of "make test"
+test-cx: ## Run the cx conformance suite (model, and ppx when present)
 	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	@test -d demo/melange/node_modules || npm --prefix demo/melange ci
 	$(CX) --self-test
 	$(CX) --candidate model,ppx
 

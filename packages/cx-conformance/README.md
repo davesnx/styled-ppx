@@ -18,7 +18,7 @@ runner uses `$CX_CHROMIUM`, else the newest
 ## Commands
 
 From the repository root, `make test-cx` runs the self-test, then the `model`
-and `ppx` candidates. It is not part of `make test`.
+and `ppx` candidates.
 
 From `packages/cx-conformance`:
 

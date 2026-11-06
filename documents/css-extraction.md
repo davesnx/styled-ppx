@@ -70,54 +70,13 @@ styled-ppx.generate (post-build aggregator)
 styles.css
 ```
 
-## Wire protocol: four attributes
+## Wire protocol
 
-Everything the aggregator needs to know is conveyed by four top-level
+Everything the aggregator needs to know is conveyed by top-level
 floating attributes that the PPX appends to the post-PPX file. They are
 the entire interface between PPX expansion and the aggregator — the
 aggregator never re-parses `CSS.make` calls or infers facts from filenames,
 and it takes no mode flags: the build environment travels in-band.
-
-### `[@@@css "..."]` — extracted CSS rule
-
-A single CSS rule string. One attribute per atomized rule, per global
-rule, or per `@keyframes` block.
-
-```ocaml
-[@@@css ".css-tokvmb-marker{color:red;}"]
-[@@@css ".css-1ru12dh-button:hover{opacity:0.8;}"]
-[@@@css "@media (min-width:768px){.css-fmb91l-card{padding:2rem;}}"]
-[@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
-```
-
-The string may contain NUL-delimited cross-module sentinels
-(`\x00LONGIDENT\x00`) when the PPX could not resolve a `$(M.binding)`
-selector reference at PPX time. The aggregator substitutes those at
-resolve time (see "Resolve" below; the sentinel constants live in
-`packages/css-extraction/css_extraction.ml`).
-
-### `[@@@css.bindings [(longident, class_string); ...]]` — binding exports
-
-One attribute per CU, listing every named `[%css]` binding and
-`[%styled.<tag>]` component the CU minted.
-The longident is the fully-qualified path users would write to reference
-the binding from another module; the class string is the
-space-separated list of atomized class names the PPX produced.
-
-```ocaml
-[@@@css.bindings
-  [("M.marker", "css-xb6hrn-marker");
-   ("M.Css.active", "css-tokvmb-active");
-   ("M.layout", "css-k008qs-layout css-1tyndxa-layout")]]
-```
-
-The aggregator folds every payload into a flat
-`(longident, class_string) Hashtbl` — its global resolution index. No
-AST walking, no `CSS.make` pattern matching, no filename-to-module
-inference.
-
-Anonymous bindings (`let _ = [%css ...]`) are not exported because they
-cannot be referenced from another module.
 
 ### `[@@@css.refs [(longident, file, line, scol, ecol); ...]]` — cross-module references
 
@@ -273,75 +232,6 @@ _                         → ignore
 
 The harvest pass is the **only** time the aggregator looks at the AST.
 Everything downstream operates on plain strings.
-
-### Resolve
-
-For each rule string, scan for `\x00LONGIDENT\x00` sentinel pairs:
-
-- on hit: replace with `Hashtbl.find idx longident`, converting the
-  space-separated class string to a dot-chain (`"a b c"` → `"a.b.c"`)
-  so it slots into selector chains correctly
-- on miss: report an error using the location stored in the file's
-  `[@@@css.refs ...]`, distinguishing **cross-library** (root module
-  not found in any binding's longident) from **missing binding**
-
-Errors are accumulated; if any fire, the aggregator prints them all to
-stderr in `File "...", line N, characters X-Y:` format (the OCaml
-compiler convention, so editors pick them up) and exits 1.
-
-### Dedup and write
-
-Resolved rule strings are deduplicated with an order-preserving
-`Hashtbl` filter: walk the rules in source-traversal order and keep the
-first occurrence of each string. This removes duplicates produced by the
-same rule appearing in multiple files (common for shared helpers).
-
-Order preservation is load-bearing: every atomized rule has the same
-specificity (one class, no qualifiers), so the cascade tiebreaker is
-"later in stylesheet wins". A longhand override written after a
-shorthand (`margin: 10px; margin-top: 20px`) must stay after it in the
-emitted stylesheet. An earlier version deduped through
-`Set.Make(String)`, which sorted by hash-prefixed rule text and silently
-destroyed declaration order (regression test:
-`packages/generate/test/source-order.t`).
-
-The deduplicated list is then written to the output channel. Inter-rule
-newlines are dropped when every contributing input file declared
-`env=production` in its `[@@@css.config ...]` (see the wire protocol
-section above); there is no CLI flag for this.
-
-## Atomization
-
-Every declaration produced by `[%css]` becomes its own atom:
-`{ display: flex; color: red; }` produces two rules, two class names,
-two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
-space-separated concatenation of those class names, so consumers apply
-all atoms by setting one `className` attribute.
-
-Class names follow `css-<murmur2 hash of CSS>-<binding label>` format
-(or bare `css-<hash>` when the PPX driver runs with production
-settings). The binding label is purely cosmetic — atom hashes are
-deduplication-safe even when labels differ. Minting lives in
-`packages/ppx/src/Hash_class.ml`.
-
-The environment is a PPX concern, set once per `(pps styled-ppx ...)`
-stanza: `--env production` (alias for `--minify`) drops label suffixes
-and minifies rule bodies; `--env development` (alias for `--dev`) keeps
-readable labels and adds `cx-<binding>` marker classes. Labels are baked
-into class names at PPX time — in both the compiled `className` and the
-extracted `[@@@css ...]` payload — so no downstream tool could change
-them without desyncing the two. The aggregator learns the environment
-from `[@@@css.config ...]` and adjusts its whitespace accordingly.
-
-Two consequences worth knowing:
-
-1. **One `[%css]` binding maps to N class names.** This is what the
-   space-separated `class_string` in `[@@@css.bindings ...]` captures.
-2. **Cross-module `$(M.marker)` resolves to a chained compound** (e.g.
-   `.cssA.cssB`) not a single class. The aggregator does the
-   space-to-dot conversion so the resulting selector requires *all*
-   atoms of `M.marker` to be present on the element, matching the
-   semantics of using `M.marker` as a className locally.
 
 ## What this design intentionally avoids
 
