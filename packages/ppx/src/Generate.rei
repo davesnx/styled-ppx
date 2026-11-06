@@ -2,6 +2,7 @@ let dynamicExtractedComponent:
   (
     ~loc: Ppxlib.location,
     ~file: string,
+    ~main_module: string,
     ~scope: list(string),
     ~opens: list(list(string)),
     ~htmlTag: string,

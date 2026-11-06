@@ -249,9 +249,11 @@ let expand_css_expression =
         let (classNames, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
             ~source_position_start,
+            ~binding_name=?label_name,
             ~label?,
             rule_list,
           );
@@ -522,9 +524,11 @@ let expand_styled_module =
         let (classNames, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
             ~source_position_start,
+            ~binding_name=name,
             ~label=name,
             rule_list,
           );
@@ -581,6 +585,7 @@ let expand_styled_module =
     Generate.dynamicExtractedComponent(
       ~loc=payload.pexp_loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~htmlTag,

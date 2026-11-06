@@ -32,6 +32,9 @@
    The emitted identifier families
    -------------------------------
      class name   `css-<hash(content)>[-<label>]`          (class_name)
+     marker       `css-<hash(marker \0 module \0 scope \0 name)>[-<label>]`
+                  an empty [%css] binding, which has no content to hash
+                                                           (marker_class)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
                   the label-free identity of an atom; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
@@ -144,6 +147,15 @@ let class_and_namespace ?label content =
 
 (* Just the class name: `css-<hash(content)>[-<label>]`. *)
 let class_name ?label content = fst (class_and_namespace ?label content)
+
+(* An empty marker's class. Every empty body has the same content, so the
+   identity is the binding's position instead: the compilation-unit module
+   name (path-independent, as in [scoped_namespace]), the submodule path and
+   the binding name. The input contains NUL, which no rendered rule does, so
+   it never equals an atom's content. *)
+let marker_class ?label ~module_name ~scope name =
+  class_name ?label
+    (nul_join [ "marker"; module_name; String.concat "." scope; name ])
 
 (* -- Interpolation variables ------------------------------------------- *)
 

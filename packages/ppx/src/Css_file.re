@@ -1256,24 +1256,33 @@ module Css_transform = {
   };
 };
 
-/* Empty `[%css {||}]` bound to a named `let` mints a deterministic
-   class handle (`css-<hash-of-empty>-<label>`) so consumers can
-   resolve `&.$(name)` against it. No `[@@@css ...]` is emitted —
-   there's no rule to write. Anonymous (`_`) and statement-position
-   bindings return `[]`, preserving the historical `CSS.make("", [])`
-   shape. */
-let mint_empty_class = (~label) =>
-  switch (label) {
-  | Some(name) when name != "_" => [Hash_class.class_name(~label=name, "")]
+/* Empty `[%css {||}]` bound to a named `let` mints a class handle
+   (`Hash_class.marker_class`) so consumers can resolve `&.$(name)` against
+   it.
+   No `[@@@css ...]` is emitted — there's no rule to write. Anonymous (`_`)
+   and statement-position bindings return `[]`, preserving the historical
+   `CSS.make("", [])` shape. */
+let mint_empty_class = (~main_module, ~scope, ~binding_name, ~label) =>
+  switch (binding_name) {
+  | Some(name) when name != "_" => [
+      Hash_class.marker_class(
+        ~label?,
+        ~module_name=main_module,
+        ~scope,
+        name,
+      ),
+    ]
   | _ => []
   };
 
 let push =
     (
       ~file,
+      ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
       ~source_position_start,
+      ~binding_name=?,
       ~label=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
@@ -1320,7 +1329,7 @@ let push =
 
   let classNames =
     switch (binding_classes) {
-    | [] => mint_empty_class(~label)
+    | [] => mint_empty_class(~main_module, ~scope, ~binding_name, ~label)
     | _ => binding_classes
     };
 
