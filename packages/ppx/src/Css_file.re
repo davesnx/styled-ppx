@@ -1285,6 +1285,7 @@ let push =
       ~source_position_start,
       ~binding_name=?,
       ~label=?,
+      ~binding_id=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
   let (shipped_rules, binding_classes, dynamic_vars, safe_inherits_false_vars) =
@@ -1294,6 +1295,7 @@ let push =
       ~opens,
       ~source_position_start,
       ~label?,
+      ~binding_id?,
       declarations,
     );
 
@@ -1492,6 +1494,8 @@ let push_global =
 
   List.rev(ctx.dynamic_vars^);
 };
+
+let get_atoms = (): list(Css_extraction.atom) => [];
 
 let get = () => {
   let rules = Buffer.get_rules();
