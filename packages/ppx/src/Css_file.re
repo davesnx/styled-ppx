@@ -1138,6 +1138,7 @@ module Css_transform = {
         ~opens: list(list(string)),
         ~source_position_start,
         ~label=?,
+        ~binding_id as _binding_id=?,
         rule_list: rule_list,
       ) => {
     let ctx = {

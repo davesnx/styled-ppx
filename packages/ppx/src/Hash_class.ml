@@ -41,6 +41,9 @@
      occurrence   `<variable>_<n>` when a name repeats in one declaration
      keyframes    `keyframe-<hash(body)>`                  (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
+     atom class   `_a|_c|_x|_b<ids><hash64>`               (atom_class)
+     binding id   `_i<hash64(bind \0 library \0 module \0 scope \0 name \0 n)>`
+                                                           (binding_id)
      scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
 
    The atomic invariant this module protects
@@ -156,6 +159,25 @@ let class_name ?label content = fst (class_and_namespace ?label content)
 let marker_class ?label ~module_name ~scope name =
   class_name ?label
     (nul_join [ "marker"; module_name; String.concat "." scope; name ])
+
+let atom_class unit_ = Property_class_mint.Mint.token unit_
+
+(* [occurrence] separates bindings that share [scope] and [name] (shadowing).
+   [module_name] is path-independent, as in [marker_class]. *)
+let binding_id ~library ~module_name ~scope ~name ~occurrence =
+  let input =
+    nul_join
+      [
+        "bind";
+        library;
+        module_name;
+        String.concat "." scope;
+        name;
+        string_of_int occurrence;
+      ]
+  in
+  Property_class_core.Css_class_format.encode_binding_id
+    (Property_class_mint.Hash64.chars (Property_class_mint.Hash64.hash input) 8)
 
 (* -- Interpolation variables ------------------------------------------- *)
 

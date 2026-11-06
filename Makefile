@@ -74,7 +74,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-generate
+TEST_TARGETS := test-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-generate test-property-class
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test
@@ -104,6 +104,10 @@ test: build
 	@status=0; for target in $(TEST_TARGETS); do \
 		make --no-print-directory $${target} || status=1; \
 	done; exit $$status
+
+.PHONY: gen-property-class
+gen-property-class: ## Regenerate the property table and cover tables
+	node --experimental-strip-types --no-warnings packages/property-class/gen/gen_tables.ts
 
 CX_DIR = packages/cx-conformance
 CX = node --experimental-strip-types --no-warnings $(CX_DIR)/src/main.ts
