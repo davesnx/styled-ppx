@@ -32,7 +32,7 @@ Development:
       ),
       (
         "_c7f-QfSkE1JM33Y",
-        ["._c7f-QfSkE1JM33Y:hover:focus{color:red;}"],
+        ["._c7f-QfSkE1JM33Y:focus:hover{color:red;}"],
         2,
         1,
         1,
@@ -119,7 +119,7 @@ Production:
       ),
       (
         "_c7f-QfSkE1JM33Y",
-        ["._c7f-QfSkE1JM33Y:hover:focus{color:red;}"],
+        ["._c7f-QfSkE1JM33Y:focus:hover{color:red;}"],
         2,
         1,
         1,

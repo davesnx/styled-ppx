@@ -14,6 +14,9 @@ let seen: Hashtbl.t(string, unit) = Hashtbl.create(16);
 
 let occurrences: Hashtbl.t((string, string), int) = Hashtbl.create(16);
 let minted_ids: ref(list((string, string))) = ref([]);
+let library = ref("");
+
+let set_library = name => library := name;
 
 let reset = () => {
   entries := [];
@@ -29,7 +32,7 @@ let mint_id = (~main_module: string, ~scope: list(string), ~name: string) => {
   Hashtbl.replace(occurrences, key, occurrence + 1);
   let token =
     Hash_class.binding_id(
-      ~library="",
+      ~library=library^,
       ~module_name=main_module,
       ~scope,
       ~name,
@@ -40,7 +43,7 @@ let mint_id = (~main_module: string, ~scope: list(string), ~name: string) => {
       (
         token,
         Hash_class.binding_id_source(
-          ~library="",
+          ~library=library^,
           ~module_name=main_module,
           ~scope,
           ~name,

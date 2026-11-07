@@ -9,7 +9,67 @@ let is_space c =
 
 let is_punctuation c = c = '(' || c = ')' || c = ',' || c = ':'
 
+let is_name_char c =
+  (c >= 'a' && c <= 'z')
+  || (c >= 'A' && c <= 'Z')
+  || (c >= '0' && c <= '9')
+  || c = '-'
+  || c = '_'
+
+let skip_quoted text i =
+  let len = String.length text in
+  let q = text.[i] in
+  let rec go j =
+    if j >= len then len
+    else if text.[j] = '\\' then go (j + 2)
+    else if text.[j] = q then j + 1
+    else go (j + 1)
+  in
+  go (i + 1)
+
+let lowercase_range text start stop =
+  String.sub text start (stop - start) |> String.lowercase_ascii
+
+let canonical_condition condition =
+  let len = String.length condition in
+  let buf = Buffer.create len in
+  let rec go i =
+    if i < len then (
+      match condition.[i] with
+      | '"' | '\'' ->
+        let stop = min len (skip_quoted condition i) in
+        Buffer.add_string buf (String.sub condition i (stop - i));
+        go stop
+      | '(' when i = 0 || not (is_name_char condition.[i - 1]) ->
+        let rec space j =
+          if j < len && is_space condition.[j] then space (j + 1) else j
+        in
+        let start = space (i + 1) in
+        let rec name j =
+          if j < len && is_name_char condition.[j] then name (j + 1) else j
+        in
+        let stop = name start in
+        let next = space stop in
+        let feature =
+          stop > start
+          && (not (stop - start >= 2 && String.sub condition start 2 = "--"))
+          && next < len
+          && String.contains ":)<>=" condition.[next]
+        in
+        Buffer.add_string buf (String.sub condition i (start - i));
+        Buffer.add_string buf
+          (if feature then lowercase_range condition start stop
+           else String.sub condition start (stop - start));
+        go stop
+      | c ->
+        Buffer.add_char buf c;
+        go (i + 1))
+  in
+  go 0;
+  Buffer.contents buf
+
 let normalize_condition condition =
+  let condition = canonical_condition condition in
   let buf = Buffer.create (String.length condition) in
   let len = String.length condition in
   let i = ref 0 in
@@ -34,6 +94,21 @@ let normalize_condition condition =
   String.trim (Buffer.contents buf)
 
 let is_pseudo_char c = (c >= 'a' && c <= 'z') || c = '-'
+let legacy_pseudo_elements = [ "after"; "before"; "first-letter"; "first-line" ]
+
+let word_end selector i =
+  let len = String.length selector in
+  let rec word j =
+    if j < len && is_pseudo_char selector.[j] then word (j + 1) else j
+  in
+  word i
+
+let is_legacy_pseudo_element selector i =
+  selector.[i] = ':'
+  && (i = 0 || selector.[i - 1] <> ':')
+  && List.mem
+       (String.sub selector (i + 1) (word_end selector (i + 1) - i - 1))
+       legacy_pseudo_elements
 
 let pseudo_suffix_from selector start =
   let len = String.length selector in
@@ -42,19 +117,56 @@ let pseudo_suffix_from selector start =
     && selector.[i] = ':'
     && i + 1 < len
     && is_pseudo_char selector.[i + 1]
+    && (not (is_legacy_pseudo_element selector i))
     &&
-    let rec word j =
-      if j < len && is_pseudo_char selector.[j] then word (j + 1) else j
-    in
-    let stop = word (i + 1) in
+    let stop = word_end selector (i + 1) in
     stop = len || pseudo stop
   in
   pseudo start
 
+let lowercase_pseudo_names selector =
+  let len = String.length selector in
+  let buf = Buffer.create len in
+  let rec go i depth =
+    if i < len then (
+      match selector.[i] with
+      | '\\' ->
+        let stop = min len (i + 2) in
+        Buffer.add_string buf (String.sub selector i (stop - i));
+        go stop depth
+      | '"' | '\'' ->
+        let stop = min len (skip_quoted selector i) in
+        Buffer.add_string buf (String.sub selector i (stop - i));
+        go stop depth
+      | '[' ->
+        Buffer.add_char buf '[';
+        go (i + 1) (depth + 1)
+      | ']' ->
+        Buffer.add_char buf ']';
+        go (i + 1) (depth - 1)
+      | ':' when depth = 0 ->
+        let start =
+          if i + 1 < len && selector.[i + 1] = ':' then i + 2 else i + 1
+        in
+        let rec name j =
+          if j < len && is_name_char selector.[j] then name (j + 1) else j
+        in
+        let stop = name start in
+        Buffer.add_string buf (String.sub selector i (start - i));
+        Buffer.add_string buf (lowercase_range selector start stop);
+        go stop depth
+      | c ->
+        Buffer.add_char buf c;
+        go (i + 1) depth)
+  in
+  go 0 0;
+  Buffer.contents buf
+
 let normalize_selector selector =
+  let selector = lowercase_pseudo_names selector in
   let len = String.length selector in
   let rec first i =
-    if i >= len then None
+    if i >= len || is_legacy_pseudo_element selector i then None
     else if pseudo_suffix_from selector i then Some i
     else first (i + 1)
   in

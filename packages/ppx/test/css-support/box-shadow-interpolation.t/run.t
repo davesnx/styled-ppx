@@ -12,11 +12,11 @@ Test box-shadow and text-shadow interpolation support in cx2
   @property --insetShadow-122p9b9{syntax:"*";inherits:false;}
   ._a706KcAqJ{box-shadow:var(--singleShadow-8oxorx);}
   ._a70NG-RMV{box-shadow:var(--shadowArray-12s7t24);}
-  ._a70rDIiHK{box-shadow:none;}
   ._a70Qz38wr{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._all0GOEmD{text-shadow:var(--textShadowValue-u99gc6);}
-  ._allOUOwF6{text-shadow:var(--textShadowArray-g4dtp1);}
-  ._allNcEXal{text-shadow:none;}
   ._a70Xz_OgA{box-shadow:var(--insetShadow-122p9b9);}
+  ._a70rDIiHK{box-shadow:none;}
+  ._all0GOEmD{text-shadow:var(--textShadowValue-u99gc6);}
+  ._allNcEXal{text-shadow:none;}
+  ._allOUOwF6{text-shadow:var(--textShadowArray-g4dtp1);}
 
 

@@ -64365,7 +64365,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "_iQG90u2rY _a9fMU0SCS _a9r6LKQt1",
+  "_i5aq73t__ _a9fMU0SCS _a9r6LKQt1",
   /* [] */
   0
 );
@@ -64378,7 +64378,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("_iJmXrZds1 _a9fMU0SCS _a9r6LKQt1 _aauoQ9QVF", {
+  return make7("_icwP7BI_t _a9fMU0SCS _a9r6LKQt1 _aauoQ9QVF", {
     hd: [
       "--lola-1lnc8cg",
       Gap.toString(lola)
@@ -64414,39 +64414,39 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "_ivtSY5N7i _a7fadbhEW _c7f1Tl5-wTx08Fk",
+  "_ivAG2vXbB _a7fadbhEW _c7f1Tl5-wTx08Fk",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
 var clx = make7(
-  "_i0ReFqeZv _aa2b7-gG2 _a99BCDc_t _abaZtN8h8",
+  "_ifqPpAPMR _aa2b7-gG2 _a99BCDc_t _abaZtN8h8",
   /* [] */
   0
 );
 var post = make7(
-  "_ivK2UVuV0 _a509iSU6R _a8hicGmkO",
+  "_iY0CUr1R7 _a509iSU6R _a8hicGmkO",
   /* [] */
   0
 );
 var card = make7(
-  "_iVBwZyud8 _actal1K5c _a50Xm2HKX _aa8izQoHh",
+  "_i-q_7aUZ8 _actal1K5c _a50Xm2HKX _aa8izQoHh",
   /* [] */
   0
 );
 var container = make7(
-  "_iZARUoFNV _cn8QlkbnZ6q-0g2 _c4lQlkbnZldMHga _ca8QlkbnZV-S-Zh _carRcMPaI4xIzqW",
+  "_iOqaJKdG3 _cn8QlkbnZ6q-0g2 _c4lQlkbnZldMHga _ca8QlkbnZV-S-Zh _carRcMPaI4xIzqW",
   /* [] */
   0
 );
 var gradiend = make7(
-  "_iMGwG1Ra5 _afyv_QhEq _a4mhQXO8u",
+  "_iRxzY1Pw4 _afyv_QhEq _a4mhQXO8u",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("_iOUsE75EO _afyLIRyoa _acx_rV5bk _a50q3u2my _a69Tc9Hwc _a4hSXV3ER _a7fQE1m9v _aa2b7-gG2", {
+  return make7("_ijtnAljPd _afyLIRyoa _acx_rV5bk _a50q3u2my _a69Tc9Hwc _a4hSXV3ER _a7fQE1m9v _aa2b7-gG2", {
     hd: [
       "--color-1raopcx",
       Color.toString(color)
@@ -64481,7 +64481,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("_iB8yZM_Sl _a41GqDIUS _a3ylayDAk _a47-aNHbU _a3zSQM1U0 _an85H32Tg _afhAcA9Lt _a9fMU0SCS _a3l1wO1Hp _ac7XuxEQv _a69xjLL2Z _a4hn4SXmy _a7fWWIiyT _a70tXQ9Hj", AnimationName.toStyleVars("--resize-pig2un", resize2));
+var keyframeDemoCard = make7("_i-VABq3_q _a41GqDIUS _a3ylayDAk _a47-aNHbU _a3zSQM1U0 _an85H32Tg _afhAcA9Lt _a9fMU0SCS _a3l1wO1Hp _ac7XuxEQv _a69xjLL2Z _a4hn4SXmy _a7fWWIiyT _a70tXQ9Hj", AnimationName.toStyleVars("--resize-pig2un", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

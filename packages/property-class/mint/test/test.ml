@@ -97,6 +97,52 @@ let context_tests =
       List.iter
         (fun s -> assert_string (Context_key.normalize_selector s) s)
         [ "&::before:hover:focus"; "&::before"; "&::before:focus:hover" ]);
+    case "legacy single-colon pseudo-elements end the sorted run" (fun () ->
+      List.iter
+        (fun s -> assert_string (Context_key.normalize_selector s) s)
+        [
+          "&:hover:after";
+          "&:after:hover";
+          "&:before:focus:hover";
+          "&:first-line:hover";
+          "&:first-letter:hover";
+        ];
+      Alcotest.(check bool)
+        "different keys" true
+        (key (ctx "&:hover:after") <> key (ctx "&:after:hover")));
+    case "pseudo names are lowercased outside strings and attributes" (fun () ->
+      assert_string (key (ctx "&:HOVER")) (key (ctx "&:hover"));
+      assert_string
+        (Context_key.normalize_selector "&:FOCUS:Hover")
+        "&:focus:hover";
+      assert_string
+        (Context_key.normalize_selector "&::BEFORE:HOVER")
+        "&::before:hover";
+      assert_string
+        (Context_key.normalize_selector "&:NOT(.Foo):HOVER")
+        "&:not(.Foo):hover";
+      List.iter
+        (fun s -> assert_string (Context_key.normalize_selector s) s)
+        [ "&[data-x=\"A:B\"]"; "&[data-x=A]"; "& .sm\\:Hidden"; "&.Foo" ]);
+    case "media feature names are lowercased" (fun () ->
+      assert_string
+        (key (ctx ~conditions:[ "@media (MIN-WIDTH: 1px)" ] "&"))
+        (key (ctx ~conditions:[ "@media (min-width: 1px)" ] "&"));
+      assert_string
+        (Context_key.canonical_condition "@media (MIN-WIDTH: 1px) and (HOVER)")
+        "@media (min-width: 1px) and (hover)";
+      assert_string
+        (Context_key.canonical_condition "@media (WIDTH >= 1PX)")
+        "@media (width >= 1PX)";
+      List.iter
+        (fun s -> assert_string (Context_key.canonical_condition s) s)
+        [
+          "@media SCREEN";
+          "@media (min-width: var(--Bp))";
+          "@supports (content: \"(A: b)\")";
+          "@supports selector(:HOVER)";
+          "@container Card (min-width: 1px)";
+        ]);
     case "other selectors are unchanged" (fun () ->
       List.iter
         (fun s -> assert_string (Context_key.normalize_selector s) s)

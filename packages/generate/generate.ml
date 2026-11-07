@@ -323,12 +323,13 @@ let collect_atoms ~errors (atoms : (string * Css_extraction.atom) list) :
                 :: !errors)
         atom.hashes)
     atoms;
-  List.rev !first_seen
-  |> List.mapi (fun first (atom : Css_extraction.atom) -> first, atom)
-  |> List.stable_sort
-       (fun (fa, (a : Css_extraction.atom)) (fb, (b : Css_extraction.atom)) ->
-       compare (a.tier, a.conds, -a.cover, fa) (b.tier, b.conds, -b.cover, fb))
-  |> List.concat_map (fun (_, (atom : Css_extraction.atom)) -> atom.rules)
+  List.sort
+    (fun (a : Css_extraction.atom) (b : Css_extraction.atom) ->
+      compare
+        (a.tier, a.conds, -a.cover, a.rules)
+        (b.tier, b.conds, -b.cover, b.rules))
+    !first_seen
+  |> List.concat_map (fun (atom : Css_extraction.atom) -> atom.rules)
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file input_files =
@@ -351,7 +352,7 @@ let run ~output_file input_files =
   let errors =
     ref (List.concat_map (fun harvest -> harvest.protocol_errors) harvests)
   in
-  let resolve_rule harvest rule =
+  let resolve_rule ~attribute harvest rule =
     let on_error longident =
       let ref_loc =
         match
@@ -369,8 +370,8 @@ let run ~output_file input_files =
     in
     let on_malformed msg =
       errors :=
-        Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename
-          Css_extraction.css_attribute_name msg
+        Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename attribute
+          msg
         :: !errors
     in
     Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
@@ -380,7 +381,11 @@ let run ~output_file input_files =
     ref
       (List.rev
          (List.concat_map
-            (fun harvest -> List.map (resolve_rule harvest) harvest.rules)
+            (fun harvest ->
+              List.map
+                (resolve_rule ~attribute:Css_extraction.css_attribute_name
+                   harvest)
+                harvest.rules)
             harvests))
   in
   let resolved_atoms =
@@ -389,7 +394,14 @@ let run ~output_file input_files =
         List.map
           (fun (atom : Css_extraction.atom) ->
             ( harvest.filename,
-              { atom with rules = List.map (resolve_rule harvest) atom.rules } ))
+              {
+                atom with
+                rules =
+                  List.map
+                    (resolve_rule ~attribute:Css_extraction.atoms_attribute_name
+                       harvest)
+                    atom.rules;
+              } ))
           harvest.atoms)
       harvests
   in

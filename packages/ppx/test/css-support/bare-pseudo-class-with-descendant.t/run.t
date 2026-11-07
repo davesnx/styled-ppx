@@ -63,7 +63,7 @@ deep nesting, and mixed compound/descendant inner chains.
       ),
       (
         "_c7f-QfSkEb--_uX",
-        ["._c7f-QfSkEb--_uX:hover:focus{color:yellow;}"],
+        ["._c7f-QfSkEb--_uX:focus:hover{color:yellow;}"],
         2,
         1,
         1,

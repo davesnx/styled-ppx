@@ -24,21 +24,21 @@ counter().
   @property --myCounterStyle-ii7dwb{syntax:"*";inherits:false;}
   @property --countersNoStyle-v6e5zv{syntax:"*";inherits:false;}
   @property --countersStyled-1fn4o8o{syntax:"*";inherits:false;}
-  ._a8iE59tKx{content:var(--singleCounter-2aeq99);}
-  ._a8id1GOI4{content:var(--singleCounterNoStyle-1l3fagq);}
-  ._a8iYOTdRG{content:var(--singleText-1v4v8ha);}
-  ._a8i5vEiRc{content:var(--counterDot-unnfh0);}
-  ._a8iFwClU7{content:var(--counterSpace-x42n6f);}
-  ._a8iUqcn71{content:var(--counterRoman-1ofhpie);}
-  ._a8ibJPcje{content:var(--bracketed-1e2cu61);}
-  ._a8iSwQkOK{content:var(--content_value-t3umxf);}
-  ._a8iK_Bn3M{content:counter(var(--myCounterName-pms5me), lower-alpha);}
-  ._a8i6MQbzB{content:counter(chapter, var(--myCounterStyle-acz03x));}
   ._a8i2n2zcR{content:counter(var(--myCounterName-1rzaa77), var(--myCounterStyle-1utcpfw));}
-  ._a8iuZCg2Y{content:counters(var(--myCounterName-1dmplkz), ".", var(--myCounterStyle-ii7dwb));}
-  ._a8iTtuts0{content:counter(ol);}
-  ._a8iWHUvD3{content:counter(chapter);}
-  ._a8iCK--zz{content:counters(section, ".");}
   ._a8i469afp{content:counters(section, ".", decimal-leading-zero);}
+  ._a8i5vEiRc{content:var(--counterDot-unnfh0);}
+  ._a8i6MQbzB{content:counter(chapter, var(--myCounterStyle-acz03x));}
+  ._a8iCK--zz{content:counters(section, ".");}
+  ._a8iE59tKx{content:var(--singleCounter-2aeq99);}
+  ._a8iFwClU7{content:var(--counterSpace-x42n6f);}
+  ._a8iK_Bn3M{content:counter(var(--myCounterName-pms5me), lower-alpha);}
   ._a8iLm8w_K{content:var(--countersNoStyle-v6e5zv);}
+  ._a8iSwQkOK{content:var(--content_value-t3umxf);}
+  ._a8iTtuts0{content:counter(ol);}
+  ._a8iUqcn71{content:var(--counterRoman-1ofhpie);}
+  ._a8iWHUvD3{content:counter(chapter);}
+  ._a8iYOTdRG{content:var(--singleText-1v4v8ha);}
+  ._a8ibJPcje{content:var(--bracketed-1e2cu61);}
+  ._a8id1GOI4{content:var(--singleCounterNoStyle-1l3fagq);}
   ._a8igwI6Ie{content:var(--countersStyled-1fn4o8o);}
+  ._a8iuZCg2Y{content:counters(var(--myCounterName-1dmplkz), ".", var(--myCounterStyle-ii7dwb));}

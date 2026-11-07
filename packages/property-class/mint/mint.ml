@@ -106,29 +106,34 @@ let hashes (unit_ : Atomize.unit_) =
   let value =
     hashed "value" (Hash64.chars (hash_fields value_fields) 6) value_fields
   in
+  let cells =
+    if unit_.bundle then cells unit_
+    else
+      [
+        {
+          property = Atomize.property head.prop;
+          key = Context_key.key head.context;
+        };
+      ]
+  in
+  let add acc h = if List.mem h acc then acc else h :: acc in
   let contexts =
     List.fold_left
       (fun acc cell ->
         match context_token cell.key with
         | _, None -> acc
-        | token, Some fields ->
-          if List.exists (fun h -> h.token = token) acc then acc
-          else hashed "ctx" token fields :: acc)
-      []
-      (if unit_.bundle then cells unit_
-       else
-         [
-           {
-             property = Atomize.property head.prop;
-             key = Context_key.key head.context;
-           };
-         ])
+        | token, Some fields -> add acc (hashed "ctx" token fields))
+      [] cells
     |> List.rev
   in
   let names =
-    match Atomize.property head.prop with
-    | Atomize.Unknown name when not unit_.bundle ->
-      [ hashed "name" (name_token name) [ "name"; name ] ]
-    | _ -> []
+    List.fold_left
+      (fun acc cell ->
+        match cell.property with
+        | Atomize.Unknown name ->
+          add acc (hashed "name" (name_token name) [ "name"; name ])
+        | Atomize.Known _ -> acc)
+      [] cells
+    |> List.rev
   in
   contexts @ names @ [ value ]

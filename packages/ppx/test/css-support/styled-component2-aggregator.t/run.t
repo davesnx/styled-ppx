@@ -13,8 +13,8 @@ through the static extraction pipeline. They also register selector bindings so
   ._cctAO8-XCxggNRo ._ipAbtA9yg{margin:0;}
   ._c9fsrgDTRP_NIyh ._iWuhvgSCU{display:block;}
   ._afy3_uoZc{padding:8px;}
-  ._a7fadbhEW{color:red;}
   ._a7fQE1m9v{color:var(--color-1raopcx);}
+  ._a7fadbhEW{color:red;}
   ._c7f1Tl5-woo8Dtu:hover{color:var(--tone-11ldn3r);}
 
   $ refmt --parse ml --print re output.ml

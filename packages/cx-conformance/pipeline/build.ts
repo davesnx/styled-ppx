@@ -144,20 +144,21 @@ function caseDuneFiles(key: string, env: Env): { native: string; js: string } {
 (rule (target styles.css) (deps case.re.pp.ml)
  (action (with-stdout-to %{target} (run styled-ppx.generate %{deps}))))
 `,
-    js: `(library (name case_${key}_js) (modes melange) (modules case)
+    js: `(library (name case_${key}) (modes melange) (modules case)
  (libraries styled-ppx.melange reason-react)
  ${jsPps})
 `,
   };
 }
 
-function driverFiles(native: string[], js: string[]): { dune: string; registry: string } {
+function driverFiles(native: string[], js: string[]): { native: string; js: string; registry: string } {
   return {
-    dune: `(executable (name driver) (modules driver registry)
+    native: `(executable (name driver) (modules driver registry)
  (libraries yojson styled-ppx.native server-reason-react.react server-reason-react.reactDom
   ${native.map((k) => `case_${k}`).join(" ")}))
-(melange.emit (target emit) (modules)
- (libraries styled-ppx.melange ${js.map((k) => `case_${k}_js`).join(" ")})
+`,
+    js: `(melange.emit (target emit) (modules)
+ (libraries styled-ppx.melange ${js.map((k) => `case_${k}`).join(" ")})
  (module_systems (es6 mjs)))
 `,
     registry: `let cases = [\n${native
@@ -170,9 +171,9 @@ function attributeErrors(output: string): Map<string, string> {
   const errors = new Map<string, string>();
   const chunks = output.split(/^(?=File ")/m);
   for (const chunk of chunks) {
-    const match = chunk.match(/^File "cases\/(c[0-9a-f]+)\/(native|js)\//);
+    const match = chunk.match(/^File "(native|js)\/cases\/(c[0-9a-f]+)\//);
     if (!match) continue;
-    const id = `${match[1]}/${match[2]}`;
+    const id = `${match[2]}/${match[1]}`;
     errors.set(id, (errors.get(id) ?? "") + chunk);
   }
   return errors;
@@ -192,9 +193,12 @@ async function ensureInstall(): Promise<void> {
 function ensureGenRoot(env: Env): string {
   const gen = join(pipelineDir, "_gen");
   const root = join(gen, env);
-  mkdirSync(join(root, "driver"), { recursive: true });
-  writeIfChanged(join(root, "dune-project"), "(lang dune 3.8)\n(using melange 0.1)\n");
-  writeIfChanged(join(root, "driver", "driver.ml"), readFileSync(join(pipelineDir, "native_driver.ml"), "utf8"));
+  writeIfChanged(join(root, "dune-project"), "(lang dune 3.8)\n");
+  writeIfChanged(join(root, "dune"), "(dirs native js)\n");
+  for (const side of ["native", "js"]) {
+    writeIfChanged(join(root, side, "dune-project"), "(lang dune 3.8)\n(using melange 0.1)\n");
+  }
+  writeIfChanged(join(root, "native", "driver", "driver.ml"), readFileSync(join(pipelineDir, "native_driver.ml"), "utf8"));
   const modules = join(gen, "node_modules");
   const demoModules = join(repoRoot, "demo", "melange", "node_modules");
   if (!existsSync(modules)) {
@@ -214,31 +218,33 @@ export async function buildCases(cases: Case[], env: Env): Promise<BuildResult> 
   for (const c of cases) {
     const key = caseKey(c);
     if (builds.has(key)) continue;
-    const dir = join(root, "cases", key);
+    const dir = join(root, "native", "cases", key);
+    const jsDir = join(root, "js", "cases", key);
     const build: CaseBuild = { key, dir };
     builds.set(key, build);
     try {
       const source = caseSource(c);
-      writeIfChanged(join(dir, "native", "case.re"), source);
-      writeIfChanged(join(dir, "js", "case.re"), source);
+      writeIfChanged(join(dir, "case.re"), source);
+      writeIfChanged(join(jsDir, "case.re"), source);
     } catch (e) {
       build.error = (e as Error).message;
       continue;
     }
     const dune = caseDuneFiles(key, env);
-    writeIfChanged(join(dir, "native", "dune"), dune.native);
-    writeIfChanged(join(dir, "js", "dune"), dune.js);
+    writeIfChanged(join(dir, "dune"), dune.native);
+    writeIfChanged(join(jsDir, "dune"), dune.js);
   }
 
   const candidates = () => [...builds.values()].filter((b) => !b.error).map((b) => b.key);
   const compile = async (native: string[], js: string[]) => {
     const files = driverFiles(native, js);
-    writeIfChanged(join(root, "driver", "dune"), files.dune);
-    writeIfChanged(join(root, "driver", "registry.ml"), files.registry);
+    writeIfChanged(join(root, "native", "driver", "dune"), files.native);
+    writeIfChanged(join(root, "native", "driver", "registry.ml"), files.registry);
+    writeIfChanged(join(root, "js", "driver", "dune"), files.js);
     const targets = [
-      "driver/driver.exe",
-      "@driver/melange",
-      ...native.map((k) => `cases/${k}/native/styles.css`),
+      "native/driver/driver.exe",
+      "@js/driver/melange",
+      ...native.map((k) => `native/cases/${k}/styles.css`),
     ];
     return dune(targets, root);
   };
@@ -260,17 +266,17 @@ export async function buildCases(cases: Case[], env: Env): Promise<BuildResult> 
   }
 
   const out = join(root, "_build", "default");
-  const emitDir = join(out, "driver", "emit");
+  const emitDir = join(out, "js", "driver", "emit");
   for (const build of builds.values()) {
     if (build.error) continue;
-    const cssPath = join(out, "cases", build.key, "native", "styles.css");
+    const cssPath = join(out, "native", "cases", build.key, "styles.css");
     if (existsSync(cssPath)) build.css = readFileSync(cssPath, "utf8");
     else build.error ??= `styles.css not produced:\n${result.output}`;
-    const jsModule = join(emitDir, "cases", build.key, "js", "case.mjs");
+    const jsModule = join(emitDir, "js", "cases", build.key, "case.mjs");
     if (existsSync(jsModule)) build.jsModule = jsModule;
     else build.jsError ??= `case.mjs not produced:\n${result.output}`;
   }
-  const exe = join(out, "driver", "driver.exe");
+  const exe = join(out, "native", "driver", "driver.exe");
   return {
     cases: builds,
     driverExe: result.code === 0 ? exe : undefined,

@@ -44,12 +44,21 @@ let leaves name =
 let last_combinator selector =
   let depth = ref 0 in
   let last = ref (-1) in
+  let quote = ref None in
+  let escaped = ref false in
   String.iteri
     (fun i ch ->
-      if ch = '(' || ch = '[' then incr depth
-      else if ch = ')' || ch = ']' then decr depth
-      else if !depth = 0 && (ch = ' ' || ch = '>' || ch = '+' || ch = '~') then
-        last := i)
+      match !quote with
+      | Some q ->
+        if !escaped then escaped := false
+        else if ch = '\\' then escaped := true
+        else if ch = q then quote := None
+      | None ->
+        if ch = '"' || ch = '\'' then quote := Some ch
+        else if ch = '(' || ch = '[' then incr depth
+        else if ch = ')' || ch = ']' then decr depth
+        else if !depth = 0 && (ch = ' ' || ch = '>' || ch = '+' || ch = '~')
+        then last := i)
     selector;
   !last
 
@@ -66,15 +75,16 @@ let is_pseudo_char c = (c >= 'a' && c <= 'z') || c = '-'
 
 let pseudo_element scope =
   let len = String.length scope in
+  let rec stop j =
+    if j < len && is_pseudo_char scope.[j] then stop (j + 1) else j
+  in
   let rec find i =
     if i + 2 >= len then None
     else if
       scope.[i] = ':' && scope.[i + 1] = ':' && is_pseudo_char scope.[i + 2]
-    then (
-      let rec stop j =
-        if j < len && is_pseudo_char scope.[j] then stop (j + 1) else j
-      in
-      Some (String.sub scope i (stop (i + 2) - i)))
+    then Some (String.sub scope i (stop (i + 2) - i))
+    else if Context_key.is_legacy_pseudo_element scope i then
+      Some (":" ^ String.sub scope i (stop (i + 1) - i))
     else find (i + 1)
   in
   find 0
@@ -85,6 +95,7 @@ let subject context =
 
 type entry = {
   decl : decl;
+  property : property;
   key : string;
   leaves : Strings.t;
   rank : int * int;
@@ -93,6 +104,7 @@ type entry = {
 let entry decl =
   {
     decl;
+    property = property decl.prop;
     key = Context_key.key decl.context;
     leaves = Strings.of_list (leaves decl.prop);
     rank = tier decl.context, condition_count decl.context;
@@ -111,7 +123,7 @@ let is_bundle es =
   | [] -> false
   | first :: rest ->
     List.exists
-      (fun e -> e.key <> first.key || e.decl.prop <> first.decl.prop)
+      (fun e -> e.key <> first.key || e.property <> first.property)
       rest
 
 let group entries =
@@ -136,7 +148,7 @@ let group entries =
     for j = i + 1 to n - 1 do
       if
         entries.(i).key = entries.(j).key
-        && entries.(i).decl.prop = entries.(j).decl.prop
+        && entries.(i).property = entries.(j).property
       then ignore (join i j)
     done
   done;

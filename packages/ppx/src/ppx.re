@@ -246,16 +246,11 @@ let expand_css_expression =
       ~opens,
       ~label_name,
       ~registry_name,
+      ~binding_id,
       payload,
     ) => {
   open Ppxlib;
   File.set(file);
-  let binding_id =
-    mint_binding_id(
-      ~main_module,
-      ~scope,
-      Option.is_some(registry_name) ? registry_name : label_name,
-    );
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
     let source_position_start =
@@ -661,6 +656,8 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
 
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
+  let top_binding_id =
+    lazy(mint_binding_id(~main_module, ~scope, top_binding));
   let rec map_with_label = (~label_name, expr) => {
     let mapper = {
       as self;
@@ -686,6 +683,10 @@ let map_css_expressions =
               ~opens,
               ~label_name,
               ~registry_name=top_binding,
+              ~binding_id=
+                Option.is_some(top_binding)
+                  ? Lazy.force(top_binding_id)
+                  : mint_binding_id(~main_module, ~scope, label_name),
               payload,
             )
           | None => css_error_expr(~payload_loc=expr.pexp_loc)
@@ -1005,6 +1006,19 @@ let () = {
       | "production" => Settings.Update.env(`Production)
       | _ => Settings.Update.env(`Development),
     ),
+  );
+
+  Ppxlib.Driver.Cookies.add_handler(cookies =>
+    Css_bindings.set_library(
+      Option.value(
+        Ppxlib.Driver.Cookies.get(
+          cookies,
+          "library-name",
+          Ppxlib.Ast_pattern.(estring(__)),
+        ),
+        ~default="",
+      ),
+    )
   );
 
   let impl = (_ctx, str: Ppxlib.structure) => {

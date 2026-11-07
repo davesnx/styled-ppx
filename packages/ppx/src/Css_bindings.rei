@@ -21,6 +21,10 @@ type entry = {
   binding_id: string,
 };
 
+/** Set the library name that [mint_id] hashes into every id: the value of
+    dune's [library-name] cookie, or [""] without it. */
+let set_library: string => unit;
+
 /** Mint the id token of a binding site. [occurrence] is the index among the
     bindings of this unit that share [scope] and [name], so a shadowed name
     gets a distinct id. The counter restarts on [drain]. */

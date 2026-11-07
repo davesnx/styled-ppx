@@ -77,6 +77,11 @@ function subject(context: Context): string {
 }
 
 const keyOf = (d: Declaration): [number, number] => [tier(d.context), conditionCount(d.context)];
+export const canonicalProp = (cover: Cover, prop: string): string => {
+  const leaves = cover(prop);
+  return leaves.length === 1 ? leaves[0]! : prop;
+};
+
 const before = (x: [number, number], y: [number, number]) => x[0] < y[0] || (x[0] === y[0] && x[1] < y[1]);
 
 function units(decls: Declaration[], cover: Cover, bundles: boolean): Declaration[][] {
@@ -90,7 +95,7 @@ function units(decls: Declaration[], cover: Cover, bundles: boolean): Declaratio
   };
   decls.forEach((d, i) =>
     decls.forEach((e, j) => {
-      if (j > i && d.contextKey === e.contextKey && d.prop === e.prop) join(i, j);
+      if (j > i && d.contextKey === e.contextKey && canonicalProp(cover, d.prop) === canonicalProp(cover, e.prop)) join(i, j);
     }),
   );
   if (bundles) {
@@ -100,7 +105,8 @@ function units(decls: Declaration[], cover: Cover, bundles: boolean): Declaratio
       const ks = members(root).map((k) => keyOf(decls[k]!));
       return [Math.max(...ks.map((k) => k[0])), Math.max(...ks.map((k) => k[1]))];
     };
-    const isBundle = (root: number) => new Set(members(root).map((k) => decls[k]!.contextKey + "#" + decls[k]!.prop)).size > 1;
+    const isBundle = (root: number) =>
+      new Set(members(root).map((k) => decls[k]!.contextKey + "#" + canonicalProp(cover, decls[k]!.prop))).size > 1;
     let changed = true;
     while (changed) {
       changed = false;
@@ -149,7 +155,7 @@ export function atomize(c: Case, cover: Cover, opts: AtomizeOptions): Atomized {
       opts.vars === "roles" && tier(d.context) === 0 ? { ...d, text: d.text.replace(/(--cxv-\w+?)\)/g, "$1-d)") } : d,
     );
     const atoms = units(decls, cover, opts.bundles).map((pieces) => {
-      const bundle = new Set(pieces.map((p) => p.contextKey + "#" + p.prop)).size > 1;
+      const bundle = new Set(pieces.map((p) => p.contextKey + "#" + canonicalProp(cover, p.prop))).size > 1;
       const sibling = opts.siblingIds && pieces.some((p) => isSiblingScope(p.context.scope));
       if (sibling) bindingIds.set(name, `b-${name}`);
       const key = (sibling ? `owner ${name} ` : "") + (bundle ? "bundle " : "") + pieces.map((p) => `${p.contextKey} # ${p.text}`).join(" ; ");

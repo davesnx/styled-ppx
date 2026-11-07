@@ -1071,32 +1071,102 @@ module Css_transform = {
       inner,
     );
 
+  let canonical_at_rule = (at: at_rule) => {
+    let (values, loc) = at.prelude;
+    let text =
+      Styled_ppx_css_parser.Render.component_value_list(
+        Styled_ppx_css_parser.Render.strip_leading_whitespace(values),
+      );
+    let canonical = Property_class_mint.Context_key.canonical_condition(text);
+    canonical == text
+      ? at
+      : {
+        ...at,
+        prelude: ([(Ident(canonical), loc)], loc),
+      };
+  };
+
+  let replace_ampersand_text = (text, replacement) => {
+    let out = Stdlib.Buffer.create(String.length(text));
+    let quote = ref(None);
+    let escaped = ref(false);
+    String.iter(
+      c =>
+        if (escaped^) {
+          escaped := false;
+          Stdlib.Buffer.add_char(out, c);
+        } else if (c == '\\') {
+          escaped := true;
+          Stdlib.Buffer.add_char(out, c);
+        } else {
+          switch (quote^) {
+          | Some(q) =>
+            if (c == q) {
+              quote := None;
+            };
+            Stdlib.Buffer.add_char(out, c);
+          | None =>
+            if (c == '"' || c == '\'') {
+              quote := Some(c);
+            };
+            if (c == '&') {
+              Stdlib.Buffer.add_string(out, replacement);
+            } else {
+              Stdlib.Buffer.add_char(out, c);
+            };
+          };
+        },
+      text,
+    );
+    Stdlib.Buffer.contents(out);
+  };
+
   let lower_run = (ctx, ~classes, ~namespace, flats) => {
     let first = List.hd(flats);
-    let style_rule =
+    let style_rule = scope =>
       Style_rule({
-        prelude: (
-          [(first.scope, Ppxlib.Location.none)],
-          Ppxlib.Location.none,
-        ),
+        prelude: ([(scope, Ppxlib.Location.none)], Ppxlib.Location.none),
         block: (
           List.map(flat => Declaration(flat.decl), flats),
           Ppxlib.Location.none,
         ),
         loc: Ppxlib.Location.none,
       });
-    let written = wrap_in_at_rules(first.at_rules, style_rule);
-    let prefix =
-      CompoundSelector({
-        type_selector: None,
-        subclass_selectors: List.map(c => Class(c), classes),
-        pseudo_selectors: [],
-      });
+    let written = wrap_in_at_rules(first.at_rules, style_rule(first.scope));
+    let rendered = Styled_ppx_css_parser.Render.selector(first.scope);
+    let canonical =
+      Property_class_mint.Context_key.normalize_selector(rendered);
+    let (prefix, printed) =
+      if (canonical == rendered) {
+        (
+          Some(
+            CompoundSelector({
+              type_selector: None,
+              subclass_selectors: List.map(c => Class(c), classes),
+              pseudo_selectors: [],
+            }),
+          ),
+          written,
+        );
+      } else {
+        let scope =
+          replace_ampersand_text(
+            canonical,
+            String.concat("", List.map(c => "." ++ c, classes)),
+          );
+        (
+          None,
+          wrap_in_at_rules(
+            first.at_rules,
+            style_rule(SimpleSelector(Type(scope))),
+          ),
+        );
+      };
     let lowered =
       Styled_ppx_css_parser.Resolve.flatten_rules(
-        ~prefix=Some(prefix),
+        ~prefix,
         ~media=None,
-        [written],
+        [printed],
       )
       |> List.map(r => transform_rule(ctx, ~var_namespace=namespace, r));
     (written, lowered);
@@ -1122,7 +1192,14 @@ module Css_transform = {
     };
     let (rules, _loc) = rule_list;
 
-    let flats = atomize_rules(ctx, ~source_position_start, rules);
+    let flats =
+      atomize_rules(ctx, ~source_position_start, rules)
+      |> List.map(flat =>
+           {
+             ...flat,
+             at_rules: List.map(canonical_at_rule, flat.at_rules),
+           }
+         );
 
     let to_decl = (flat): (Atomize.decl, flat) => {
       let rendered = Styled_ppx_css_parser.Render.selector(flat.scope);

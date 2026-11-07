@@ -30,7 +30,7 @@ Selectors covered here:
       [("ctx", "LNkI0L", "ctx\\0&:focus-visible::after | ");
       ("value", "dcQTpA",
         "val\\08i\\0&:focus-visible::after | \\0content:\"\"")]);
-    ("_c7f-QfSkEHxRRZG", ["._c7f-QfSkEHxRRZG:hover:focus{color:green;}"], 2, 1,
+    ("_c7f-QfSkEHxRRZG", ["._c7f-QfSkEHxRRZG:focus:hover{color:green;}"], 2, 1,
       1,
       [("ctx", "-QfSkE", "ctx\\0&:focus:hover | ");
       ("value", "HxRRZG", "val\\07f\\0&:focus:hover | \\0color:green")]);

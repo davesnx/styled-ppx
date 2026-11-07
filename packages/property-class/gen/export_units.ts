@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { loadCases } from "../../cx-conformance/src/load.ts";
 import { coverOf, type CoverageTable } from "../../cx-conformance/src/coverage.ts";
-import { atomize, tier } from "../../cx-conformance/src/candidates/model.ts";
+import { atomize, canonicalProp, tier } from "../../cx-conformance/src/candidates/model.ts";
 import { SELF, declarations, substitute, type Declaration } from "../../cx-conformance/src/css.ts";
 
 type Decl = { scope: string; conditions: string[]; important: boolean; prop: string; text: string };
@@ -31,7 +31,7 @@ const cellsOf = (pieces: Declaration[]): string[] =>
 
 const unitOf = (pieces: Declaration[]): Unit => ({
   pieces,
-  bundle: new Set(pieces.map((p) => `${p.contextKey}#${p.prop}`)).size > 1,
+  bundle: new Set(pieces.map((p) => `${p.contextKey}#${canonicalProp(cover, p.prop)}`)).size > 1,
   tier: Math.max(...pieces.map((p) => tier(p.context))),
   conds: Math.max(...pieces.map(conditionCount)),
   cover: new Set(cellsOf(pieces)).size,

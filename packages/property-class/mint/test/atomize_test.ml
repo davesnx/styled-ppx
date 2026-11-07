@@ -307,6 +307,46 @@ let case_tests =
           "monorepo-10", "iconGhost", [ 2 ];
           "monorepo-10", "buttonDisabled", [];
         ]);
+    case "an alias and its canonical property in one context are one atom"
+      (fun () ->
+      let decl prop text : Atomize.decl =
+        {
+          context = { scope = "&"; conditions = []; important = false };
+          prop;
+          text;
+        }
+      in
+      match
+        Atomize.units
+          [
+            decl "word-wrap" "word-wrap:break-word";
+            decl "overflow-wrap" "overflow-wrap:anywhere";
+          ]
+      with
+      | [ u ] ->
+        Alcotest.(check bool) "bundle" false u.bundle;
+        Alcotest.(check (list string))
+          "texts"
+          [ "word-wrap:break-word"; "overflow-wrap:anywhere" ]
+          (List.map (fun (d : Atomize.decl) -> d.text) u.pieces)
+      | units -> Alcotest.failf "%d units" (List.length units));
+    case "a legacy single-colon pseudo-element is its own subject" (fun () ->
+      let decl scope text : Atomize.decl =
+        {
+          context = { scope; conditions = []; important = false };
+          prop = "color";
+          text;
+        }
+      in
+      List.iter
+        (fun scope ->
+          let units =
+            Atomize.units [ decl scope "color:red"; decl "&" "color:blue" ]
+          in
+          Alcotest.(check (list bool))
+            scope [ false; false ]
+            (List.map (fun (u : Atomize.unit_) -> u.bundle) units))
+        [ "&::after"; "&:after"; "&:before"; "&:first-line"; "&:first-letter" ]);
     case "a repeated property in one context is an atom, not a bundle"
       (fun () ->
       let decl text : Atomize.decl =
@@ -345,6 +385,16 @@ let tier_tests =
           ctx "&[data-x=\"a b\"]", 2;
           ctx "&:not(& span)", 2;
           ctx ".parent &", 2;
+        ]);
+    case "brackets inside quoted strings do not change the tier" (fun () ->
+      List.iter
+        (fun (context, want) ->
+          Alcotest.(check int) context.Atomize.scope want (Atomize.tier context))
+        [
+          ctx "&[title=\")\"] > *", 0;
+          ctx "&[title=']'] > *", 0;
+          ctx "&[title=\"(\"] > *", 0;
+          ctx "&[title=\"a > b\"]", 2;
         ]);
   ]
 

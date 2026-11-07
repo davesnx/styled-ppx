@@ -12,38 +12,38 @@
   @property --borderWidth-44vefn{syntax:"*";inherits:false;}
   @property --bgColor-a2k7kf{syntax:"*";inherits:false;}
   @property --shadow-ufj824{syntax:"*";inherits:false;}
-  ._a50UaH0F4{border:1px solid black;}
-  ._a50gsYQcx{border:2px dashed #ff0000;}
-  ._a509jfVVJ{border:1px solid transparent;}
-  ._a50c0XN8y{border:none;}
-  ._a50a6krRA{border:1px solid #ccc;}
-  ._a504qkVGy{border:1px solid #e5e7eb;}
   ._a502yeKwI{border:1px solid rgba(0, 0, 0, 0.05);}
+  ._a504qkVGy{border:1px solid #e5e7eb;}
   ._a505mf7wf{border:2px solid #3b82f6;}
+  ._a509jfVVJ{border:1px solid transparent;}
   ._a50JXvaTm{border:1px solid var(--borderColor-ual3lr);}
+  ._a50UaH0F4{border:1px solid black;}
   ._a50_zg6BX{border:var(--borderWidth-44vefn) solid black;}
-  ._a6p-2HcxY{border-width:2px;}
-  ._a6ii447kq{border-style:solid;}
+  ._a50a6krRA{border:1px solid #ccc;}
+  ._a50c0XN8y{border:none;}
+  ._a50gsYQcx{border:2px dashed #ff0000;}
   ._a5k5WrAtr{border-color:#333;}
   ._a69YD0py4{border-radius:8px;}
-  ._a69yKinvI{border-radius:12px;}
   ._a69ahZJxo{border-radius:16px;}
-  ._a6j6n4e8s{border-top:1px solid red;}
-  ._a6afsBys-{border-right:2px dashed blue;}
+  ._a69yKinvI{border-radius:12px;}
+  ._a6ii447kq{border-style:solid;}
+  ._a6p-2HcxY{border-width:2px;}
   ._a5d4dzdGz{border-bottom:3px dotted green;}
   ._a65EtrB4L{border-left:4px double orange;}
-  ._a70Qz38wr{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a70r4AFUF{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
-  ._a70M1OwqE{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a70rDIiHK{box-shadow:none;}
-  ._a70A723Qg{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
-  ._a70BDFfBK{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
-  ._a70v3_nEJ{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
-  ._a70nNJmMg{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
-  ._a70HMhZH6{box-shadow:var(--shadowX-l6kymr) var(--shadowY-ltjj7m) var(--blur-byweb4) var(--spread-10gpoti) var(--shadowColor-1ckq9cl);}
-  ._a70AYEOi3{box-shadow:var(--myShadow-m7jaqr);}
+  ._a6afsBys-{border-right:2px dashed blue;}
+  ._a6j6n4e8s{border-top:1px solid red;}
   ._a4lnP56xQ{background-color:var(--bgColor-a2k7kf);}
+  ._a70A723Qg{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
+  ._a70AYEOi3{box-shadow:var(--myShadow-m7jaqr);}
+  ._a70BDFfBK{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
+  ._a70HMhZH6{box-shadow:var(--shadowX-l6kymr) var(--shadowY-ltjj7m) var(--blur-byweb4) var(--spread-10gpoti) var(--shadowColor-1ckq9cl);}
+  ._a70M1OwqE{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  ._a70Qz38wr{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
   ._a70Rp-wkp{box-shadow:var(--shadow-ufj824);}
+  ._a70nNJmMg{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
+  ._a70r4AFUF{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
+  ._a70rDIiHK{box-shadow:none;}
+  ._a70v3_nEJ{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 
