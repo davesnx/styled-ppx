@@ -189,6 +189,19 @@ let report name ~scale token =
     name c m (m /. c) share
     ((s1 + s2) mod 7)
 
+let report_repeated name ~distinct =
+  let pool () = Array.init distinct (fun _ -> operand ~scale:4 atom) in
+  let pool_left = pool () in
+  let pool_right = pool () in
+  let left = Array.init pairs (fun i -> pool_left.(i mod distinct)) in
+  let right = Array.init pairs (fun i -> pool_right.(i mod distinct)) in
+  let m, s1 = time Clock.merge left right in
+  let c, s2 = time Clock.cached_merge left right in
+  Printf.printf
+    "%-34s merge %6.1f ns   cached %6.1f ns   ratio %5.2fx   (sink %d)\n" name m
+    c (c /. m)
+    ((s1 + s2) mod 7)
+
 let () =
   List.iter
     (fun n ->
@@ -199,4 +212,6 @@ let () =
   fixed_size := -1;
   report "foreign tokens, real sizes" ~scale:4 foreign;
   report "atoms, real sizes" ~scale:4 atom;
-  report "atoms, bundles split (x1.25)" ~scale:5 atom
+  report "atoms, bundles split (x1.25)" ~scale:5 atom;
+  report_repeated "atoms, real sizes, 945 pairs" ~distinct:945;
+  report_repeated "atoms, real sizes, all distinct" ~distinct:pairs

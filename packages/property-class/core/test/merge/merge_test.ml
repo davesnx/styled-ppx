@@ -8,6 +8,7 @@ let id name =
 
 let plain = Format_.plain_ctx
 let hover = "3fQ-zT"
+let near_hover = "3fQaaa"
 let focus = "9-_Aab"
 let v1 = "Xk3_9w"
 let v2 = "aaaaaa"
@@ -79,6 +80,15 @@ let golden_tests =
         [ atom ~ctx:hover "color" ]
         [ atom ~ctx:focus "color" ]
         [ atom ~ctx:hover "color"; atom ~ctx:focus "color" ]);
+    case "a context that shares its first half is another context" (fun () ->
+      check_merge
+        [ atom ~ctx:hover "color" ]
+        [ atom ~ctx:near_hover "color" ]
+        [ atom ~ctx:hover "color"; atom ~ctx:near_hover "color" ];
+      check_merge
+        [ atom ~ctx:near_hover "overflow" ]
+        [ atom "all"; atom ~ctx:hover "all" ]
+        [ atom ~ctx:near_hover "overflow"; atom "all"; atom ~ctx:hover "all" ]);
     case "the same context drops across values" (fun () ->
       check_merge
         [ atom ~ctx:hover ~value:v1 "color" ]
@@ -177,6 +187,22 @@ let golden_tests =
         [ name_atom "abcdef" ]
         [ name_atom ~ctx:hover "abcdef" ]
         [ name_atom "abcdef"; name_atom ~ctx:hover "abcdef" ]);
+    case "a raw operand with two atoms of one property keeps the last"
+      (fun () ->
+      Alcotest.(check string)
+        "literal" "_ad3bbbbbb _a7fXk3_9w"
+        (Css_merge.merge "_ad3Xk3_9w _ad3bbbbbb" "_a7fXk3_9w");
+      let raw = [ atom "margin-top"; atom ~value:v3 "margin-top" ] in
+      List.iter
+        (fun name ->
+          check_merge ~msg:(name ^ " after") raw
+            [ atom name ]
+            [ atom ~value:v3 "margin-top"; atom name ];
+          check_merge ~msg:(name ^ " before")
+            [ atom name ]
+            raw
+            [ atom name; atom ~value:v3 "margin-top" ])
+        [ "color"; "padding"; "margin-left" ]);
     case "an empty side returns the other side" (fun () ->
       let a = join [ atom "color"; "card" ] in
       Alcotest.(check string) "right empty" a (Css_merge.merge a "");
@@ -211,7 +237,7 @@ let group_b =
   [| "color"; "border"; "border-top"; "border-color"; "font"; "line-height" |]
 
 let group_c = [| "display"; "width"; "gap"; "overflow"; "overflow-x"; "all" |]
-let contexts = [| plain; plain; plain; hover; focus |]
+let contexts = [| plain; plain; plain; hover; near_hover; focus |]
 let values = [| v1; v2; v3 |]
 
 let random_token groups =
@@ -311,6 +337,22 @@ let property_tests =
             (Css_merge.normalize (join (a @ b)))
             (merge2 a b))
         pairs);
+    case "merge of raw operands with atoms equals normalize of the join"
+      (fun () ->
+      let atomic t =
+        match Format_.decode t with
+        | Atom _ | Bundle _ -> true
+        | Binding_id _ | Foreign -> false
+      in
+      for _ = 1 to rounds do
+        let a = random_list all_groups
+        and b = random_list all_groups in
+        if a <> [] && b <> [] && List.exists atomic (a @ b) then
+          Alcotest.(check string)
+            (join a ^ " + " ^ join b)
+            (Css_merge.normalize (join (a @ b)))
+            (merge2 a b)
+      done);
     case "normalize equals the reference model on any list" (fun () ->
       for _ = 1 to rounds do
         let tokens = random_list all_groups @ random_list all_groups in

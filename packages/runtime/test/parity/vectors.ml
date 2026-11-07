@@ -4,7 +4,7 @@ let id name =
   | None -> failwith ("no id for " ^ name)
 
 let plain = Css_class_format.plain_ctx
-let contexts = [| plain; plain; plain; "3fQ-zT"; "9-_Aab" |]
+let contexts = [| plain; plain; plain; "3fQ-zT"; "3fQaaa"; "9-_Aab" |]
 let values = [| "Xk3_9w"; "aaaaaa"; "bbbbbb" |]
 
 let names =
@@ -85,6 +85,8 @@ let fixed =
     [ a "color"; a "direction" ], [ a "all" ];
     [ bundle plain "Xk3_9w" ("margin-top", "padding-top") ], [ a "margin" ];
     [ " card" ], [ "active " ];
+    [ {js|_ad3ĀĀĀĀĀĀ|js} ], [ a "margin-top" ];
+    [ {js|_ad3😀3_9w|js} ], [ a "margin-top" ];
     [], [ "x" ];
   ]
 

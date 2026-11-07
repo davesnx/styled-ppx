@@ -34,7 +34,7 @@ let combine_vars style1 style2 =
   dedupe [] all
 
 let merge (styles1 : styles) (styles2 : styles) =
-  ( Css_merge.merge (fst styles1) (fst styles2),
+  ( Css_merge_cache.merge (fst styles1) (fst styles2),
     combine_vars (snd styles1) (snd styles2) )
 
 let global_style_tag css =
