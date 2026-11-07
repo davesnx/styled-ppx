@@ -1078,7 +1078,7 @@ module Css_transform = {
         Styled_ppx_css_parser.Render.strip_leading_whitespace(values),
       );
     let canonical = Property_class_mint.Context_key.canonical_condition(text);
-    canonical == text
+    canonical == text || component_value_list_has_interpolation(values)
       ? at
       : {
         ...at,

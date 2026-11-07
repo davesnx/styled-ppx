@@ -130,7 +130,7 @@ let context_tests =
         (key (ctx ~conditions:[ "@media (min-width: 1px)" ] "&"));
       assert_string
         (Context_key.canonical_condition "@media (MIN-WIDTH: 1px) and (HOVER)")
-        "@media (min-width: 1px) and (hover)";
+        "@media (min-width:1px) and (hover)";
       assert_string
         (Context_key.canonical_condition "@media (WIDTH >= 1PX)")
         "@media (width >= 1PX)";
@@ -138,10 +138,10 @@ let context_tests =
         (fun s -> assert_string (Context_key.canonical_condition s) s)
         [
           "@media SCREEN";
-          "@media (min-width: var(--Bp))";
-          "@supports (content: \"(A: b)\")";
+          "@media (min-width:var(--Bp))";
+          "@supports (content:\"(A: b)\")";
           "@supports selector(:HOVER)";
-          "@container Card (min-width: 1px)";
+          "@container Card (min-width:1px)";
         ]);
     case "other selectors are unchanged" (fun () ->
       List.iter
@@ -156,16 +156,24 @@ let context_tests =
           "";
           "& [data-x=\"a:b\"]";
         ]);
-    case "conditions ignore whitespace around punctuation" (fun () ->
+    case "conditions have one valid whitespace form" (fun () ->
       assert_string
-        (Context_key.normalize_condition "@media  (min-width :  1px)")
-        "@media(min-width:1px)";
+        (Context_key.canonical_condition "@media  (min-width :  1px)")
+        "@media (min-width:1px)";
       assert_string
-        (Context_key.normalize_condition "  (min-width: 1px)  ")
+        (Context_key.canonical_condition "  ( min-width: 1px )  ")
         "(min-width:1px)";
       assert_string
-        (Context_key.normalize_condition "@media screen   and (min-width: 1px)")
-        "@media screen and(min-width:1px)";
+        (Context_key.canonical_condition
+           "@media screen   and (min-width: 1px) ,\tprint")
+        "@media screen and (min-width:1px),print";
+      assert_string
+        (Context_key.canonical_condition "@supports (content: \"a  b\")")
+        "@supports (content:\"a  b\")";
+      Alcotest.(check bool)
+        "quoted whitespace is kept" true
+        (key (ctx ~conditions:[ "@supports (content: \"a  b\")" ] "&")
+        <> key (ctx ~conditions:[ "@supports (content: \"a b\")" ] "&"));
       assert_string
         (key (ctx ~conditions:[ "(min-width: 1px)" ] "&"))
         (key (ctx ~conditions:[ "(min-width:1px)" ] "&")));

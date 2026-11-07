@@ -7,8 +7,6 @@ type context = {
 let is_space c =
   c = ' ' || c = '\t' || c = '\n' || c = '\r' || c = '\011' || c = '\012'
 
-let is_punctuation c = c = '(' || c = ')' || c = ',' || c = ':'
-
 let is_name_char c =
   (c >= 'a' && c <= 'z')
   || (c >= 'A' && c <= 'Z')
@@ -30,7 +28,7 @@ let skip_quoted text i =
 let lowercase_range text start stop =
   String.sub text start (stop - start) |> String.lowercase_ascii
 
-let canonical_condition condition =
+let lowercase_features condition =
   let len = String.length condition in
   let buf = Buffer.create len in
   let rec go i =
@@ -68,30 +66,36 @@ let canonical_condition condition =
   go 0;
   Buffer.contents buf
 
-let normalize_condition condition =
-  let condition = canonical_condition condition in
-  let buf = Buffer.create (String.length condition) in
+let canonical_spaces condition =
   let len = String.length condition in
-  let i = ref 0 in
-  while !i < len do
-    if is_space condition.[!i] then begin
-      while !i < len && is_space condition.[!i] do
-        incr i
-      done;
-      let after_punctuation =
-        Buffer.length buf > 0
-        && is_punctuation (Buffer.nth buf (Buffer.length buf - 1))
-      in
-      let before_punctuation = !i < len && is_punctuation condition.[!i] in
-      if not (after_punctuation || before_punctuation) then
-        Buffer.add_char buf ' '
-    end
-    else begin
-      Buffer.add_char buf condition.[!i];
-      incr i
-    end
-  done;
-  String.trim (Buffer.contents buf)
+  let buf = Buffer.create len in
+  let rec go i pending =
+    if i < len then
+      if is_space condition.[i] then go (i + 1) true
+      else begin
+        let c = condition.[i] in
+        let last =
+          if Buffer.length buf = 0 then '('
+          else Buffer.nth buf (Buffer.length buf - 1)
+        in
+        if
+          pending
+          && (not (String.contains "(:," last))
+          && not (String.contains "):," c)
+        then Buffer.add_char buf ' ';
+        let stop =
+          if c = '"' || c = '\'' then min len (skip_quoted condition i)
+          else i + 1
+        in
+        Buffer.add_string buf (String.sub condition i (stop - i));
+        go stop false
+      end
+  in
+  go 0 false;
+  Buffer.contents buf
+
+let canonical_condition condition =
+  canonical_spaces (lowercase_features condition)
 
 let is_pseudo_char c = (c >= 'a' && c <= 'z') || c = '-'
 let legacy_pseudo_elements = [ "after"; "before"; "first-letter"; "first-line" ]
@@ -192,5 +196,5 @@ let normalize_scope scope =
 let key { scope; conditions; important } =
   String.concat " | "
     (normalize_scope scope
-     :: List.sort String.compare (List.map normalize_condition conditions)
+     :: List.sort String.compare (List.map canonical_condition conditions)
     @ [ (if important then "!important" else "") ])

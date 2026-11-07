@@ -4,21 +4,25 @@
   [@css.atoms
     [
       (
-        "_bAC7f3o_Jr57fBQj8Icm27qnV",
+        "_bAC7fTbdY2z7fURyXTcaZMgyJ",
         [
-          "@media (min-width: calc(2px + 1px)) {._bAC7f3o_Jr57fBQj8Icm27qnV{color:red;}}",
-          "@media (min-width: calc(1000px - 2%)) {._bAC7f3o_Jr57fBQj8Icm27qnV{color:red;}}",
+          "@media (min-width:calc(2px + 1px)){._bAC7fTbdY2z7fURyXTcaZMgyJ{color:red;}}",
+          "@media (min-width:calc(1000px - 2%)){._bAC7fTbdY2z7fURyXTcaZMgyJ{color:red;}}",
         ],
         2,
         1,
         2,
         [
-          ("ctx", "3o_Jr5", "ctx\\0& | @media(min-width:calc(2px + 1px)) | "),
-          ("ctx", "BQj8Ic", "ctx\\0& | @media(min-width:calc(1000px - 2%)) | "),
+          ("ctx", "TbdY2z", "ctx\\0& | @media (min-width:calc(2px + 1px)) | "),
+          (
+            "ctx",
+            "URyXTc",
+            "ctx\\0& | @media (min-width:calc(1000px - 2%)) | ",
+          ),
           (
             "value",
-            "m27qnV",
-            "bval\\0& | @media(min-width:calc(2px + 1px)) | \\07f\\0color:red\\0& | @media(min-width:calc(1000px - 2%)) | \\07f\\0color:red",
+            "aZMgyJ",
+            "bval\\0& | @media (min-width:calc(2px + 1px)) | \\07f\\0color:red\\0& | @media (min-width:calc(1000px - 2%)) | \\07f\\0color:red",
           ),
         ],
       ),
@@ -36,7 +40,7 @@
     [
       (
         "Output.MediaQueryCalc",
-        "_izLV7pGEj _bAC7f3o_Jr57fBQj8Icm27qnV",
+        "_izLV7pGEj _bAC7fTbdY2z7fURyXTcaZMgyJ",
         "_izLV7pGEj",
       ),
     ]
@@ -1024,7 +1028,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("_izLV7pGEj _bAC7f3o_Jr57fBQj8Icm27qnV", []);
+    let styles = CSS.make("_izLV7pGEj _bAC7fTbdY2z7fURyXTcaZMgyJ", []);
     let make = (props: makeProps) => {
       let className =
         CSS.className(

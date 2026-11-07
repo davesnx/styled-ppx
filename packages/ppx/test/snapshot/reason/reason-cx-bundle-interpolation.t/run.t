@@ -5,7 +5,7 @@ Each interpolating declaration is its own atom with its own var, across base /
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --color-1raopcx{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-ycftl9{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-qvekgg{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-zlktsz{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-s4afn7{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-1poadf9{syntax:\"*\";inherits:false;}"];
@@ -20,21 +20,21 @@ Each interpolating declaration is its own atom with its own var, across base /
         [("value", "QE1m9v", "val\\07f\\0& | \\0color:$(color)")],
       ),
       (
-        "_bAC7f1Tl5-w7fjG-6dW27L7Rx",
+        "_bAC7f1Tl5-w7fHwfC2rjsxQ9O",
         [
-          "._bAC7f1Tl5-w7fjG-6dW27L7Rx:hover{color:var(--color-ycftl9);}",
-          "@media (max-width: 768px) {._bAC7f1Tl5-w7fjG-6dW27L7Rx{color:var(--color-ycftl9);}}",
+          "._bAC7f1Tl5-w7fHwfC2rjsxQ9O:hover{color:var(--color-qvekgg);}",
+          "@media (max-width:768px){._bAC7f1Tl5-w7fHwfC2rjsxQ9O{color:var(--color-qvekgg);}}",
         ],
         2,
         1,
         2,
         [
           ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
-          ("ctx", "jG-6dW", "ctx\\0& | @media(max-width:768px) | "),
+          ("ctx", "HwfC2r", "ctx\\0& | @media (max-width:768px) | "),
           (
             "value",
-            "27L7Rx",
-            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media(max-width:768px) | \\07f\\0color:$(color)",
+            "jsxQ9O",
+            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media (max-width:768px) | \\07f\\0color:$(color)",
           ),
         ],
       ),
@@ -114,7 +114,7 @@ Each interpolating declaration is its own atom with its own var, across base /
     [
       (
         "Output.multiVariant",
-        "_igtOx8BPu _a7fQE1m9v _bAC7f1Tl5-w7fjG-6dW27L7Rx",
+        "_igtOx8BPu _a7fQE1m9v _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
         "_igtOx8BPu",
       ),
       (
@@ -133,10 +133,10 @@ Each interpolating declaration is its own atom with its own var, across base /
   let width = CSS.px(10);
   let multiVariant =
     CSS.make(
-      "_igtOx8BPu _a7fQE1m9v _bAC7f1Tl5-w7fjG-6dW27L7Rx",
+      "_igtOx8BPu _a7fQE1m9v _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
       [
         ("--color-1raopcx", CSS.Types.Color.toString(color)),
-        ("--color-ycftl9", CSS.Types.Color.toString(color)),
+        ("--color-qvekgg", CSS.Types.Color.toString(color)),
       ],
     );
   let mixed =

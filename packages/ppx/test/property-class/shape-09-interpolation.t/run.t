@@ -8,7 +8,7 @@ Development:
   $ refmt --parse ml --print re dev.ml
   [@css "@property --color-1raopcx{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-1n2ktc0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-ycftl9{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-qvekgg{syntax:\"*\";inherits:false;}"];
   [@css.atoms
     [
       (
@@ -28,21 +28,21 @@ Development:
         [("value", "QPFuDn", "val\\0fy\\0& | \\0padding:$(width)")],
       ),
       (
-        "_bAC7f1Tl5-w7fjG-6dW27L7Rx",
+        "_bAC7f1Tl5-w7fHwfC2rjsxQ9O",
         [
-          "._bAC7f1Tl5-w7fjG-6dW27L7Rx:hover{color:var(--color-ycftl9);}",
-          "@media (max-width: 768px) {._bAC7f1Tl5-w7fjG-6dW27L7Rx{color:var(--color-ycftl9);}}",
+          "._bAC7f1Tl5-w7fHwfC2rjsxQ9O:hover{color:var(--color-qvekgg);}",
+          "@media (max-width:768px){._bAC7f1Tl5-w7fHwfC2rjsxQ9O{color:var(--color-qvekgg);}}",
         ],
         2,
         1,
         2,
         [
           ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
-          ("ctx", "jG-6dW", "ctx\\0& | @media(max-width:768px) | "),
+          ("ctx", "HwfC2r", "ctx\\0& | @media (max-width:768px) | "),
           (
             "value",
-            "27L7Rx",
-            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media(max-width:768px) | \\07f\\0color:$(color)",
+            "jsxQ9O",
+            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media (max-width:768px) | \\07f\\0color:$(color)",
           ),
         ],
       ),
@@ -76,7 +76,7 @@ Development:
     [
       (
         "Input.both",
-        "_iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fjG-6dW27L7Rx",
+        "_iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
         "_iIxGXPL5_",
       ),
       ("Input.mixed", "_ig3UcJKch _a9fMU0SCS _a7fQE1m9v", "_ig3UcJKch"),
@@ -86,11 +86,11 @@ Development:
   let width = CSS.px(10);
   let both =
     CSS.make(
-      "cx-both _iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fjG-6dW27L7Rx",
+      "cx-both _iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
       [
         ("--color-1raopcx", CSS.Types.Color.toString(color)),
         ("--width-1n2ktc0", CSS.Types.Padding.toString(width)),
-        ("--color-ycftl9", CSS.Types.Color.toString(color)),
+        ("--color-qvekgg", CSS.Types.Color.toString(color)),
       ],
     );
   let mixed =
@@ -106,7 +106,7 @@ Production:
   [@css.config [("env", "production")]];
   [@css "@property --color-1raopcx{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-1n2ktc0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-ycftl9{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-qvekgg{syntax:\"*\";inherits:false;}"];
   [@css.atoms
     [
       (
@@ -126,21 +126,21 @@ Production:
         [("value", "QPFuDn", "val\\0fy\\0& | \\0padding:$(width)")],
       ),
       (
-        "_bAC7f1Tl5-w7fjG-6dW27L7Rx",
+        "_bAC7f1Tl5-w7fHwfC2rjsxQ9O",
         [
-          "._bAC7f1Tl5-w7fjG-6dW27L7Rx:hover{color:var(--color-ycftl9);}",
-          "@media (max-width: 768px) {._bAC7f1Tl5-w7fjG-6dW27L7Rx{color:var(--color-ycftl9);}}",
+          "._bAC7f1Tl5-w7fHwfC2rjsxQ9O:hover{color:var(--color-qvekgg);}",
+          "@media (max-width:768px){._bAC7f1Tl5-w7fHwfC2rjsxQ9O{color:var(--color-qvekgg);}}",
         ],
         2,
         1,
         2,
         [
           ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
-          ("ctx", "jG-6dW", "ctx\\0& | @media(max-width:768px) | "),
+          ("ctx", "HwfC2r", "ctx\\0& | @media (max-width:768px) | "),
           (
             "value",
-            "27L7Rx",
-            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media(max-width:768px) | \\07f\\0color:$(color)",
+            "jsxQ9O",
+            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media (max-width:768px) | \\07f\\0color:$(color)",
           ),
         ],
       ),
@@ -174,7 +174,7 @@ Production:
     [
       (
         "Input.both",
-        "_iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fjG-6dW27L7Rx",
+        "_iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
         "_iIxGXPL5_",
       ),
       ("Input.mixed", "_ig3UcJKch _a9fMU0SCS _a7fQE1m9v", "_ig3UcJKch"),
@@ -184,11 +184,11 @@ Production:
   let width = CSS.px(10);
   let both =
     CSS.make(
-      "_iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fjG-6dW27L7Rx",
+      "_iIxGXPL5_ _a7fQE1m9v _afyQPFuDn _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
       [
         ("--color-1raopcx", CSS.Types.Color.toString(color)),
         ("--width-1n2ktc0", CSS.Types.Padding.toString(width)),
-        ("--color-ycftl9", CSS.Types.Color.toString(color)),
+        ("--color-qvekgg", CSS.Types.Color.toString(color)),
       ],
     );
   let mixed =

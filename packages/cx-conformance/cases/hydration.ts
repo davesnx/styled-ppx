@@ -4,7 +4,7 @@ import { M1, merge } from "./lib/build.ts";
 const c = { css: "red", reason: "CSS.red" };
 const p = { css: "7px", reason: "`px(7)" };
 const why = (s: string) =>
-  `${s} The merged carrier holds the same inline var key twice. Native server-reason-react appends (two entries in the style attribute), Melange Object.assign keeps one: the class strings match, the style strings do not (hydration-duplicate-style-rootcause.md). Expected to fail \`ppx\` with kind hydration on main until srr's combine is fixed; not pinned.`;
+  `${s} The merged carrier holds the same inline var key twice. Native server-reason-react appends (two entries in the style attribute), Melange Object.assign keeps one: the class strings match, the style strings do not (hydration-duplicate-style-rootcause.md). They pass \`ppx\` with the pinned server-reason-react, whose combine keeps one entry; a hydration failure here means the duplicate is back.`;
 
 const all: Case[] = [
   { ...merge("hydration-01", "one interpolated block merged twice", { a: "color:$(c);" }, ["color"], { why: why("merge(a, a)."), vars: { c } }), tree: [{ id: "x", merge: ["a", "a"] }] },

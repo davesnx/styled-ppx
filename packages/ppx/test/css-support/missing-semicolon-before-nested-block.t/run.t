@@ -89,17 +89,17 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
         [("value", "_rV5bk", "val\\0cx\\0& | \\0margin-bottom:24px")],
       ),
       (
-        "_cn853b5Sftd8uYC",
-        ["@media (min-width: 1024px) {._cn853b5Sftd8uYC{width:50%;}}"],
+        "_cn8NPimJabfDfKP",
+        ["@media (min-width:1024px){._cn8NPimJabfDfKP{width:50%;}}"],
         2,
         1,
         1,
         [
-          ("ctx", "53b5Sf", "ctx\\0& | @media(min-width:1024px) | "),
+          ("ctx", "NPimJa", "ctx\\0& | @media (min-width:1024px) | "),
           (
             "value",
-            "td8uYC",
-            "val\\0n8\\0& | @media(min-width:1024px) | \\0width:50%",
+            "bfDfKP",
+            "val\\0n8\\0& | @media (min-width:1024px) | \\0width:50%",
           ),
         ],
       ),
@@ -181,19 +181,19 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
         ],
       ),
       (
-        "_cc7z5EnMHQrZm7O",
+        "_cc7SO36iemNMQdh",
         [
-          "@media (min-width: 768px) {._cc7z5EnMHQrZm7O{justify-content:center;}}",
+          "@media (min-width:768px){._cc7SO36iemNMQdh{justify-content:center;}}",
         ],
         2,
         1,
         1,
         [
-          ("ctx", "z5EnMH", "ctx\\0& | @media(min-width:768px) | "),
+          ("ctx", "SO36ie", "ctx\\0& | @media (min-width:768px) | "),
           (
             "value",
-            "QrZm7O",
-            "val\\0c7\\0& | @media(min-width:768px) | \\0justify-content:center",
+            "mNMQdh",
+            "val\\0c7\\0& | @media (min-width:768px) | \\0justify-content:center",
           ),
         ],
       ),
@@ -208,17 +208,17 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
         [("value", "nSf-2W", "val\\0n8\\0& | \\0width:min-content")],
       ),
       (
-        "_cg8bRSL2YnaoUk-",
-        ["@media (min-width: 1200px) {._cg8bRSL2YnaoUk-{padding-top:8px;}}"],
+        "_cg8qmuVFYadoXVw",
+        ["@media (min-width:1200px){._cg8qmuVFYadoXVw{padding-top:8px;}}"],
         2,
         1,
         1,
         [
-          ("ctx", "bRSL2Y", "ctx\\0& | @media(min-width:1200px) | "),
+          ("ctx", "qmuVFY", "ctx\\0& | @media (min-width:1200px) | "),
           (
             "value",
-            "naoUk-",
-            "val\\0g8\\0& | @media(min-width:1200px) | \\0padding-top:8px",
+            "adoXVw",
+            "val\\0g8\\0& | @media (min-width:1200px) | \\0padding-top:8px",
           ),
         ],
       ),
@@ -513,15 +513,15 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
         "_iV9BCttCT _amazEikwp _cf9kDsyxkq0t9MI _cmdkDsyxkoRq0K-",
         "_iV9BCttCT",
       ),
-      ("Input._case3", "_iPPaJrbqs _acx_rV5bk _cn853b5Sftd8uYC", "_iPPaJrbqs"),
+      ("Input._case3", "_iPPaJrbqs _acx_rV5bk _cn8NPimJabfDfKP", "_iPPaJrbqs"),
       ("Input._case4", "_iDEeQJNNy _amatVIEZs _cm6eo0aiLJp2tM-", "_iDEeQJNNy"),
       (
         "Input._case5",
         "_ippW4sFxr _a5diBj4d_ _cg2eH7qFlrYGmjB _c5ieH7qFlgUBAeW",
         "_ippW4sFxr",
       ),
-      ("Input._case6", "_i1aXavgi7 _ac7EEvBtR _cc7z5EnMHQrZm7O", "_i1aXavgi7"),
-      ("Input._case7", "_iJM1nZ1-R _an8nSf-2W _cg8bRSL2YnaoUk-", "_iJM1nZ1-R"),
+      ("Input._case6", "_i1aXavgi7 _ac7EEvBtR _cc7SO36iemNMQdh", "_i1aXavgi7"),
+      ("Input._case7", "_iJM1nZ1-R _an8nSf-2W _cg8qmuVFYadoXVw", "_iJM1nZ1-R"),
       ("Input._case8", "_iFq6RDJMr _abdWWDqhK _cfybxDcu-_dRzoa", "_iFq6RDJMr"),
       (
         "Input._case9",
@@ -544,16 +544,16 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
   let _case2 =
     CSS.make("_iV9BCttCT _amazEikwp _cf9kDsyxkq0t9MI _cmdkDsyxkoRq0K-", []);
   
-  let _case3 = CSS.make("_iPPaJrbqs _acx_rV5bk _cn853b5Sftd8uYC", []);
+  let _case3 = CSS.make("_iPPaJrbqs _acx_rV5bk _cn8NPimJabfDfKP", []);
   
   let _case4 = CSS.make("_iDEeQJNNy _amatVIEZs _cm6eo0aiLJp2tM-", []);
   
   let _case5 =
     CSS.make("_ippW4sFxr _a5diBj4d_ _cg2eH7qFlrYGmjB _c5ieH7qFlgUBAeW", []);
   
-  let _case6 = CSS.make("_i1aXavgi7 _ac7EEvBtR _cc7z5EnMHQrZm7O", []);
+  let _case6 = CSS.make("_i1aXavgi7 _ac7EEvBtR _cc7SO36iemNMQdh", []);
   
-  let _case7 = CSS.make("_iJM1nZ1-R _an8nSf-2W _cg8bRSL2YnaoUk-", []);
+  let _case7 = CSS.make("_iJM1nZ1-R _an8nSf-2W _cg8qmuVFYadoXVw", []);
   
   let _case8 = CSS.make("_iFq6RDJMr _abdWWDqhK _cfybxDcu-_dRzoa", []);
   

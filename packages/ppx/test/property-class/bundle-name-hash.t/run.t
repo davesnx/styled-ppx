@@ -11,22 +11,22 @@ checks it for collisions like the name of a plain atom.
   [@css.atoms
     [
       (
-        "_bACzzDaTjT0gUl2yyzzDaTjT0lHuiU0QyvVlH",
+        "_bACzzDaTjT0-T3I8pzzDaTjT0KcXeumQNX2D_",
         [
-          "@media (min-width: 1px) {._bACzzDaTjT0gUl2yyzzDaTjT0lHuiU0QyvVlH{--gap:1px;}}",
-          "@media (min-width: 2px) {._bACzzDaTjT0gUl2yyzzDaTjT0lHuiU0QyvVlH{--gap:2px;}}",
+          "@media (min-width:1px){._bACzzDaTjT0-T3I8pzzDaTjT0KcXeumQNX2D_{--gap:1px;}}",
+          "@media (min-width:2px){._bACzzDaTjT0-T3I8pzzDaTjT0KcXeumQNX2D_{--gap:2px;}}",
         ],
         2,
         1,
         2,
         [
-          ("ctx", "gUl2yy", "ctx\\0& | @media(min-width:1px) | "),
-          ("ctx", "lHuiU0", "ctx\\0& | @media(min-width:2px) | "),
+          ("ctx", "-T3I8p", "ctx\\0& | @media (min-width:1px) | "),
+          ("ctx", "KcXeum", "ctx\\0& | @media (min-width:2px) | "),
           ("name", "DaTjT0", "name\\0--gap"),
           (
             "value",
-            "QyvVlH",
-            "bval\\0& | @media(min-width:1px) | \\0--gap\\0--gap:1px\\0& | @media(min-width:2px) | \\0--gap\\0--gap:2px",
+            "QNX2D_",
+            "bval\\0& | @media (min-width:1px) | \\0--gap\\0--gap:1px\\0& | @media (min-width:2px) | \\0--gap\\0--gap:2px",
           ),
         ],
       ),
@@ -44,9 +44,9 @@ checks it for collisions like the name of a plain atom.
     [
       (
         "Input.theme",
-        "_ijYcUjvH7 _bACzzDaTjT0gUl2yyzzDaTjT0lHuiU0QyvVlH",
+        "_ijYcUjvH7 _bACzzDaTjT0-T3I8pzzDaTjT0KcXeumQNX2D_",
         "_ijYcUjvH7",
       ),
     ]
   ];
-  let theme = CSS.make("_ijYcUjvH7 _bACzzDaTjT0gUl2yyzzDaTjT0lHuiU0QyvVlH", []);
+  let theme = CSS.make("_ijYcUjvH7 _bACzzDaTjT0-T3I8pzzDaTjT0KcXeumQNX2D_", []);

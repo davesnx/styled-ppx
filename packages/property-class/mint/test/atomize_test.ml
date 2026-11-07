@@ -552,13 +552,15 @@ let mint_tests =
            (unit_of
               [
                 decl
-                  ~conditions:[ "@media (min-width: 1px)" ]
+                  ~conditions:[ "@media  ( min-width : 1px )" ]
                   "color" "color:red";
               ]))
         (Mint.token
            (unit_of
               [
-                decl ~conditions:[ "@media(min-width:1px)" ] "color" "color:red";
+                decl
+                  ~conditions:[ "@media (min-width:1px)" ]
+                  "color" "color:red";
               ])));
     case "aliases mint the property of their canonical name" (fun () ->
       let alias = Mint.token (unit_of [ decl "word-wrap" "x" ]) in

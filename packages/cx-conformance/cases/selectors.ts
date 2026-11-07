@@ -37,7 +37,7 @@ const all: Case[] = [
   }),
   merge("selectors-03", "explicit & {} vs base declaration", ["& {color:red;}", "color:blue;"], ["color"], {
     why: "cx prints `& {}` as a nested rule after all base declarations, so it wins in both orders. If the ppx folds `& {}` into the plain context, merge AB drops it and blue wins.",
-    expect: knownFail("RT-04", "cx treats `& {}` as a nested rule printed after every base declaration; the design folds it into the plain context"),
+    expect: knownFail("decision-19", "cx treats `& {}` as a nested rule printed after every base declaration; the design folds it into the plain context"),
   }),
   merge("selectors-04", "one block: same nested selector twice", ["&:hover{color:red;} &:hover{color:blue;}"], ["color"], {
     why: "Two nested rules with one key in one block become two atoms with the same key on one element. The ppx must keep only the later (cx: blue).",
@@ -175,6 +175,14 @@ const all: Case[] = [
     why: "Decision 11: `&` in a sibling scope resolves to the binding id. Two bindings write the same `& + &` rule; the first sibling uses `t`, the second `s`. cx: `.css-s + .css-s` needs both siblings to carry s's class, so 0. An atom class shared by text would give 10px.",
     blocks: { s: "& + &{margin-top:10px;}", t: "& + &{margin-top:10px;} color:red;" },
     tree: [{ id: "p", merge: [], children: [{ id: "s1", merge: ["t"] }, { id: "s2", merge: ["s"] }] }],
+    probes: [{ el: "s2", props: ["margin-top"] }],
+  },
+  {
+    id: "selectors-33",
+    title: "& ~ & with the same rule text in two bindings",
+    why: "As selectors-32, for the general sibling combinator: `& ~ &` also resolves to the binding id.",
+    blocks: { s: "& ~ &{margin-top:10px;}", t: "& ~ &{margin-top:10px;} color:red;" },
+    tree: [{ id: "p", merge: [], children: [{ id: "s1", merge: ["t"] }, { id: "m", merge: [] }, { id: "s2", merge: ["s"] }] }],
     probes: [{ el: "s2", props: ["margin-top"] }],
   },
 ];

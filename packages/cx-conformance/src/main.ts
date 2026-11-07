@@ -8,6 +8,7 @@ import { coverOf, loadCoverage, type Cover } from "./coverage.ts";
 import { declaredProps } from "./css.ts";
 import { generate, generatorProps } from "./generate.ts";
 import { globToRegExp, loadCases } from "./load.ts";
+import { checkPin, diffLines, isPinned, loadPins, writePins, type PinnedName } from "./pins.ts";
 import { Prober } from "./probe.ts";
 import { priorCases } from "./prior.ts";
 import { summaryLine, writeReport } from "./report.ts";
@@ -24,6 +25,7 @@ const usage = `usage: node --experimental-strip-types src/main.ts [options]
   --generate <n>        property-based run: n random cases, model vs cx, shrink failures
   --seed <s>            generator seed (default 1)
   --self-test           check that broken model variants fail the prior cases they must fail
+  --write-pins          run model and ppx on every case and write their known-fail differences to pins.json
   --refresh-coverage    derive coverage.json again in Chromium`;
 
 const { values: args } = parseArgs({
@@ -38,6 +40,7 @@ const { values: args } = parseArgs({
     seed: { type: "string", default: "1" },
     "self-test": { type: "boolean", default: false },
     "refresh-coverage": { type: "boolean", default: false },
+    "write-pins": { type: "boolean", default: false },
     help: { type: "boolean", default: false },
   },
 });
@@ -70,8 +73,6 @@ async function candidateByName(name: string, cover: Cover): Promise<Candidate | 
   throw new Error(`unknown candidate ${name}\n${usage}`);
 }
 
-const pinned = (name: string) => name === "model" || name === "ppx";
-
 async function main(): Promise<number> {
   const started = Date.now();
   const browser = await launch();
@@ -86,6 +87,11 @@ async function main(): Promise<number> {
     if (mode === "self-test") return await selfTest(suite);
     if (mode === "generate") return await generate(suite, int("generate", args.generate!), int("seed", args.seed));
 
+    const writing = args["write-pins"];
+    if (writing && (args.prior || args.filter || args.cap !== "64" || !["model", "ppx"].every((n) => args.candidate.split(",").includes(n))))
+      throw new Error("--write-pins needs --candidate model,ppx, the default --cap and no --filter or --prior");
+    const pins = args.prior || writing ? undefined : loadPins(cases);
+    const written: Partial<Record<PinnedName, Map<string, string[]>>> = {};
     if (args.filter) {
       const re = globToRegExp(args.filter);
       cases = cases.filter((c) => re.test(c.id));
@@ -104,17 +110,24 @@ async function main(): Promise<number> {
       const t0 = Date.now();
       const lifecycle = candidate as Candidate & { prepare?: (cs: Case[]) => Promise<void>; close?: () => Promise<void> };
       await lifecycle.prepare?.(cases);
-      const results = await Promise.all(cases.map((c) => runCase(suite, c, candidate, pinned(name))));
+      const ran = await Promise.all(cases.map((c) => runCase(suite, c, candidate, isPinned(name))));
       await lifecycle.close?.();
+      const results = pins && isPinned(name) ? ran.map((r) => checkPin(r, pins, name)) : ran;
+      if (writing && isPinned(name)) written[name] = new Map(ran.filter((r) => r.status === "known-fail").map((r) => [r.id, diffLines(r.orders)]));
       console.log(`${summaryLine(name, results)} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
       for (const r of results.filter((r) => unexpected.has(r.status))) {
         bad++;
         const o = r.orders.find((o) => o.error || o.diffs.length > 0);
         const d = o?.diffs[0];
         const detail = o?.error ?? (d ? `${d.probe} ${d.prop}: cx ${d.oracle}, got ${d.candidate}` : "");
-        console.log(`  ${r.status.toUpperCase()} ${r.id}: ${r.title}${o ? ` [${o.label}] ${detail}` : ""}`);
+        const where = r.pinMismatch ?? (o ? `[${o.label}] ${detail}` : "");
+        console.log(`  ${r.status.toUpperCase()} ${r.id}: ${r.title}${where ? ` ${where}` : ""}`);
       }
       if (args.report) for (const f of writeReport(name, results)) console.log(`  wrote ${f}`);
+    }
+    if (writing) {
+      if (!written.model || !written.ppx) throw new Error("--write-pins: model and ppx must both run");
+      console.log(`wrote ${writePins({ model: written.model, ppx: written.ppx })}`);
     }
     console.log(`total ${((Date.now() - started) / 1000).toFixed(1)}s`);
     return bad > 0 ? 1 : 0;

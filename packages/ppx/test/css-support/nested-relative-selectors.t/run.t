@@ -87,9 +87,9 @@ Each pair below must render and hash to the same atom.
         ],
       ),
       (
-        "_c7fHGihBSjznH_s",
+        "_c7fmNthTM_ucMgb",
         [
-          "@media (min-width: 1px) {._c7fHGihBSjznH_s .parent > .child{color:red;}}",
+          "@media (min-width:1px){._c7fmNthTM_ucMgb .parent > .child{color:red;}}",
         ],
         0,
         2,
@@ -97,13 +97,13 @@ Each pair below must render and hash to the same atom.
         [
           (
             "ctx",
-            "HGihBS",
-            "ctx\\0& .parent > .child | @media(min-width:1px) | ",
+            "mNthTM",
+            "ctx\\0& .parent > .child | @media (min-width:1px) | ",
           ),
           (
             "value",
-            "jznH_s",
-            "val\\07f\\0& .parent > .child | @media(min-width:1px) | \\0color:red",
+            "_ucMgb",
+            "val\\07f\\0& .parent > .child | @media (min-width:1px) | \\0color:red",
           ),
         ],
       ),
@@ -125,5 +125,5 @@ Each pair below must render and hash to the same atom.
   CSS.make("_bAC7fWSO6UY7f7Zxw_YvPhMLx", []);
   CSS.make("_bAC7fWSO6UY7f7Zxw_YvPhMLx", []);
   
-  CSS.make("_c7fHGihBSjznH_s", []);
-  CSS.make("_c7fHGihBSjznH_s", []);
+  CSS.make("_c7fmNthTM_ucMgb", []);
+  CSS.make("_c7fmNthTM_ucMgb", []);

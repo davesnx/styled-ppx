@@ -46,29 +46,28 @@ selector chain into the at-rule's contents instead of dropping it.
       ("ctx", "svRT0l", "ctx\\0& .b:hover | ");
       ("value", "0HNRUi",
         "bval\\0& .a | \\07f\\0color:red\\0& .b | \\07f\\0color:red\\0& .a:hover | \\07f\\0color:blue\\0& .b:hover | \\07f\\0color:blue")]);
-    ("_c7f3Xeo8tWEoBh6",
-      ["@media (min-width: 768px) {._c7f3Xeo8tWEoBh6 .a{color:red;}}"], 0, 2,
+    ("_c7fP3RA54yz8J2j",
+      ["@media (min-width:768px){._c7fP3RA54yz8J2j .a{color:red;}}"], 0, 2, 1,
+      [("ctx", "P3RA54", "ctx\\0& .a | @media (min-width:768px) | ");
+      ("value", "yz8J2j",
+        "val\\07f\\0& .a | @media (min-width:768px) | \\0color:red")]);
+    ("_c7fvCEQWdJB1TY2",
+      ["@media (max-width:600px){._c7fvCEQWdJB1TY2 .a .b{color:red;}}"], 0, 2,
       1,
-      [("ctx", "3Xeo8t", "ctx\\0& .a | @media(min-width:768px) | ");
-      ("value", "WEoBh6",
-        "val\\07f\\0& .a | @media(min-width:768px) | \\0color:red")]);
-    ("_c7f1Tns1XXzLzAF",
-      ["@media (max-width: 600px) {._c7f1Tns1XXzLzAF .a .b{color:red;}}"], 0,
-      2, 1,
-      [("ctx", "1Tns1X", "ctx\\0& .a .b | @media(max-width:600px) | ");
-      ("value", "XzLzAF",
-        "val\\07f\\0& .a .b | @media(max-width:600px) | \\0color:red")]);
+      [("ctx", "vCEQWd", "ctx\\0& .a .b | @media (max-width:600px) | ");
+      ("value", "JB1TY2",
+        "val\\07f\\0& .a .b | @media (max-width:600px) | \\0color:red")]);
     ("_c7f5JrtD6N_h5Bz", ["._c7f5JrtD6N_h5Bz .a{color:black;}"], 0, 1, 1,
       [("ctx", "5JrtD6", "ctx\\0& .a | ");
       ("value", "N_h5Bz", "val\\07f\\0& .a | \\0color:black")]);
-    ("_bAC7fZ7gXBQ7fL3jK-sc0WOGx",
-      ["@media (max-width: 600px) {._bAC7fZ7gXBQ7fL3jK-sc0WOGx .a{color:red;}}";
-      "@media (max-width: 600px) {._bAC7fZ7gXBQ7fL3jK-sc0WOGx .a:hover{color:blue;}}"],
+    ("_bAC7fytOc2z7fK6Mo6aGxRoun",
+      ["@media (max-width:600px){._bAC7fytOc2z7fK6Mo6aGxRoun .a{color:red;}}";
+      "@media (max-width:600px){._bAC7fytOc2z7fK6Mo6aGxRoun .a:hover{color:blue;}}"],
       0, 2, 2,
-      [("ctx", "Z7gXBQ", "ctx\\0& .a | @media(max-width:600px) | ");
-      ("ctx", "L3jK-s", "ctx\\0& .a:hover | @media(max-width:600px) | ");
-      ("value", "c0WOGx",
-        "bval\\0& .a | @media(max-width:600px) | \\07f\\0color:red\\0& .a:hover | @media(max-width:600px) | \\07f\\0color:blue")]);
+      [("ctx", "ytOc2z", "ctx\\0& .a | @media (max-width:600px) | ");
+      ("ctx", "K6Mo6a", "ctx\\0& .a:hover | @media (max-width:600px) | ");
+      ("value", "GxRoun",
+        "bval\\0& .a | @media (max-width:600px) | \\07f\\0color:red\\0& .a:hover | @media (max-width:600px) | \\07f\\0color:blue")]);
     ("_iw3F77wcE", [], 1, 0, 0,
       [("id", "_iw3F77wcE", "bind\\0\\0Input\\0\\0multiTop\\00")]);
     ("_iTZc0ckOP", [], 1, 0, 0,
@@ -91,17 +90,17 @@ selector chain into the at-rule's contents instead of dropping it.
       "_iFWUDyyrN _bAE7fd5_A1-7fLmQB5b7fGzl8e97fWp7iwEHgBEQB", "_iFWUDyyrN");
     ("Input.multiMixed",
       "_idsNbl91u _bAE7f5JrtD67ffiDtDH7fDwyoqa7fsvRT0l0HNRUi", "_idsNbl91u");
-    ("Input.mediaUnderSelector", "_iHmydnKPe _c7f3Xeo8tWEoBh6", "_iHmydnKPe");
-    ("Input.mediaDeep", "_ibPnwlRae _c7f1Tns1XXzLzAF", "_ibPnwlRae");
+    ("Input.mediaUnderSelector", "_iHmydnKPe _c7fP3RA54yz8J2j", "_iHmydnKPe");
+    ("Input.mediaDeep", "_ibPnwlRae _c7fvCEQWdJB1TY2", "_ibPnwlRae");
     ("Input.mediaWithNested",
-      "_iU0CdlKe9 _c7f5JrtD6N_h5Bz _bAC7fZ7gXBQ7fL3jK-sc0WOGx", "_iU0CdlKe9")]]
+      "_iU0CdlKe9 _c7f5JrtD6N_h5Bz _bAC7fytOc2z7fK6Mo6aGxRoun", "_iU0CdlKe9")]]
   let multiTop = CSS.make "_iw3F77wcE _bAC7f5JrtD67ffiDtDHpi0BaP" []
   let multiNested = CSS.make "_iTZc0ckOP _bAC7fAUeLuW7fEPcp_Bcl1hyC" []
   let cartesian =
     CSS.make "_iFWUDyyrN _bAE7fd5_A1-7fLmQB5b7fGzl8e97fWp7iwEHgBEQB" []
   let multiMixed =
     CSS.make "_idsNbl91u _bAE7f5JrtD67ffiDtDH7fDwyoqa7fsvRT0l0HNRUi" []
-  let mediaUnderSelector = CSS.make "_iHmydnKPe _c7f3Xeo8tWEoBh6" []
-  let mediaDeep = CSS.make "_ibPnwlRae _c7f1Tns1XXzLzAF" []
+  let mediaUnderSelector = CSS.make "_iHmydnKPe _c7fP3RA54yz8J2j" []
+  let mediaDeep = CSS.make "_ibPnwlRae _c7fvCEQWdJB1TY2" []
   let mediaWithNested =
-    CSS.make "_iU0CdlKe9 _c7f5JrtD6N_h5Bz _bAC7fZ7gXBQ7fL3jK-sc0WOGx" []
+    CSS.make "_iU0CdlKe9 _c7f5JrtD6N_h5Bz _bAC7fytOc2z7fK6Mo6aGxRoun" []

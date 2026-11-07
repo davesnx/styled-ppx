@@ -4,21 +4,21 @@
   [@css.atoms
     [
       (
-        "_bAC4hlV6fu14h1Tl5-wJs-II0",
+        "_bAC4hKKj5ll4h1Tl5-wtt6yzx",
         [
-          "@media (min-width: 600px) {._bAC4hlV6fu14h1Tl5-wJs-II0{background:blue;}}",
-          "._bAC4hlV6fu14h1Tl5-wJs-II0:hover{background:green;}",
+          "@media (min-width:600px){._bAC4hKKj5ll4h1Tl5-wtt6yzx{background:blue;}}",
+          "._bAC4hKKj5ll4h1Tl5-wtt6yzx:hover{background:green;}",
         ],
         2,
         1,
         18,
         [
-          ("ctx", "lV6fu1", "ctx\\0& | @media(min-width:600px) | "),
+          ("ctx", "KKj5ll", "ctx\\0& | @media (min-width:600px) | "),
           ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
           (
             "value",
-            "Js-II0",
-            "bval\\0& | @media(min-width:600px) | \\04h\\0background:blue\\0&:hover | \\04h\\0background:green",
+            "tt6yzx",
+            "bval\\0& | @media (min-width:600px) | \\04h\\0background:blue\\0&:hover | \\04h\\0background:green",
           ),
         ],
       ),
@@ -64,7 +64,7 @@
     [
       (
         "Output.SelectorsMediaQueries",
-        "_idJHTBSM3 _bAC4hlV6fu14h1Tl5-wJs-II0 _c7fiC0GSE3Mjgzr _ca8iC0GSEy3zWJa",
+        "_idJHTBSM3 _bAC4hKKj5ll4h1Tl5-wtt6yzx _c7fiC0GSE3Mjgzr _ca8iC0GSEy3zWJa",
         "_idJHTBSM3",
       ),
     ]
@@ -1054,7 +1054,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "_idJHTBSM3 _bAC4hlV6fu14h1Tl5-wJs-II0 _c7fiC0GSE3Mjgzr _ca8iC0GSEy3zWJa",
+        "_idJHTBSM3 _bAC4hKKj5ll4h1Tl5-wtt6yzx _c7fiC0GSE3Mjgzr _ca8iC0GSEy3zWJa",
         [],
       );
     let make = (props: makeProps) => {

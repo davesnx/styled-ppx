@@ -16,14 +16,12 @@ val is_legacy_pseudo_element : string -> int -> bool
 val normalize_selector : string -> string
 
 (** Lowercases media feature names: the name right after a [(] that does not
-    open a function, when [:], [)], [<], [>] or [=] follows it. Custom property
-    names and quoted text keep their case. *)
+    open a function, when [:], [)], [<], [>] or [=] follows it. Then collapses
+    whitespace to one space, and removes it at both ends, after [(], before [)],
+    and around [:] and [,]. Custom property names and quoted text stay as
+    written. The result is valid CSS: [screen and (min-width:1px)]. *)
 val canonical_condition : string -> string
 
-(** {!canonical_condition}, then collapses whitespace, and removes it around
-    [(], [)], [,] and [:]. *)
-val normalize_condition : string -> string
-
-(** The identity of a context: the normalized scope, the sorted normalized
+(** The identity of a context: the normalized scope, the sorted canonical
     conditions and the importance, joined by [" | "]. *)
 val key : context -> string

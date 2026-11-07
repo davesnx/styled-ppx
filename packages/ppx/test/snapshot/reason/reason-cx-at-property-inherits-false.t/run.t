@@ -6,7 +6,7 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   $ refmt --parse ml --print re output.ml
   [@css "@property --color-1raopcx{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-zlktsz{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-lb2a0s{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-1r721c0{syntax:\"*\";inherits:false;}"];
   [@css "@property --str-rhaclj{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-1ltynhr{syntax:\"*\";inherits:false;}"];
   [@css.atoms
@@ -31,19 +31,19 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
         ],
       ),
       (
-        "_c7fjG-6dWipEbbG",
+        "_c7fHwfC2rzL6zgZ",
         [
-          "@media (max-width: 768px) {._c7fjG-6dWipEbbG{color:var(--color-lb2a0s);}}",
+          "@media (max-width:768px){._c7fHwfC2rzL6zgZ{color:var(--color-1r721c0);}}",
         ],
         2,
         1,
         1,
         [
-          ("ctx", "jG-6dW", "ctx\\0& | @media(max-width:768px) | "),
+          ("ctx", "HwfC2r", "ctx\\0& | @media (max-width:768px) | "),
           (
             "value",
-            "ipEbbG",
-            "val\\07f\\0& | @media(max-width:768px) | \\0color:$(color)",
+            "zL6zgZ",
+            "val\\07f\\0& | @media (max-width:768px) | \\0color:$(color)",
           ),
         ],
       ),
@@ -207,7 +207,7 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
     [
       ("Output.topLevel", "_iU79GCYAj _a7fQE1m9v", "_iU79GCYAj"),
       ("Output.hover", "_iYq2a33uD _c7f1Tl5-wm8KWM7", "_iYq2a33uD"),
-      ("Output.media", "_i2N5XvSeL _c7fjG-6dWipEbbG", "_i2N5XvSeL"),
+      ("Output.media", "_i2N5XvSeL _c7fHwfC2rzL6zgZ", "_i2N5XvSeL"),
       ("Output.descendant", "_iIjlCg7wy _c7fsFnj_7u_QGgb", "_iIjlCg7wy"),
       (
         "Output.bundleSpan",
@@ -243,8 +243,8 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
     );
   let media =
     CSS.make(
-      "_i2N5XvSeL _c7fjG-6dWipEbbG",
-      [("--color-lb2a0s", CSS.Types.Color.toString(color))],
+      "_i2N5XvSeL _c7fHwfC2rzL6zgZ",
+      [("--color-1r721c0", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(

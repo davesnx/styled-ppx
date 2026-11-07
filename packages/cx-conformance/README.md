@@ -29,6 +29,7 @@ node --experimental-strip-types --no-warnings src/main.ts --candidate ppx --filt
 node --experimental-strip-types --no-warnings src/main.ts --prior --candidate model
 node --experimental-strip-types --no-warnings src/main.ts --generate 300 --seed 1
 node --experimental-strip-types --no-warnings src/main.ts --self-test
+node --experimental-strip-types --no-warnings src/main.ts --candidate model,ppx --write-pins
 npm run typecheck
 ```
 
@@ -42,6 +43,7 @@ npm run typecheck
 | `--jobs n` | browser pages in parallel (default 8) |
 | `--generate n --seed s` | random cases, model against cx, failures shrunk |
 | `--refresh-coverage` | derive `coverage.json` again |
+| `--write-pins` | run `model` and `ppx` on every case and write `pins.json` |
 
 Exit code: 0 when every case has its expected result, 1 otherwise, 2 on a
 harness error (invalid cases, no browser).
@@ -69,13 +71,21 @@ tree.
 | Status | Meaning | Expected |
 |---|---|---|
 | `pass` | every order matches cx | yes |
-| `known-fail` | `expect: known-fail` and some order differs | yes |
-| `fail` | `expect: pass` (default) and some order differs | no |
+| `known-fail` | `expect: known-fail` and the orders differ exactly as `pins.json` records | yes |
+| `fail` | `expect: pass` (default) and some order differs, or `expect: known-fail` and the differences are not the ones in `pins.json` | no |
 | `now-passing` | `expect: known-fail` but every order matches: remove the pin | no |
 | `error` | the oracle threw | no |
 
 Pins (`expect`) apply to `model` and `ppx`. `main-concat` and the model
 variants ignore them.
+
+`pins.json` holds, per known-fail case, every difference line
+(`order | probe | property: cx value, got value`) at the default `--cap`. One
+list applies to both candidates; `{ "model": [...], "ppx": [...] }` when
+they differ (the model and the generated sheet use different fixed orders,
+so the losing merge order differs). A pin for a case that is not `known-fail` is a
+harness error. After an accepted change, run `--write-pins` and review the
+diff of `pins.json`. `--prior` and `--self-test` do not read `pins.json`.
 
 ## Candidates
 

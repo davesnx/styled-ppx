@@ -17,6 +17,7 @@ export type CaseResult = {
   status: Status;
   total: number;
   orders: OrderResult[];
+  pinMismatch?: string;
 };
 
 export type Suite = {

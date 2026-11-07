@@ -31,12 +31,11 @@ the diff IS the blast radius.
       ("ctx", "fiDtDH", "ctx\\0& .b | ");
       ("value", "WBs5rK",
         "bval\\0& .a | \\07f\\0color:green\\0& .b | \\07f\\0color:green")]);
-    ("_c7f3Xeo8tWEoBh6",
-      ["@media (min-width: 768px) {._c7f3Xeo8tWEoBh6 .a{color:red;}}"], 0, 2,
-      1,
-      [("ctx", "3Xeo8t", "ctx\\0& .a | @media(min-width:768px) | ");
-      ("value", "WEoBh6",
-        "val\\07f\\0& .a | @media(min-width:768px) | \\0color:red")]);
+    ("_c7fP3RA54yz8J2j",
+      ["@media (min-width:768px){._c7fP3RA54yz8J2j .a{color:red;}}"], 0, 2, 1,
+      [("ctx", "P3RA54", "ctx\\0& .a | @media (min-width:768px) | ");
+      ("value", "yz8J2j",
+        "val\\07f\\0& .a | @media (min-width:768px) | \\0color:red")]);
     ("_an8qYbiEc", ["._an8qYbiEc{width:1.5rem;}"], 1, 0, 1,
       [("value", "qYbiEc", "val\\0n8\\0& | \\0width:1.5rem")]);
     ("_af9B4nh92", ["._af9B4nh92{opacity:0.5;}"], 1, 0, 1,
@@ -63,13 +62,13 @@ the diff IS the blast radius.
       "_i3CYVHwSU");
     ("Input.hovered", "_i-QpDUWl7 _a7fn70fsU _c7f1Tl5-wX5Zn_K", "_i-QpDUWl7");
     ("Input.multiSel", "_iRbdWAU7_ _bAC7f5JrtD67ffiDtDHWBs5rK", "_iRbdWAU7_");
-    ("Input.withMedia", "_ivioO1pp- _c7f3Xeo8tWEoBh6", "_ivioO1pp-");
+    ("Input.withMedia", "_ivioO1pp- _c7fP3RA54yz8J2j", "_ivioO1pp-");
     ("Input.units", "_iz9h8px1z _an8qYbiEc _af9B4nh92", "_iz9h8px1z");
     ("Input.withFallback", "_iIOXhQNdE _a7fLyB3G1", "_iIOXhQNdE")]]
   let solid = CSS.make "_ijxrs__xh _a7fadbhEW" []
   let multi = CSS.make "_i3CYVHwSU _actal1K5c _afyhaCP9E _a7fCPHFf-" []
   let hovered = CSS.make "_i-QpDUWl7 _a7fn70fsU _c7f1Tl5-wX5Zn_K" []
   let multiSel = CSS.make "_iRbdWAU7_ _bAC7f5JrtD67ffiDtDHWBs5rK" []
-  let withMedia = CSS.make "_ivioO1pp- _c7f3Xeo8tWEoBh6" []
+  let withMedia = CSS.make "_ivioO1pp- _c7fP3RA54yz8J2j" []
   let units = CSS.make "_iz9h8px1z _an8qYbiEc _af9B4nh92" []
   let withFallback = CSS.make "_iIOXhQNdE _a7fLyB3G1" []
