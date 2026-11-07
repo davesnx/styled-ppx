@@ -133,6 +133,20 @@ let merge_empty_carriers () =
   Alcotest.(check string) "className" "" (fst styles);
   Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
 
+let merge_equals_the_core_merge_on_repeated_vectors () =
+  let check (ac, av) (bc, bv) =
+    let merged = CSS.className (CSS.merge (CSS.make ac av) (CSS.make bc bv)) in
+    Alcotest.(check string) (ac ^ " + " ^ bc) (Css_merge.merge ac bc) merged;
+    merged
+  in
+  for _ = 1 to 2 do
+    List.iter
+      (fun (a, b, c) ->
+        let ab = check a b in
+        ignore (check (ab, []) c))
+      Vectors.cases
+  done
+
 let font_families_single_font () =
   Alcotest.(check string)
     "single font family" {js|"Mono"|js}
@@ -171,6 +185,8 @@ let tests =
     test "trim empty merge class 2" trim_empty_merge_class_2;
     test "trim empty merge class 3" trim_empty_merge_class_3;
     test "merge empty carriers" merge_empty_carriers;
+    test "merge equals the core merge on repeated vectors"
+      merge_equals_the_core_merge_on_repeated_vectors;
     test "font families single font" font_families_single_font;
     test "font families multiple fonts" font_families_multiple_fonts;
   ]

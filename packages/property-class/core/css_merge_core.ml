@@ -71,9 +71,10 @@ let symbol_index =
     else if c = '-' then Char.chr 63
     else Char.chr 255)
 
+(* Melange strings are UTF-16, so a char code can exceed 255. *)
 let sym s pos =
-  Char.code
-    (String.unsafe_get symbol_index (Char.code (String.unsafe_get s pos)))
+  let c = Char.code (String.unsafe_get s pos) in
+  if c > 255 then 255 else Char.code (String.unsafe_get symbol_index c)
 
 let part s pos =
   let a = sym s pos
@@ -339,39 +340,31 @@ let rec family_slot tbl mask f slot =
   else if v = f then -1
   else family_slot tbl mask f ((slot + 1) land mask)
 
-let independent t la =
+let independent t =
   let s = t.s
   and meta = t.meta
   and n = t.n in
-  let na = ref 0 in
-  while !na < n && Array.unsafe_get meta (stride * !na) < la do
-    incr na
-  done;
-  let na = !na in
-  let fslots = pow2 (2 * na) in
-  let fmask = fslots - 1 in
-  let sslots = pow2 (2 * na) in
-  let smask = sslots - 1 in
-  let tbl = Array.make (fslots + sslots) (-1) in
+  let slots = pow2 (2 * n) in
+  let mask = slots - 1 in
+  let tbl = Array.make (2 * slots) (-1) in
   let ok = ref true in
   let i = ref 0 in
   while !ok && !i < n do
-    let base = stride * !i in
-    let key = Array.unsafe_get meta (base + 2) in
-    if key < 0 then (
-      let h = -key - 1 in
-      if !i < na then (
-        let slot = seen_slot s meta tbl fslots smask !i (h land smask) in
-        if slot >= 0 then tbl.(fslots + slot) <- !i)
-      else if seen_slot s meta tbl fslots smask !i (h land smask) < 0 then
-        ok := false)
-    else (
-      let f = family key in
-      if f = 0 then ok := false
-      else if !i < na then (
-        let slot = family_slot tbl fmask f (f land fmask) in
-        if slot >= 0 then tbl.(slot) <- f)
-      else if family_slot tbl fmask f (f land fmask) < 0 then ok := false);
+    let key = Array.unsafe_get meta ((stride * !i) + 2) in
+    let slot =
+      if key < 0 then (
+        let slot = seen_slot s meta tbl slots mask !i ((-key - 1) land mask) in
+        if slot >= 0 then tbl.(slots + slot) <- !i;
+        slot)
+      else (
+        let f = family key in
+        if f = 0 then -1
+        else (
+          let slot = family_slot tbl mask f (f land mask) in
+          if slot >= 0 then tbl.(slot) <- f;
+          slot))
+    in
+    if slot < 0 then ok := false;
     incr i
   done;
   !ok
@@ -481,6 +474,6 @@ module Make (T : Text) : S = struct
       let s = a ^ " " ^ b in
       let t = scan s in
       if t.generic then normalize_decoded concat s
-      else if t.canonical && independent t (String.length a) then s
+      else if t.canonical && independent t then s
       else walk ~sub ~concat t)
 end

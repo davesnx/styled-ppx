@@ -63320,7 +63320,12 @@ var symbol_index2 = init5(256, (function(i) {
   }
 }));
 function sym(s2, pos) {
-  return symbol_index2.charCodeAt(s2.charCodeAt(pos));
+  const c = s2.charCodeAt(pos);
+  if (c > 255) {
+    return 255;
+  } else {
+    return symbol_index2.charCodeAt(c);
+  }
 }
 function part(s2, pos) {
   const a = sym(s2, pos);
@@ -63676,48 +63681,38 @@ function family_slot(tbl, mask, f, _slot) {
   }
   ;
 }
-function independent(t, la) {
+function independent(t) {
   const s2 = t.s;
   const meta = t.meta;
   const n2 = t.n;
-  let na = 0;
-  while (na < n2 && meta[Math.imul(5, na)] < la) {
-    na = na + 1 | 0;
-  }
-  ;
-  const na$1 = na;
-  const fslots = pow2(na$1 << 1);
-  const fmask = fslots - 1 | 0;
-  const sslots = pow2(na$1 << 1);
-  const smask = sslots - 1 | 0;
-  const tbl = make(fslots + sslots | 0, -1);
+  const slots = pow2(n2 << 1);
+  const mask = slots - 1 | 0;
+  const tbl = make(slots << 1, -1);
   let ok = true;
   let i = 0;
   while (ok && i < n2) {
-    const base = Math.imul(5, i);
-    const key = meta[base + 2 | 0];
+    const key = meta[Math.imul(5, i) + 2 | 0];
+    let slot;
     if (key < 0) {
-      const h = (-key | 0) - 1 | 0;
-      if (i < na$1) {
-        const slot = seen_slot(s2, meta, tbl, fslots, smask, i, h & smask);
-        if (slot >= 0) {
-          set(tbl, fslots + slot | 0, i);
-        }
-      } else if (seen_slot(s2, meta, tbl, fslots, smask, i, h & smask) < 0) {
-        ok = false;
+      const slot$1 = seen_slot(s2, meta, tbl, slots, mask, i, (-key | 0) - 1 & mask);
+      if (slot$1 >= 0) {
+        set(tbl, slots + slot$1 | 0, i);
       }
+      slot = slot$1;
     } else {
       const f = family(key);
       if (f === 0) {
-        ok = false;
-      } else if (i < na$1) {
-        const slot$1 = family_slot(tbl, fmask, f, f & fmask);
-        if (slot$1 >= 0) {
-          set(tbl, slot$1, f);
+        slot = -1;
+      } else {
+        const slot$2 = family_slot(tbl, mask, f, f & mask);
+        if (slot$2 >= 0) {
+          set(tbl, slot$2, f);
         }
-      } else if (family_slot(tbl, fmask, f, f & fmask) < 0) {
-        ok = false;
+        slot = slot$2;
       }
+    }
+    if (slot < 0) {
+      ok = false;
     }
     i = i + 1 | 0;
   }
@@ -63867,7 +63862,7 @@ function Make2(T) {
     const t = scan2(s2);
     if (t.generic) {
       return normalize_decoded(concat8, s2);
-    } else if (t.canonical && independent(t, a.length)) {
+    } else if (t.canonical && independent(t)) {
       return s2;
     } else {
       return walk(sub9, concat8, t);
