@@ -123,7 +123,7 @@
 - User clarification: `rule('a) = ast => (data('a), ast)` is still the intended shape; the next refactor is about richer AST constructors, not removing AST cursor consumption.
 - Landed slices: `Ast.Delim(string)` became `Ast.Delim(delimiter)`, `Ast.Dimension((float, string))` became a richer `Ast.dimension` with parser-classified `dimension_kind`, and `Ast.Hash(string)` now preserves lexer hash kind.
 - Landed slices: component-value functions now preserve `FUNCTION` vs `NTH_FUNCTION` as `Ast.function_kind`, and selector combinators now use typed `Ast.selector_combinator` constructors instead of raw strings.
-- Registry split: `packages/css-grammar/lib/Parser.ml` is now a compatibility facade over `packages/css-grammar/lib/Types.ml`, `packages/css-grammar/lib/Definitions.ml`, and `packages/css-grammar/lib/Registry.ml`, with uncategorized/base registrations in `packages/css-grammar/lib/Values.ml` and sectioned registration lists in `packages/css-grammar/lib/Properties/Layout.ml`, `packages/css-grammar/lib/Properties/Font.ml`, `packages/css-grammar/lib/Properties/Text.ml`, `packages/css-grammar/lib/Properties/Color.ml`, `packages/css-grammar/lib/Properties/Animation.ml`, and `packages/css-grammar/lib/Properties/Backgrounds.ml`.
+- Registry split: `packages/css-grammar/lib/Parser.ml` is now a compatibility facade over `packages/css-grammar/lib/Types.ml`, `packages/css-grammar/lib/Definitions.ml`, and `packages/css-grammar/lib/Registry.ml`, with uncategorized/base registrations in `packages/css-grammar/lib/Values.ml` and sectioned registration lists in `packages/css-grammar/lib/properties/Layout.ml`, `packages/css-grammar/lib/properties/Font.ml`, `packages/css-grammar/lib/properties/Text.ml`, `packages/css-grammar/lib/properties/Color.ml`, `packages/css-grammar/lib/properties/Animation.ml`, and `packages/css-grammar/lib/properties/Backgrounds.ml`.
 - Build layout: `packages/css-grammar/lib/dune` now uses `include_subdirs qualified` so the new section modules are imported as `Properties.*` while `Definitions.ml` remains the only file preprocessed by `css_grammar_ppx`.
 - Verification so far: `make test-parser`, `make test-css-grammar`, `make test-ppx-native`, and `opam exec -- dune build -j1 @test-css-support` pass after the delimiter, dimension, hash-kind, function-kind, selector-combinator, and registry/section split refactors.
 - Remaining work: there are still some string-carrying AST areas, but the highest-value lexer/parser semantics in component values and selector combinators are now preserved directly on the AST.
@@ -150,7 +150,7 @@
 ## Property category split
 
 - [x] Inventory `Property_*` definitions and current registry entries, including shared-module aliases.
-- [x] Generate one `packages/css-grammar/lib/Properties/*.ml` module for each requested CSS property category and move the matching `Property_*` definitions out of `Definitions.ml`.
+- [x] Generate one `packages/css-grammar/lib/properties/*.ml` module for each requested CSS property category and move the matching `Property_*` definitions out of `Definitions.ml`.
 - [x] Keep the parser surface stable by re-exporting moved property modules/types from `Parser.ml`.
 - [x] Move remaining property-like entries omitted from the requested list into explicit fallback category modules: `Media`, `Descriptors`, and `Legacy`.
 - [x] Rebuild `Values.ml` so it only carries non-property registry entries, and rebuild `Registry.ml` around the new category module list.
@@ -163,7 +163,7 @@
 - The requested 143-category list does not cover all existing `Property` registry entries. Current gaps include media features/descriptors (`media-*`, `media-type`), CSS property descriptors (`syntax`, `inherits`, `initial-value`), and several legacy properties (`behavior`, `ime-mode`, `nav-*`).
 - To keep the refactor complete and preserve behavior, the move will create the 143 requested category modules plus `Properties.Media`, `Properties.Descriptors`, and `Properties.Legacy` for the omitted registry entries.
 - Two registered property names currently share existing modules: `box-orient`/`-webkit-box-orient` and `box-shadow`/`-webkit-box-shadow`. The generated split will keep a single canonical module definition and reference it from both registry buckets.
-- Completed split: `Definitions.ml` now retains only shared helpers/value definitions, and all 678 moved `Property_*` modules live under `packages/css-grammar/lib/Properties/`.
+- Completed split: `Definitions.ml` now retains only shared helpers/value definitions, and all 678 moved `Property_*` modules live under `packages/css-grammar/lib/properties/`.
 - Compatibility choice: `Parser.ml` still includes each property category module because downstream code still imports `Css_grammar.Parser.property_*` definitions directly; `Registry.ml` only registers entries and does not re-export those definitions.
 - Validation choice: requested category files now contain only literal category members. Omitted/internal/descriptor-style entries were moved into `Media`, `Descriptors`, and `Legacy` instead of staying in the closest semantic bucket.
 - Follow-up: `word-wrap` no longer lives in the generic `Legacy` bucket; it now has its own `Properties.WordWrap` module because it is still a first-class exposed property in the parser/runtime surface.

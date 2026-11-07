@@ -494,7 +494,7 @@ module, not a giant registry file plus a separate runtime types file.
 Status:
 
 - **Done:** the css-grammar side of the split. The central parser file is
-  gone; `packages/css-grammar/lib/Properties/` holds ~163 per-property
+  gone; `packages/css-grammar/lib/properties/` holds ~163 per-property
   modules, each owning its `[%spec_module]` declarations, with
   `Registry.ml` as the dispatch layer and `Css_grammar.re` as the facade.
   (Caveat: `Types.ml` and `Shared.ml` inside css-grammar are still large

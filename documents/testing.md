@@ -29,7 +29,7 @@ target also has `-watch` and `-promote` variants (e.g. `make test-parser-watch`,
 
 Every property in the css-grammar registry can declare a runtime witness
 (`[%spec_module "...", (module Css_types.X)]` in
-`packages/css-grammar/lib/Properties/*.ml`). The witness survives only as a
+`packages/css-grammar/lib/properties/*.ml`). The witness survives only as a
 string (`runtime_module_path`), which the PPX bakes into user code as
 `CSS.Types.<Module>.toString(value)` for interpolated values (see
 `packages/ppx/src/Property_to_types.re`), so nothing ties it to the runtime
