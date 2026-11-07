@@ -177,6 +177,21 @@ let context_tests =
       assert_string
         (key (ctx ~conditions:[ "(min-width: 1px)" ] "&"))
         (key (ctx ~conditions:[ "(min-width:1px)" ] "&")));
+    case "selector() and style() arguments keep their spaces" (fun () ->
+      assert_string
+        (Context_key.canonical_condition "@supports selector( a  :hover )")
+        "@supports selector(a :hover)";
+      assert_string
+        (Context_key.canonical_condition
+           "@supports SELECTOR(A , B) and ( display : grid )")
+        "@supports SELECTOR(A , B) and (display:grid)";
+      assert_string
+        (Context_key.canonical_condition "@container style( --x:  a , b )")
+        "@container style(--x: a , b)";
+      Alcotest.(check bool)
+        "descendant and compound differ" true
+        (key (ctx ~conditions:[ "@supports selector(a :hover)" ] "&")
+        <> key (ctx ~conditions:[ "@supports selector(a:hover)" ] "&")));
     case "conditions are a sorted set" (fun () ->
       assert_string
         (key (ctx ~conditions:[ "(b)"; "(a)" ] "&"))

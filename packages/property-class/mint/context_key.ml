@@ -66,6 +66,51 @@ let lowercase_features condition =
   go 0;
   Buffer.contents buf
 
+let verbatim_function text i =
+  List.exists
+    (fun name ->
+      let n = String.length name in
+      i >= n
+      && String.lowercase_ascii (String.sub text (i - n) n) = name
+      && (i = n || not (is_name_char text.[i - n - 1])))
+    [ "selector"; "style" ]
+
+let close_paren text i =
+  let len = String.length text in
+  let rec go j depth =
+    if j >= len then len
+    else (
+      match text.[j] with
+      | '"' | '\'' -> go (skip_quoted text j) depth
+      | '\\' -> go (j + 2) depth
+      | '(' -> go (j + 1) (depth + 1)
+      | ')' when depth = 1 -> j
+      | ')' -> go (j + 1) (depth - 1)
+      | _ -> go (j + 1) depth)
+  in
+  min len (go i 0)
+
+let collapse_spaces text =
+  let len = String.length text in
+  let buf = Buffer.create len in
+  let rec go i pending =
+    if i < len then
+      if is_space text.[i] then go (i + 1) true
+      else begin
+        if pending && Buffer.length buf > 0 then Buffer.add_char buf ' ';
+        let stop =
+          match text.[i] with
+          | '"' | '\'' -> min len (skip_quoted text i)
+          | '\\' -> min len (i + 2)
+          | _ -> i + 1
+        in
+        Buffer.add_string buf (String.sub text i (stop - i));
+        go stop false
+      end
+  in
+  go 0 false;
+  Buffer.contents buf
+
 let canonical_spaces condition =
   let len = String.length condition in
   let buf = Buffer.create len in
@@ -83,12 +128,21 @@ let canonical_spaces condition =
           && (not (String.contains "(:," last))
           && not (String.contains "):," c)
         then Buffer.add_char buf ' ';
-        let stop =
-          if c = '"' || c = '\'' then min len (skip_quoted condition i)
-          else i + 1
-        in
-        Buffer.add_string buf (String.sub condition i (stop - i));
-        go stop false
+        if c = '(' && verbatim_function condition i then begin
+          let stop = close_paren condition i in
+          Buffer.add_char buf '(';
+          Buffer.add_string buf
+            (collapse_spaces (String.sub condition (i + 1) (stop - i - 1)));
+          go stop false
+        end
+        else begin
+          let stop =
+            if c = '"' || c = '\'' then min len (skip_quoted condition i)
+            else i + 1
+          in
+          Buffer.add_string buf (String.sub condition i (stop - i));
+          go stop false
+        end
       end
   in
   go 0 false;
