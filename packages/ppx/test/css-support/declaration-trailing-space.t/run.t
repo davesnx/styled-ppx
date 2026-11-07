@@ -20,20 +20,62 @@ with no trailing space.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs{display:flex;}"];
-  [@css ".css-1d33txl > *{min-height:0;}"];
-  [@css "@media (min-width: 100px) {.css-oi5e8m{display:flex;}}"];
-  [@css ".css-ehba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css.atoms
+    [
+      (
+        "_a9fMU0SCS",
+        ["._a9fMU0SCS{display:flex;}"],
+        1,
+        0,
+        1,
+        [("value", "MU0SCS", "val\\09f\\0& | \\0display:flex")],
+      ),
+      (
+        "_ceqkDsyxkl3zePh",
+        ["._ceqkDsyxkl3zePh > *{min-height:0;}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "kDsyxk", "ctx\\0& > * | "),
+          ("value", "l3zePh", "val\\0eq\\0& > * | \\0min-height:0"),
+        ],
+      ),
+      (
+        "_c9fzDjCmYLDw3ng",
+        ["@media (min-width:100px){._c9fzDjCmYLDw3ng{display:flex;}}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "zDjCmY", "ctx\\0& | @media (min-width:100px) | "),
+          (
+            "value",
+            "LDw3ng",
+            "val\\09f\\0& | @media (min-width:100px) | \\0display:flex",
+          ),
+        ],
+      ),
+      (
+        "_a99o8062j",
+        ["._a99o8062j{cursor:-webkit-grab;cursor:grab;}"],
+        1,
+        0,
+        1,
+        [("value", "o8062j", "val\\099\\0& | \\0cursor:grab")],
+      ),
+    ]
+  ];
   
-  CSS.make("css-k008qs", []);
+  CSS.make("_a9fMU0SCS", []);
   
-  CSS.make("css-k008qs", []);
+  CSS.make("_a9fMU0SCS", []);
   
-  CSS.make("css-1d33txl", []);
-  CSS.make("css-1d33txl", []);
+  CSS.make("_ceqkDsyxkl3zePh", []);
+  CSS.make("_ceqkDsyxkl3zePh", []);
   
-  CSS.make("css-oi5e8m", []);
-  CSS.make("css-oi5e8m", []);
+  CSS.make("_c9fzDjCmYLDw3ng", []);
+  CSS.make("_c9fzDjCmYLDw3ng", []);
   
-  CSS.make("css-ehba41", []);
-  CSS.make("css-ehba41", []);
+  CSS.make("_a99o8062j", []);
+  CSS.make("_a99o8062j", []);

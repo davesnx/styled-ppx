@@ -15,36 +15,157 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1bn2far{touch-action:auto;}"];
-  [@css ".css-z0sbrd{touch-action:none;}"];
-  [@css ".css-rvsu0a{touch-action:pan-x;}"];
-  [@css ".css-1gecb00{touch-action:pan-y;}"];
-  [@css ".css-11ee94{touch-action:pan-x pan-y;}"];
-  [@css ".css-1cw4v8x{touch-action:manipulation;}"];
-  [@css ".css-1alt8dp{touch-action:pan-left;}"];
-  [@css ".css-1u0iuj3{touch-action:pan-right;}"];
-  [@css ".css-54tga0{touch-action:pan-up;}"];
-  [@css ".css-7apx43{touch-action:pan-down;}"];
-  [@css ".css-1in9hg{touch-action:pan-left pan-up;}"];
-  [@css ".css-10ugay6{touch-action:pinch-zoom;}"];
-  [@css ".css-1gnive7{touch-action:pan-x pinch-zoom;}"];
-  [@css ".css-1sg2qdh{touch-action:pan-y pinch-zoom;}"];
-  [@css ".css-12jbds3{touch-action:pan-x pan-y pinch-zoom;}"];
+  [@css.atoms
+    [
+      (
+        "_am5Fg8Aw_",
+        ["._am5Fg8Aw_{touch-action:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "Fg8Aw_", "val\\0m5\\0& | \\0touch-action:auto")],
+      ),
+      (
+        "_am5K3jON5",
+        ["._am5K3jON5{touch-action:none;}"],
+        1,
+        0,
+        1,
+        [("value", "K3jON5", "val\\0m5\\0& | \\0touch-action:none")],
+      ),
+      (
+        "_am5pWEZtY",
+        ["._am5pWEZtY{touch-action:pan-x;}"],
+        1,
+        0,
+        1,
+        [("value", "pWEZtY", "val\\0m5\\0& | \\0touch-action:pan-x")],
+      ),
+      (
+        "_am5_-CsbI",
+        ["._am5_-CsbI{touch-action:pan-y;}"],
+        1,
+        0,
+        1,
+        [("value", "_-CsbI", "val\\0m5\\0& | \\0touch-action:pan-y")],
+      ),
+      (
+        "_am5vWL2hF",
+        ["._am5vWL2hF{touch-action:pan-x pan-y;}"],
+        1,
+        0,
+        1,
+        [("value", "vWL2hF", "val\\0m5\\0& | \\0touch-action:pan-x pan-y")],
+      ),
+      (
+        "_am5KcQaSc",
+        ["._am5KcQaSc{touch-action:manipulation;}"],
+        1,
+        0,
+        1,
+        [("value", "KcQaSc", "val\\0m5\\0& | \\0touch-action:manipulation")],
+      ),
+      (
+        "_am55B34I1",
+        ["._am55B34I1{touch-action:pan-left;}"],
+        1,
+        0,
+        1,
+        [("value", "5B34I1", "val\\0m5\\0& | \\0touch-action:pan-left")],
+      ),
+      (
+        "_am55q53mV",
+        ["._am55q53mV{touch-action:pan-right;}"],
+        1,
+        0,
+        1,
+        [("value", "5q53mV", "val\\0m5\\0& | \\0touch-action:pan-right")],
+      ),
+      (
+        "_am5nvhKGO",
+        ["._am5nvhKGO{touch-action:pan-up;}"],
+        1,
+        0,
+        1,
+        [("value", "nvhKGO", "val\\0m5\\0& | \\0touch-action:pan-up")],
+      ),
+      (
+        "_am5twU7Ja",
+        ["._am5twU7Ja{touch-action:pan-down;}"],
+        1,
+        0,
+        1,
+        [("value", "twU7Ja", "val\\0m5\\0& | \\0touch-action:pan-down")],
+      ),
+      (
+        "_am55Xj9hX",
+        ["._am55Xj9hX{touch-action:pan-left pan-up;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "5Xj9hX", "val\\0m5\\0& | \\0touch-action:pan-left pan-up"),
+        ],
+      ),
+      (
+        "_am58Q1oWN",
+        ["._am58Q1oWN{touch-action:pinch-zoom;}"],
+        1,
+        0,
+        1,
+        [("value", "8Q1oWN", "val\\0m5\\0& | \\0touch-action:pinch-zoom")],
+      ),
+      (
+        "_am5JJIFCl",
+        ["._am5JJIFCl{touch-action:pan-x pinch-zoom;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "JJIFCl", "val\\0m5\\0& | \\0touch-action:pan-x pinch-zoom"),
+        ],
+      ),
+      (
+        "_am5wKIJh5",
+        ["._am5wKIJh5{touch-action:pan-y pinch-zoom;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "wKIJh5", "val\\0m5\\0& | \\0touch-action:pan-y pinch-zoom"),
+        ],
+      ),
+      (
+        "_am5dGEVAD",
+        ["._am5dGEVAD{touch-action:pan-x pan-y pinch-zoom;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "dGEVAD",
+            "val\\0m5\\0& | \\0touch-action:pan-x pan-y pinch-zoom",
+          ),
+        ],
+      ),
+    ]
+  ];
   
-  CSS.make("css-1bn2far", []);
-  CSS.make("css-z0sbrd", []);
-  CSS.make("css-rvsu0a", []);
-  CSS.make("css-1gecb00", []);
-  CSS.make("css-11ee94", []);
-  CSS.make("css-1cw4v8x", []);
+  CSS.make("_am5Fg8Aw_", []);
+  CSS.make("_am5K3jON5", []);
+  CSS.make("_am5pWEZtY", []);
+  CSS.make("_am5_-CsbI", []);
+  CSS.make("_am5vWL2hF", []);
+  CSS.make("_am5KcQaSc", []);
   
-  CSS.make("css-1alt8dp", []);
-  CSS.make("css-1u0iuj3", []);
-  CSS.make("css-54tga0", []);
-  CSS.make("css-7apx43", []);
-  CSS.make("css-1in9hg", []);
+  CSS.make("_am55B34I1", []);
+  CSS.make("_am55q53mV", []);
+  CSS.make("_am5nvhKGO", []);
+  CSS.make("_am5twU7Ja", []);
+  CSS.make("_am55Xj9hX", []);
   
-  CSS.make("css-10ugay6", []);
-  CSS.make("css-1gnive7", []);
-  CSS.make("css-1sg2qdh", []);
-  CSS.make("css-12jbds3", []);
+  CSS.make("_am58Q1oWN", []);
+  CSS.make("_am5JJIFCl", []);
+  CSS.make("_am5wKIJh5", []);
+  CSS.make("_am5dGEVAD", []);

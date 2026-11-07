@@ -1,6 +1,6 @@
 /** Per-compilation-unit buffer of [%css] binding exports.
 
-    Every named [%css] binding records a [(longident, class_string)] entry
+    Every named [%css] binding records a [(longident, class_string, binding_id)] entry
     here. The longident is the fully-qualified path users would write to
     reference the binding from another module (e.g. ["M.Css.marker"]); the
     class string is the space-separated list of atomized class names the
@@ -18,12 +18,29 @@
 type entry = {
   longident: string,
   class_string: string,
+  binding_id: string,
 };
 
+/** Set the library name that [mint_id] hashes into every id: the value of
+    dune's [library-name] cookie, or [""] without it. */
+let set_library: string => unit;
+
+/** Mint the id token of a binding site. [occurrence] is the index among the
+    bindings of this unit that share [scope] and [name], so a shadowed name
+    gets a distinct id. The counter restarts on [drain]. */
+let mint_id:
+  (~main_module: string, ~scope: list(string), ~name: string) => string;
+
+/** The [(token, hash source)] pair of every id minted since the last [drain],
+    in minting order. Call before [drain], which clears them. */
+let drain_ids: unit => list((string, string));
+
 /** Record a [%css] binding's resolved class string under its
-    fully-qualified longident. No-op if [longident] is empty (anonymous
-    binding). Last-write-wins for duplicate longidents within a CU. */
-let record: (~longident: string, ~class_string: string) => unit;
+    fully-qualified longident. [binding_id = ""] means the binding has no id.
+    No-op if [longident] is empty (anonymous binding). Last-write-wins for
+    duplicate longidents within a CU. */
+let record:
+  (~longident: string, ~class_string: string, ~binding_id: string) => unit;
 
 /** Drain and clear all recorded entries, in insertion order. */
 let drain: unit => list(entry);

@@ -1,0 +1,3 @@
+(library
+ (name property_class_core)
+ (package styled-ppx))

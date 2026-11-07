@@ -15,103 +15,598 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --lineAlpha-14x2350{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-16iaxxw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --selectedMuted-coapl4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --flag-r97mq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1-10w4q1l{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1Bottom-1jgyvpw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-16e6nb4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation2-a9z6ve{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-1pvcfai{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation3-u89uz4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-110y8m6_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-110y8m6_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1-s7j1om{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation3-1tt1uog{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-10u4hbk{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-17j5in5{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-jfym6t{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-2dnuub{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-doha9t{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-uf1ggy{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1i61so0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-18cgk19{syntax:\"*\";inherits:false;}"];
-  [@css "@property --accent-1w0inj7{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-9kmuhm_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-9kmuhm_2{syntax:\"*\";inherits:false;}"];
-  [@css ".css-tjsoaq{transition:all 200ms ease 0ms;}"];
-  [@css ".css-9an52v{transition:all 300ms ease-in-out 0ms;}"];
-  [@css ".css-9gb0kb{transition:opacity 300ms ease-in-out 0ms;}"];
-  [@css ".css-1d2ga4{transition:left 0.15s;}"];
-  [@css ".css-9lk53a{transition:opacity 0.5s ease-in-out;}"];
-  [@css
-    ".css-1hwm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+  [@css "@property --lineAlpha-1sh9rrm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1n4cbat{syntax:\"*\";inherits:false;}"];
+  [@css "@property --selectedMuted-1eqw3q8{syntax:\"*\";inherits:false;}"];
+  [@css "@property --flag-r83zad{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-3ve4h5{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1Bottom-1c9od9y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-g1fxhl{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation2-1yo29p{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-1xmg9oz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation3-r3xv18{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1om7wni_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1om7wni_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1om7wni_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1jzm6m3_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1jzm6m3_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-1jvm9pw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation3-1cut2k7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-ew7dcu{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1qlpppm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-139iwo4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1duigd{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-sczbf{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-3a0cs2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-3rcwgn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-22gjm6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --accent-o8d88n{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-dykbaq_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-dykbaq_2{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_amad6u9qq",
+        ["._amad6u9qq{transition:all 200ms ease 0ms;}"],
+        1,
+        0,
+        5,
+        [
+          ("value", "d6u9qq", "val\\0ma\\0& | \\0transition:all 200ms ease 0ms"),
+        ],
+      ),
+      (
+        "_amavwXQ9V",
+        ["._amavwXQ9V{transition:all 300ms ease-in-out 0ms;}"],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "vwXQ9V",
+            "val\\0ma\\0& | \\0transition:all 300ms ease-in-out 0ms",
+          ),
+        ],
+      ),
+      (
+        "_amanWVcMB",
+        ["._amanWVcMB{transition:opacity 300ms ease-in-out 0ms;}"],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "nWVcMB",
+            "val\\0ma\\0& | \\0transition:opacity 300ms ease-in-out 0ms",
+          ),
+        ],
+      ),
+      (
+        "_amazqDB_Y",
+        ["._amazqDB_Y{transition:left 0.15s;}"],
+        1,
+        0,
+        5,
+        [("value", "zqDB_Y", "val\\0ma\\0& | \\0transition:left 0.15s")],
+      ),
+      (
+        "_amaWlTCY1",
+        ["._amaWlTCY1{transition:opacity 0.5s ease-in-out;}"],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "WlTCY1",
+            "val\\0ma\\0& | \\0transition:opacity 0.5s ease-in-out",
+          ),
+        ],
+      ),
+      (
+        "_amapvYp_U",
+        [
+          "._amapvYp_U{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}",
+        ],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "pvYp_U",
+            "val\\0ma\\0& | \\0transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out",
+          ),
+        ],
+      ),
+      (
+        "_amaP6F_Bx",
+        [
+          "._amaP6F_Bx{transition:width 200ms ease, height 200ms ease, background-color 200ms ease;}",
+        ],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "P6F_Bx",
+            "val\\0ma\\0& | \\0transition:width 200ms ease, height 200ms ease, background-color 200ms ease",
+          ),
+        ],
+      ),
+      (
+        "_amaQKiA5_",
+        ["._amaQKiA5_{transition:transform 0.3s;}"],
+        1,
+        0,
+        5,
+        [("value", "QKiA5_", "val\\0ma\\0& | \\0transition:transform 0.3s")],
+      ),
+      (
+        "_a70RP59tF",
+        ["._a70RP59tF{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-1sh9rrm);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "RP59tF",
+            "val\\070\\0& | \\0box-shadow:inset 0 -1px 0 0 $(Color.Border.lineAlpha)",
+          ),
+        ],
+      ),
+      (
+        "_a70ZSPp0s",
+        ["._a70ZSPp0s{box-shadow:inset 1px 0 0 0 var(--line-1n4cbat);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "ZSPp0s",
+            "val\\070\\0& | \\0box-shadow:inset 1px 0 0 0 $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a70tyrfge",
+        [
+          "._a70tyrfge{box-shadow:inset 0 0 0 1000px var(--selectedMuted-1eqw3q8);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "tyrfge",
+            "val\\070\\0& | \\0box-shadow:inset 0 0 0 1000px $(Color.Background.selectedMuted)",
+          ),
+        ],
+      ),
+      (
+        "_a70in2rI-",
+        ["._a70in2rI-{box-shadow:inset 0 0 0 0.5px var(--flag-r83zad);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "in2rI-",
+            "val\\070\\0& | \\0box-shadow:inset 0 0 0 0.5px $(Color.Shadow.flag)",
+          ),
+        ],
+      ),
+      (
+        "_a70A5U0Qs",
+        [
+          "._a70A5U0Qs{box-shadow:0 0 0 1px var(--elevation1-3ve4h5), 0 1px 0 0 var(--elevation1Bottom-1c9od9y);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "A5U0Qs",
+            "val\\070\\0& | \\0box-shadow:0 0 0 1px $(Color.Shadow.elevation1), 0 1px 0 0 $(Color.Shadow.elevation1Bottom)",
+          ),
+        ],
+      ),
+      (
+        "_a70xff-MD",
+        [
+          "._a70xff-MD{box-shadow:0 0 0 1px var(--border-g1fxhl), 0 2px 4px 0 var(--elevation2-1yo29p);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "xff-MD",
+            "val\\070\\0& | \\0box-shadow:0 0 0 1px $(Color.Shadow.border), 0 2px 4px 0 $(Color.Shadow.elevation2)",
+          ),
+        ],
+      ),
+      (
+        "_a70enYDLq",
+        [
+          "._a70enYDLq{box-shadow:0 0 0 1px var(--border-1xmg9oz), 0 3px 18px 0 var(--elevation3-r3xv18);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "enYDLq",
+            "val\\070\\0& | \\0box-shadow:0 0 0 1px $(Color.Shadow.border), 0 3px 18px 0 $(Color.Shadow.elevation3)",
+          ),
+        ],
+      ),
+      (
+        "_a70k1yhUy",
+        [
+          "._a70k1yhUy{box-shadow:1px 0 0 0 var(--line-1om7wni_1), inset 1px 0 0 0 var(--line-1om7wni_2), inset 0 -1px 0 0 var(--line-1om7wni_3);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "k1yhUy",
+            "val\\070\\0& | \\0box-shadow:1px 0 0 0 $(Color.Border.line), inset 1px 0 0 0 $(Color.Border.line), inset 0 -1px 0 0 $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a70WUi5-l",
+        [
+          "._a70WUi5-l{box-shadow:inset 0 1px 0 0 var(--line-1jzm6m3_1), inset 0 -1px 0 0 var(--line-1jzm6m3_2);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "WUi5-l",
+            "val\\070\\0& | \\0box-shadow:inset 0 1px 0 0 $(Color.Border.line), inset 0 -1px 0 0 $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a70NtIKzk",
+        ["._a70NtIKzk{box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "NtIKzk",
+            "val\\070\\0& | \\0box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+          ),
+        ],
+      ),
+      (
+        "_a70hABGT3",
+        ["._a70hABGT3{box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "hABGT3",
+            "val\\070\\0& | \\0box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5)",
+          ),
+        ],
+      ),
+      (
+        "_a709znXGi",
+        [
+          "._a709znXGi{box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "9znXGi",
+            "val\\070\\0& | \\0box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02)",
+          ),
+        ],
+      ),
+      (
+        "_a70q_ynwg",
+        [
+          "._a70q_ynwg{box-shadow:0 0 0 1px var(--elevation1-1jvm9pw), 0 3px 18px 0 var(--elevation3-1cut2k7);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "q_ynwg",
+            "val\\070\\0& | \\0box-shadow:0 0 0 1px $(Color.Shadow.elevation1), 0 3px 18px 0 $(Color.Shadow.elevation3)",
+          ),
+        ],
+      ),
+      (
+        "_a50EyWzNk",
+        ["._a50EyWzNk{border:1px solid var(--line-ew7dcu);}"],
+        1,
+        0,
+        17,
+        [
+          (
+            "value",
+            "EyWzNk",
+            "val\\050\\0& | \\0border:1px solid $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a50k257b1",
+        ["._a50k257b1{border:0px none transparent;}"],
+        1,
+        0,
+        17,
+        [("value", "k257b1", "val\\050\\0& | \\0border:0px none transparent")],
+      ),
+      (
+        "_a6jD48_sq",
+        ["._a6jD48_sq{border-top:1px solid var(--line-1qlpppm);}"],
+        1,
+        0,
+        3,
+        [
+          (
+            "value",
+            "D48_sq",
+            "val\\06j\\0& | \\0border-top:1px solid $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a5dVajjlm",
+        ["._a5dVajjlm{border-bottom:1px solid var(--line-139iwo4);}"],
+        1,
+        0,
+        3,
+        [
+          (
+            "value",
+            "Vajjlm",
+            "val\\05d\\0& | \\0border-bottom:1px solid $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a65SdHngU",
+        ["._a65SdHngU{border-left:1px solid var(--line-1duigd);}"],
+        1,
+        0,
+        3,
+        [
+          (
+            "value",
+            "SdHngU",
+            "val\\065\\0& | \\0border-left:1px solid $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a6aNpEUCG",
+        ["._a6aNpEUCG{border-right:1px solid var(--line-sczbf);}"],
+        1,
+        0,
+        3,
+        [
+          (
+            "value",
+            "NpEUCG",
+            "val\\06a\\0& | \\0border-right:1px solid $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a500F2Ik4",
+        ["._a500F2Ik4{border:1px dashed var(--line-3a0cs2);}"],
+        1,
+        0,
+        17,
+        [
+          (
+            "value",
+            "0F2Ik4",
+            "val\\050\\0& | \\0border:1px dashed $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_a50gee1SF",
+        ["._a50gee1SF{border:1px none var(--line-3rcwgn);}"],
+        1,
+        0,
+        17,
+        [
+          (
+            "value",
+            "gee1SF",
+            "val\\050\\0& | \\0border:1px none $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_afc38Shrb",
+        ["._afc38Shrb{outline:1px solid var(--line-22gjm6);}"],
+        1,
+        0,
+        3,
+        [
+          (
+            "value",
+            "38Shrb",
+            "val\\0fc\\0& | \\0outline:1px solid $(Color.Border.line)",
+          ),
+        ],
+      ),
+      (
+        "_afcvh-07F",
+        ["._afcvh-07F{outline:2px solid var(--accent-o8d88n);}"],
+        1,
+        0,
+        3,
+        [
+          (
+            "value",
+            "vh-07F",
+            "val\\0fc\\0& | \\0outline:2px solid $(Color.Border.accent)",
+          ),
+        ],
+      ),
+      (
+        "_a3siyGp-g",
+        [
+          "._a3siyGp-g{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards;}",
+        ],
+        1,
+        0,
+        11,
+        [
+          (
+            "value",
+            "iyGp-g",
+            "val\\03s\\0& | \\0animation:helpMenuFadeIn 0.18s ease-in-out forwards",
+          ),
+        ],
+      ),
+      (
+        "_a3sc2N2qd",
+        [
+          "._a3sc2N2qd{-webkit-animation:helpMenuFadeOut 0.08s ease-out forwards;animation:helpMenuFadeOut 0.08s ease-out forwards;}",
+        ],
+        1,
+        0,
+        11,
+        [
+          (
+            "value",
+            "c2N2qd",
+            "val\\03s\\0& | \\0animation:helpMenuFadeOut 0.08s ease-out forwards",
+          ),
+        ],
+      ),
+      (
+        "_amaVB_mR5",
+        [
+          "._amaVB_mR5{transition:height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);}",
+        ],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "VB_mR5",
+            "val\\0ma\\0& | \\0transition:height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          ),
+        ],
+      ),
+      (
+        "_amaKqv3P5",
+        [
+          "._amaKqv3P5{transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);}",
+        ],
+        1,
+        0,
+        5,
+        [
+          (
+            "value",
+            "Kqv3P5",
+            "val\\0ma\\0& | \\0transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+          ),
+        ],
+      ),
+      (
+        "_c70-ypkeDD-tUh9",
+        [
+          "._c70-ypkeDD-tUh9{box-shadow:inset 1px 0 0 0 transparent !important;}",
+        ],
+        1,
+        0,
+        1,
+        [
+          ("ctx", "-ypkeD", "ctx\\0& | !important"),
+          (
+            "value",
+            "D-tUh9",
+            "val\\070\\0& | !important\\0box-shadow:inset 1px 0 0 0 transparent !important",
+          ),
+        ],
+      ),
+      (
+        "_c70-ypkeDUmBRd1",
+        ["._c70-ypkeDUmBRd1{box-shadow:1px 0 0 0 black !important;}"],
+        1,
+        0,
+        1,
+        [
+          ("ctx", "-ypkeD", "ctx\\0& | !important"),
+          (
+            "value",
+            "UmBRd1",
+            "val\\070\\0& | !important\\0box-shadow:1px 0 0 0 black !important",
+          ),
+        ],
+      ),
+      (
+        "_c70-ypkeDyJ8YYx",
+        [
+          "._c70-ypkeDyJ8YYx{box-shadow:1px 0 0 0 var(--line-dykbaq_1), inset 0 -1px 0 0 var(--line-dykbaq_2) !important;}",
+        ],
+        1,
+        0,
+        1,
+        [
+          ("ctx", "-ypkeD", "ctx\\0& | !important"),
+          (
+            "value",
+            "yJ8YYx",
+            "val\\070\\0& | !important\\0box-shadow:1px 0 0 0 $(Color.Border.line), inset 0 -1px 0 0 $(Color.Border.line) !important",
+          ),
+        ],
+      ),
+      (
+        "_cma-ypkeDhtGUDm",
+        ["._cma-ypkeDhtGUDm{transition:transform 0.3s !important;}"],
+        1,
+        0,
+        5,
+        [
+          ("ctx", "-ypkeD", "ctx\\0& | !important"),
+          (
+            "value",
+            "htGUDm",
+            "val\\0ma\\0& | !important\\0transition:transform 0.3s !important",
+          ),
+        ],
+      ),
+    ]
   ];
-  [@css
-    ".css-1dfmtix{transition:width 200ms ease, height 200ms ease, background-color 200ms ease;}"
-  ];
-  [@css ".css-2jhocq{transition:transform 0.3s;}"];
-  [@css ".css-z1xaab{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-14x2350);}"];
-  [@css ".css-k42oj0{box-shadow:inset 1px 0 0 0 var(--line-16iaxxw);}"];
-  [@css
-    ".css-jfxwmt{box-shadow:inset 0 0 0 1000px var(--selectedMuted-coapl4);}"
-  ];
-  [@css ".css-lirt76{box-shadow:inset 0 0 0 0.5px var(--flag-r97mq);}"];
-  [@css
-    ".css-1iayzvr{box-shadow:0 0 0 1px var(--elevation1-10w4q1l), 0 1px 0 0 var(--elevation1Bottom-1jgyvpw);}"
-  ];
-  [@css
-    ".css-13ydyrw{box-shadow:0 0 0 1px var(--border-16e6nb4), 0 2px 4px 0 var(--elevation2-a9z6ve);}"
-  ];
-  [@css
-    ".css-1ga3v0v{box-shadow:0 0 0 1px var(--border-1pvcfai), 0 3px 18px 0 var(--elevation3-u89uz4);}"
-  ];
-  [@css
-    ".css-w2f2bw{box-shadow:1px 0 0 0 var(--line-1fm6v6v_1), inset 1px 0 0 0 var(--line-1fm6v6v_2), inset 0 -1px 0 0 var(--line-1fm6v6v_3);}"
-  ];
-  [@css
-    ".css-uatfq{box-shadow:inset 0 1px 0 0 var(--line-110y8m6_1), inset 0 -1px 0 0 var(--line-110y8m6_2);}"
-  ];
-  [@css ".css-k4sr4i{box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1);}"];
-  [@css ".css-2ptrw{box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5);}"];
-  [@css
-    ".css-itknjr{box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02);}"
-  ];
-  [@css
-    ".css-x09jpc{box-shadow:0 0 0 1px var(--elevation1-s7j1om), 0 3px 18px 0 var(--elevation3-1tt1uog);}"
-  ];
-  [@css ".css-1q2o3yi{border:1px solid var(--line-10u4hbk);}"];
-  [@css ".css-192yc9x{border:0px none transparent;}"];
-  [@css ".css-11h9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css ".css-pkcjyn{border-bottom:1px solid var(--line-jfym6t);}"];
-  [@css ".css-1ry65jw{border-left:1px solid var(--line-2dnuub);}"];
-  [@css ".css-ypjvaq{border-right:1px solid var(--line-doha9t);}"];
-  [@css ".css-1ismcmj{border:1px dashed var(--line-uf1ggy);}"];
-  [@css ".css-150towz{border:1px none var(--line-1i61so0);}"];
-  [@css ".css-188ct1l{outline:1px solid var(--line-18cgk19);}"];
-  [@css ".css-1xnyi32{outline:2px solid var(--accent-1w0inj7);}"];
-  [@css
-    ".css-w1ep28{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards;}"
-  ];
-  [@css
-    ".css-d9hwlt{-webkit-animation:helpMenuFadeOut 0.08s ease-out forwards;animation:helpMenuFadeOut 0.08s ease-out forwards;}"
-  ];
-  [@css
-    ".css-1ir9788{transition:height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);}"
-  ];
-  [@css
-    ".css-fwdrfx{transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);}"
-  ];
-  [@css ".css-t2slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
-  [@css ".css-2se9zy{box-shadow:1px 0 0 0 black !important;}"];
-  [@css
-    ".css-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
-  ];
-  [@css ".css-keq5th{transition:transform 0.3s !important;}"];
   module Color = {
     module Border = {
       let line = `rgba((0, 0, 0, `num(0.1)));
@@ -131,163 +626,163 @@ If this test fail means that the module is not in sync with the ppx
     };
   };
   
-  CSS.make("css-tjsoaq", []);
-  CSS.make("css-9an52v", []);
-  CSS.make("css-9gb0kb", []);
+  CSS.make("_amad6u9qq", []);
+  CSS.make("_amavwXQ9V", []);
+  CSS.make("_amanWVcMB", []);
   
-  CSS.make("css-1d2ga4", []);
-  CSS.make("css-9lk53a", []);
-  CSS.make("css-1hwm8mm", []);
-  CSS.make("css-1dfmtix", []);
-  CSS.make("css-2jhocq", []);
+  CSS.make("_amazqDB_Y", []);
+  CSS.make("_amaWlTCY1", []);
+  CSS.make("_amapvYp_U", []);
+  CSS.make("_amaP6F_Bx", []);
+  CSS.make("_amaQKiA5_", []);
   
   CSS.make(
-    "css-z1xaab",
+    "_a70RP59tF",
     [
-      ("--lineAlpha-14x2350", CSS.Types.Color.toString(Color.Border.lineAlpha)),
+      ("--lineAlpha-1sh9rrm", CSS.Types.Color.toString(Color.Border.lineAlpha)),
     ],
   );
   CSS.make(
-    "css-k42oj0",
-    [("--line-16iaxxw", CSS.Types.Color.toString(Color.Border.line))],
+    "_a70ZSPp0s",
+    [("--line-1n4cbat", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-jfxwmt",
+    "_a70tyrfge",
     [
       (
-        "--selectedMuted-coapl4",
+        "--selectedMuted-1eqw3q8",
         CSS.Types.Color.toString(Color.Background.selectedMuted),
       ),
     ],
   );
   CSS.make(
-    "css-lirt76",
-    [("--flag-r97mq", CSS.Types.Color.toString(Color.Shadow.flag))],
+    "_a70in2rI-",
+    [("--flag-r83zad", CSS.Types.Color.toString(Color.Shadow.flag))],
   );
   
   CSS.make(
-    "css-1iayzvr",
+    "_a70A5U0Qs",
     [
       (
-        "--elevation1-10w4q1l",
+        "--elevation1-3ve4h5",
         CSS.Types.Color.toString(Color.Shadow.elevation1),
       ),
       (
-        "--elevation1Bottom-1jgyvpw",
+        "--elevation1Bottom-1c9od9y",
         CSS.Types.Color.toString(Color.Shadow.elevation1Bottom),
       ),
     ],
   );
   CSS.make(
-    "css-13ydyrw",
+    "_a70xff-MD",
     [
-      ("--border-16e6nb4", CSS.Types.Color.toString(Color.Shadow.border)),
+      ("--border-g1fxhl", CSS.Types.Color.toString(Color.Shadow.border)),
       (
-        "--elevation2-a9z6ve",
+        "--elevation2-1yo29p",
         CSS.Types.Color.toString(Color.Shadow.elevation2),
       ),
     ],
   );
   CSS.make(
-    "css-1ga3v0v",
+    "_a70enYDLq",
     [
-      ("--border-1pvcfai", CSS.Types.Color.toString(Color.Shadow.border)),
+      ("--border-1xmg9oz", CSS.Types.Color.toString(Color.Shadow.border)),
       (
-        "--elevation3-u89uz4",
+        "--elevation3-r3xv18",
         CSS.Types.Color.toString(Color.Shadow.elevation3),
       ),
     ],
   );
   
   CSS.make(
-    "css-w2f2bw",
+    "_a70k1yhUy",
     [
-      ("--line-1fm6v6v_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-1fm6v6v_2", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-1fm6v6v_3", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1om7wni_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1om7wni_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1om7wni_3", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   CSS.make(
-    "css-uatfq",
+    "_a70WUi5-l",
     [
-      ("--line-110y8m6_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-110y8m6_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1jzm6m3_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1jzm6m3_2", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-k4sr4i", []);
-  CSS.make("css-2ptrw", []);
-  CSS.make("css-itknjr", []);
+  CSS.make("_a70NtIKzk", []);
+  CSS.make("_a70hABGT3", []);
+  CSS.make("_a709znXGi", []);
   CSS.make(
-    "css-x09jpc",
+    "_a70q_ynwg",
     [
       (
-        "--elevation1-s7j1om",
+        "--elevation1-1jvm9pw",
         CSS.Types.Color.toString(Color.Shadow.elevation1),
       ),
       (
-        "--elevation3-1tt1uog",
+        "--elevation3-1cut2k7",
         CSS.Types.Color.toString(Color.Shadow.elevation3),
       ),
     ],
   );
   
   CSS.make(
-    "css-1q2o3yi",
-    [("--line-10u4hbk", CSS.Types.Color.toString(Color.Border.line))],
+    "_a50EyWzNk",
+    [("--line-ew7dcu", CSS.Types.Color.toString(Color.Border.line))],
   );
-  CSS.make("css-192yc9x", []);
+  CSS.make("_a50k257b1", []);
   CSS.make(
-    "css-11h9vd4",
-    [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
-  );
-  CSS.make(
-    "css-pkcjyn",
-    [("--line-jfym6t", CSS.Types.Color.toString(Color.Border.line))],
+    "_a6jD48_sq",
+    [("--line-1qlpppm", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-1ry65jw",
-    [("--line-2dnuub", CSS.Types.Color.toString(Color.Border.line))],
+    "_a5dVajjlm",
+    [("--line-139iwo4", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-ypjvaq",
-    [("--line-doha9t", CSS.Types.Color.toString(Color.Border.line))],
+    "_a65SdHngU",
+    [("--line-1duigd", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-1ismcmj",
-    [("--line-uf1ggy", CSS.Types.Color.toString(Color.Border.line))],
+    "_a6aNpEUCG",
+    [("--line-sczbf", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-150towz",
-    [("--line-1i61so0", CSS.Types.Color.toString(Color.Border.line))],
-  );
-  
-  CSS.make(
-    "css-188ct1l",
-    [("--line-18cgk19", CSS.Types.Color.toString(Color.Border.line))],
+    "_a500F2Ik4",
+    [("--line-3a0cs2", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-1xnyi32",
-    [("--accent-1w0inj7", CSS.Types.Color.toString(Color.Border.accent))],
+    "_a50gee1SF",
+    [("--line-3rcwgn", CSS.Types.Color.toString(Color.Border.line))],
   );
   
-  CSS.make("css-w1ep28", []);
-  CSS.make("css-d9hwlt", []);
-  
-  CSS.make("css-1ir9788", []);
-  CSS.make("css-fwdrfx", []);
-  
-  CSS.make("css-t2slgw", []);
-  CSS.make("css-2se9zy", []);
   CSS.make(
-    "css-1rh80o9",
+    "_afc38Shrb",
+    [("--line-22gjm6", CSS.Types.Color.toString(Color.Border.line))],
+  );
+  CSS.make(
+    "_afcvh-07F",
+    [("--accent-o8d88n", CSS.Types.Color.toString(Color.Border.accent))],
+  );
+  
+  CSS.make("_a3siyGp-g", []);
+  CSS.make("_a3sc2N2qd", []);
+  
+  CSS.make("_amaVB_mR5", []);
+  CSS.make("_amaKqv3P5", []);
+  
+  CSS.make("_c70-ypkeDD-tUh9", []);
+  CSS.make("_c70-ypkeDUmBRd1", []);
+  CSS.make(
+    "_c70-ypkeDyJ8YYx",
     [
-      ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-dykbaq_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-dykbaq_2", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-keq5th", []);
+  CSS.make("_cma-ypkeDhtGUDm", []);
   
   let _shadow1: CSS.Shadow.box =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

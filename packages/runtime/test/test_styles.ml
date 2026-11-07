@@ -45,14 +45,61 @@ let merge_carriers () =
     [ "--gap", "--gap", "8px"; "--color", "--color", "red" ]
     (snd styles)
 
-let merge_preserves_duplicate_variables () =
+let merge_keeps_first_position_and_last_value_of_duplicate_variables () =
   let left = CSS.make "card" [ "--gap", "8px" ] in
   let right = CSS.make "active" [ "--gap", "12px" ] in
   let styles = CSS.merge left right in
   Alcotest.(check (list (triple string string string)))
     "vars"
-    [ "--gap", "--gap", "8px"; "--gap", "--gap", "12px" ]
+    [ "--gap", "--gap", "12px" ]
     (snd styles)
+
+let merge_dedupes_variables_across_several_keys () =
+  let left = CSS.make "one" [ "--a", "1"; "--b", "2"; "--a", "3" ] in
+  let right = CSS.make "two" [ "--c", "4"; "--b", "5"; "--d", "6" ] in
+  let styles = CSS.merge left right in
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [
+      "--a", "--a", "3"; "--b", "--b", "5"; "--c", "--c", "4"; "--d", "--d", "6";
+    ]
+    (snd styles)
+
+let merge_keeps_distinct_variables_untouched () =
+  let styles =
+    CSS.merge
+      (CSS.make "one" [ "--a", "1"; "--b", "2" ])
+      (CSS.make "two" [ "--c", "3" ])
+  in
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [ "--a", "--a", "1"; "--b", "--b", "2"; "--c", "--c", "3" ]
+    (snd styles)
+
+let atom ?(ctx = Css_class_format.plain_ctx) ?(value = "Xk3_9w") name =
+  match Css_cover.id_of_name name with
+  | Some id -> Css_class_format.encode_atom ~prop:(Id id) ~ctx ~value
+  | None -> Alcotest.failf "no id for %s" name
+
+let merge_drops_a_covered_atom () =
+  let left = CSS.make (atom "margin-top" ^ " " ^ atom "color") [] in
+  let right = CSS.make (atom "margin") [] in
+  Alcotest.(check string)
+    "className"
+    (atom "color" ^ " " ^ atom "margin")
+    (CSS.className (CSS.merge left right))
+
+let merge_keeps_an_atom_in_another_context () =
+  let left = CSS.make (atom "color") [] in
+  let right = CSS.make (atom ~ctx:"3fQ-zT" "color") [] in
+  Alcotest.(check string)
+    "className"
+    (atom "color" ^ " " ^ atom ~ctx:"3fQ-zT" "color")
+    (CSS.className (CSS.merge left right))
+
+let merge_drops_a_repeated_foreign_class () =
+  let styles = CSS.merge (CSS.make "card active" []) (CSS.make "card" []) in
+  Alcotest.(check string) "className" "active card" (fst styles)
 
 let merge_keeps_left_to_right_style_order () =
   let one = CSS.make "one" [ "--one", "1" ] in
@@ -86,6 +133,20 @@ let merge_empty_carriers () =
   Alcotest.(check string) "className" "" (fst styles);
   Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
 
+let merge_equals_the_core_merge_on_repeated_vectors () =
+  let check (ac, av) (bc, bv) =
+    let merged = CSS.className (CSS.merge (CSS.make ac av) (CSS.make bc bv)) in
+    Alcotest.(check string) (ac ^ " + " ^ bc) (Css_merge.merge ac bc) merged;
+    merged
+  in
+  for _ = 1 to 2 do
+    List.iter
+      (fun (a, b, c) ->
+        let ab = check a b in
+        ignore (check (ab, []) c))
+      Vectors.cases
+  done
+
 let font_families_single_font () =
   Alcotest.(check string)
     "single font family" {js|"Mono"|js}
@@ -106,8 +167,17 @@ let tests =
     test "make dynamic carrier" make_dynamic_carrier;
     test "make allows duplicate variables" make_allows_duplicate_variables;
     test "merge carriers" merge_carriers;
-    test "merge preserves duplicate variables"
-      merge_preserves_duplicate_variables;
+    test "merge keeps first position and last value of duplicate variables"
+      merge_keeps_first_position_and_last_value_of_duplicate_variables;
+    test "merge dedupes variables across several keys"
+      merge_dedupes_variables_across_several_keys;
+    test "merge keeps distinct variables untouched"
+      merge_keeps_distinct_variables_untouched;
+    test "merge drops a covered atom" merge_drops_a_covered_atom;
+    test "merge keeps an atom in another context"
+      merge_keeps_an_atom_in_another_context;
+    test "merge drops a repeated foreign class"
+      merge_drops_a_repeated_foreign_class;
     test "merge keeps left-to-right style order"
       merge_keeps_left_to_right_style_order;
     test "merge trims outer whitespace only" merge_trims_outer_whitespace_only;
@@ -115,6 +185,8 @@ let tests =
     test "trim empty merge class 2" trim_empty_merge_class_2;
     test "trim empty merge class 3" trim_empty_merge_class_3;
     test "merge empty carriers" merge_empty_carriers;
+    test "merge equals the core merge on repeated vectors"
+      merge_equals_the_core_merge_on_repeated_vectors;
     test "font families single font" font_families_single_font;
     test "font families multiple fonts" font_families_multiple_fonts;
   ]

@@ -15,17 +15,95 @@ properties, not just registered as standalone functions.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-zpelvd{width:clamp(10px, 5vw, 100px);}"];
-  [@css ".css-2ju9ys{padding-top:env(safe-area-inset-top);}"];
-  [@css ".css-1qehw7i{padding-top:env(safe-area-inset-top, 8px);}"];
-  [@css ".css-ojmp0b{font-size:clamp(1rem, 2.5vw, 2rem);}"];
-  [@css ".css-1k5blas{max-width:clamp(20%, 50vw, 80%);}"];
-  [@css ".css-1vs0z9k{width:calc(clamp(1px, 2vw, 3px) + 1px);}"];
-  CSS.make("css-zpelvd", []);
-  CSS.make("css-2ju9ys", []);
-  CSS.make("css-1qehw7i", []);
-  CSS.make("css-ojmp0b", []);
-  CSS.make("css-1k5blas", []);
-  CSS.make("css-1vs0z9k", []);
+  [@css.atoms
+    [
+      (
+        "_an8quELsT",
+        ["._an8quELsT{width:clamp(10px, 5vw, 100px);}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "quELsT", "val\\0n8\\0& | \\0width:clamp(10px, 5vw, 100px)"),
+        ],
+      ),
+      (
+        "_ag8J2b66W",
+        ["._ag8J2b66W{padding-top:env(safe-area-inset-top);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "J2b66W",
+            "val\\0g8\\0& | \\0padding-top:env(safe-area-inset-top)",
+          ),
+        ],
+      ),
+      (
+        "_ag8B8_y0k",
+        ["._ag8B8_y0k{padding-top:env(safe-area-inset-top, 8px);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "B8_y0k",
+            "val\\0g8\\0& | \\0padding-top:env(safe-area-inset-top, 8px)",
+          ),
+        ],
+      ),
+      (
+        "_aa8OsoW_l",
+        ["._aa8OsoW_l{font-size:clamp(1rem, 2.5vw, 2rem);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "OsoW_l",
+            "val\\0a8\\0& | \\0font-size:clamp(1rem, 2.5vw, 2rem)",
+          ),
+        ],
+      ),
+      (
+        "_adzg53ZRB",
+        ["._adzg53ZRB{max-width:clamp(20%, 50vw, 80%);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "g53ZRB",
+            "val\\0dz\\0& | \\0max-width:clamp(20%, 50vw, 80%)",
+          ),
+        ],
+      ),
+      (
+        "_an8YzzrS9",
+        ["._an8YzzrS9{width:calc(clamp(1px, 2vw, 3px) + 1px);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "YzzrS9",
+            "val\\0n8\\0& | \\0width:calc(clamp(1px, 2vw, 3px) + 1px)",
+          ),
+        ],
+      ),
+    ]
+  ];
+  CSS.make("_an8quELsT", []);
+  CSS.make("_ag8J2b66W", []);
+  CSS.make("_ag8B8_y0k", []);
+  CSS.make("_aa8OsoW_l", []);
+  CSS.make("_adzg53ZRB", []);
+  CSS.make("_an8YzzrS9", []);
 
   $ dune build

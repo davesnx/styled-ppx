@@ -1,61 +1,167 @@
-Plan 3b: a block's interpolating declarations share one bundle class and one
-var per (source-path, runtime-type) across base / :hover / @media variants.
+Each interpolating declaration is its own atom with its own var, across base /
+:hover / @media variants.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --color-3f9mj1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-13vjntp{syntax:\"*\";inherits:false;}"];
-  [@css "@property --width-1v9ua{syntax:\"*\";inherits:false;}"];
-  [@css "@property --width-c62vcf{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}"];
-  [@css ".css-1kbzua4-multiVariant:hover{color:var(--color-3f9mj1);}"];
-  [@css
-    "@media (max-width: 768px) {.css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}}"
+  [@css "@property --color-1raopcx{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-qvekgg{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-zlktsz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --width-s4afn7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --width-1poadf9{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fQE1m9v",
+        ["._a7fQE1m9v{color:var(--color-1raopcx);}"],
+        1,
+        0,
+        1,
+        [("value", "QE1m9v", "val\\07f\\0& | \\0color:$(color)")],
+      ),
+      (
+        "_bAC7f1Tl5-w7fHwfC2rjsxQ9O",
+        [
+          "._bAC7f1Tl5-w7fHwfC2rjsxQ9O:hover{color:var(--color-qvekgg);}",
+          "@media (max-width:768px){._bAC7f1Tl5-w7fHwfC2rjsxQ9O{color:var(--color-qvekgg);}}",
+        ],
+        2,
+        1,
+        2,
+        [
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          ("ctx", "HwfC2r", "ctx\\0& | @media (max-width:768px) | "),
+          (
+            "value",
+            "jsxQ9O",
+            "bval\\0&:hover | \\07f\\0color:$(color)\\0& | @media (max-width:768px) | \\07f\\0color:$(color)",
+          ),
+        ],
+      ),
+      (
+        "_a9fMU0SCS",
+        ["._a9fMU0SCS{display:flex;}"],
+        1,
+        0,
+        1,
+        [("value", "MU0SCS", "val\\09f\\0& | \\0display:flex")],
+      ),
+      (
+        "_c7f1Tl5-wm8KWM7",
+        ["._c7f1Tl5-wm8KWM7:hover{color:var(--color-zlktsz);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          ("value", "m8KWM7", "val\\07f\\0&:hover | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_an8FHTy9P",
+        ["._an8FHTy9P{width:var(--width-s4afn7);}"],
+        1,
+        0,
+        1,
+        [("value", "FHTy9P", "val\\0n8\\0& | \\0width:$(width)")],
+      ),
+      (
+        "_cbd1Tl5-wDx39OI",
+        ["._cbd1Tl5-wDx39OI:hover{height:var(--width-1poadf9);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          ("value", "Dx39OI", "val\\0bd\\0&:hover | \\0height:$(width)"),
+        ],
+      ),
+      (
+        "_a7fadbhEW",
+        ["._a7fadbhEW{color:red;}"],
+        1,
+        0,
+        1,
+        [("value", "adbhEW", "val\\07f\\0& | \\0color:red")],
+      ),
+      (
+        "_igtOx8BPu",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_igtOx8BPu", "bind\\0\\0Output\\0\\0multiVariant\\00")],
+      ),
+      (
+        "_iPy6mSKfI",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iPy6mSKfI", "bind\\0\\0Output\\0\\0mixed\\00")],
+      ),
+      (
+        "_iNt-gUZds",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iNt-gUZds", "bind\\0\\0Output\\0\\0twoTypes\\00")],
+      ),
+    ]
   ];
-  [@css ".css-k008qs-mixed{display:flex;}"];
-  [@css ".css-1upqar2-mixed{color:var(--color-13vjntp);}"];
-  [@css ".css-1upqar2-mixed:hover{color:var(--color-13vjntp);}"];
-  [@css ".css-e286e6-twoTypes{width:var(--width-1v9ua);}"];
-  [@css ".css-e286e6-twoTypes:hover{height:var(--width-c62vcf);}"];
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-lfbwy0:hover{color:var(--color-4uzv5u);}"];
-  [@css ".css-k008qs{display:flex;}"];
   [@css.bindings
     [
-      ("Output.multiVariant", "css-1kbzua4-multiVariant"),
-      ("Output.mixed", "css-k008qs-mixed css-1upqar2-mixed"),
-      ("Output.twoTypes", "css-e286e6-twoTypes"),
+      (
+        "Output.multiVariant",
+        "_igtOx8BPu _a7fQE1m9v _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
+        "_igtOx8BPu",
+      ),
+      (
+        "Output.mixed",
+        "_iPy6mSKfI _a9fMU0SCS _a7fQE1m9v _c7f1Tl5-wm8KWM7",
+        "_iPy6mSKfI",
+      ),
+      (
+        "Output.twoTypes",
+        "_iNt-gUZds _an8FHTy9P _cbd1Tl5-wDx39OI",
+        "_iNt-gUZds",
+      ),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let multiVariant =
     CSS.make(
-      "css-1kbzua4-multiVariant",
-      [("--color-3f9mj1", CSS.Types.Color.toString(color))],
+      "_igtOx8BPu _a7fQE1m9v _bAC7f1Tl5-w7fHwfC2rjsxQ9O",
+      [
+        ("--color-1raopcx", CSS.Types.Color.toString(color)),
+        ("--color-qvekgg", CSS.Types.Color.toString(color)),
+      ],
     );
   let mixed =
     CSS.make(
-      "css-k008qs-mixed css-1upqar2-mixed",
-      [("--color-13vjntp", CSS.Types.Color.toString(color))],
+      "_iPy6mSKfI _a9fMU0SCS _a7fQE1m9v _c7f1Tl5-wm8KWM7",
+      [
+        ("--color-1raopcx", CSS.Types.Color.toString(color)),
+        ("--color-zlktsz", CSS.Types.Color.toString(color)),
+      ],
     );
   let twoTypes =
     CSS.make(
-      "css-e286e6-twoTypes",
+      "_iNt-gUZds _an8FHTy9P _cbd1Tl5-wDx39OI",
       [
-        ("--width-1v9ua", CSS.Types.Width.toString(width)),
-        ("--width-c62vcf", CSS.Types.Height.toString(width)),
+        ("--width-s4afn7", CSS.Types.Width.toString(width)),
+        ("--width-1poadf9", CSS.Types.Height.toString(width)),
       ],
     );
   let _ =
     CSS.make(
-      "css-tokvmb css-lfbwy0",
-      [("--color-4uzv5u", CSS.Types.Color.toString(color))],
+      "_a7fadbhEW _c7f1Tl5-wm8KWM7",
+      [("--color-zlktsz", CSS.Types.Color.toString(color))],
     );
   let _ =
     CSS.make(
-      "css-k008qs css-lfbwy0",
-      [("--color-4uzv5u", CSS.Types.Color.toString(color))],
+      "_a9fMU0SCS _c7f1Tl5-wm8KWM7",
+      [("--color-zlktsz", CSS.Types.Color.toString(color))],
     );

@@ -15,40 +15,198 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1ww2ddt{empty-cells:show;}"];
-  [@css ".css-2uav7h{empty-cells:hide;}"];
-  [@css ".css-1wyzhlp{field-sizing:content;}"];
-  [@css ".css-1rpat5c{field-sizing:fixed;}"];
-  [@css ".css-1eo7wts{interpolate-size:numeric-only;}"];
-  [@css ".css-ja4lek{interpolate-size:allow-keywords;}"];
-  [@css ".css-19bo2dy{initial-letter:normal;}"];
-  [@css ".css-12uwub8{initial-letter:1.5;}"];
-  [@css ".css-1h50l7m{initial-letter:1.5 2;}"];
-  [@css ".css-mobm9f{initial-letter-align:auto;}"];
-  [@css ".css-1hnpsj{initial-letter-align:alphabetic;}"];
-  [@css ".css-1hjwje6{initial-letter-align:hanging;}"];
-  [@css ".css-nrtz0y{initial-letter-align:ideographic;}"];
-  [@css ".css-5cqonx{image-resolution:from-image;}"];
-  [@css ".css-1od4m46{image-resolution:96dpi;}"];
-  [@css ".css-m6btb7{image-resolution:2dppx;}"];
-  [@css ".css-1g7wnyr{image-resolution:from-image snap;}"];
-  [@css ".css-8kehnm{image-resolution:96dpi snap;}"];
+  [@css.atoms
+    [
+      (
+        "_a9ivfV7Wf",
+        ["._a9ivfV7Wf{empty-cells:show;}"],
+        1,
+        0,
+        1,
+        [("value", "vfV7Wf", "val\\09i\\0& | \\0empty-cells:show")],
+      ),
+      (
+        "_a9iLAoXA3",
+        ["._a9iLAoXA3{empty-cells:hide;}"],
+        1,
+        0,
+        1,
+        [("value", "LAoXA3", "val\\09i\\0& | \\0empty-cells:hide")],
+      ),
+      (
+        "_a9kWfzMKt",
+        ["._a9kWfzMKt{field-sizing:content;}"],
+        1,
+        0,
+        1,
+        [("value", "WfzMKt", "val\\09k\\0& | \\0field-sizing:content")],
+      ),
+      (
+        "_a9kNUT4qd",
+        ["._a9kNUT4qd{field-sizing:fixed;}"],
+        1,
+        0,
+        1,
+        [("value", "NUT4qd", "val\\09k\\0& | \\0field-sizing:fixed")],
+      ),
+      (
+        "_ac5-oiy8A",
+        ["._ac5-oiy8A{interpolate-size:numeric-only;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "-oiy8A", "val\\0c5\\0& | \\0interpolate-size:numeric-only"),
+        ],
+      ),
+      (
+        "_ac5ClH0Uk",
+        ["._ac5ClH0Uk{interpolate-size:allow-keywords;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "ClH0Uk",
+            "val\\0c5\\0& | \\0interpolate-size:allow-keywords",
+          ),
+        ],
+      ),
+      (
+        "_abp0q3bl8",
+        ["._abp0q3bl8{initial-letter:normal;}"],
+        1,
+        0,
+        1,
+        [("value", "0q3bl8", "val\\0bp\\0& | \\0initial-letter:normal")],
+      ),
+      (
+        "_abpNedyd6",
+        ["._abpNedyd6{initial-letter:1.5;}"],
+        1,
+        0,
+        1,
+        [("value", "Nedyd6", "val\\0bp\\0& | \\0initial-letter:1.5")],
+      ),
+      (
+        "_abpMqaluW",
+        ["._abpMqaluW{initial-letter:1.5 2;}"],
+        1,
+        0,
+        1,
+        [("value", "MqaluW", "val\\0bp\\0& | \\0initial-letter:1.5 2")],
+      ),
+      (
+        "_abqiSzq2R",
+        ["._abqiSzq2R{initial-letter-align:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "iSzq2R", "val\\0bq\\0& | \\0initial-letter-align:auto")],
+      ),
+      (
+        "_abqag6T0d",
+        ["._abqag6T0d{initial-letter-align:alphabetic;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "ag6T0d",
+            "val\\0bq\\0& | \\0initial-letter-align:alphabetic",
+          ),
+        ],
+      ),
+      (
+        "_abqaAUXCr",
+        ["._abqaAUXCr{initial-letter-align:hanging;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "aAUXCr", "val\\0bq\\0& | \\0initial-letter-align:hanging"),
+        ],
+      ),
+      (
+        "_abqWJhzUf",
+        ["._abqWJhzUf{initial-letter-align:ideographic;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "WJhzUf",
+            "val\\0bq\\0& | \\0initial-letter-align:ideographic",
+          ),
+        ],
+      ),
+      (
+        "_abmnXNPJZ",
+        ["._abmnXNPJZ{image-resolution:from-image;}"],
+        1,
+        0,
+        1,
+        [("value", "nXNPJZ", "val\\0bm\\0& | \\0image-resolution:from-image")],
+      ),
+      (
+        "_abmulmCLe",
+        ["._abmulmCLe{image-resolution:96dpi;}"],
+        1,
+        0,
+        1,
+        [("value", "ulmCLe", "val\\0bm\\0& | \\0image-resolution:96dpi")],
+      ),
+      (
+        "_abmJzRCu8",
+        ["._abmJzRCu8{image-resolution:2dppx;}"],
+        1,
+        0,
+        1,
+        [("value", "JzRCu8", "val\\0bm\\0& | \\0image-resolution:2dppx")],
+      ),
+      (
+        "_abmJ3Ag9b",
+        ["._abmJ3Ag9b{image-resolution:from-image snap;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "J3Ag9b",
+            "val\\0bm\\0& | \\0image-resolution:from-image snap",
+          ),
+        ],
+      ),
+      (
+        "_abmGiQLc9",
+        ["._abmGiQLc9{image-resolution:96dpi snap;}"],
+        1,
+        0,
+        1,
+        [("value", "GiQLc9", "val\\0bm\\0& | \\0image-resolution:96dpi snap")],
+      ),
+    ]
+  ];
   
-  CSS.make("css-1ww2ddt", []);
-  CSS.make("css-2uav7h", []);
-  CSS.make("css-1wyzhlp", []);
-  CSS.make("css-1rpat5c", []);
-  CSS.make("css-1eo7wts", []);
-  CSS.make("css-ja4lek", []);
-  CSS.make("css-19bo2dy", []);
-  CSS.make("css-12uwub8", []);
-  CSS.make("css-1h50l7m", []);
-  CSS.make("css-mobm9f", []);
-  CSS.make("css-1hnpsj", []);
-  CSS.make("css-1hjwje6", []);
-  CSS.make("css-nrtz0y", []);
-  CSS.make("css-5cqonx", []);
-  CSS.make("css-1od4m46", []);
-  CSS.make("css-m6btb7", []);
-  CSS.make("css-1g7wnyr", []);
-  CSS.make("css-8kehnm", []);
+  CSS.make("_a9ivfV7Wf", []);
+  CSS.make("_a9iLAoXA3", []);
+  CSS.make("_a9kWfzMKt", []);
+  CSS.make("_a9kNUT4qd", []);
+  CSS.make("_ac5-oiy8A", []);
+  CSS.make("_ac5ClH0Uk", []);
+  CSS.make("_abp0q3bl8", []);
+  CSS.make("_abpNedyd6", []);
+  CSS.make("_abpMqaluW", []);
+  CSS.make("_abqiSzq2R", []);
+  CSS.make("_abqag6T0d", []);
+  CSS.make("_abqaAUXCr", []);
+  CSS.make("_abqWJhzUf", []);
+  CSS.make("_abmnXNPJZ", []);
+  CSS.make("_abmulmCLe", []);
+  CSS.make("_abmJzRCu8", []);
+  CSS.make("_abmJ3Ag9b", []);
+  CSS.make("_abmGiQLc9", []);

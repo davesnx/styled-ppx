@@ -15,25 +15,103 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-12m0k8p{pointer-events:auto;}"];
-  [@css ".css-1k273s1{pointer-events:visiblePainted;}"];
-  [@css ".css-1z0le2q{pointer-events:visibleFill;}"];
-  [@css ".css-1e64ebn{pointer-events:visibleStroke;}"];
-  [@css ".css-1ttsh4e{pointer-events:visible;}"];
-  [@css ".css-nw29yp{pointer-events:painted;}"];
-  [@css ".css-1olh5dc{pointer-events:fill;}"];
-  [@css ".css-k8ii8d{pointer-events:stroke;}"];
-  [@css ".css-uw7k7s{pointer-events:all;}"];
-  [@css ".css-1ixbp0l{pointer-events:none;}"];
+  [@css.atoms
+    [
+      (
+        "_agljYx8J2",
+        ["._agljYx8J2{pointer-events:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "jYx8J2", "val\\0gl\\0& | \\0pointer-events:auto")],
+      ),
+      (
+        "_aglZnBGOM",
+        ["._aglZnBGOM{pointer-events:visiblePainted;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "ZnBGOM", "val\\0gl\\0& | \\0pointer-events:visiblePainted"),
+        ],
+      ),
+      (
+        "_agl7SbafR",
+        ["._agl7SbafR{pointer-events:visibleFill;}"],
+        1,
+        0,
+        1,
+        [("value", "7SbafR", "val\\0gl\\0& | \\0pointer-events:visibleFill")],
+      ),
+      (
+        "_agliaCAsY",
+        ["._agliaCAsY{pointer-events:visibleStroke;}"],
+        1,
+        0,
+        1,
+        [
+          ("value", "iaCAsY", "val\\0gl\\0& | \\0pointer-events:visibleStroke"),
+        ],
+      ),
+      (
+        "_agl2Y9PGN",
+        ["._agl2Y9PGN{pointer-events:visible;}"],
+        1,
+        0,
+        1,
+        [("value", "2Y9PGN", "val\\0gl\\0& | \\0pointer-events:visible")],
+      ),
+      (
+        "_aglqN0Aek",
+        ["._aglqN0Aek{pointer-events:painted;}"],
+        1,
+        0,
+        1,
+        [("value", "qN0Aek", "val\\0gl\\0& | \\0pointer-events:painted")],
+      ),
+      (
+        "_aglZy05ur",
+        ["._aglZy05ur{pointer-events:fill;}"],
+        1,
+        0,
+        1,
+        [("value", "Zy05ur", "val\\0gl\\0& | \\0pointer-events:fill")],
+      ),
+      (
+        "_aglM0o3Wn",
+        ["._aglM0o3Wn{pointer-events:stroke;}"],
+        1,
+        0,
+        1,
+        [("value", "M0o3Wn", "val\\0gl\\0& | \\0pointer-events:stroke")],
+      ),
+      (
+        "_agluyH9zv",
+        ["._agluyH9zv{pointer-events:all;}"],
+        1,
+        0,
+        1,
+        [("value", "uyH9zv", "val\\0gl\\0& | \\0pointer-events:all")],
+      ),
+      (
+        "_agl6mqgrC",
+        ["._agl6mqgrC{pointer-events:none;}"],
+        1,
+        0,
+        1,
+        [("value", "6mqgrC", "val\\0gl\\0& | \\0pointer-events:none")],
+      ),
+    ]
+  ];
   
-  CSS.make("css-12m0k8p", []);
+  CSS.make("_agljYx8J2", []);
   
-  CSS.make("css-1k273s1", []);
-  CSS.make("css-1z0le2q", []);
-  CSS.make("css-1e64ebn", []);
-  CSS.make("css-1ttsh4e", []);
-  CSS.make("css-nw29yp", []);
-  CSS.make("css-1olh5dc", []);
-  CSS.make("css-k8ii8d", []);
-  CSS.make("css-uw7k7s", []);
-  CSS.make("css-1ixbp0l", []);
+  CSS.make("_aglZnBGOM", []);
+  CSS.make("_agl7SbafR", []);
+  CSS.make("_agliaCAsY", []);
+  CSS.make("_agl2Y9PGN", []);
+  CSS.make("_aglqN0Aek", []);
+  CSS.make("_aglZy05ur", []);
+  CSS.make("_aglM0o3Wn", []);
+  CSS.make("_agluyH9zv", []);
+  CSS.make("_agl6mqgrC", []);

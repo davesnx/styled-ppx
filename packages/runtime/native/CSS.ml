@@ -18,10 +18,24 @@ let make className vars : styles =
   in
   className, style
 
+let combine_vars style1 style2 =
+  let all = ReactDOM.Style.combine style1 style2 in
+  let rec last_value key value = function
+    | [] -> value
+    | (_, k, v) :: rest -> last_value key (if k = key then v else value) rest
+  in
+  let rec dedupe seen = function
+    | [] -> []
+    | (property, key, value) :: rest ->
+      if List.mem key seen then dedupe seen rest
+      else
+        (property, key, last_value key value rest) :: dedupe (key :: seen) rest
+  in
+  dedupe [] all
+
 let merge (styles1 : styles) (styles2 : styles) =
-  let className = String.trim (fst styles1 ^ " " ^ fst styles2) in
-  let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
-  className, style
+  ( Css_merge_cache.merge (fst styles1) (fst styles2),
+    combine_vars (snd styles1) (snd styles2) )
 
 let global_style_tag css =
   ReactDOM.createDOMElementVariadic "style"

@@ -54,7 +54,8 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## pin
-	opam pin add quickjs 0.5.1 -y
+	opam pin add quickjs.0.5.2~dev "https://github.com/ml-in-barcelona/quickjs.ml.git#5fe648ebf09d1a98064f4548c7db1f8e7e4b0729" -y
+	opam pin add dune.3.26.0~dev "https://github.com/ocaml/dune.git#27d95d8dbf977a38059334618d539bb9d699ac21" -y
 	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#82c52e8a27dffa433f56753713bd699c9b31016b" -y
 
 .PHONY: init
@@ -74,7 +75,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-generate
+TEST_TARGETS := test-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-generate test-property-class test-property-class-bindings
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test
@@ -101,9 +102,38 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
 .PHONY: test
 test: build
-	@status=0; for target in $(TEST_TARGETS); do \
+	@status=0; for target in $(TEST_TARGETS) test-property-class-units test-cx; do \
 		make --no-print-directory $${target} || status=1; \
 	done; exit $$status
+
+.PHONY: gen-property-class
+gen-property-class: ## Regenerate the property table and cover tables
+	node --experimental-strip-types --no-warnings packages/property-class/gen/gen_tables.ts
+
+CX_DIR = packages/cx-conformance
+CX = node --experimental-strip-types --no-warnings $(CX_DIR)/src/main.ts
+
+UNITS_GEN = node --experimental-strip-types --no-warnings packages/property-class/gen/export_units.ts
+UNITS_FIXTURE = packages/property-class/gen/units_fixture.json
+
+.PHONY: gen-property-class-units
+gen-property-class-units: ## Regenerate the atomize fixture from the cx model
+	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	$(UNITS_GEN) $(UNITS_FIXTURE)
+
+.PHONY: test-property-class-units
+test-property-class-units: ## Check the atomize fixture against the cx model
+	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	@mkdir -p _build
+	$(UNITS_GEN) _build/units_fixture.check.json
+	diff $(UNITS_FIXTURE) _build/units_fixture.check.json
+
+.PHONY: test-cx
+test-cx: ## Run the cx conformance suite (model, and ppx when present)
+	@test -d $(CX_DIR)/node_modules || npm --prefix $(CX_DIR) ci
+	@test -d demo/melange/node_modules || npm --prefix demo/melange ci
+	$(CX) --self-test
+	$(CX) --candidate model,ppx
 
 # Demo
 

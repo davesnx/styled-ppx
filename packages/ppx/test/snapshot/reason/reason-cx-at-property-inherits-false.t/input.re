@@ -20,8 +20,8 @@ let media = [%css {| @media (max-width: 768px) { color: $(color) } |}];
 /* Descendant reads the var via inheritance: no @property. */
 let descendant = [%css {| & .child { color: $(color) } |}];
 
-/* Shared bundle var read by `.child` via inheritance: no @property, even though
-   the base and descendant atoms share one var. */
+/* Each atom owns its var: the base atom's var registers; the descendant atom's
+   var is read by `.child` via inheritance: no @property. */
 let bundleSpan = [%css {| color: $(color); & .child { color: $(color) } |}];
 
 /* The `$(str)` feeder is `&`-local and registers; the `--brand` property it

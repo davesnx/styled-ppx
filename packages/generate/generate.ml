@@ -86,7 +86,9 @@ module Index = struct
     | Ok entries ->
       List.iter
         (fun (entry : Css_extraction.binding) ->
-          Hashtbl.replace idx entry.longident entry.class_string)
+          Hashtbl.replace idx entry.longident
+            (if entry.binding_id <> "" then entry.binding_id
+             else entry.class_string))
         entries;
       Ok ()
 end
@@ -109,6 +111,7 @@ end
 type harvest = {
   filename : string;
   rules : string list;
+  atoms : Css_extraction.atom list;
   refs : Refs.ref_loc list;
   env : string option;
   protocol_errors : string list;
@@ -116,6 +119,7 @@ type harvest = {
 
 let harvest_structure ~filename ~idx structure : harvest =
   let rules = ref [] in
+  let atoms = ref [] in
   let refs = ref [] in
   let env = ref None in
   let protocol_errors = ref [] in
@@ -131,6 +135,11 @@ let harvest_structure ~filename ~idx structure : harvest =
         (match Css_extraction.decode_css_payload value with
         | Ok v -> rules := v :: !rules
         | Error msg -> add_protocol_error Css_extraction.css_attribute_name msg)
+      | [%stri [@@@css.atoms [%e? value]]] ->
+        (match Css_extraction.decode_atoms_payload value with
+        | Ok entries -> atoms := List.rev_append entries !atoms
+        | Error msg ->
+          add_protocol_error Css_extraction.atoms_attribute_name msg)
       | [%stri [@@@css.refs [%e? value]]] ->
         (match Refs.of_list_expr value with
         | Ok entries -> refs := entries @ !refs
@@ -153,6 +162,7 @@ let harvest_structure ~filename ~idx structure : harvest =
   {
     filename;
     rules = List.rev !rules;
+    atoms = List.rev !atoms;
     refs = List.rev !refs;
     env = !env;
     protocol_errors = List.rev !protocol_errors;
@@ -257,7 +267,9 @@ let unresolved_message ~longident ~ref_loc ~in_library_modules =
     some did not: warn and emit readable output. *)
 let production_mode harvests =
   let contributing =
-    List.filter (fun h -> h.rules <> [] || h.env <> None) harvests
+    List.filter
+      (fun h -> h.rules <> [] || h.atoms <> [] || h.env <> None)
+      harvests
   in
   let production, development =
     List.partition
@@ -274,6 +286,50 @@ let production_mode harvests =
        environment to every (pps styled-ppx ...) stanza."
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
+
+let collect_atoms ~errors (atoms : (string * Css_extraction.atom) list) :
+  string list =
+  let by_cls = Hashtbl.create 64 in
+  let by_hash = Hashtbl.create 64 in
+  let first_seen = ref [] in
+  List.iter
+    (fun (file, (atom : Css_extraction.atom)) ->
+      (match Hashtbl.find_opt by_cls atom.cls with
+      | None ->
+        Hashtbl.add by_cls atom.cls (file, atom);
+        first_seen := atom :: !first_seen
+      | Some (other_file, (other : Css_extraction.atom)) ->
+        if other.rules <> atom.rules then
+          errors :=
+            Printf.sprintf
+              "class `%s` has two different rule sets: %s in %s and %s in %s"
+              atom.cls
+              (String.concat " " other.rules)
+              other_file
+              (String.concat " " atom.rules)
+              file
+            :: !errors);
+      List.iter
+        (fun (h : Css_extraction.hash_source) ->
+          let key = h.kind, h.token in
+          match Hashtbl.find_opt by_hash key with
+          | None -> Hashtbl.add by_hash key (file, h.source)
+          | Some (other_file, other_source) ->
+            if other_source <> h.source then
+              errors :=
+                Printf.sprintf
+                  "%s hash collision on `%s`: %S in %s and %S in %s" h.kind
+                  h.token other_source other_file h.source file
+                :: !errors)
+        atom.hashes)
+    atoms;
+  List.sort
+    (fun (a : Css_extraction.atom) (b : Css_extraction.atom) ->
+      compare
+        (a.tier, a.conds, -a.cover, a.rules)
+        (b.tier, b.conds, -b.cover, b.rules))
+    !first_seen
+  |> List.concat_map (fun (atom : Css_extraction.atom) -> atom.rules)
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file input_files =
@@ -296,41 +352,60 @@ let run ~output_file input_files =
   let errors =
     ref (List.concat_map (fun harvest -> harvest.protocol_errors) harvests)
   in
-  let resolved_rules = ref [] in
-  List.iter
-    (fun harvest ->
-      List.iter
-        (fun rule ->
-          let on_error longident =
-            let ref_loc =
-              match
-                List.find_opt
-                  (fun (r : Refs.ref_loc) -> r.longident = longident)
-                  harvest.refs
-              with
-              | Some r -> r
-              | None ->
-                Css_extraction.ref_loc ~longident ~file:harvest.filename
-                  ~start_line:1 ~start_col:0 ~end_col:0
-            in
-            let msg =
-              unresolved_message ~longident ~ref_loc ~in_library_modules
-            in
-            errors := msg :: !errors
-          in
-          let on_malformed msg =
-            errors :=
-              Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename
-                Css_extraction.css_attribute_name msg
-              :: !errors
-          in
-          let resolved =
-            Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
-              ~on_unresolved:on_error ~on_malformed rule
-          in
-          resolved_rules := resolved :: !resolved_rules)
-        harvest.rules)
-    harvests;
+  let resolve_rule ~attribute harvest rule =
+    let on_error longident =
+      let ref_loc =
+        match
+          List.find_opt
+            (fun (r : Refs.ref_loc) -> r.longident = longident)
+            harvest.refs
+        with
+        | Some r -> r
+        | None ->
+          Css_extraction.ref_loc ~longident ~file:harvest.filename ~start_line:1
+            ~start_col:0 ~end_col:0
+      in
+      let msg = unresolved_message ~longident ~ref_loc ~in_library_modules in
+      errors := msg :: !errors
+    in
+    let on_malformed msg =
+      errors :=
+        Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename attribute
+          msg
+        :: !errors
+    in
+    Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
+      ~on_unresolved:on_error ~on_malformed rule
+  in
+  let resolved_rules =
+    ref
+      (List.rev
+         (List.concat_map
+            (fun harvest ->
+              List.map
+                (resolve_rule ~attribute:Css_extraction.css_attribute_name
+                   harvest)
+                harvest.rules)
+            harvests))
+  in
+  let resolved_atoms =
+    List.concat_map
+      (fun harvest ->
+        List.map
+          (fun (atom : Css_extraction.atom) ->
+            ( harvest.filename,
+              {
+                atom with
+                rules =
+                  List.map
+                    (resolve_rule ~attribute:Css_extraction.atoms_attribute_name
+                       harvest)
+                    atom.rules;
+              } ))
+          harvest.atoms)
+      harvests
+  in
+  let ordered_atoms = collect_atoms ~errors resolved_atoms in
 
   (match !errors with
   | [] -> ()
@@ -378,7 +453,7 @@ let run ~output_file input_files =
       (fun rule ->
         Buffer.add_string buffer rule;
         Buffer.add_string buffer separator)
-      ordered_rules;
+      (ordered_rules @ ordered_atoms);
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;

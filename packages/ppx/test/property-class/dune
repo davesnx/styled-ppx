@@ -1,0 +1,6 @@
+(cram
+ (alias test-property-class)
+ (deps
+  %{exe:../standalone.exe}
+  %{bin:refmt}
+  (package styled-ppx)))

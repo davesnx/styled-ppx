@@ -37,13 +37,16 @@ jobs:
 
       - name: Use Node.js
         uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Setup OCaml and dependencies
         uses: ml-in-barcelona/gh-ci-action@v1.3.1
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           pins: |
-            quickjs 0.5.1
+            quickjs.0.5.2~dev https://github.com/ml-in-barcelona/quickjs.ml.git#5fe648ebf09d1a98064f4548c7db1f8e7e4b0729
+            dune.3.26.0~dev https://github.com/ocaml/dune.git#27d95d8dbf977a38059334618d539bb9d699ac21
             server-reason-react.0.4.1 https://github.com/ml-in-barcelona/server-reason-react.git#82c52e8a27dffa433f56753713bd699c9b31016b
           with-dev-setup: true
           depext-bypass: npm
@@ -61,6 +64,8 @@ jobs:
 
       - name: Test
         run: make test
+        env:
+          CX_CHROMIUM: ${{ runner.os == 'macOS' && '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' || '/usr/bin/google-chrome' }}
 
       - name: Format
         if: matrix.ocaml-compiler == '5.4.0'

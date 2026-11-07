@@ -8,29 +8,79 @@ merged styles cannot overwrite each other.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
-  [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6);}"];
-  [@css
-    ".css-10a6meq-clickable:hover{background-color:var(--backgroundColor-7yjmr3);}"
+  [@css "@property --backgroundColor-z3f4ba{syntax:\"*\";inherits:false;}"];
+  [@css "@property --backgroundColor-1iwsayc{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a4lsOeNzD",
+        ["._a4lsOeNzD{background-color:var(--backgroundColor-z3f4ba);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "sOeNzD",
+            "val\\04l\\0& | \\0background-color:$(backgroundColor)",
+          ),
+        ],
+      ),
+      (
+        "_c4l1Tl5-wOl_MVX",
+        [
+          "._c4l1Tl5-wOl_MVX:hover{background-color:var(--backgroundColor-1iwsayc);}",
+        ],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          (
+            "value",
+            "Ol_MVX",
+            "val\\04l\\0&:hover | \\0background-color:$(backgroundColor)",
+          ),
+        ],
+      ),
+      (
+        "_iyPgGBH2V",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iyPgGBH2V", "bind\\0\\0Output\\0\\0common\\00")],
+      ),
+      (
+        "_iMDXdfI31",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iMDXdfI31", "bind\\0\\0Output\\0\\0clickable\\00")],
+      ),
+    ]
   ];
   [@css.bindings
     [
-      ("Output.common", "css-160vrad-common"),
-      ("Output.clickable", "css-10a6meq-clickable"),
+      ("Output.common", "_iyPgGBH2V _a4lsOeNzD", "_iyPgGBH2V"),
+      ("Output.clickable", "_iMDXdfI31 _c4l1Tl5-wOl_MVX", "_iMDXdfI31"),
     ]
   ];
   let common = backgroundColor =>
     CSS.make(
-      "css-160vrad-common",
+      "_iyPgGBH2V _a4lsOeNzD",
       [
-        ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
+        ("--backgroundColor-z3f4ba", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "css-10a6meq-clickable",
+      "_iMDXdfI31 _c4l1Tl5-wOl_MVX",
       [
-        ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
+        (
+          "--backgroundColor-1iwsayc",
+          CSS.Types.Color.toString(backgroundColor),
+        ),
       ],
     );

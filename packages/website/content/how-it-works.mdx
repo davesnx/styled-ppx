@@ -52,35 +52,11 @@ See [Setting up the dune rules](/getting-started/dune-setup) for the concrete bu
 
 ## Atomization: one declaration, one class
 
-Every declaration inside a `[%css]` or `[%styled.<tag>]` block becomes its own rule with its own class:
-
-```reason
-let layout = [%css {|
-  display: flex;
-  align-items: center;
-|}];
-```
-
-extracts to:
-
-```css
-.css-k008qs-layout { display: flex; }
-.css-1tyndxa-layout { align-items: center; }
-```
-
-and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
+Every declaration inside a `[%css]` or `[%styled.<tag>]` block becomes its own rule with its own class.
 
 Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components. That's the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
 
 Repeated fallback declarations for the same property (e.g. `display: -webkit-box; display: flex;`) are kept together in a single atom, so their intra-rule order, which the fallback depends on, is preserved.
-
-### Class names
-
-The format is `css-<hash>-<label>`, where the label is the `let` binding or module name (`layout` above). The label is purely cosmetic, for debuggability: hashes alone determine identity and deduplication. Running the ppx with the `--minify` flag drops the label, emitting bare `css-<hash>` names for production.
-
-### Cascade and ordering
-
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -91,11 +67,6 @@ let title = (~color) => [%css {|
   font-size: 2rem;
   color: $(color);
 |}];
-```
-
-```css
-.css-abc123-title { font-size: 2rem; }
-.css-def456-title { color: var(--color-xk29fh); }
 ```
 
 The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--color-xk29fh: #667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
@@ -118,7 +89,7 @@ The ppx runs one file at a time and cannot see the rest of your project, so each
 1. walks the post-ppx `.ml`/`.pp.ml` files you point it at,
 2. harvests every extracted rule and binding export,
 3. resolves cross-module selector references,
-4. deduplicates rules (order-preserving), and
+4. deduplicates rules, and
 5. writes the final stylesheet.
 
 You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting live in [Setting up the dune rules](/getting-started/dune-setup).

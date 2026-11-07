@@ -4,6 +4,22 @@ module Builder = Ppxlib.Ast_builder.Default
 type binding = {
   longident : string;
   class_string : string;
+  binding_id : string;
+}
+
+type hash_source = {
+  kind : string;
+  token : string;
+  source : string;
+}
+
+type atom = {
+  cls : string;
+  rules : string list;
+  tier : int;
+  conds : int;
+  cover : int;
+  hashes : hash_source list;
 }
 
 type ref_loc = {
@@ -17,6 +33,7 @@ type ref_loc = {
 let css_attribute_name = "css"
 let bindings_attribute_name = "css.bindings"
 let refs_attribute_name = "css.refs"
+let atoms_attribute_name = "css.atoms"
 let config_attribute_name = "css.config"
 let config_env_key = "env"
 let config_env_production = "production"
@@ -30,7 +47,11 @@ let class_chain_of_class_string class_string =
   |> List.filter (fun s -> s <> "")
   |> String.concat "."
 
-let binding ~longident ~class_string = { longident; class_string }
+let binding_with_id ~longident ~class_string ~binding_id =
+  { longident; class_string; binding_id }
+
+let binding ~longident ~class_string =
+  binding_with_id ~longident ~class_string ~binding_id:""
 
 let ref_loc ~longident ~file ~start_line ~start_col ~end_col =
   { longident; file; start_line; start_col; end_col }
@@ -62,10 +83,13 @@ let bindings_attribute entries =
   let loc = Ppxlib.Location.none in
   let entry_to_expr (entry : binding) =
     Builder.pexp_tuple ~loc
-      [
-        Builder.estring ~loc entry.longident;
-        Builder.estring ~loc entry.class_string;
-      ]
+      ([
+         Builder.estring ~loc entry.longident;
+         Builder.estring ~loc entry.class_string;
+       ]
+      @
+      if entry.binding_id = "" then []
+      else [ Builder.estring ~loc entry.binding_id ])
   in
   make_list_attribute ~name:bindings_attribute_name
     (Builder.elist ~loc (List.map entry_to_expr entries))
@@ -92,6 +116,30 @@ let refs_attribute entries =
       ]
   in
   make_list_attribute ~name:refs_attribute_name
+    (Builder.elist ~loc (List.map entry_to_expr entries))
+
+let atoms_attribute entries =
+  let loc = Ppxlib.Location.none in
+  let hash_to_expr (h : hash_source) =
+    Builder.pexp_tuple ~loc
+      [
+        Builder.estring ~loc h.kind;
+        Builder.estring ~loc h.token;
+        Builder.estring ~loc h.source;
+      ]
+  in
+  let entry_to_expr (entry : atom) =
+    Builder.pexp_tuple ~loc
+      [
+        Builder.estring ~loc entry.cls;
+        Builder.elist ~loc (List.map (Builder.estring ~loc) entry.rules);
+        Builder.eint ~loc entry.tier;
+        Builder.eint ~loc entry.conds;
+        Builder.eint ~loc entry.cover;
+        Builder.elist ~loc (List.map hash_to_expr entry.hashes);
+      ]
+  in
+  make_list_attribute ~name:atoms_attribute_name
     (Builder.elist ~loc (List.map entry_to_expr entries))
 
 let string_of_const_expr (e : Ppxlib.expression) : string option =
@@ -131,8 +179,18 @@ let decode_binding (e : Ppxlib.expression) =
   match e.pexp_desc with
   | Pexp_tuple [ longident_e; class_e ] ->
     (match string_of_const_expr longident_e, string_of_const_expr class_e with
-    | Some longident, Some class_string -> Ok { longident; class_string }
+    | Some longident, Some class_string ->
+      Ok { longident; class_string; binding_id = "" }
     | _ -> Error "expected (longident, class_string) string tuple")
+  | Pexp_tuple [ longident_e; class_e; id_e ] ->
+    (match
+       ( string_of_const_expr longident_e,
+         string_of_const_expr class_e,
+         string_of_const_expr id_e )
+     with
+    | Some longident, Some class_string, Some binding_id ->
+      Ok { longident; class_string; binding_id }
+    | _ -> Error "expected (longident, class_string, binding_id) string tuple")
   | _ -> Error "expected (longident, class_string) tuple"
 
 let decode_ref (e : Ppxlib.expression) =
@@ -153,6 +211,45 @@ let decode_ref (e : Ppxlib.expression) =
   | _ ->
     Error "expected (longident, file, start_line, start_col, end_col) tuple"
 
+let decode_hash (e : Ppxlib.expression) =
+  match e.pexp_desc with
+  | Pexp_tuple [ kind_e; token_e; source_e ] ->
+    (match
+       ( string_of_const_expr kind_e,
+         string_of_const_expr token_e,
+         string_of_const_expr source_e )
+     with
+    | Some kind, Some token, Some source -> Ok { kind; token; source }
+    | _ -> Error "expected (kind, token, source) string tuple")
+  | _ -> Error "expected (kind, token, source) tuple"
+
+let decode_atom (e : Ppxlib.expression) =
+  let shape = "expected (cls, rules, tier, conds, cover, hashes) tuple" in
+  match e.pexp_desc with
+  | Pexp_tuple [ cls_e; rules_e; tier_e; conds_e; cover_e; hashes_e ] ->
+    (match
+       ( string_of_const_expr cls_e,
+         int_of_const_expr tier_e,
+         int_of_const_expr conds_e,
+         int_of_const_expr cover_e )
+     with
+    | Some cls, Some tier, Some conds, Some cover ->
+      let rules =
+        decode_list ~attribute:"rules"
+          ~decode:(fun r ->
+            match string_of_const_expr r with
+            | Some rule -> Ok rule
+            | None -> Error "expected a string literal")
+          rules_e
+      in
+      (match
+         rules, decode_list ~attribute:"hashes" ~decode:decode_hash hashes_e
+       with
+      | Ok rules, Ok hashes -> Ok { cls; rules; tier; conds; cover; hashes }
+      | Error msg, _ | _, Error msg -> Error msg)
+    | _ -> Error shape)
+  | _ -> Error shape
+
 let decode_config_entry (e : Ppxlib.expression) =
   match e.pexp_desc with
   | Pexp_tuple [ key_e; value_e ] ->
@@ -166,6 +263,9 @@ let decode_bindings_payload =
 
 let decode_config_payload =
   decode_list ~attribute:config_attribute_name ~decode:decode_config_entry
+
+let decode_atoms_payload =
+  decode_list ~attribute:atoms_attribute_name ~decode:decode_atom
 
 let decode_refs_payload =
   decode_list ~attribute:refs_attribute_name ~decode:decode_ref

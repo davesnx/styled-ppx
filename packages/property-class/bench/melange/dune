@@ -1,0 +1,9 @@
+(copy_files ../bench.ml)
+
+(melange.emit
+ (target out)
+ (modules bench clock)
+ (libraries styled-ppx.melange)
+ (module_systems commonjs)
+ (preprocess
+  (pps melange.ppx)))

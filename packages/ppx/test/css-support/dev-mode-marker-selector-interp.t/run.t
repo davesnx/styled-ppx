@@ -14,15 +14,55 @@ extracted CSS, and resolved selectors are byte-identical between
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fadbhEW",
+        ["._a7fadbhEW{color:red;}"],
+        1,
+        0,
+        1,
+        [("value", "adbhEW", "val\\07f\\0& | \\0color:red")],
+      ),
+      (
+        "_c7fdO-1AgybFZur",
+        ["._c7fdO-1AgybFZur._iBZ5mNPO7{color:blue;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "dO-1Ag", "ctx\\0&._iBZ5mNPO7 | "),
+          ("value", "ybFZur", "val\\07f\\0&._iBZ5mNPO7 | \\0color:blue"),
+        ],
+      ),
+      (
+        "_iBZ5mNPO7",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBZ5mNPO7", "bind\\0\\0Input\\0\\0foo\\00")],
+      ),
+      (
+        "_iBEU_scOh",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBEU_scOh", "bind\\0\\0Input\\0\\0bar\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
-    [("Input.foo", "css-tokvmb-foo"), ("Input.bar", "css-11o9qin-bar")]
+    [
+      ("Input.foo", "_iBZ5mNPO7 _a7fadbhEW", "_iBZ5mNPO7"),
+      ("Input.bar", "_iBEU_scOh _c7fdO-1AgybFZur", "_iBEU_scOh"),
+    ]
   ];
   
-  let foo = CSS.make("cx-foo css-tokvmb-foo", []);
+  let foo = CSS.make("cx-foo _iBZ5mNPO7 _a7fadbhEW", []);
   
-  let bar = CSS.make("cx-bar css-11o9qin-bar", []);
+  let bar = CSS.make("cx-bar _iBEU_scOh _c7fdO-1AgybFZur", []);
   
   let _ = (foo, bar);
 

@@ -1,17 +1,47 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "@media (min-width: calc(2px + 1px)) {.css-1gk5m2e-MediaQueryCalc{color:red;}}"
-  ];
-  [@css
-    "@media (min-width: calc(1000px - 2%)) {.css-d1l0w0-MediaQueryCalc{color:red;}}"
+  [@css.atoms
+    [
+      (
+        "_bAC7fTbdY2z7fURyXTcaZMgyJ",
+        [
+          "@media (min-width:calc(2px + 1px)){._bAC7fTbdY2z7fURyXTcaZMgyJ{color:red;}}",
+          "@media (min-width:calc(1000px - 2%)){._bAC7fTbdY2z7fURyXTcaZMgyJ{color:red;}}",
+        ],
+        2,
+        1,
+        2,
+        [
+          ("ctx", "TbdY2z", "ctx\\0& | @media (min-width:calc(2px + 1px)) | "),
+          (
+            "ctx",
+            "URyXTc",
+            "ctx\\0& | @media (min-width:calc(1000px - 2%)) | ",
+          ),
+          (
+            "value",
+            "aZMgyJ",
+            "bval\\0& | @media (min-width:calc(2px + 1px)) | \\07f\\0color:red\\0& | @media (min-width:calc(1000px - 2%)) | \\07f\\0color:red",
+          ),
+        ],
+      ),
+      (
+        "_izLV7pGEj",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_izLV7pGEj", "bind\\0\\0Output\\0\\0MediaQueryCalc\\00")],
+      ),
+    ]
   ];
   [@css.bindings
     [
       (
         "Output.MediaQueryCalc",
-        "css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc",
+        "_izLV7pGEj _bAC7fTbdY2z7fURyXTcaZMgyJ",
+        "_izLV7pGEj",
       ),
     ]
   ];
@@ -998,10 +1028,12 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles =
-      CSS.make("css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc", []);
+    let styles = CSS.make("_izLV7pGEj _bAC7fTbdY2z7fURyXTcaZMgyJ", []);
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

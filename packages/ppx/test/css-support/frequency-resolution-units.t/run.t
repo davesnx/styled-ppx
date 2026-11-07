@@ -15,25 +15,102 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-11tobub{image-rendering:auto;}"];
-  [@css ".css-1e7m01f{image-rendering:crisp-edges;}"];
-  [@css ".css-fjhmlf{image-rendering:pixelated;}"];
-  [@css
-    ".css-25toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}"
+  [@css.atoms
+    [
+      (
+        "_ablemaR7h",
+        ["._ablemaR7h{image-rendering:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "emaR7h", "val\\0bl\\0& | \\0image-rendering:auto")],
+      ),
+      (
+        "_ably8MMkG",
+        ["._ably8MMkG{image-rendering:crisp-edges;}"],
+        1,
+        0,
+        1,
+        [("value", "y8MMkG", "val\\0bl\\0& | \\0image-rendering:crisp-edges")],
+      ),
+      (
+        "_ablC-eDY6",
+        ["._ablC-eDY6{image-rendering:pixelated;}"],
+        1,
+        0,
+        1,
+        [("value", "C-eDY6", "val\\0bl\\0& | \\0image-rendering:pixelated")],
+      ),
+      (
+        "_a4mwHLjUw",
+        [
+          "._a4mwHLjUw{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "wHLjUw",
+            "val\\04m\\0& | \\0background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x)",
+          ),
+        ],
+      ),
+      (
+        "_a4mbgDFSr",
+        [
+          "._a4mbgDFSr{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "bgDFSr",
+            "val\\04m\\0& | \\0background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx)",
+          ),
+        ],
+      ),
+      (
+        "_a4m5vCQMN",
+        [
+          "._a4m5vCQMN{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "5vCQMN",
+            "val\\04m\\0& | \\0background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi)",
+          ),
+        ],
+      ),
+      (
+        "_a4mjDTHxL",
+        ["._a4mjDTHxL{background-image:image-set(\"cat.png\" 37dpcm);}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "jDTHxL",
+            "val\\04m\\0& | \\0background-image:image-set(\"cat.png\" 37dpcm)",
+          ),
+        ],
+      ),
+    ]
   ];
-  [@css
-    ".css-knsfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}"
-  ];
-  [@css
-    ".css-9l0k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
-  ];
-  [@css ".css-ihfchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
   
-  CSS.make("css-11tobub", []);
-  CSS.make("css-1e7m01f", []);
-  CSS.make("css-fjhmlf", []);
+  CSS.make("_ablemaR7h", []);
+  CSS.make("_ably8MMkG", []);
+  CSS.make("_ablC-eDY6", []);
   
-  CSS.make("css-25toi3", []);
-  CSS.make("css-knsfyn", []);
-  CSS.make("css-9l0k4n", []);
-  CSS.make("css-ihfchh", []);
+  CSS.make("_a4mwHLjUw", []);
+  CSS.make("_a4mbgDFSr", []);
+  CSS.make("_a4m5vCQMN", []);
+  CSS.make("_a4mjDTHxL", []);

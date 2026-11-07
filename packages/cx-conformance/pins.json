@@ -1,0 +1,267 @@
+{
+ "T04": [
+  "x=a+b | #x @1024x768 | border-top-color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+ ],
+ "T05": [
+  "x=b+a | #x @1024x768 | border-top-color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+ ],
+ "T06": [
+  "x=a+b | #x @1024x768 | border-left-width: cx 1px, got 5px"
+ ],
+ "T19": [
+  "x=a+b | #x @1024x768 | margin-left: cx 0px, got 5px"
+ ],
+ "T20": [
+  "x=b+a | #x @1024x768 | margin-left: cx 0px, got 5px"
+ ],
+ "T21": {
+  "model": [
+   "x=b+a | #x @1024x768 | margin-left: cx 5px, got 0px"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | margin-left: cx 0px, got 5px"
+  ]
+ },
+ "T29": [
+  "x=b+a | #x @1024x768 | padding-top: cx 1px, got 2px"
+ ],
+ "T30": {
+  "model": [
+   "x=b+a | #x @1024x768 | padding-top: cx 2px, got 1px"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | padding-top: cx 1px, got 2px"
+  ]
+ },
+ "T31": [
+  "x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-06": [
+  "x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-07": {
+  "model": [
+   "x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "conditions-08": {
+  "model": [
+   "x=a+b | #x @1024x768 | color: cx rgb(0, 0, 255), got rgb(0, 0, 0)",
+   "x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 0)"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "conditions-09": [
+  "x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-13": {
+  "model": [
+   "x=b+a | #x @600x800 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+  ],
+  "ppx": [
+   "x=a+b | #x @600x800 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "conditions-16": {
+  "model": [
+   "x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "conditions-18": [
+  "w=w x=b+a | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-31": [
+  "x=b+a | #x:hover:focus @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-32": [
+  "x=b+a | #x:focus:focus-visible @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-33": [
+  "x=b+a | #x:hover @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "conditions-34": [
+  "x=a+b s= | #s @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+ ],
+ "conditions-36": {
+  "model": [
+   "x=b+a | #x:hover @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+  ],
+  "ppx": [
+   "x=a+b | #x:hover @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "conditions-41": [
+  "x=b+a | #x @375x800 | padding-left: cx 0px, got 16px"
+ ],
+ "groups-15": [
+  "x=b+a | #x @1024x768 | flex-grow: cx 5, got 1"
+ ],
+ "important-14": [
+  "x=a+b | #x @1024x768 | border-top-color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+ ],
+ "logical-01": [
+  "x=b+a | #x @1024x768 | padding-left: cx 4px, got 8px"
+ ],
+ "logical-02": [
+  "x=b+a | #x @1024x768 | padding-right: cx 4px, got 8px"
+ ],
+ "logical-04": [
+  "x=b+a | #x @1024x768 | left: cx 5px, got 7px"
+ ],
+ "logical-05": [
+  "x=b+a | #x @1024x768 | right: cx 0px, got 5px"
+ ],
+ "logical-06": [
+  "x=b+a | #x @1024x768 | top: cx 1px, got 5px"
+ ],
+ "logical-07": [
+  "x=b+a | #x @1024x768 | left: cx 2px, got 1px",
+  "x=b+a | #x @1024x768 | right: cx 2px, got 1px"
+ ],
+ "logical-08": [
+  "x=b+a | #x @1024x768 | width: cx 10px, got 20px"
+ ],
+ "logical-09": [
+  "x=b+a | #x @1024x768 | height: cx 10px, got 20px"
+ ],
+ "logical-10": [
+  "x=b+a | #x @1024x768 | min-width: cx 10px, got 20px"
+ ],
+ "logical-11": [
+  "x=b+a | #x @1024x768 | max-height: cx 10px, got 20px"
+ ],
+ "logical-12": [
+  "x=b+a | #x @1024x768 | margin-top: cx 3px, got 9px"
+ ],
+ "logical-13": [
+  "x=b+a | #x @1024x768 | margin-top: cx 3px, got 9px"
+ ],
+ "logical-14": [
+  "x=b+a | #x @1024x768 | margin-left: cx 1px, got 4px"
+ ],
+ "logical-15": [
+  "x=b+a | #x @1024x768 | padding-bottom: cx 3px, got 9px"
+ ],
+ "logical-16": [
+  "x=b+a | #x @1024x768 | border-left-color: cx rgb(0, 128, 0), got rgb(255, 0, 0)"
+ ],
+ "logical-17": [
+  "x=b+a | #x @1024x768 | border-left-color: cx rgb(0, 128, 0), got rgb(255, 0, 0)",
+  "x=b+a | #x @1024x768 | border-left-width: cx 2px, got 3px",
+  "x=b+a | #x @1024x768 | border-left-style: cx solid, got dotted"
+ ],
+ "logical-18": [
+  "x=b+a | #x @1024x768 | border-top-left-radius: cx 4px, got 9px"
+ ],
+ "logical-19": [
+  "x=b+a | #x @1024x768 | scroll-margin-left: cx 4px, got 9px"
+ ],
+ "logical-20": [
+  "x=b+a | #x @1024x768 | margin-right: cx 3px, got 9px"
+ ],
+ "logical-21": [
+  "x=b+a | #x @1024x768 | margin-top: cx 3px, got 9px"
+ ],
+ "logical-22": {
+  "model": [
+   "x=b+a | #x @1024x768 | height: cx 10px, got 20px"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | height: cx 20px, got 10px"
+  ]
+ },
+ "logical-25": [
+  "x=b+a | #x @1024x768 | margin-left: cx 4px, got 9px"
+ ],
+ "merge-algebra-08": [
+  "x=a+b+c+d | #x @1024x768 | border-top-width: cx 3px, got 2px"
+ ],
+ "monorepo-06": [
+  "x=rowToolPadding+row | #x @375x800 | padding-left: cx 0px, got 16px"
+ ],
+ "monorepo-13": [
+  "warm=minHeight+grid+stackChildrenMinHeight stack=grid+stackChildrenMinHeight inner=minHeight+grid+stackChildrenMinHeight | #inner @1024x768 | min-height: cx 0px, got 400px"
+ ],
+ "recursive-01": [
+  "p=r c=r | #c @1024x768 | margin-top: cx 0px, got 4px"
+ ],
+ "recursive-02": [
+  "p=r c=r g=r | #c @1024x768 | margin-top: cx 0px, got 4px",
+  "p=r c=r g=r | #g @1024x768 | margin-top: cx 0px, got 4px"
+ ],
+ "recursive-03": [
+  "p=r c=r | #c @1024x768 | margin-top: cx 0px, got 4px"
+ ],
+ "recursive-04": [
+  "p=r c=r | #c @1024x768 | margin-top: cx 0px, got 4px"
+ ],
+ "selectors-03": [
+  "x=a+b | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "selectors-10": [
+  "x=b+a | #x @1024x768 | height: cx 10px, got 30px",
+  "x=b+a | #x @1024x768 | ::before height: cx 10px, got 30px"
+ ],
+ "selectors-12": {
+  "model": [
+   "p= x=b+a y= | #x @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+  ],
+  "ppx": [
+   "p= x=a+b y= | #x @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "selectors-17": [
+  "outer= x=b+a | #x:hover @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ],
+ "selectors-24": {
+  "model": [
+   "p=p2+p1 c=c | #c @1024x768 | color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+  ],
+  "ppx": [
+   "p=p1+p2 c=c | #c @1024x768 | color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+  ]
+ },
+ "selectors-28": [
+  "p= s1=s s2=s+x | #s2 @1024x768 | margin-top: cx 0px, got 10px",
+  "p= s1=s s2=x+s | #s2 @1024x768 | margin-top: cx 0px, got 10px"
+ ],
+ "selectors-30": [
+  "p= s1=s+x m= s2=s | #s2 @1024x768 | margin-top: cx 0px, got 10px",
+  "p= s1=x+s m= s2=s | #s2 @1024x768 | margin-top: cx 0px, got 10px"
+ ],
+ "shorthand-100": [
+  "x=b+a | #x @1024x768 | border-left-width: cx 2px, got 5px"
+ ],
+ "shorthand-101": {
+  "model": [
+   "x=b+a | #x @1024x768 | text-wrap-mode: cx nowrap, got wrap"
+  ],
+  "ppx": [
+   "x=a+b | #x @1024x768 | text-wrap-mode: cx wrap, got nowrap"
+  ]
+ },
+ "shorthand-102": [
+  "x=a+b | #x @1024x768 | border-top-color: cx rgb(0, 0, 255), got rgb(255, 0, 0)",
+  "x=a+b | #x @1024x768 | border-left-color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+ ],
+ "shorthand-96": [
+  "x=a+b | #x @1024x768 | border-right-style: cx solid, got dotted"
+ ],
+ "shorthand-97": [
+  "x=a+b | #x @1024x768 | border-bottom-width: cx 5px, got 2px"
+ ],
+ "shorthand-98": [
+  "x=a+b | #x @1024x768 | border-left-color: cx rgb(0, 0, 255), got rgb(255, 0, 0)"
+ ],
+ "shorthand-99": [
+  "x=b+a | #x @1024x768 | border-top-color: cx rgb(255, 0, 0), got rgb(0, 0, 255)"
+ ]
+}

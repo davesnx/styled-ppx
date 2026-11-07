@@ -31,21 +31,52 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --cosas-112i897{syntax:\"*\";inherits:false;}"];
-  [@css
-    ".css-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
-  ];
-  [@css
-    ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
-  ];
-  [@css
-    ".css-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
+  [@css "@property --cosas-1xbmf3s{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_an8GbUK3p",
+        [
+          "._an8GbUK3p{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}",
+        ],
+        1,
+        0,
+        1,
+        [("value", "GbUK3p", "val\\0n8\\0& | \\0width:fit-content")],
+      ),
+      (
+        "_abaDSLzSu",
+        [
+          "._abaDSLzSu{grid-template-columns:fit-content(20px) fit-content(10%);}",
+        ],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "DSLzSu",
+            "val\\0ba\\0& | \\0grid-template-columns:fit-content(20px) fit-content(10%)",
+          ),
+        ],
+      ),
+      (
+        "_akv-0mK0f",
+        [
+          "._akv-0mK0f{-webkit-text-decoration:var(--cosas-1xbmf3s);text-decoration:var(--cosas-1xbmf3s);}",
+        ],
+        1,
+        0,
+        4,
+        [("value", "-0mK0f", "val\\0kv\\0& | \\0text-decoration:$(cosas)")],
+      ),
+    ]
   ];
   let cosas = `bold;
   
-  CSS.make("css-1gtanqs css-1jqkbxn", []);
+  CSS.make("_an8GbUK3p _abaDSLzSu", []);
   
   CSS.make(
-    "css-1wxdqmz",
-    [("--cosas-112i897", CSS.Types.TextDecoration.toString(cosas))],
+    "_akv-0mK0f",
+    [("--cosas-1xbmf3s", CSS.Types.TextDecoration.toString(cosas))],
   );

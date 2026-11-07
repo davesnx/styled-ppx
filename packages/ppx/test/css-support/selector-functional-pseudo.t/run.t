@@ -19,28 +19,119 @@ had no branch for the `of` keyword.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1scn809-_part::part(foo){color:red;}"];
-  [@css ".css-upe6d9-_slotted::slotted(.bar){color:blue;}"];
-  [@css ".css-1uy51rt-_nth_child_of:nth-child(2n+1 of .x){color:green;}"];
-  [@css
-    ".css-1qws5ty-_nth_last_child_of_list:nth-last-child(odd of .a,.b){color:yellow;}"
+  [@css.atoms
+    [
+      (
+        "_c7fckIxoSO1-tGH",
+        ["._c7fckIxoSO1-tGH::part(foo){color:red;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "ckIxoS", "ctx\\0&::part(foo) | "),
+          ("value", "O1-tGH", "val\\07f\\0&::part(foo) | \\0color:red"),
+        ],
+      ),
+      (
+        "_c7fu9c8y49wzGc4",
+        ["._c7fu9c8y49wzGc4::slotted(.bar){color:blue;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "u9c8y4", "ctx\\0&::slotted(.bar) | "),
+          ("value", "9wzGc4", "val\\07f\\0&::slotted(.bar) | \\0color:blue"),
+        ],
+      ),
+      (
+        "_c7f1ytCvrGdR7dA",
+        ["._c7f1ytCvrGdR7dA:nth-child(2n+1 of .x){color:green;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "1ytCvr", "ctx\\0&:nth-child(2n+1 of .x) | "),
+          (
+            "value",
+            "GdR7dA",
+            "val\\07f\\0&:nth-child(2n+1 of .x) | \\0color:green",
+          ),
+        ],
+      ),
+      (
+        "_c7fw_ooS0E1jBDy",
+        ["._c7fw_ooS0E1jBDy:nth-last-child(odd of .a,.b){color:yellow;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "w_ooS0", "ctx\\0&:nth-last-child(odd of .a,.b) | "),
+          (
+            "value",
+            "E1jBDy",
+            "val\\07f\\0&:nth-last-child(odd of .a,.b) | \\0color:yellow",
+          ),
+        ],
+      ),
+      (
+        "_iO07H2Z4_",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iO07H2Z4_", "bind\\0\\0Input\\0\\0_part\\00")],
+      ),
+      (
+        "_ibt8CpdH8",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ibt8CpdH8", "bind\\0\\0Input\\0\\0_slotted\\00")],
+      ),
+      (
+        "_iPJCmT2NO",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iPJCmT2NO", "bind\\0\\0Input\\0\\0_nth_child_of\\00")],
+      ),
+      (
+        "_iGhag597M",
+        [],
+        1,
+        0,
+        0,
+        [
+          (
+            "id",
+            "_iGhag597M",
+            "bind\\0\\0Input\\0\\0_nth_last_child_of_list\\00",
+          ),
+        ],
+      ),
+    ]
   ];
   [@css.bindings
     [
-      ("Input._part", "css-1scn809-_part"),
-      ("Input._slotted", "css-upe6d9-_slotted"),
-      ("Input._nth_child_of", "css-1uy51rt-_nth_child_of"),
-      ("Input._nth_last_child_of_list", "css-1qws5ty-_nth_last_child_of_list"),
+      ("Input._part", "_iO07H2Z4_ _c7fckIxoSO1-tGH", "_iO07H2Z4_"),
+      ("Input._slotted", "_ibt8CpdH8 _c7fu9c8y49wzGc4", "_ibt8CpdH8"),
+      ("Input._nth_child_of", "_iPJCmT2NO _c7f1ytCvrGdR7dA", "_iPJCmT2NO"),
+      (
+        "Input._nth_last_child_of_list",
+        "_iGhag597M _c7fw_ooS0E1jBDy",
+        "_iGhag597M",
+      ),
     ]
   ];
   
-  let _part = CSS.make("css-1scn809-_part", []);
+  let _part = CSS.make("_iO07H2Z4_ _c7fckIxoSO1-tGH", []);
   
-  let _slotted = CSS.make("css-upe6d9-_slotted", []);
+  let _slotted = CSS.make("_ibt8CpdH8 _c7fu9c8y49wzGc4", []);
   
-  let _nth_child_of = CSS.make("css-1uy51rt-_nth_child_of", []);
+  let _nth_child_of = CSS.make("_iPJCmT2NO _c7f1ytCvrGdR7dA", []);
   
-  let _nth_last_child_of_list =
-    CSS.make("css-1qws5ty-_nth_last_child_of_list", []);
+  let _nth_last_child_of_list = CSS.make("_iGhag597M _c7fw_ooS0E1jBDy", []);
 
   $ dune build

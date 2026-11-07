@@ -15,32 +15,94 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-9y6172-_chart{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"
-  ];
-  [@css
-    ".css-wdylr4-_chart .recharts-cartesian-grid-horizontal line:nth-last-child(1){stroke-opacity:0;}"
-  ];
-  [@css
-    ".css-3xax0l-_chart .recharts-cartesian-grid-horizontal line:nth-last-child(2){stroke-opacity:0;}"
-  ];
-  [@css
-    ".css-1fqvgu0-_chart .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}"
-  ];
-  [@css
-    ".css-o0c7xs-_chart .recharts-scatter .recharts-scatter-symbol .recharts-symbols:hover{opacity:1;}"
+  [@css.atoms
+    [
+      (
+        "_aml-wc9hs",
+        [
+          "._aml-wc9hs{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}",
+        ],
+        1,
+        0,
+        1,
+        [("value", "-wc9hs", "val\\0ml\\0& | \\0user-select:none")],
+      ),
+      (
+        "_bACkdE1296Tkd_fJZxm31p8J8",
+        [
+          "._bACkdE1296Tkd_fJZxm31p8J8 .recharts-cartesian-grid-horizontal line:nth-last-child(1){stroke-opacity:0;}",
+          "._bACkdE1296Tkd_fJZxm31p8J8 .recharts-cartesian-grid-horizontal line:nth-last-child(2){stroke-opacity:0;}",
+        ],
+        0,
+        1,
+        2,
+        [
+          (
+            "ctx",
+            "E1296T",
+            "ctx\\0& .recharts-cartesian-grid-horizontal line:nth-last-child(1) | ",
+          ),
+          (
+            "ctx",
+            "_fJZxm",
+            "ctx\\0& .recharts-cartesian-grid-horizontal line:nth-last-child(2) | ",
+          ),
+          (
+            "value",
+            "31p8J8",
+            "bval\\0& .recharts-cartesian-grid-horizontal line:nth-last-child(1) | \\0kd\\0stroke-opacity:0\\0& .recharts-cartesian-grid-horizontal line:nth-last-child(2) | \\0kd\\0stroke-opacity:0",
+          ),
+        ],
+      ),
+      (
+        "_bACf9F5voZKf91Ql9bP94KE3W",
+        [
+          "._bACf9F5voZKf91Ql9bP94KE3W .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}",
+          "._bACf9F5voZKf91Ql9bP94KE3W .recharts-scatter .recharts-scatter-symbol .recharts-symbols:hover{opacity:1;}",
+        ],
+        0,
+        1,
+        2,
+        [
+          (
+            "ctx",
+            "F5voZK",
+            "ctx\\0& .recharts-scatter .recharts-scatter-symbol .recharts-symbols | ",
+          ),
+          (
+            "ctx",
+            "1Ql9bP",
+            "ctx\\0& .recharts-scatter .recharts-scatter-symbol .recharts-symbols:hover | ",
+          ),
+          (
+            "value",
+            "94KE3W",
+            "bval\\0& .recharts-scatter .recharts-scatter-symbol .recharts-symbols | \\0f9\\0opacity:0.8\\0& .recharts-scatter .recharts-scatter-symbol .recharts-symbols:hover | \\0f9\\0opacity:1",
+          ),
+        ],
+      ),
+      (
+        "_iLLZ4hOiX",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iLLZ4hOiX", "bind\\0\\0Input\\0\\0_chart\\00")],
+      ),
+    ]
   ];
   [@css.bindings
     [
       (
         "Input._chart",
-        "css-9y6172-_chart css-wdylr4-_chart css-3xax0l-_chart css-1fqvgu0-_chart css-o0c7xs-_chart",
+        "_iLLZ4hOiX _aml-wc9hs _bACkdE1296Tkd_fJZxm31p8J8 _bACf9F5voZKf91Ql9bP94KE3W",
+        "_iLLZ4hOiX",
       ),
     ]
   ];
   
   let _chart =
     CSS.make(
-      "css-9y6172-_chart css-wdylr4-_chart css-3xax0l-_chart css-1fqvgu0-_chart css-o0c7xs-_chart",
+      "_iLLZ4hOiX _aml-wc9hs _bACkdE1296Tkd_fJZxm31p8J8 _bACf9F5voZKf91Ql9bP94KE3W",
       [],
     );

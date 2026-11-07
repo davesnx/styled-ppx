@@ -1,0 +1,4 @@
+(library
+ (name property_class_mint)
+ (package styled-ppx)
+ (libraries property_class_core))

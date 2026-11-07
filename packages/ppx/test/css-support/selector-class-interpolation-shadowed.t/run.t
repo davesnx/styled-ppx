@@ -13,19 +13,74 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-14ksm7b-foo{color:blue;}"];
-  [@css ".css-191lhl1-bar.css-14ksm7b-foo{font-weight:bold;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fadbhEW",
+        ["._a7fadbhEW{color:red;}"],
+        1,
+        0,
+        1,
+        [("value", "adbhEW", "val\\07f\\0& | \\0color:red")],
+      ),
+      (
+        "_a7fCPHFf-",
+        ["._a7fCPHFf-{color:blue;}"],
+        1,
+        0,
+        1,
+        [("value", "CPHFf-", "val\\07f\\0& | \\0color:blue")],
+      ),
+      (
+        "_cark8WBZ20L7eVq",
+        ["._cark8WBZ20L7eVq._ih7MsK5eg{font-weight:bold;}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "k8WBZ2", "ctx\\0&._ih7MsK5eg | "),
+          ("value", "0L7eVq", "val\\0ar\\0&._ih7MsK5eg | \\0font-weight:bold"),
+        ],
+      ),
+      (
+        "_iBZ5mNPO7",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBZ5mNPO7", "bind\\0\\0Input\\0\\0foo\\00")],
+      ),
+      (
+        "_ih7MsK5eg",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ih7MsK5eg", "bind\\0\\0Input\\0\\0foo\\01")],
+      ),
+      (
+        "_iBEU_scOh",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBEU_scOh", "bind\\0\\0Input\\0\\0bar\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
-    [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
+    [
+      ("Input.foo", "_ih7MsK5eg _a7fCPHFf-", "_ih7MsK5eg"),
+      ("Input.bar", "_iBEU_scOh _cark8WBZ20L7eVq", "_iBEU_scOh"),
+    ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("_iBZ5mNPO7 _a7fadbhEW", []);
   let _ = foo;
   
-  let foo = CSS.make("css-14ksm7b-foo", []);
+  let foo = CSS.make("_ih7MsK5eg _a7fCPHFf-", []);
   
-  let bar = CSS.make("css-191lhl1-bar", []);
+  let bar = CSS.make("_iBEU_scOh _cark8WBZ20L7eVq", []);
   
   let _ = (foo, bar);
 

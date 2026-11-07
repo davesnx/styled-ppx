@@ -17,16 +17,71 @@ top-level interpolation does. If the inline list is empty `[]` for the
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1b5xvk3-topLevel{color:var(--c-dq4mhq);}"];
-  [@css ".css-1orh0hp-hover:hover{color:var(--c-11hlefi);}"];
-  [@css ".css-zjac4l-placeholder::placeholder{color:var(--c-gzgct8);}"];
+  [@css "@property --c-88x3i5{syntax:\"*\";inherits:false;}"];
+  [@css "@property --c-ethmpb{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fPvdZiG",
+        ["._a7fPvdZiG{color:var(--c-88x3i5);}"],
+        1,
+        0,
+        1,
+        [("value", "PvdZiG", "val\\07f\\0& | \\0color:$(c)")],
+      ),
+      (
+        "_c7f1Tl5-w1etZ_n",
+        ["._c7f1Tl5-w1etZ_n:hover{color:var(--c-ethmpb);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          ("value", "1etZ_n", "val\\07f\\0&:hover | \\0color:$(c)"),
+        ],
+      ),
+      (
+        "_c7fDXixWYKN11ya",
+        ["._c7fDXixWYKN11ya::placeholder{color:var(--c-pe4j6c);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "DXixWY", "ctx\\0&::placeholder | "),
+          ("value", "KN11ya", "val\\07f\\0&::placeholder | \\0color:$(c)"),
+        ],
+      ),
+      (
+        "_iLmDm0ZqY",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iLmDm0ZqY", "bind\\0\\0Input\\0\\0topLevel\\00")],
+      ),
+      (
+        "_i-gYBYMwr",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i-gYBYMwr", "bind\\0\\0Input\\0\\0hover\\00")],
+      ),
+      (
+        "_iBy8fNT17",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iBy8fNT17", "bind\\0\\0Input\\0\\0placeholder\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
     [
-      ("Input.topLevel", "css-1b5xvk3-topLevel"),
-      ("Input.hover", "css-1orh0hp-hover"),
-      ("Input.placeholder", "css-zjac4l-placeholder"),
+      ("Input.topLevel", "_iLmDm0ZqY _a7fPvdZiG", "_iLmDm0ZqY"),
+      ("Input.hover", "_i-gYBYMwr _c7f1Tl5-w1etZ_n", "_i-gYBYMwr"),
+      ("Input.placeholder", "_iBy8fNT17 _c7fDXixWYKN11ya", "_iBy8fNT17"),
     ]
   ];
   
@@ -34,20 +89,20 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let topLevel =
     CSS.make(
-      "css-1b5xvk3-topLevel",
-      [("--c-dq4mhq", CSS.Types.Color.toString(c))],
+      "_iLmDm0ZqY _a7fPvdZiG",
+      [("--c-88x3i5", CSS.Types.Color.toString(c))],
     );
   
   let hover =
     CSS.make(
-      "css-1orh0hp-hover",
-      [("--c-11hlefi", CSS.Types.Color.toString(c))],
+      "_i-gYBYMwr _c7f1Tl5-w1etZ_n",
+      [("--c-ethmpb", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "css-zjac4l-placeholder",
-      [("--c-gzgct8", CSS.Types.Color.toString(c))],
+      "_iBy8fNT17 _c7fDXixWYKN11ya",
+      [("--c-pe4j6c", CSS.Types.Color.toString(c))],
     );
   
   let _ = (topLevel, hover, placeholder);

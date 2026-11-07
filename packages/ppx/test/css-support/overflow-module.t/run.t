@@ -15,75 +15,366 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-iscixw{line-clamp:none;}"];
-  [@css ".css-10whhy3{line-clamp:1;}"];
-  [@css ".css-f8eyiu{max-lines:none;}"];
-  [@css ".css-1tdkhmq{max-lines:1;}"];
-  [@css ".css-16qbhz6{overflow-x:visible;}"];
-  [@css ".css-1kzo3b9{overflow-x:hidden;}"];
-  [@css ".css-1th3fel{overflow-x:clip;}"];
-  [@css ".css-13ad1he{overflow-x:scroll;}"];
-  [@css ".css-ayshjd{overflow-x:auto;}"];
-  [@css ".css-ifv34m{overflow-y:visible;}"];
-  [@css ".css-144vlu9{overflow-y:hidden;}"];
-  [@css ".css-w43dqe{overflow-y:clip;}"];
-  [@css ".css-15bvnbz{overflow-y:scroll;}"];
-  [@css ".css-13v3rg8{overflow-y:auto;}"];
-  [@css ".css-1rb7o30{overflow-inline:visible;}"];
-  [@css ".css-7yocar{overflow-inline:hidden;}"];
-  [@css ".css-fumbnd{overflow-inline:clip;}"];
-  [@css ".css-1n7vnt4{overflow-inline:scroll;}"];
-  [@css ".css-1ukl3d7{overflow-inline:auto;}"];
-  [@css ".css-9e376w{overflow-block:visible;}"];
-  [@css ".css-l7i9nl{overflow-block:hidden;}"];
-  [@css ".css-174mqtl{overflow-block:clip;}"];
-  [@css ".css-1l7b3k{overflow-block:scroll;}"];
-  [@css ".css-gge70x{overflow-block:auto;}"];
-  [@css ".css-1piyyg0{scrollbar-gutter:auto;}"];
-  [@css ".css-1x6kn4i{scrollbar-gutter:stable;}"];
-  [@css ".css-1600g5d{scrollbar-gutter:both-edges stable;}"];
-  [@css ".css-btacsl{scrollbar-gutter:stable both-edges;}"];
-  [@css ".css-g8w8p9{overflow-clip-margin:content-box;}"];
-  [@css ".css-gpc69b{overflow-clip-margin:padding-box;}"];
-  [@css ".css-16k4htk{overflow-clip-margin:border-box;}"];
-  [@css ".css-olg26a{overflow-clip-margin:20px;}"];
-  [@css ".css-1kiluqi{overflow-clip-margin:1em;}"];
-  [@css ".css-15fxgse{overflow-clip-margin:content-box 5px;}"];
-  [@css ".css-1gl8vwx{overflow-clip-margin:5px content-box;}"];
+  [@css.atoms
+    [
+      (
+        "_acloPgxdk",
+        ["._acloPgxdk{line-clamp:none;}"],
+        1,
+        0,
+        1,
+        [("value", "oPgxdk", "val\\0cl\\0& | \\0line-clamp:none")],
+      ),
+      (
+        "_acl_uqHKR",
+        ["._acl_uqHKR{line-clamp:1;}"],
+        1,
+        0,
+        1,
+        [("value", "_uqHKR", "val\\0cl\\0& | \\0line-clamp:1")],
+      ),
+      (
+        "_adyPpKu28",
+        ["._adyPpKu28{max-lines:none;}"],
+        1,
+        0,
+        1,
+        [("value", "PpKu28", "val\\0dy\\0& | \\0max-lines:none")],
+      ),
+      (
+        "_adyuUWN2_",
+        ["._adyuUWN2_{max-lines:1;}"],
+        1,
+        0,
+        1,
+        [("value", "uUWN2_", "val\\0dy\\0& | \\0max-lines:1")],
+      ),
+      (
+        "_afoWFHKmM",
+        ["._afoWFHKmM{overflow-x:visible;}"],
+        1,
+        0,
+        1,
+        [("value", "WFHKmM", "val\\0fo\\0& | \\0overflow-x:visible")],
+      ),
+      (
+        "_afoL3rz1S",
+        ["._afoL3rz1S{overflow-x:hidden;}"],
+        1,
+        0,
+        1,
+        [("value", "L3rz1S", "val\\0fo\\0& | \\0overflow-x:hidden")],
+      ),
+      (
+        "_afoVMHK7u",
+        ["._afoVMHK7u{overflow-x:clip;}"],
+        1,
+        0,
+        1,
+        [("value", "VMHK7u", "val\\0fo\\0& | \\0overflow-x:clip")],
+      ),
+      (
+        "_afohUKmvv",
+        ["._afohUKmvv{overflow-x:scroll;}"],
+        1,
+        0,
+        1,
+        [("value", "hUKmvv", "val\\0fo\\0& | \\0overflow-x:scroll")],
+      ),
+      (
+        "_afoi70nem",
+        ["._afoi70nem{overflow-x:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "i70nem", "val\\0fo\\0& | \\0overflow-x:auto")],
+      ),
+      (
+        "_afp9dxJME",
+        ["._afp9dxJME{overflow-y:visible;}"],
+        1,
+        0,
+        1,
+        [("value", "9dxJME", "val\\0fp\\0& | \\0overflow-y:visible")],
+      ),
+      (
+        "_afpXbWJo4",
+        ["._afpXbWJo4{overflow-y:hidden;}"],
+        1,
+        0,
+        1,
+        [("value", "XbWJo4", "val\\0fp\\0& | \\0overflow-y:hidden")],
+      ),
+      (
+        "_afpOyeHvF",
+        ["._afpOyeHvF{overflow-y:clip;}"],
+        1,
+        0,
+        1,
+        [("value", "OyeHvF", "val\\0fp\\0& | \\0overflow-y:clip")],
+      ),
+      (
+        "_afpKHMBWe",
+        ["._afpKHMBWe{overflow-y:scroll;}"],
+        1,
+        0,
+        1,
+        [("value", "KHMBWe", "val\\0fp\\0& | \\0overflow-y:scroll")],
+      ),
+      (
+        "_afptJfutg",
+        ["._afptJfutg{overflow-y:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "tJfutg", "val\\0fp\\0& | \\0overflow-y:auto")],
+      ),
+      (
+        "_afmv4Dz6r",
+        ["._afmv4Dz6r{overflow-inline:visible;}"],
+        1,
+        0,
+        1,
+        [("value", "v4Dz6r", "val\\0fm\\0& | \\0overflow-inline:visible")],
+      ),
+      (
+        "_afm3HOQiN",
+        ["._afm3HOQiN{overflow-inline:hidden;}"],
+        1,
+        0,
+        1,
+        [("value", "3HOQiN", "val\\0fm\\0& | \\0overflow-inline:hidden")],
+      ),
+      (
+        "_afmoysJac",
+        ["._afmoysJac{overflow-inline:clip;}"],
+        1,
+        0,
+        1,
+        [("value", "oysJac", "val\\0fm\\0& | \\0overflow-inline:clip")],
+      ),
+      (
+        "_afmB0O7tu",
+        ["._afmB0O7tu{overflow-inline:scroll;}"],
+        1,
+        0,
+        1,
+        [("value", "B0O7tu", "val\\0fm\\0& | \\0overflow-inline:scroll")],
+      ),
+      (
+        "_afmBmNr6W",
+        ["._afmBmNr6W{overflow-inline:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "BmNr6W", "val\\0fm\\0& | \\0overflow-inline:auto")],
+      ),
+      (
+        "_afjZlfKaH",
+        ["._afjZlfKaH{overflow-block:visible;}"],
+        1,
+        0,
+        1,
+        [("value", "ZlfKaH", "val\\0fj\\0& | \\0overflow-block:visible")],
+      ),
+      (
+        "_afjwDCg5p",
+        ["._afjwDCg5p{overflow-block:hidden;}"],
+        1,
+        0,
+        1,
+        [("value", "wDCg5p", "val\\0fj\\0& | \\0overflow-block:hidden")],
+      ),
+      (
+        "_afjc17ESv",
+        ["._afjc17ESv{overflow-block:clip;}"],
+        1,
+        0,
+        1,
+        [("value", "c17ESv", "val\\0fj\\0& | \\0overflow-block:clip")],
+      ),
+      (
+        "_afjNzJAO1",
+        ["._afjNzJAO1{overflow-block:scroll;}"],
+        1,
+        0,
+        1,
+        [("value", "NzJAO1", "val\\0fj\\0& | \\0overflow-block:scroll")],
+      ),
+      (
+        "_afjtyemM5",
+        ["._afjtyemM5{overflow-block:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "tyemM5", "val\\0fj\\0& | \\0overflow-block:auto")],
+      ),
+      (
+        "_ajq-7MfW_",
+        ["._ajq-7MfW_{scrollbar-gutter:auto;}"],
+        1,
+        0,
+        1,
+        [("value", "-7MfW_", "val\\0jq\\0& | \\0scrollbar-gutter:auto")],
+      ),
+      (
+        "_ajqpi6M8S",
+        ["._ajqpi6M8S{scrollbar-gutter:stable;}"],
+        1,
+        0,
+        1,
+        [("value", "pi6M8S", "val\\0jq\\0& | \\0scrollbar-gutter:stable")],
+      ),
+      (
+        "_ajq9sMT8U",
+        ["._ajq9sMT8U{scrollbar-gutter:both-edges stable;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "9sMT8U",
+            "val\\0jq\\0& | \\0scrollbar-gutter:both-edges stable",
+          ),
+        ],
+      ),
+      (
+        "_ajqV1aYmZ",
+        ["._ajqV1aYmZ{scrollbar-gutter:stable both-edges;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "V1aYmZ",
+            "val\\0jq\\0& | \\0scrollbar-gutter:stable both-edges",
+          ),
+        ],
+      ),
+      (
+        "_aflnhRIiB",
+        ["._aflnhRIiB{overflow-clip-margin:content-box;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "nhRIiB",
+            "val\\0fl\\0& | \\0overflow-clip-margin:content-box",
+          ),
+        ],
+      ),
+      (
+        "_aflmssBC4",
+        ["._aflmssBC4{overflow-clip-margin:padding-box;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "mssBC4",
+            "val\\0fl\\0& | \\0overflow-clip-margin:padding-box",
+          ),
+        ],
+      ),
+      (
+        "_aflb0EheV",
+        ["._aflb0EheV{overflow-clip-margin:border-box;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "b0EheV",
+            "val\\0fl\\0& | \\0overflow-clip-margin:border-box",
+          ),
+        ],
+      ),
+      (
+        "_afl-k9xjW",
+        ["._afl-k9xjW{overflow-clip-margin:20px;}"],
+        1,
+        0,
+        1,
+        [("value", "-k9xjW", "val\\0fl\\0& | \\0overflow-clip-margin:20px")],
+      ),
+      (
+        "_aflw2Q-d4",
+        ["._aflw2Q-d4{overflow-clip-margin:1em;}"],
+        1,
+        0,
+        1,
+        [("value", "w2Q-d4", "val\\0fl\\0& | \\0overflow-clip-margin:1em")],
+      ),
+      (
+        "_aflsDK3gP",
+        ["._aflsDK3gP{overflow-clip-margin:content-box 5px;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "sDK3gP",
+            "val\\0fl\\0& | \\0overflow-clip-margin:content-box 5px",
+          ),
+        ],
+      ),
+      (
+        "_aflZKrtx7",
+        ["._aflZKrtx7{overflow-clip-margin:5px content-box;}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "ZKrtx7",
+            "val\\0fl\\0& | \\0overflow-clip-margin:5px content-box",
+          ),
+        ],
+      ),
+    ]
+  ];
   
-  CSS.make("css-iscixw", []);
-  CSS.make("css-10whhy3", []);
+  CSS.make("_acloPgxdk", []);
+  CSS.make("_acl_uqHKR", []);
   
-  CSS.make("css-f8eyiu", []);
-  CSS.make("css-1tdkhmq", []);
-  CSS.make("css-16qbhz6", []);
-  CSS.make("css-1kzo3b9", []);
-  CSS.make("css-1th3fel", []);
-  CSS.make("css-13ad1he", []);
-  CSS.make("css-ayshjd", []);
-  CSS.make("css-ifv34m", []);
-  CSS.make("css-144vlu9", []);
-  CSS.make("css-w43dqe", []);
-  CSS.make("css-15bvnbz", []);
-  CSS.make("css-13v3rg8", []);
-  CSS.make("css-1rb7o30", []);
-  CSS.make("css-7yocar", []);
-  CSS.make("css-fumbnd", []);
-  CSS.make("css-1n7vnt4", []);
-  CSS.make("css-1ukl3d7", []);
-  CSS.make("css-9e376w", []);
-  CSS.make("css-l7i9nl", []);
-  CSS.make("css-174mqtl", []);
-  CSS.make("css-1l7b3k", []);
-  CSS.make("css-gge70x", []);
-  CSS.make("css-1piyyg0", []);
-  CSS.make("css-1x6kn4i", []);
-  CSS.make("css-1600g5d", []);
-  CSS.make("css-btacsl", []);
-  CSS.make("css-g8w8p9", []);
-  CSS.make("css-gpc69b", []);
-  CSS.make("css-16k4htk", []);
-  CSS.make("css-olg26a", []);
-  CSS.make("css-1kiluqi", []);
-  CSS.make("css-15fxgse", []);
-  CSS.make("css-1gl8vwx", []);
+  CSS.make("_adyPpKu28", []);
+  CSS.make("_adyuUWN2_", []);
+  CSS.make("_afoWFHKmM", []);
+  CSS.make("_afoL3rz1S", []);
+  CSS.make("_afoVMHK7u", []);
+  CSS.make("_afohUKmvv", []);
+  CSS.make("_afoi70nem", []);
+  CSS.make("_afp9dxJME", []);
+  CSS.make("_afpXbWJo4", []);
+  CSS.make("_afpOyeHvF", []);
+  CSS.make("_afpKHMBWe", []);
+  CSS.make("_afptJfutg", []);
+  CSS.make("_afmv4Dz6r", []);
+  CSS.make("_afm3HOQiN", []);
+  CSS.make("_afmoysJac", []);
+  CSS.make("_afmB0O7tu", []);
+  CSS.make("_afmBmNr6W", []);
+  CSS.make("_afjZlfKaH", []);
+  CSS.make("_afjwDCg5p", []);
+  CSS.make("_afjc17ESv", []);
+  CSS.make("_afjNzJAO1", []);
+  CSS.make("_afjtyemM5", []);
+  CSS.make("_ajq-7MfW_", []);
+  CSS.make("_ajqpi6M8S", []);
+  CSS.make("_ajq9sMT8U", []);
+  CSS.make("_ajqV1aYmZ", []);
+  CSS.make("_aflnhRIiB", []);
+  CSS.make("_aflmssBC4", []);
+  CSS.make("_aflb0EheV", []);
+  CSS.make("_afl-k9xjW", []);
+  CSS.make("_aflw2Q-d4", []);
+  CSS.make("_aflsDK3gP", []);
+  CSS.make("_aflZKrtx7", []);

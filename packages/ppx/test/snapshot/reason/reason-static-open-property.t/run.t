@@ -1,9 +1,28 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-13o7eu2-OneSingleProperty{display:block;}"];
+  [@css.atoms
+    [
+      (
+        "_a9f0DQt2Z",
+        ["._a9f0DQt2Z{display:block;}"],
+        1,
+        0,
+        1,
+        [("value", "0DQt2Z", "val\\09f\\0& | \\0display:block")],
+      ),
+      (
+        "_irf7adNIU",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_irf7adNIU", "bind\\0\\0Output\\0\\0OneSingleProperty\\00")],
+      ),
+    ]
+  ];
   [@css.bindings
-    [("Output.OneSingleProperty", "css-13o7eu2-OneSingleProperty")]
+    [("Output.OneSingleProperty", "_irf7adNIU _a9f0DQt2Z", "_irf7adNIU")]
   ];
   module OneSingleProperty = {
     [@deriving abstract]
@@ -988,9 +1007,12 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("css-13o7eu2-OneSingleProperty", []);
+    let styles = CSS.make("_irf7adNIU _a9f0DQt2Z", []);
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

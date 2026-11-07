@@ -14,3 +14,6 @@
 (copy_files#
  (only_sources)
  (files ./../native/Kloth.mli))
+
+(copy_files#
+ (files ../../property-class/core/*.{ml,mli}))

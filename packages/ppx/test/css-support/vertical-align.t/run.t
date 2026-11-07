@@ -15,19 +15,79 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1wj9eo6{vertical-align:baseline;}"];
-  [@css ".css-c6kzuz{vertical-align:sub;}"];
-  [@css ".css-9z1ck9{vertical-align:super;}"];
-  [@css ".css-1hgawz4{vertical-align:top;}"];
-  [@css ".css-ezbbe2{vertical-align:text-top;}"];
-  [@css ".css-uk6cul{vertical-align:middle;}"];
-  [@css ".css-1170n61{vertical-align:bottom;}"];
-  [@css ".css-i6dzq1{vertical-align:text-bottom;}"];
-  CSS.make("css-1wj9eo6", []);
-  CSS.make("css-c6kzuz", []);
-  CSS.make("css-9z1ck9", []);
-  CSS.make("css-1hgawz4", []);
-  CSS.make("css-ezbbe2", []);
-  CSS.make("css-uk6cul", []);
-  CSS.make("css-1170n61", []);
-  CSS.make("css-i6dzq1", []);
+  [@css.atoms
+    [
+      (
+        "_amnD6ttRX",
+        ["._amnD6ttRX{vertical-align:baseline;}"],
+        1,
+        0,
+        1,
+        [("value", "D6ttRX", "val\\0mn\\0& | \\0vertical-align:baseline")],
+      ),
+      (
+        "_amnFJVvVm",
+        ["._amnFJVvVm{vertical-align:sub;}"],
+        1,
+        0,
+        1,
+        [("value", "FJVvVm", "val\\0mn\\0& | \\0vertical-align:sub")],
+      ),
+      (
+        "_amnYGRDw7",
+        ["._amnYGRDw7{vertical-align:super;}"],
+        1,
+        0,
+        1,
+        [("value", "YGRDw7", "val\\0mn\\0& | \\0vertical-align:super")],
+      ),
+      (
+        "_amnHcrflz",
+        ["._amnHcrflz{vertical-align:top;}"],
+        1,
+        0,
+        1,
+        [("value", "Hcrflz", "val\\0mn\\0& | \\0vertical-align:top")],
+      ),
+      (
+        "_amnNnlIhV",
+        ["._amnNnlIhV{vertical-align:text-top;}"],
+        1,
+        0,
+        1,
+        [("value", "NnlIhV", "val\\0mn\\0& | \\0vertical-align:text-top")],
+      ),
+      (
+        "_amnjMTvWq",
+        ["._amnjMTvWq{vertical-align:middle;}"],
+        1,
+        0,
+        1,
+        [("value", "jMTvWq", "val\\0mn\\0& | \\0vertical-align:middle")],
+      ),
+      (
+        "_amnQsRMIa",
+        ["._amnQsRMIa{vertical-align:bottom;}"],
+        1,
+        0,
+        1,
+        [("value", "QsRMIa", "val\\0mn\\0& | \\0vertical-align:bottom")],
+      ),
+      (
+        "_amnYzltok",
+        ["._amnYzltok{vertical-align:text-bottom;}"],
+        1,
+        0,
+        1,
+        [("value", "Yzltok", "val\\0mn\\0& | \\0vertical-align:text-bottom")],
+      ),
+    ]
+  ];
+  CSS.make("_amnD6ttRX", []);
+  CSS.make("_amnFJVvVm", []);
+  CSS.make("_amnYGRDw7", []);
+  CSS.make("_amnHcrflz", []);
+  CSS.make("_amnNnlIhV", []);
+  CSS.make("_amnjMTvWq", []);
+  CSS.make("_amnQsRMIa", []);
+  CSS.make("_amnYzltok", []);

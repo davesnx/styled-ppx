@@ -2,10 +2,29 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@keyframes keyframe-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
-  [@css
-    ".css-dy0iev-FadeIn{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
+  [@css.atoms
+    [
+      (
+        "_a41z-V3KR",
+        [
+          "._a41z-V3KR{-webkit-animation-name:var(--animation-1fn4vhd);animation-name:var(--animation-1fn4vhd);}",
+        ],
+        1,
+        0,
+        1,
+        [("value", "z-V3KR", "val\\041\\0& | \\0animation-name:$(animation)")],
+      ),
+      (
+        "_ioyz-S2jt",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_ioyz-S2jt", "bind\\0\\0Output\\0\\0FadeIn\\00")],
+      ),
+    ]
   ];
-  [@css.bindings [("Output.FadeIn", "css-dy0iev-FadeIn")]];
+  [@css.bindings [("Output.FadeIn", "_ioyz-S2jt _a41z-V3KR", "_ioyz-S2jt")]];
   let animation = CSS.Types.AnimationName.make("keyframe-m6pt8e");
   module FadeIn = {
     [@deriving abstract]
@@ -992,11 +1011,14 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-dy0iev-FadeIn",
-        CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
+        "_ioyz-S2jt _a41z-V3KR",
+        CSS.Types.AnimationName.toStyleVars("--animation-1fn4vhd", animation),
       );
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

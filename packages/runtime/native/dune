@@ -5,3 +5,6 @@
  (public_name styled-ppx.native)
  (libraries server-reason-react.reactDom)
  (wrapped false))
+
+(copy_files#
+ (files ../../property-class/core/*.{ml,mli}))

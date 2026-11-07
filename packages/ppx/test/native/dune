@@ -14,4 +14,7 @@
 
 (cram
  (alias test-ppx-native)
- (deps %{exe:Runner.exe} %{bin:refmt}))
+ (deps
+  %{exe:Runner.exe}
+  %{bin:refmt}
+  (package styled-ppx)))

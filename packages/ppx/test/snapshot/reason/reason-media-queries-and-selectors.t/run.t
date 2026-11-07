@@ -1,17 +1,71 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "@media (min-width: 600px) {.css-99qt2j-SelectorsMediaQueries{background:blue;}}"
+  [@css.atoms
+    [
+      (
+        "_bAC4hKKj5ll4h1Tl5-wtt6yzx",
+        [
+          "@media (min-width:600px){._bAC4hKKj5ll4h1Tl5-wtt6yzx{background:blue;}}",
+          "._bAC4hKKj5ll4h1Tl5-wtt6yzx:hover{background:green;}",
+        ],
+        2,
+        1,
+        18,
+        [
+          ("ctx", "KKj5ll", "ctx\\0& | @media (min-width:600px) | "),
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          (
+            "value",
+            "tt6yzx",
+            "bval\\0& | @media (min-width:600px) | \\04h\\0background:blue\\0&:hover | \\04h\\0background:green",
+          ),
+        ],
+      ),
+      (
+        "_c7fiC0GSE3Mjgzr",
+        ["._c7fiC0GSE3Mjgzr > p{color:pink;}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "iC0GSE", "ctx\\0& > p | "),
+          ("value", "3Mjgzr", "val\\07f\\0& > p | \\0color:pink"),
+        ],
+      ),
+      (
+        "_ca8iC0GSEy3zWJa",
+        ["._ca8iC0GSEy3zWJa > p{font-size:24px;}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "iC0GSE", "ctx\\0& > p | "),
+          ("value", "y3zWJa", "val\\0a8\\0& > p | \\0font-size:24px"),
+        ],
+      ),
+      (
+        "_idJHTBSM3",
+        [],
+        1,
+        0,
+        0,
+        [
+          (
+            "id",
+            "_idJHTBSM3",
+            "bind\\0\\0Output\\0\\0SelectorsMediaQueries\\00",
+          ),
+        ],
+      ),
+    ]
   ];
-  [@css ".css-hxxfxf-SelectorsMediaQueries:hover{background:green;}"];
-  [@css ".css-qzw9gh-SelectorsMediaQueries > p{color:pink;}"];
-  [@css ".css-z0beaj-SelectorsMediaQueries > p{font-size:24px;}"];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "_idJHTBSM3 _bAC4hKKj5ll4h1Tl5-wtt6yzx _c7fiC0GSE3Mjgzr _ca8iC0GSEy3zWJa",
+        "_idJHTBSM3",
       ),
     ]
   ];
@@ -1000,11 +1054,14 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "_idJHTBSM3 _bAC4hKKj5ll4h1Tl5-wtt6yzx _c7fiC0GSE3Mjgzr _ca8iC0GSEy3zWJa",
         [],
       );
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

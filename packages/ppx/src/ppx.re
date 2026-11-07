@@ -137,9 +137,10 @@ let make_refs_attribute = (entries: list(Cross_module_refs.entry)) =>
 let make_bindings_attribute = (entries: list(Css_bindings.entry)) =>
   entries
   |> List.map((entry: Css_bindings.entry) =>
-       Css_extraction.binding(
+       Css_extraction.binding_with_id(
          ~longident=entry.longident,
          ~class_string=entry.class_string,
+         ~binding_id=entry.binding_id,
        )
      )
   |> Css_extraction.bindings_attribute;
@@ -208,12 +209,34 @@ let css_error_expr = (~payload_loc) => {
   );
 };
 
-let record_css_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
-  Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
+let record_css_binding =
+    (~file, ~main_module, ~scope, ~name, ~binding_id, ~classNames) => {
+  let selector_classes =
+    switch (binding_id) {
+    | Some(id) => [id]
+    | None => classNames
+    };
+  Local_selector_environment.register(
+    ~file,
+    ~scope,
+    ~name,
+    ~classNames=selector_classes,
+  );
   let longident = String.concat(".", [main_module, ...scope] @ [name]);
   let class_string = String.concat(" ", classNames);
-  Css_bindings.record(~longident, ~class_string);
+  Css_bindings.record(
+    ~longident,
+    ~class_string,
+    ~binding_id=Option.value(binding_id, ~default=""),
+  );
 };
+
+let mint_binding_id = (~main_module, ~scope, name) =>
+  switch (name) {
+  | Some(name) when name != "_" =>
+    Some(Css_bindings.mint_id(~main_module, ~scope, ~name))
+  | _ => None
+  };
 
 let expand_css_expression =
     (
@@ -223,11 +246,11 @@ let expand_css_expression =
       ~opens,
       ~label_name,
       ~registry_name,
+      ~binding_id,
       payload,
     ) => {
   open Ppxlib;
   File.set(file);
-  let label = Settings.Get.minify() ? None : label_name;
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
     let source_position_start =
@@ -253,13 +276,19 @@ let expand_css_expression =
             ~scope,
             ~opens,
             ~source_position_start,
-            ~binding_name=?label_name,
-            ~label?,
+            ~binding_id?,
             rule_list,
           );
         switch (registry_name) {
         | Some(name) =>
-          record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
+          record_css_binding(
+            ~file,
+            ~main_module,
+            ~scope,
+            ~name,
+            ~binding_id,
+            ~classNames,
+          )
         | None => ()
         };
         let marker = Dev_mode.marker(label_name);
@@ -501,8 +530,16 @@ let expand_styled_module =
     (~file, ~main_module, ~scope, ~opens, ~name, ~htmlTag, payload) => {
   open Ppxlib;
   File.set(file);
+  let binding_id = mint_binding_id(~main_module, ~scope, Some(name));
   let record_component_binding = classNames =>
-    record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames);
+    record_css_binding(
+      ~file,
+      ~main_module,
+      ~scope,
+      ~name,
+      ~binding_id,
+      ~classNames,
+    );
 
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
@@ -528,8 +565,7 @@ let expand_styled_module =
             ~scope,
             ~opens,
             ~source_position_start,
-            ~binding_name=name,
-            ~label=name,
+            ~binding_id?,
             rule_list,
           );
         record_component_binding(classNames);
@@ -590,7 +626,7 @@ let expand_styled_module =
       ~opens,
       ~htmlTag,
       ~label=fnLabel,
-      ~moduleName=name,
+      ~binding_id,
       ~defaultValue,
       ~param,
       ~body=expression,
@@ -620,6 +656,8 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
 
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
+  let top_binding_id =
+    lazy(mint_binding_id(~main_module, ~scope, top_binding));
   let rec map_with_label = (~label_name, expr) => {
     let mapper = {
       as self;
@@ -645,6 +683,10 @@ let map_css_expressions =
               ~opens,
               ~label_name,
               ~registry_name=top_binding,
+              ~binding_id=
+                Option.is_some(top_binding)
+                  ? Lazy.force(top_binding_id)
+                  : mint_binding_id(~main_module, ~scope, label_name),
               payload,
             )
           | None => css_error_expr(~payload_loc=expr.pexp_loc)
@@ -966,6 +1008,19 @@ let () = {
     ),
   );
 
+  Ppxlib.Driver.Cookies.add_handler(cookies =>
+    Css_bindings.set_library(
+      Option.value(
+        Ppxlib.Driver.Cookies.get(
+          cookies,
+          "library-name",
+          Ppxlib.Ast_pattern.(estring(__)),
+        ),
+        ~default="",
+      ),
+    )
+  );
+
   let impl = (_ctx, str: Ppxlib.structure) => {
     let file =
       switch (str) {
@@ -974,8 +1029,33 @@ let () = {
       };
     let main_module = module_name_of_file(file);
     let str = map_ordered_structure(~file, ~main_module, ~scope=[], str);
+    let id_atoms =
+      List.map(
+        ((token, source)) =>
+          {
+            Css_extraction.cls: token,
+            rules: [],
+            tier: 1,
+            conds: 0,
+            cover: 0,
+            hashes: [
+              {
+                Css_extraction.kind: "id",
+                token,
+                source,
+              },
+            ],
+          },
+        Css_bindings.drain_ids(),
+      );
+    let atoms = Css_file.get_atoms() @ id_atoms;
     let rules = Css_file.get();
     let rule_items = List.map(Css_extraction.css_attribute, rules);
+    let atoms_items =
+      switch (atoms) {
+      | [] => []
+      | _ => [Css_extraction.atoms_attribute(atoms)]
+      };
     let binding_entries = Css_bindings.drain();
     let bindings_items =
       switch (binding_entries) {
@@ -993,8 +1073,8 @@ let () = {
     /* Declares production mode in the wire protocol so the aggregator can
        minify without a flag of its own; absence means development. */
     let config_items =
-      switch (rule_items, bindings_items) {
-      | ([], []) => []
+      switch (rule_items, atoms_items, bindings_items) {
+      | ([], [], []) => []
       | _ when Settings.Get.minify() => [
           Css_extraction.config_attribute([("env", "production")]),
         ]
@@ -1003,11 +1083,18 @@ let () = {
     /* Order:
        - extraction config (production marker)
        - extracted CSS rules
+       - extracted atoms
        - binding exports
        - cross-module refs descriptor
        - dep-tracking synthetic lets
        - user's source. */
-    config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
+    config_items
+    @ rule_items
+    @ atoms_items
+    @ bindings_items
+    @ refs_items
+    @ dep_items
+    @ str;
   };
 
   Ppxlib.Driver.V2.register_transformation(

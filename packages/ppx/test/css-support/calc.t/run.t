@@ -13,15 +13,60 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-hxo6vg{width:calc(50% + 4px);}"];
-  [@css ".css-1bjj19s{width:calc(20px - 10px);}"];
-  [@css ".css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}"];
-  [@css ".css-1g5uhfp{width:calc(100vh * 2);}"];
-  [@css ".css-6t8hw4{width:calc(2 * 120px);}"];
-  CSS.make("css-hxo6vg", []);
-  CSS.make("css-1bjj19s", []);
-  CSS.make("css-12qo4ty", []);
-  CSS.make("css-1g5uhfp", []);
-  CSS.make("css-6t8hw4", []);
+  [@css.atoms
+    [
+      (
+        "_an8DCSMSV",
+        ["._an8DCSMSV{width:calc(50% + 4px);}"],
+        1,
+        0,
+        1,
+        [("value", "DCSMSV", "val\\0n8\\0& | \\0width:calc(50% + 4px)")],
+      ),
+      (
+        "_an8S7W97K",
+        ["._an8S7W97K{width:calc(20px - 10px);}"],
+        1,
+        0,
+        1,
+        [("value", "S7W97K", "val\\0n8\\0& | \\0width:calc(20px - 10px)")],
+      ),
+      (
+        "_an8se1Q7V",
+        ["._an8se1Q7V{width:calc(100vh - calc(2rem + 120px));}"],
+        1,
+        0,
+        1,
+        [
+          (
+            "value",
+            "se1Q7V",
+            "val\\0n8\\0& | \\0width:calc(100vh - calc(2rem + 120px))",
+          ),
+        ],
+      ),
+      (
+        "_an8G7zUUK",
+        ["._an8G7zUUK{width:calc(100vh * 2);}"],
+        1,
+        0,
+        1,
+        [("value", "G7zUUK", "val\\0n8\\0& | \\0width:calc(100vh * 2)")],
+      ),
+      (
+        "_an8eayX0a",
+        ["._an8eayX0a{width:calc(2 * 120px);}"],
+        1,
+        0,
+        1,
+        [("value", "eayX0a", "val\\0n8\\0& | \\0width:calc(2 * 120px)")],
+      ),
+    ]
+  ];
+  CSS.make("_an8DCSMSV", []);
+  CSS.make("_an8S7W97K", []);
+  CSS.make("_an8se1Q7V", []);
+  CSS.make("_an8G7zUUK", []);
+  CSS.make("_an8eayX0a", []);
 
   $ dune build

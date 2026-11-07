@@ -1,0 +1,22 @@
+(copy_files ../../../ppx/src/Hash_class.ml)
+
+(tests
+ (names test atomize_test)
+ (flags
+  (:standard -open Alcotest_extra))
+ (deps ../../gen/units_fixture.json)
+ (libraries
+  property_class_mint
+  property_class_core
+  murmur2
+  alcotest
+  alcotest_extra
+  fmt))
+
+(rule
+ (alias test-property-class)
+ (deps test.exe atomize_test.exe ../../gen/units_fixture.json)
+ (action
+  (progn
+   (run ./test.exe)
+   (run ./atomize_test.exe))))

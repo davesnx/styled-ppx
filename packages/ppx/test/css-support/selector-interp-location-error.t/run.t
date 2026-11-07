@@ -20,8 +20,44 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1c21bcw-_className .lolaso :nth-child(2n){color:red;}"];
-  [@css.bindings [("Input._className", "css-1c21bcw-_className")]];
-  let _className = CSS.make("css-1c21bcw-_className", []);
+  [@css.atoms
+    [
+      (
+        "_c7fGwfMTaoDDk77",
+        ["._c7fGwfMTaoDDk77 .lolaso :nth-child(2n){color:red;}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "GwfMTa", "ctx\\0& .lolaso :nth-child(2n) | "),
+          (
+            "value",
+            "oDDk77",
+            "val\\07f\\0& .lolaso :nth-child(2n) | \\0color:red",
+          ),
+        ],
+      ),
+      (
+        "_i1g5OUSB_",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i1g5OUSB_", "bind\\0\\0Input\\0\\0_className\\00")],
+      ),
+      (
+        "_i3MedpYGS",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i3MedpYGS", "bind\\0\\0Input\\0\\0_className\\01")],
+      ),
+    ]
+  ];
+  [@css.bindings
+    [("Input._className", "_i1g5OUSB_ _c7fGwfMTaoDDk77", "_i1g5OUSB_")]
+  ];
+  let _className = CSS.make("_i1g5OUSB_ _c7fGwfMTaoDDk77", []);
   
   let _className = [%ocaml.error "Parse error while reading token '2'"];

@@ -1,9 +1,19 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css.bindings
-    [("Output.SelfClosingElement", "css-ognkzg-SelfClosingElement")]
+  [@css.atoms
+    [
+      (
+        "_iAxjZu1e0",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iAxjZu1e0", "bind\\0\\0Output\\0\\0SelfClosingElement\\00")],
+      ),
+    ]
   ];
+  [@css.bindings [("Output.SelfClosingElement", "_iAxjZu1e0", "_iAxjZu1e0")]];
   module SelfClosingElement = {
     [@deriving abstract]
     [@warning "-69"]
@@ -987,9 +997,12 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("css-ognkzg-SelfClosingElement", []);
+    let styles = CSS.make("_iAxjZu1e0", []);
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      let className =
+        CSS.className(
+          CSS.merge(styles, CSS.make(getOrEmpty(classNameGet(props)), [])),
+        )
       and style = snd(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));

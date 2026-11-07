@@ -4,87 +4,283 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-km0lr0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --str-vye19e{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-f5c7x{syntax:\"*\";inherits:false;}"];
-  [@css ".css-kusjgz-topLevel{color:var(--color-1a279q8);}"];
-  [@css ".css-lfbwy0-hover:hover{color:var(--color-4uzv5u);}"];
-  [@css
-    "@media (max-width: 768px) {.css-19xpxeg-media{color:var(--color-km0lr0);}}"
-  ];
-  [@css ".css-1g3cfa1-descendant .child{color:var(--color-ump0qt);}"];
-  [@css ".css-1d8si03-bundleSpan{color:var(--color-7srqv7);}"];
-  [@css ".css-1d8si03-bundleSpan .child{color:var(--color-7srqv7);}"];
-  [@css ".css-1l36lcw-customFeeder{--brand:var(--str-vye19e);}"];
-  [@css ".css-1vdqaxy-pseudoElement::placeholder{color:var(--color-12r6fyr);}"];
-  [@css ".css-yfluo3-legacyPseudoElement:before{color:var(--color-e7n16g);}"];
-  [@css ".css-i81g8d-mixedPseudo{color:var(--color-xrtge);}"];
-  [@css ".css-i81g8d-mixedPseudo::before{color:var(--color-xrtge);}"];
-  [@css
-    ".css-11o9ny0-pseudoClassOnly:focus-visible:not(:disabled){color:var(--color-f5c7x);}"
+  [@css "@property --color-1raopcx{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-zlktsz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-1r721c0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --str-rhaclj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-1ltynhr{syntax:\"*\";inherits:false;}"];
+  [@css.atoms
+    [
+      (
+        "_a7fQE1m9v",
+        ["._a7fQE1m9v{color:var(--color-1raopcx);}"],
+        1,
+        0,
+        1,
+        [("value", "QE1m9v", "val\\07f\\0& | \\0color:$(color)")],
+      ),
+      (
+        "_c7f1Tl5-wm8KWM7",
+        ["._c7f1Tl5-wm8KWM7:hover{color:var(--color-zlktsz);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "1Tl5-w", "ctx\\0&:hover | "),
+          ("value", "m8KWM7", "val\\07f\\0&:hover | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_c7fHwfC2rzL6zgZ",
+        [
+          "@media (max-width:768px){._c7fHwfC2rzL6zgZ{color:var(--color-1r721c0);}}",
+        ],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "HwfC2r", "ctx\\0& | @media (max-width:768px) | "),
+          (
+            "value",
+            "zL6zgZ",
+            "val\\07f\\0& | @media (max-width:768px) | \\0color:$(color)",
+          ),
+        ],
+      ),
+      (
+        "_c7fsFnj_7u_QGgb",
+        ["._c7fsFnj_7u_QGgb .child{color:var(--color-hx661j);}"],
+        0,
+        1,
+        1,
+        [
+          ("ctx", "sFnj_7", "ctx\\0& .child | "),
+          ("value", "u_QGgb", "val\\07f\\0& .child | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_xd_H_Nx000000HyMkKn",
+        ["._xd_H_Nx000000HyMkKn{--brand:var(--str-rhaclj);}"],
+        1,
+        0,
+        1,
+        [
+          ("name", "d_H_Nx", "name\\0--brand"),
+          ("value", "HyMkKn", "val\\0--brand\\0& | \\0--brand:$(str)"),
+        ],
+      ),
+      (
+        "_c7fDXixWYhRvvsW",
+        ["._c7fDXixWYhRvvsW::placeholder{color:var(--color-1c8yon3);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "DXixWY", "ctx\\0&::placeholder | "),
+          ("value", "hRvvsW", "val\\07f\\0&::placeholder | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_c7f33tZ8CiL_rBc",
+        ["._c7f33tZ8CiL_rBc:before{color:var(--color-1pupb4k);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "33tZ8C", "ctx\\0&:before | "),
+          ("value", "iL_rBc", "val\\07f\\0&:before | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_c7fE-cX-HuMImMd",
+        ["._c7fE-cX-HuMImMd::before{color:var(--color-5te31o);}"],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "E-cX-H", "ctx\\0&::before | "),
+          ("value", "uMImMd", "val\\07f\\0&::before | \\0color:$(color)"),
+        ],
+      ),
+      (
+        "_c7fPVtQGX7-H0ZP",
+        [
+          "._c7fPVtQGX7-H0ZP:focus-visible:not(:disabled){color:var(--color-1ltynhr);}",
+        ],
+        2,
+        1,
+        1,
+        [
+          ("ctx", "PVtQGX", "ctx\\0&:focus-visible:not(:disabled) | "),
+          (
+            "value",
+            "7-H0ZP",
+            "val\\07f\\0&:focus-visible:not(:disabled) | \\0color:$(color)",
+          ),
+        ],
+      ),
+      (
+        "_iU79GCYAj",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iU79GCYAj", "bind\\0\\0Output\\0\\0topLevel\\00")],
+      ),
+      (
+        "_iYq2a33uD",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iYq2a33uD", "bind\\0\\0Output\\0\\0hover\\00")],
+      ),
+      (
+        "_i2N5XvSeL",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i2N5XvSeL", "bind\\0\\0Output\\0\\0media\\00")],
+      ),
+      (
+        "_iIjlCg7wy",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_iIjlCg7wy", "bind\\0\\0Output\\0\\0descendant\\00")],
+      ),
+      (
+        "_i--7b0PhA",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i--7b0PhA", "bind\\0\\0Output\\0\\0bundleSpan\\00")],
+      ),
+      (
+        "_i5SFodIU_",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i5SFodIU_", "bind\\0\\0Output\\0\\0customFeeder\\00")],
+      ),
+      (
+        "_i99sdMKbM",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_i99sdMKbM", "bind\\0\\0Output\\0\\0pseudoElement\\00")],
+      ),
+      (
+        "_ick9Uc70c",
+        [],
+        1,
+        0,
+        0,
+        [
+          ("id", "_ick9Uc70c", "bind\\0\\0Output\\0\\0legacyPseudoElement\\00"),
+        ],
+      ),
+      (
+        "_il-dZZ8wU",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_il-dZZ8wU", "bind\\0\\0Output\\0\\0mixedPseudo\\00")],
+      ),
+      (
+        "_igTwNjb97",
+        [],
+        1,
+        0,
+        0,
+        [("id", "_igTwNjb97", "bind\\0\\0Output\\0\\0pseudoClassOnly\\00")],
+      ),
+    ]
   ];
   [@css.bindings
     [
-      ("Output.topLevel", "css-kusjgz-topLevel"),
-      ("Output.hover", "css-lfbwy0-hover"),
-      ("Output.media", "css-19xpxeg-media"),
-      ("Output.descendant", "css-1g3cfa1-descendant"),
-      ("Output.bundleSpan", "css-1d8si03-bundleSpan"),
-      ("Output.customFeeder", "css-1l36lcw-customFeeder"),
-      ("Output.pseudoElement", "css-1vdqaxy-pseudoElement"),
-      ("Output.legacyPseudoElement", "css-yfluo3-legacyPseudoElement"),
-      ("Output.mixedPseudo", "css-i81g8d-mixedPseudo"),
-      ("Output.pseudoClassOnly", "css-11o9ny0-pseudoClassOnly"),
+      ("Output.topLevel", "_iU79GCYAj _a7fQE1m9v", "_iU79GCYAj"),
+      ("Output.hover", "_iYq2a33uD _c7f1Tl5-wm8KWM7", "_iYq2a33uD"),
+      ("Output.media", "_i2N5XvSeL _c7fHwfC2rzL6zgZ", "_i2N5XvSeL"),
+      ("Output.descendant", "_iIjlCg7wy _c7fsFnj_7u_QGgb", "_iIjlCg7wy"),
+      (
+        "Output.bundleSpan",
+        "_i--7b0PhA _a7fQE1m9v _c7fsFnj_7u_QGgb",
+        "_i--7b0PhA",
+      ),
+      ("Output.customFeeder", "_i5SFodIU_ _xd_H_Nx000000HyMkKn", "_i5SFodIU_"),
+      ("Output.pseudoElement", "_i99sdMKbM _c7fDXixWYhRvvsW", "_i99sdMKbM"),
+      (
+        "Output.legacyPseudoElement",
+        "_ick9Uc70c _c7f33tZ8CiL_rBc",
+        "_ick9Uc70c",
+      ),
+      (
+        "Output.mixedPseudo",
+        "_il-dZZ8wU _a7fQE1m9v _c7fE-cX-HuMImMd",
+        "_il-dZZ8wU",
+      ),
+      ("Output.pseudoClassOnly", "_igTwNjb97 _c7fPVtQGX7-H0ZP", "_igTwNjb97"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let str = "literal";
   let topLevel =
     CSS.make(
-      "css-kusjgz-topLevel",
-      [("--color-1a279q8", CSS.Types.Color.toString(color))],
+      "_iU79GCYAj _a7fQE1m9v",
+      [("--color-1raopcx", CSS.Types.Color.toString(color))],
     );
   let hover =
     CSS.make(
-      "css-lfbwy0-hover",
-      [("--color-4uzv5u", CSS.Types.Color.toString(color))],
+      "_iYq2a33uD _c7f1Tl5-wm8KWM7",
+      [("--color-zlktsz", CSS.Types.Color.toString(color))],
     );
   let media =
     CSS.make(
-      "css-19xpxeg-media",
-      [("--color-km0lr0", CSS.Types.Color.toString(color))],
+      "_i2N5XvSeL _c7fHwfC2rzL6zgZ",
+      [("--color-1r721c0", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "css-1g3cfa1-descendant",
-      [("--color-ump0qt", CSS.Types.Color.toString(color))],
+      "_iIjlCg7wy _c7fsFnj_7u_QGgb",
+      [("--color-hx661j", CSS.Types.Color.toString(color))],
     );
   let bundleSpan =
     CSS.make(
-      "css-1d8si03-bundleSpan",
-      [("--color-7srqv7", CSS.Types.Color.toString(color))],
+      "_i--7b0PhA _a7fQE1m9v _c7fsFnj_7u_QGgb",
+      [
+        ("--color-1raopcx", CSS.Types.Color.toString(color)),
+        ("--color-hx661j", CSS.Types.Color.toString(color)),
+      ],
     );
   let customFeeder =
-    CSS.make("css-1l36lcw-customFeeder", [("--str-vye19e", str)]);
+    CSS.make("_i5SFodIU_ _xd_H_Nx000000HyMkKn", [("--str-rhaclj", str)]);
   let pseudoElement =
     CSS.make(
-      "css-1vdqaxy-pseudoElement",
-      [("--color-12r6fyr", CSS.Types.Color.toString(color))],
+      "_i99sdMKbM _c7fDXixWYhRvvsW",
+      [("--color-1c8yon3", CSS.Types.Color.toString(color))],
     );
   let legacyPseudoElement =
     CSS.make(
-      "css-yfluo3-legacyPseudoElement",
-      [("--color-e7n16g", CSS.Types.Color.toString(color))],
+      "_ick9Uc70c _c7f33tZ8CiL_rBc",
+      [("--color-1pupb4k", CSS.Types.Color.toString(color))],
     );
   let mixedPseudo =
     CSS.make(
-      "css-i81g8d-mixedPseudo",
-      [("--color-xrtge", CSS.Types.Color.toString(color))],
+      "_il-dZZ8wU _a7fQE1m9v _c7fE-cX-HuMImMd",
+      [
+        ("--color-1raopcx", CSS.Types.Color.toString(color)),
+        ("--color-5te31o", CSS.Types.Color.toString(color)),
+      ],
     );
   let pseudoClassOnly =
     CSS.make(
-      "css-11o9ny0-pseudoClassOnly",
-      [("--color-f5c7x", CSS.Types.Color.toString(color))],
+      "_igTwNjb97 _c7fPVtQGX7-H0ZP",
+      [("--color-1ltynhr", CSS.Types.Color.toString(color))],
     );
