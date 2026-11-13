@@ -1,8 +1,8 @@
 Non-conditional at-rules under [%css] error instead of extracting broken CSS.
 
 Only conditional group rules (@media, @supports, @container,
-@starting-style) can be atomized: their condition distributes over the
-block's rules. Everything else used to be torn apart per-declaration:
+@starting-style) can sit in a block: their condition distributes over the
+block's rules. Everything else was once torn apart per-declaration:
 @font-face split into fragments each missing required descriptors,
 @keyframes split into same-name rules where the last clobbered the rest,
 @property descriptors got wrapped in a class selector, and blockless

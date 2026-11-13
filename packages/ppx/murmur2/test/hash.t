@@ -79,72 +79,78 @@
   $ ./compare.sh "z-index: 10"
   Hashes match: 7au0g0
 
+Non-ASCII input. The native hash reads the UTF-8 bytes of the string;
+@emotion/hash (murmur2.js) reads the low byte of each UTF-16 code unit, so
+the two differ on non-ASCII input and only the native hash is pinned below.
+Reading the low byte made inputs such as `…` (U+2026), `✦` (U+2726) and `&`
+hash the same.
+
 Special chars
-  $ ./compare.sh 'é'
-  Hashes match: dcz6rs
-  $ ./compare.sh '®'
-  Hashes match: 13s0tnc
-  $ ./compare.sh '😀'
-  Hashes match: 1ek03rz
-  $ ./compare.sh '中'
-  Hashes match: 182x3xl
-  $ ./compare.sh '𐍈'
-  Hashes match: mzbau4
-  $ ./compare.sh '™'
-  Hashes match: 19lqsls
-  $ ./compare.sh '☃'
-  Hashes match: hlpok8
-  $ ./compare.sh 'أ'
-  Hashes match: wm3gqk
-  $ ./compare.sh 'ß'
-  Hashes match: wodsab
-  $ ./compare.sh 'α'
-  Hashes match: 1t3vr8o
-  $ ./compare.sh '♥'
-  Hashes match: 1wuke12
-  $ ./compare.sh 'א'
-  Hashes match: 175czf5
-  $ ./compare.sh 'ᵖ'
-  Hashes match: 18p4nib
+  $ ./cli_murmur2.exe 'é'
+  ilzlt2
+  $ ./cli_murmur2.exe '®'
+  g7jfu6
+  $ ./cli_murmur2.exe '😀'
+  lmvgqi
+  $ ./cli_murmur2.exe '中'
+  190d7mz
+  $ ./cli_murmur2.exe '𐍈'
+  1yt2tcr
+  $ ./cli_murmur2.exe '™'
+  1e9udzs
+  $ ./cli_murmur2.exe '☃'
+  u7spzg
+  $ ./cli_murmur2.exe 'أ'
+  17cq4li
+  $ ./cli_murmur2.exe 'ß'
+  1rfv3ty
+  $ ./cli_murmur2.exe 'α'
+  1e1uxzs
+  $ ./cli_murmur2.exe '♥'
+  lq5pl6
+  $ ./cli_murmur2.exe 'א'
+  1w0lns2
+  $ ./cli_murmur2.exe 'ᵖ'
+  1jk7esd
 
 UTF-16 Code Units (real code points U+FFFF and astral U+10000, via raw UTF-8 bytes)
-  $ ./compare.sh "$(printf '\357\277\277')"
-  Hashes match: 1mh24mp
-  $ ./compare.sh "$(printf '\360\220\200\200')"
-  Hashes match: 0
-  $ ./compare.sh "$(printf '\357\277\277\360\220\200\200')"
-  Hashes match: 1mh24mp
+  $ ./cli_murmur2.exe "$(printf '\357\277\277')"
+  1giifmf
+  $ ./cli_murmur2.exe "$(printf '\360\220\200\200')"
+  9ycxuf
+  $ ./cli_murmur2.exe "$(printf '\357\277\277\360\220\200\200')"
+  gz5fuh
 
 Surrogate pairs (astral U+1D11E and U+10FFFF). Lone surrogates are not representable
 in valid UTF-8 and cannot pass through argv, so only paired code points are exercised.
-  $ ./compare.sh "$(printf '\360\235\204\236')"
-  Hashes match: hynuwk
-  $ ./compare.sh "$(printf '\364\217\277\277')"
-  Hashes match: k5acwm
+  $ ./cli_murmur2.exe "$(printf '\360\235\204\236')"
+  m9w5lc
+  $ ./cli_murmur2.exe "$(printf '\364\217\277\277')"
+  s2nfxe
 
 Combining Marks (real combining acute U+0301 and tilde U+0303, via raw UTF-8 bytes)
-  $ ./compare.sh "$(printf 'e\314\201')"
-  Hashes match: 1a78bpn
-  $ ./compare.sh "$(printf 'n\314\203o\314\201')"
-  Hashes match: k2d7qz
+  $ ./cli_murmur2.exe "$(printf 'e\314\201')"
+  on1yyj
+  $ ./cli_murmur2.exe "$(printf 'n\314\203o\314\201')"
+  17ie8y0
 
 Mixed BMP and non-BMP
-  $ ./compare.sh 'a𐍈z'
-  Hashes match: 16j7at3
-  $ ./compare.sh 'é😀中'
-  Hashes match: 1951hkp
+  $ ./cli_murmur2.exe 'a𐍈z'
+  1ctl70h
+  $ ./cli_murmur2.exe 'é😀中'
+  1uekv9k
 
 Emoji combinations
-  $ ./compare.sh '👍🏽'
-  Hashes match: k0hfz4
-  $ ./compare.sh '👩‍💻'
-  Hashes match: q1f8iz
+  $ ./cli_murmur2.exe '👍🏽'
+  1yjas9n
+  $ ./cli_murmur2.exe '👩‍💻'
+  1ho5ehw
 
 Chinese and Hindi characters
-  $ ./compare.sh 'content: "漢字"'
-  Hashes match: 1s623fv
-  $ ./compare.sh 'content: "हिन्दी"'
-  Hashes match: 1jqc061
+  $ ./cli_murmur2.exe 'content: "漢字"'
+  iylsm3
+  $ ./cli_murmur2.exe 'content: "हिन्दी"'
+  og9pwq
 
 Non-Printable ASCII and Control Characters (real newline and tab, via printf)
   $ ./compare.sh "$(printf 'Line1\nLine2')"
@@ -155,8 +161,8 @@ Non-Printable ASCII and Control Characters (real newline and tab, via printf)
 Long strings
   $ ./compare.sh "$(head -c 1000 < /dev/zero | tr '\0' 'a')"
   Hashes match: 11lsq50
-  $ ./compare.sh "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
-  Hashes match: j9pabx
+  $ ./cli_murmur2.exe "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+  ze004f
 
 The following two rule sets produced the same hash (see https://github.com/davesnx/styled-ppx/pull/376)
   $ ./compare.sh "color:var(--alt-text--tertiary);:disabled{color:var(--alt-text--tertiary);}:hover{color:var(--alt-text--primary);}"
@@ -164,8 +170,6 @@ The following two rule sets produced the same hash (see https://github.com/daves
   $ ./compare.sh "display:flex;:before, :after{content:'';flex:0 0 16px;}"
   Hashes match: ab0yh7
 
-Malformed UTF-8. Coverage is limited to leading-byte-only sequences, where native's
-whole-string replacement coincides with Node's. A valid-prefix malformed input (e.g.
-'a' + 0xC0) diverges (native drops the prefix, Node keeps it) and is not asserted here.
-  $ ./compare-malformed.sh
-  Hashes match: z68v9f (2 bytes) - c4jucd (3 bytes) - c4jucd (4 bytes)
+Malformed UTF-8: the bytes are hashed as they are.
+  $ ./malformed.exe
+  zp11b8 (2 bytes) - 1wob9r9 (3 bytes) - 1x3lfa8 (4 bytes)

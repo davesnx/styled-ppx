@@ -21,7 +21,7 @@ target also has `-watch` and `-promote` variants (e.g. `make test-parser-watch`,
 | `make test-ppx-snapshot-reason` | PPX output snapshots (cram) | `packages/ppx/test/snapshot/reason` |
 | `make test-css-support` | CSS property support (cram) | `packages/ppx/test/css-support` |
 | `make test-runtime` | Runtime hash/styles unit tests + witness conformance check | `packages/runtime/test` |
-| `make test-murmur2` | Murmur2 hash parity with emotion (cram + scripts) and hash unit tests | `packages/ppx/murmur2/test` |
+| `make test-murmur2` | Murmur2 hash parity with emotion on ASCII input, pinned native hashes for non-ASCII input (cram), and hash unit tests | `packages/ppx/murmur2/test` |
 | `make test-css-spec-parser` | CSS value-definition spec parser | `packages/css-spec-parser/test` |
 | `make test-generate` | CSS extraction aggregator (cram) | `packages/generate/test` |
 

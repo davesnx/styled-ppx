@@ -2,69 +2,77 @@ Comprehensive test for cx2 interpolation with various property types
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --lengthVar-1fwod6p{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lengthVar-5g6bk9{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lengthVar-1qqvx43{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lengthVar-11faw47{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lengthVar-oy21bt{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lengthVar-1lpa833{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lengthVar-vh1osb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --colorVar-14sye4i{syntax:\"*\";inherits:false;}"];
-  [@css "@property --flexBasisVar-16vl5bp{syntax:\"*\";inherits:false;}"];
-  [@css "@property --gridLineVar-1qxvc00{syntax:\"*\";inherits:false;}"];
-  [@css "@property --gridLineVar-175omdk{syntax:\"*\";inherits:false;}"];
-  [@css "@property --topVar-1iqysbe{syntax:\"*\";inherits:false;}"];
-  [@css "@property --topVar-10dkp5m{syntax:\"*\";inherits:false;}"];
-  [@css "@property --zIndexVar-osv02l{syntax:\"*\";inherits:false;}"];
-  [@css "@property --borderWidthVar-1nwhzbd{syntax:\"*\";inherits:false;}"];
-  [@css "@property --spacingVar-15s0ecx{syntax:\"*\";inherits:false;}"];
-  [@css "@property --spacingVar-1m50b62{syntax:\"*\";inherits:false;}"];
-  [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
-  [@css ".css-b8f0pi-test1{width:var(--lengthVar-1fwod6p);}"];
-  [@css ".css-b8f0pi-test1{height:var(--lengthVar-5g6bk9);}"];
-  [@css ".css-b8f0pi-test1{min-width:var(--lengthVar-1qqvx43);}"];
-  [@css ".css-b8f0pi-test1{max-width:var(--lengthVar-11faw47);}"];
-  [@css ".css-1swajk7-test2{margin-top:var(--lengthVar-oy21bt);}"];
-  [@css ".css-1swajk7-test2{margin-bottom:var(--lengthVar-oy21bt);}"];
-  [@css ".css-1swajk7-test2{padding-left:var(--lengthVar-1lpa833);}"];
-  [@css ".css-1swajk7-test2{padding-right:var(--lengthVar-1lpa833);}"];
-  [@css ".css-1i6vyy6-test3{gap:var(--lengthVar-vh1osb);}"];
-  [@css ".css-1i6vyy6-test3{row-gap:var(--lengthVar-vh1osb);}"];
+  [@css "@property --ubj1i5-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ubj1i5-1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ubj1i5-2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ubj1i5-3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --1m3cgby-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --1m3cgby-1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --64n598-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --1r2kd15-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --17kihyh-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --1ru2qt3-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --1ru2qt3-1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --11yi134-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --11yi134-1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --fapduw-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --10rpcqh-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --udueyp-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --udueyp-1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --5kfx3l-0{syntax:\"*\";inherits:false;}"];
   [@css
-    ".css-1i6vyy6-test3{-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
+    ".css-ubj1i5{width:var(--ubj1i5-0);height:var(--ubj1i5-1);min-width:var(--ubj1i5-2);max-width:var(--ubj1i5-3);}"
   ];
-  [@css ".css-1vzwmoy-test4{color:var(--colorVar-14sye4i);}"];
-  [@css ".css-1vzwmoy-test4{background-color:var(--colorVar-14sye4i);}"];
-  [@css ".css-1vzwmoy-test4{border-top-color:var(--colorVar-14sye4i);}"];
-  [@css ".css-ycpa9s-test5{flex-basis:var(--flexBasisVar-16vl5bp);}"];
-  [@css ".css-1knt7y9-test6{grid-row-start:var(--gridLineVar-1qxvc00);}"];
-  [@css ".css-1knt7y9-test6{grid-column-end:var(--gridLineVar-175omdk);}"];
-  [@css ".css-1d6x35p-test7{top:var(--topVar-1iqysbe);}"];
-  [@css ".css-1d6x35p-test7{bottom:var(--topVar-10dkp5m);}"];
-  [@css ".css-1bkxgpr-test8{z-index:var(--zIndexVar-osv02l);}"];
-  [@css ".css-1bezkxi-test9{border-top-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".css-1bezkxi-test9{border-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".css-zoi7e9-test10{letter-spacing:var(--spacingVar-15s0ecx);}"];
-  [@css ".css-zoi7e9-test10{word-spacing:var(--spacingVar-1m50b62);}"];
-  [@css ".css-1dfkyy8-test11{width:var(--width-18c1xss);}"];
-  [@css ".css-73nay0-test11{height:100px;}"];
-  [@css ".css-tokvmb-test11{color:red;}"];
+  [@css
+    ".css-1m3cgby{margin-top:var(--1m3cgby-0);margin-bottom:var(--1m3cgby-0);padding-left:var(--1m3cgby-1);padding-right:var(--1m3cgby-1);}"
+  ];
+  [@css
+    ".css-64n598{gap:var(--64n598-0);row-gap:var(--64n598-0);-webkit-column-gap:var(--64n598-0);column-gap:var(--64n598-0);}"
+  ];
+  [@css
+    ".css-1r2kd15{color:var(--1r2kd15-0);background-color:var(--1r2kd15-0);border-top-color:var(--1r2kd15-0);}"
+  ];
+  [@css ".css-17kihyh{flex-basis:var(--17kihyh-0);}"];
+  [@css
+    ".css-1ru2qt3{grid-row-start:var(--1ru2qt3-0);grid-column-end:var(--1ru2qt3-1);}"
+  ];
+  [@css ".css-11yi134{top:var(--11yi134-0);bottom:var(--11yi134-1);}"];
+  [@css ".css-fapduw{z-index:var(--fapduw-0);}"];
+  [@css
+    ".css-10rpcqh{border-top-width:var(--10rpcqh-0);border-width:var(--10rpcqh-0);}"
+  ];
+  [@css
+    ".css-udueyp{letter-spacing:var(--udueyp-0);word-spacing:var(--udueyp-1);}"
+  ];
+  [@css ".css-5kfx3l{width:var(--5kfx3l-0);height:100px;color:red;}"];
+  [@css.classes
+    [
+      ("css-ubj1i5", 18, "Output.test1", "output.ml", 8, 2, 12, 0),
+      ("css-1m3cgby", 19, "Output.test2", "output.ml", 16, 2, 20, 0),
+      ("css-64n598", 20, "Output.test3", "output.ml", 24, 2, 27, 0),
+      ("css-1r2kd15", 21, "Output.test4", "output.ml", 31, 2, 34, 0),
+      ("css-17kihyh", 22, "Output.test5", "output.ml", 37, 2, 38, 0),
+      ("css-1ru2qt3", 23, "Output.test6", "output.ml", 43, 2, 45, 0),
+      ("css-11yi134", 24, "Output.test7", "output.ml", 48, 2, 50, 0),
+      ("css-fapduw", 25, "Output.test8", "output.ml", 53, 2, 54, 0),
+      ("css-10rpcqh", 26, "Output.test9", "output.ml", 59, 2, 61, 0),
+      ("css-udueyp", 27, "Output.test10", "output.ml", 66, 2, 68, 0),
+      ("css-5kfx3l", 28, "Output.test11", "output.ml", 71, 2, 74, 0),
+    ]
+  ];
   [@css.bindings
     [
-      ("Output.test1", "css-b8f0pi-test1"),
-      ("Output.test2", "css-1swajk7-test2"),
-      ("Output.test3", "css-1i6vyy6-test3"),
-      ("Output.test4", "css-1vzwmoy-test4"),
-      ("Output.test5", "css-ycpa9s-test5"),
-      ("Output.test6", "css-1knt7y9-test6"),
-      ("Output.test7", "css-1d6x35p-test7"),
-      ("Output.test8", "css-1bkxgpr-test8"),
-      ("Output.test9", "css-1bezkxi-test9"),
-      ("Output.test10", "css-zoi7e9-test10"),
-      (
-        "Output.test11",
-        "css-1dfkyy8-test11 css-73nay0-test11 css-tokvmb-test11",
-      ),
+      ("Output.test1", "css-ubj1i5"),
+      ("Output.test2", "css-1m3cgby"),
+      ("Output.test3", "css-64n598"),
+      ("Output.test4", "css-1r2kd15"),
+      ("Output.test5", "css-17kihyh"),
+      ("Output.test6", "css-1ru2qt3"),
+      ("Output.test7", "css-11yi134"),
+      ("Output.test8", "css-fapduw"),
+      ("Output.test9", "css-10rpcqh"),
+      ("Output.test10", "css-udueyp"),
+      ("Output.test11", ""),
     ]
   ];
   let lengthVar = CSS.px(10);
@@ -73,89 +81,79 @@ Comprehensive test for cx2 interpolation with various property types
   let autoVar = `auto;
   let test1 =
     CSS.make(
-      "css-b8f0pi-test1",
+      "css-ubj1i5",
       [
-        ("--lengthVar-1fwod6p", CSS.Types.Width.toString(lengthVar)),
-        ("--lengthVar-5g6bk9", CSS.Types.Height.toString(lengthVar)),
-        ("--lengthVar-1qqvx43", CSS.Types.MinWidth.toString(lengthVar)),
-        ("--lengthVar-11faw47", CSS.Types.MaxWidth.toString(lengthVar)),
+        ("--ubj1i5-0", CSS.Types.Width.toString(lengthVar)),
+        ("--ubj1i5-1", CSS.Types.Height.toString(lengthVar)),
+        ("--ubj1i5-2", CSS.Types.MinWidth.toString(lengthVar)),
+        ("--ubj1i5-3", CSS.Types.MaxWidth.toString(lengthVar)),
       ],
     );
   let test2 =
     CSS.make(
-      "css-1swajk7-test2",
+      "css-1m3cgby",
       [
-        ("--lengthVar-oy21bt", CSS.Types.Margin.toString(lengthVar)),
-        ("--lengthVar-1lpa833", CSS.Types.Length.toString(lengthVar)),
+        ("--1m3cgby-0", CSS.Types.Margin.toString(lengthVar)),
+        ("--1m3cgby-1", CSS.Types.Length.toString(lengthVar)),
       ],
     );
   let test3 =
     CSS.make(
-      "css-1i6vyy6-test3",
-      [("--lengthVar-vh1osb", CSS.Types.Gap.toString(lengthVar))],
+      "css-64n598",
+      [("--64n598-0", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
     CSS.make(
-      "css-1vzwmoy-test4",
-      [("--colorVar-14sye4i", CSS.Types.Color.toString(colorVar))],
+      "css-1r2kd15",
+      [("--1r2kd15-0", CSS.Types.Color.toString(colorVar))],
     );
   let flexBasisVar = CSS.px(100);
   let test5 =
     CSS.make(
-      "css-ycpa9s-test5",
-      [
-        ("--flexBasisVar-16vl5bp", CSS.Types.FlexBasis.toString(flexBasisVar)),
-      ],
+      "css-17kihyh",
+      [("--17kihyh-0", CSS.Types.FlexBasis.toString(flexBasisVar))],
     );
   let gridLineVar = `auto;
   let test6 =
     CSS.make(
-      "css-1knt7y9-test6",
+      "css-1ru2qt3",
       [
-        ("--gridLineVar-1qxvc00", CSS.Types.GridRowStart.toString(gridLineVar)),
-        (
-          "--gridLineVar-175omdk",
-          CSS.Types.GridColumnEnd.toString(gridLineVar),
-        ),
+        ("--1ru2qt3-0", CSS.Types.GridRowStart.toString(gridLineVar)),
+        ("--1ru2qt3-1", CSS.Types.GridColumnEnd.toString(gridLineVar)),
       ],
     );
   let topVar = CSS.px(20);
   let test7 =
     CSS.make(
-      "css-1d6x35p-test7",
+      "css-11yi134",
       [
-        ("--topVar-1iqysbe", CSS.Types.Top.toString(topVar)),
-        ("--topVar-10dkp5m", CSS.Types.Bottom.toString(topVar)),
+        ("--11yi134-0", CSS.Types.Top.toString(topVar)),
+        ("--11yi134-1", CSS.Types.Bottom.toString(topVar)),
       ],
     );
   let zIndexVar = `num(10);
   let test8 =
     CSS.make(
-      "css-1bkxgpr-test8",
-      [("--zIndexVar-osv02l", CSS.Types.ZIndex.toString(zIndexVar))],
+      "css-fapduw",
+      [("--fapduw-0", CSS.Types.ZIndex.toString(zIndexVar))],
     );
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
-      "css-1bezkxi-test9",
-      [
-        (
-          "--borderWidthVar-1nwhzbd",
-          CSS.Types.LineWidth.toString(borderWidthVar),
-        ),
-      ],
+      "css-10rpcqh",
+      [("--10rpcqh-0", CSS.Types.LineWidth.toString(borderWidthVar))],
     );
   let spacingVar = CSS.px(2);
   let test10 =
     CSS.make(
-      "css-zoi7e9-test10",
+      "css-udueyp",
       [
-        ("--spacingVar-15s0ecx", CSS.Types.LetterSpacing.toString(spacingVar)),
-        ("--spacingVar-1m50b62", CSS.Types.WordSpacing.toString(spacingVar)),
+        ("--udueyp-0", CSS.Types.LetterSpacing.toString(spacingVar)),
+        ("--udueyp-1", CSS.Types.WordSpacing.toString(spacingVar)),
       ],
     );
   let test11 = width =>
     CSS.make(
-      "css-1dfkyy8-test11 css-73nay0-test11 css-tokvmb-test11",
-      [("--width-18c1xss", CSS.Types.Width.toString(width))],
+      "css-5kfx3l",
+      [("--5kfx3l-0", CSS.Types.Width.toString(width))],
     );

@@ -2,7 +2,7 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "body{color:var(--textColor-1ltpo4o);width:var(--bodyWidth-xjb6x5);opacity:var(--mainOpacity-tdbeio);z-index:var(--layerIndex-vll3e5);}"
+    "body{color:var(--1ltpo4o);width:var(--xjb6x5);opacity:var(--tdbeio);z-index:var(--vll3e5);}"
   ];
   let textColor = CSS.red;
   let bodyWidth = CSS.px(960);
@@ -21,24 +21,24 @@
                       (
                         (
                           (
-                            (":root{" ++ "--textColor-1ltpo4o:")
+                            (":root{" ++ "--1ltpo4o:")
                             ++ CSS.Types.Color.toString(textColor)
                           )
                           ++ ";"
                         )
-                        ++ "--bodyWidth-xjb6x5:"
+                        ++ "--xjb6x5:"
                       )
                       ++ CSS.Types.Width.toString(bodyWidth)
                     )
                     ++ ";"
                   )
-                  ++ "--mainOpacity-tdbeio:"
+                  ++ "--tdbeio:"
                 )
                 ++ CSS.Types.Opacity.toString(mainOpacity)
               )
               ++ ";"
             )
-            ++ "--layerIndex-vll3e5:"
+            ++ "--vll3e5:"
           )
           ++ CSS.Types.ZIndex.toString(layerIndex)
         )

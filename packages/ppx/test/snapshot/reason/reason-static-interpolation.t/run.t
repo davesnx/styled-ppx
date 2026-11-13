@@ -1,23 +1,27 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-16tzllb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-11zsw44{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-1e15k1a{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1oz3n15-StringInterpolation{color:var(--var-16tzllb);}"];
+  [@css "@property --18tf9wt-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --18tf9wt-1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --18tf9wt-2{syntax:\"*\";inherits:false;}"];
   [@css
-    ".css-1oz3n15-StringInterpolation{background-color:var(--black-11zsw44);}"
+    ".css-18tf9wt{color:var(--18tf9wt-0);background-color:var(--18tf9wt-1);border-color:var(--18tf9wt-2);display:block;}"
   ];
-  [@css ".css-1oz3n15-StringInterpolation{border-color:var(--black-1e15k1a);}"];
-  [@css ".css-13o7eu2-StringInterpolation{display:block;}"];
-  [@css.bindings
+  [@css.classes
     [
       (
+        "css-18tf9wt",
+        3,
         "Output.StringInterpolation",
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "output.ml",
+        10,
+        2,
+        14,
+        0,
       ),
     ]
   ];
+  [@css.bindings [("Output.StringInterpolation", "css-18tf9wt")]];
   module Theme = {
     let var = CSS.hex("333333");
     module Border = {
@@ -1010,11 +1014,11 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "css-18tf9wt",
         [
-          ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
-          ("--black-11zsw44", CSS.Types.Color.toString(black)),
-          ("--black-1e15k1a", CSS.Types.Color.toString(Theme.Border.black)),
+          ("--18tf9wt-0", CSS.Types.Color.toString(Theme.var)),
+          ("--18tf9wt-1", CSS.Types.Color.toString(black)),
+          ("--18tf9wt-2", CSS.Types.Color.toString(Theme.Border.black)),
         ],
       );
     let make = (props: makeProps) => {

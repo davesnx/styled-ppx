@@ -44,7 +44,7 @@ Dynamic values are welcome: any OCaml or Reason expression goes inside `$( ... )
 
 All CSS is extracted while your project compiles:
 
-1. The ppx splits your CSS into **atomic rules** (one class per declaration) and hashes each one into a content-addressed class name, so repeated declarations across your app dedupe into one rule.
+1. The ppx gives each `[%css]` block **one class**, a hash of where the block is defined and what it contains, and keeps the block's declarations together in one rule.
 2. A build step ([`styled-ppx.generate`](/how-it-works#the-aggregator-styled-ppxgenerate)) collects every rule in your project and writes a single, deduplicated `styles.css`.
 3. At runtime, your components only carry class names. Interpolated values become CSS custom properties supplied through the `style` attribute.
 

@@ -14,19 +14,21 @@ the flag omitted, locking in that the marker is purely opt-in.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs-layout{display:flex;}"];
-  [@css ".css-38zrbw-layout{padding:12px;}"];
-  [@css ".css-tokvmb-button{color:red;}"];
-  [@css.bindings
+  [@css ".css-1992jrt{display:flex;padding:12px;}"];
+  [@css ".css-1y4lziy{color:red;}"];
+  [@css.classes
     [
-      ("Input.layout", "css-k008qs-layout css-38zrbw-layout"),
-      ("Input.button", "css-tokvmb-button"),
+      ("css-1992jrt", 0, "Input.layout", "input.re", 6, 22, 6, 52),
+      ("css-1y4lziy", 1, "Input.button", "input.re", 8, 22, 8, 34),
     ]
   ];
+  [@css.bindings
+    [("Input.layout", "css-1992jrt"), ("Input.button", "css-1y4lziy")]
+  ];
   
-  let layout = CSS.make("css-k008qs-layout css-38zrbw-layout", []);
+  let layout = CSS.make("css-1992jrt", []);
   
-  let button = CSS.make("css-tokvmb-button", []);
+  let button = CSS.make("css-1y4lziy", []);
   
   let _ = (layout, button);
 

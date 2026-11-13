@@ -13,15 +13,24 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-hxo6vg{width:calc(50% + 4px);}"];
-  [@css ".css-1bjj19s{width:calc(20px - 10px);}"];
-  [@css ".css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}"];
-  [@css ".css-1g5uhfp{width:calc(100vh * 2);}"];
-  [@css ".css-6t8hw4{width:calc(2 * 120px);}"];
-  CSS.make("css-hxo6vg", []);
-  CSS.make("css-1bjj19s", []);
-  CSS.make("css-12qo4ty", []);
-  CSS.make("css-1g5uhfp", []);
-  CSS.make("css-6t8hw4", []);
+  [@css ".css-lfe0ay{width:calc(50% + 4px);}"];
+  [@css ".css-gx4ohy{width:calc(20px - 10px);}"];
+  [@css ".css-lsttcz{width:calc(100vh - calc(2rem + 120px));}"];
+  [@css ".css-10bvwot{width:calc(100vh * 2);}"];
+  [@css ".css-1m2qxuo{width:calc(2 * 120px);}"];
+  [@css.classes
+    [
+      ("css-lfe0ay", 0, "", "input.re", 1, 8, 1, 30),
+      ("css-gx4ohy", 1, "", "input.re", 2, 8, 2, 32),
+      ("css-lsttcz", 2, "", "input.re", 3, 8, 3, 47),
+      ("css-10bvwot", 3, "", "input.re", 4, 8, 4, 30),
+      ("css-1m2qxuo", 4, "", "input.re", 5, 8, 5, 30),
+    ]
+  ];
+  CSS.make("css-lfe0ay", []);
+  CSS.make("css-gx4ohy", []);
+  CSS.make("css-lsttcz", []);
+  CSS.make("css-10bvwot", []);
+  CSS.make("css-1m2qxuo", []);
 
   $ dune build

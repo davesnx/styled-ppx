@@ -4,19 +4,14 @@ interpolation verbatim - no Cascading.toString wrap.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    ":root{--color-primary:var(--primary-eweeub);--gutter:var(--gutter-nbps89);}"
-  ];
+  [@css ":root{--color-primary:var(--eweeub);--gutter:var(--nbps89);}"];
   let primary = CSS.Types.Color.toString(`hex("3A57FC"));
   let gutter = "16px";
   module Theme = {
     let to_string = () =>
       (
         (
-          (
-            (((":root{" ++ "--primary-eweeub:") ++ primary) ++ ";")
-            ++ "--gutter-nbps89:"
-          )
+          ((((":root{" ++ "--eweeub:") ++ primary) ++ ";") ++ "--nbps89:")
           ++ gutter
         )
         ++ ";"

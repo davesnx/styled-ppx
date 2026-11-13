@@ -15,40 +15,47 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
-  [@css ".css-1vf0mg9-buttonLoadingAnimation{background-size:1rem 1rem;}"];
+  [@css ".css-13dtv01{color:red;}"];
+  [@css ".css-123fdlm.css-13dtv01{color:blue;}"];
   [@css
-    ".css-rj3gnv-buttonLoadingAnimation{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
+    ".css-czniaf{background-size:1rem 1rem;-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
   ];
-  [@css ".css-f9xk9e-colorAccent{background-color:blue;}"];
   [@css
-    ".css-1eo9rnb-colorAccent:disabled:not(.css-1eo9rnb-colorAccent.css-1vf0mg9-buttonLoadingAnimation.css-rj3gnv-buttonLoadingAnimation){background-color:gray;}"
+    ".css-gte91w{background-color:blue;}.css-gte91w:disabled:not(.css-gte91w.css-czniaf){background-color:gray;}"
+  ];
+  [@css.classes
+    [
+      ("css-13dtv01", 0, "Input.foo", "input.re", 7, 19, 7, 31),
+      ("css-123fdlm", 1, "Input.bar", "input.re", 10, 2, 11, 0),
+      (
+        "css-czniaf",
+        2,
+        "Input.buttonLoadingAnimation",
+        "input.re",
+        16,
+        2,
+        18,
+        0,
+      ),
+      ("css-gte91w", 3, "Input.colorAccent", "input.re", 23, 2, 28, 0),
+    ]
   ];
   [@css.bindings
     [
-      ("Input.foo", "css-tokvmb-foo"),
-      ("Input.bar", "css-11o9qin-bar"),
-      (
-        "Input.buttonLoadingAnimation",
-        "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
-      ),
-      ("Input.colorAccent", "css-f9xk9e-colorAccent css-1eo9rnb-colorAccent"),
+      ("Input.foo", "css-13dtv01"),
+      ("Input.bar", "css-123fdlm"),
+      ("Input.buttonLoadingAnimation", "css-czniaf"),
+      ("Input.colorAccent", "css-gte91w"),
     ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("css-13dtv01", []);
   
-  let bar = CSS.make("css-11o9qin-bar", []);
+  let bar = CSS.make("css-123fdlm", []);
   
-  let buttonLoadingAnimation =
-    CSS.make(
-      "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
-      [],
-    );
+  let buttonLoadingAnimation = CSS.make("css-czniaf", []);
   
-  let colorAccent =
-    CSS.make("css-f9xk9e-colorAccent css-1eo9rnb-colorAccent", []);
+  let colorAccent = CSS.make("css-gte91w", []);
   
   let _ = (foo, bar, buttonLoadingAnimation, colorAccent);
 

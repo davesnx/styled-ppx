@@ -31,14 +31,11 @@ The static rule and the runtime :root binding reference the same variable, and
 the PPX output is byte-identical across both paths:
 
   $ refmt --parse ml --print re native/Global_Css.ml
-  [@css "body{color:var(--primary-uvgzxa);}"];
+  [@css "body{color:var(--uvgzxa);}"];
   let primary = CSS.red;
   module Styles = {
     let to_string = () =>
-      (
-        ((":root{" ++ "--primary-uvgzxa:") ++ CSS.Types.Color.toString(primary))
-        ++ ";"
-      )
+      (((":root{" ++ "--uvgzxa:") ++ CSS.Types.Color.toString(primary)) ++ ";")
       ++ "}";
     [@warning "-27-32"]
     let makeProps = (~key=?, ()) => Js.Obj.empty();

@@ -45,6 +45,12 @@ let record = (~longident: string, ~class_string: string) =>
     };
   };
 
+let remove = (~longident: string) =>
+  if (Hashtbl.mem(seen, longident)) {
+    Hashtbl.remove(seen, longident);
+    entries := List.filter(e => e.longident != longident, entries^);
+  };
+
 let drain = (): list(entry) => {
   let out = List.rev(entries^);
   reset();

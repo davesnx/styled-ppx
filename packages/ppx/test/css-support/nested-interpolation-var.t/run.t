@@ -17,37 +17,35 @@ top-level interpolation does. If the inline list is empty `[]` for the
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1b5xvk3-topLevel{color:var(--c-dq4mhq);}"];
-  [@css ".css-1orh0hp-hover:hover{color:var(--c-11hlefi);}"];
-  [@css ".css-zjac4l-placeholder::placeholder{color:var(--c-gzgct8);}"];
+  [@css "@property --5fjx3z-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --3mj0eq-0{syntax:\"*\";inherits:false;}"];
+  [@css ".css-5fjx3z{color:var(--5fjx3z-0);}"];
+  [@css ".css-3mj0eq:hover{color:var(--3mj0eq-0);}"];
+  [@css ".css-1bptu1q::placeholder{color:var(--1bptu1q-0);}"];
+  [@css.classes
+    [
+      ("css-5fjx3z", 2, "Input.topLevel", "input.re", 14, 24, 14, 37),
+      ("css-3mj0eq", 3, "Input.hover", "input.re", 17, 21, 17, 46),
+      ("css-1bptu1q", 4, "Input.placeholder", "input.re", 20, 27, 20, 59),
+    ]
+  ];
   [@css.bindings
     [
-      ("Input.topLevel", "css-1b5xvk3-topLevel"),
-      ("Input.hover", "css-1orh0hp-hover"),
-      ("Input.placeholder", "css-zjac4l-placeholder"),
+      ("Input.topLevel", "css-5fjx3z"),
+      ("Input.hover", "css-3mj0eq"),
+      ("Input.placeholder", "css-1bptu1q"),
     ]
   ];
   
   let c = CSS.hex("ff0000");
   
   let topLevel =
-    CSS.make(
-      "css-1b5xvk3-topLevel",
-      [("--c-dq4mhq", CSS.Types.Color.toString(c))],
-    );
+    CSS.make("css-5fjx3z", [("--5fjx3z-0", CSS.Types.Color.toString(c))]);
   
   let hover =
-    CSS.make(
-      "css-1orh0hp-hover",
-      [("--c-11hlefi", CSS.Types.Color.toString(c))],
-    );
+    CSS.make("css-3mj0eq", [("--3mj0eq-0", CSS.Types.Color.toString(c))]);
   
   let placeholder =
-    CSS.make(
-      "css-zjac4l-placeholder",
-      [("--c-gzgct8", CSS.Types.Color.toString(c))],
-    );
+    CSS.make("css-1bptu1q", [("--1bptu1q-0", CSS.Types.Color.toString(c))]);
   
   let _ = (topLevel, hover, placeholder);

@@ -1,36 +1,29 @@
-Custom-property names are keyed to atom declaration content (selector context +
-property + resolved type), not to the owning [%css] expression. Two atoms
-collide or share the same generated var only when their declaration content is
-identical; the two atoms below differ in selector context (top-level vs :hover),
-so they get distinct var names and equal local interpolation names in separately
-merged styles cannot overwrite each other.
+Custom-property names are keyed to the owning [%css] block (its class: module,
+scope, binding, content) plus the interpolation path and resolved type. The
+two blocks below get distinct var names, so equal local interpolation names in
+separately merged styles cannot overwrite each other.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
-  [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6);}"];
-  [@css
-    ".css-10a6meq-clickable:hover{background-color:var(--backgroundColor-7yjmr3);}"
-  ];
-  [@css.bindings
+  [@css "@property --14b42r2-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --zfnpzf-0{syntax:\"*\";inherits:false;}"];
+  [@css ".css-14b42r2{background-color:var(--14b42r2-0);}"];
+  [@css ".css-zfnpzf:hover{background-color:var(--zfnpzf-0);}"];
+  [@css.classes
     [
-      ("Output.common", "css-160vrad-common"),
-      ("Output.clickable", "css-10a6meq-clickable"),
+      ("css-14b42r2", 2, "Output.common", "output.ml", 3, 2, 4, 0),
+      ("css-zfnpzf", 3, "Output.clickable", "output.ml", 7, 2, 10, 0),
     ]
   ];
+  [@css.bindings [("Output.common", ""), ("Output.clickable", "")]];
   let common = backgroundColor =>
     CSS.make(
-      "css-160vrad-common",
-      [
-        ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
-      ],
+      "css-14b42r2",
+      [("--14b42r2-0", CSS.Types.Color.toString(backgroundColor))],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "css-10a6meq-clickable",
-      [
-        ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
-      ],
+      "css-zfnpzf",
+      [("--zfnpzf-0", CSS.Types.Color.toString(backgroundColor))],
     );

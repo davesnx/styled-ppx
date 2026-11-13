@@ -15,42 +15,62 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1majsr1{-webkit-print-color-adjust:economy;color-adjust:economy;}"
+  [@css ".css-3wbcxr{-webkit-print-color-adjust:economy;color-adjust:economy;}"];
+  [@css ".css-1lszhcn{-webkit-print-color-adjust:exact;color-adjust:exact;}"];
+  [@css ".css-yl4w22{forced-color-adjust:auto;}"];
+  [@css ".css-1jyhcxx{forced-color-adjust:none;}"];
+  [@css ".css-1tekp75{forced-color-adjust:preserve-parent-color;}"];
+  [@css ".css-1qymq7y{color-scheme:normal;}"];
+  [@css ".css-6b7kbj{color-scheme:light;}"];
+  [@css ".css-1ay18vt{color-scheme:dark;}"];
+  [@css ".css-1ti0rb7{color-scheme:light dark;}"];
+  [@css ".css-1j1vq9m{color-scheme:dark light;}"];
+  [@css ".css-12zg3gc{color-scheme:only light;}"];
+  [@css ".css-1vmhhz6{color-scheme:light only;}"];
+  [@css ".css-198vrbp{color-scheme:light light;}"];
+  [@css ".css-cpudfk{color-scheme:dark dark;}"];
+  [@css ".css-1ksr3af{color-scheme:light purple;}"];
+  [@css ".css-1chpnt6{color-scheme:purple dark interesting;}"];
+  [@css ".css-1hglvkd{color-scheme:none;}"];
+  [@css ".css-9z19gc{color-scheme:light none;}"];
+  [@css.classes
+    [
+      ("css-3wbcxr", 0, "", "input.re", 2, 8, 2, 29),
+      ("css-1lszhcn", 1, "", "input.re", 3, 8, 3, 27),
+      ("css-yl4w22", 2, "", "input.re", 4, 8, 4, 33),
+      ("css-1jyhcxx", 3, "", "input.re", 5, 8, 5, 33),
+      ("css-1tekp75", 4, "", "input.re", 6, 8, 6, 50),
+      ("css-1qymq7y", 5, "", "input.re", 7, 8, 7, 28),
+      ("css-6b7kbj", 6, "", "input.re", 8, 8, 8, 27),
+      ("css-1ay18vt", 7, "", "input.re", 9, 8, 9, 26),
+      ("css-1ti0rb7", 8, "", "input.re", 10, 8, 10, 32),
+      ("css-1j1vq9m", 9, "", "input.re", 11, 8, 11, 32),
+      ("css-12zg3gc", 10, "", "input.re", 12, 8, 12, 32),
+      ("css-1vmhhz6", 11, "", "input.re", 13, 8, 13, 32),
+      ("css-198vrbp", 12, "", "input.re", 14, 8, 14, 33),
+      ("css-cpudfk", 13, "", "input.re", 15, 8, 15, 31),
+      ("css-1ksr3af", 14, "", "input.re", 16, 8, 16, 34),
+      ("css-1chpnt6", 15, "", "input.re", 17, 8, 17, 45),
+      ("css-1hglvkd", 16, "", "input.re", 18, 8, 18, 26),
+      ("css-9z19gc", 17, "", "input.re", 19, 8, 19, 32),
+    ]
   ];
-  [@css ".css-1i8uoce{-webkit-print-color-adjust:exact;color-adjust:exact;}"];
-  [@css ".css-k2jaoo{forced-color-adjust:auto;}"];
-  [@css ".css-9og3m8{forced-color-adjust:none;}"];
-  [@css ".css-1aesf9s{forced-color-adjust:preserve-parent-color;}"];
-  [@css ".css-14rmdkq{color-scheme:normal;}"];
-  [@css ".css-1bo0ddm{color-scheme:light;}"];
-  [@css ".css-ed8a77{color-scheme:dark;}"];
-  [@css ".css-ujor4h{color-scheme:light dark;}"];
-  [@css ".css-4hsghk{color-scheme:dark light;}"];
-  [@css ".css-1nd6avj{color-scheme:only light;}"];
-  [@css ".css-p0bop6{color-scheme:light only;}"];
-  [@css ".css-16p24tl{color-scheme:light light;}"];
-  [@css ".css-1uyd4nr{color-scheme:dark dark;}"];
-  [@css ".css-1y02q1k{color-scheme:light purple;}"];
-  [@css ".css-eqcn74{color-scheme:purple dark interesting;}"];
-  [@css ".css-5yh2ut{color-scheme:none;}"];
-  [@css ".css-1ge6jec{color-scheme:light none;}"];
   
-  CSS.make("css-1majsr1", []);
-  CSS.make("css-1i8uoce", []);
-  CSS.make("css-k2jaoo", []);
-  CSS.make("css-9og3m8", []);
-  CSS.make("css-1aesf9s", []);
-  CSS.make("css-14rmdkq", []);
-  CSS.make("css-1bo0ddm", []);
-  CSS.make("css-ed8a77", []);
-  CSS.make("css-ujor4h", []);
-  CSS.make("css-4hsghk", []);
-  CSS.make("css-1nd6avj", []);
-  CSS.make("css-p0bop6", []);
-  CSS.make("css-16p24tl", []);
-  CSS.make("css-1uyd4nr", []);
-  CSS.make("css-1y02q1k", []);
-  CSS.make("css-eqcn74", []);
-  CSS.make("css-5yh2ut", []);
-  CSS.make("css-1ge6jec", []);
+  CSS.make("css-3wbcxr", []);
+  CSS.make("css-1lszhcn", []);
+  CSS.make("css-yl4w22", []);
+  CSS.make("css-1jyhcxx", []);
+  CSS.make("css-1tekp75", []);
+  CSS.make("css-1qymq7y", []);
+  CSS.make("css-6b7kbj", []);
+  CSS.make("css-1ay18vt", []);
+  CSS.make("css-1ti0rb7", []);
+  CSS.make("css-1j1vq9m", []);
+  CSS.make("css-12zg3gc", []);
+  CSS.make("css-1vmhhz6", []);
+  CSS.make("css-198vrbp", []);
+  CSS.make("css-cpudfk", []);
+  CSS.make("css-1ksr3af", []);
+  CSS.make("css-1chpnt6", []);
+  CSS.make("css-1hglvkd", []);
+  CSS.make("css-9z19gc", []);

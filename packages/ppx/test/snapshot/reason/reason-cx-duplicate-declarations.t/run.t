@@ -1,62 +1,58 @@
-Same-property declaration grouping under [%css] extraction.
-
-Atomic extraction hashes each declaration into its own class and dedups
-identical classes keeping the first stylesheet position. Duplicate
-declarations of the same property (last-wins overrides, vendor fallback
-pairs like `display: -webkit-box; display: flex`) therefore used to
-resolve by stylesheet position instead of source order — silently
-diverging from the emotion runtime, which serializes the whole block
-verbatim. Grouping every same-property declaration of a block into one
-atom makes the winner an intra-atom decision, immune to position, dedup,
-and cross-binding hash sharing. Single declarations keep the historical
-atom shape and hash.
+Duplicate declarations of one property in a block. A block is written as one
+rule per selector or at-rule, with its declarations in source order, the way
+the emotion runtime serializes a block. So the later declaration wins inside
+the block (last-wins overrides), and vendor fallback pairs like
+`display: -webkit-box; display: flex` keep their order.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-ztpkbn-dup{color:blue;color:red;color:blue;}"]
-  [@@@css ".css-17ax8u2-fallback{display:-webkit-box;display:flex;}"]
-  [@@@css ".css-1uk1gs8-interleaved{margin:0;}"]
-  [@@@css ".css-dhb7kq-interleaved{color:blue;color:red;}"]
+  [@@@css "@property --1crn56w-0{syntax:\"*\";inherits:false;}"]
+  [@@@css ".css-fa6rym{color:blue;color:red;color:blue;}"]
+  [@@@css ".css-qv5ggl{display:-webkit-box;display:flex;}"]
+  [@@@css ".css-5jblis{color:blue;margin:0;color:red;}"]
   [@@@css
-    "@media (min-width: 600px) {.css-1g5p0x6-mediaInterleaved{color:green;}}"]
-  [@@@css ".css-dhb7kq-mediaInterleaved{color:blue;color:red;}"]
-  [@@@css ".css-odz94x-shorthandReset{margin-top:5px;}"]
-  [@@@css ".css-19xrixt-shorthandReset{margin:0;margin:10px;}"]
-  [@@@css ".css-1e7bukr-nested:hover{color:blue;color:red;}"]
-  [@@@css ".css-mngo80-twice:hover{color:red;}"]
-  [@@@css ".css-zkbrel-custom{--Foo:1px;}"]
-  [@@@css ".css-1r75vyo-custom{--foo:2px;}"]
-  [@@@css ".css-tokvmb-x{color:red;}"]
-  [@@@css ".css-dhb7kq-x{color:blue;color:red;}"]
-  [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--c-kv4uq2);}"]
+    ".css-bx3aix{color:blue;}@media (min-width: 600px) {.css-bx3aix{color:green;}}.css-bx3aix{color:red;}"]
+  [@@@css ".css-11jz9wk{margin:0;margin-top:5px;margin:10px;}"]
+  [@@@css ".css-1nsx6rt:hover{color:blue;color:red;}"]
+  [@@@css ".css-2lh2vc:hover{color:red;}.css-2lh2vc:hover{color:red;}"]
+  [@@@css ".css-1jd6lr0{--Foo:1px;--foo:2px;}"]
+  [@@@css ".css-wb1jsp{color:red;}"]
+  [@@@css ".css-10nngyc{color:blue;color:red;}"]
+  [@@@css ".css-1crn56w{margin:0;margin:var(--1crn56w-0);}"]
+  [@@@css.classes
+    [("css-fa6rym", 1, "Input.dup", "input.ml", 7, 17, 7, 53);
+    ("css-qv5ggl", 2, "Input.fallback", "input.ml", 11, 22, 11, 57);
+    ("css-5jblis", 3, "Input.interleaved", "input.ml", 15, 25, 15, 59);
+    ("css-bx3aix", 4, "Input.mediaInterleaved", "input.ml", 23, 9, 23, 76);
+    ("css-11jz9wk", 5, "Input.shorthandReset", "input.ml", 28, 28, 28, 68);
+    ("css-1nsx6rt", 6, "Input.nested", "input.ml", 31, 20, 31, 56);
+    ("css-2lh2vc", 7, "Input.twice", "input.ml", 35, 19, 35, 66);
+    ("css-1jd6lr0", 8, "Input.custom", "input.ml", 38, 20, 38, 42);
+    ("css-wb1jsp", 9, "Input.A.x", "input.ml", 44, 17, 44, 27);
+    ("css-10nngyc", 10, "Input.B.x", "input.ml", 48, 17, 48, 40);
+    ("css-1crn56w", 11, "Input.vars", "input.ml", 53, 18, 53, 41)]]
   [@@@css.bindings
-    [("Input.dup", "css-ztpkbn-dup");
-    ("Input.fallback", "css-17ax8u2-fallback");
-    ("Input.interleaved", "css-1uk1gs8-interleaved css-dhb7kq-interleaved");
-    ("Input.mediaInterleaved",
-      "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved");
-    ("Input.shorthandReset",
-      "css-odz94x-shorthandReset css-19xrixt-shorthandReset");
-    ("Input.nested", "css-1e7bukr-nested");
-    ("Input.twice", "css-mngo80-twice");
-    ("Input.custom", "css-zkbrel-custom css-1r75vyo-custom");
-    ("Input.A.x", "css-tokvmb-x");
-    ("Input.B.x", "css-dhb7kq-x");
-    ("Input.vars", "css-zwzjs7-vars")]]
-  let dup = CSS.make "css-ztpkbn-dup" []
-  let fallback = CSS.make "css-17ax8u2-fallback" []
-  let interleaved =
-    CSS.make "css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
-  let mediaInterleaved =
-    CSS.make "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
-  let shorthandReset =
-    CSS.make "css-odz94x-shorthandReset css-19xrixt-shorthandReset" []
-  let nested = CSS.make "css-1e7bukr-nested" []
-  let twice = CSS.make "css-mngo80-twice" []
-  let custom = CSS.make "css-zkbrel-custom css-1r75vyo-custom" []
-  module A = struct let x = CSS.make "css-tokvmb-x" [] end
-  module B = struct let x = CSS.make "css-dhb7kq-x" [] end
+    [("Input.dup", "css-fa6rym");
+    ("Input.fallback", "css-qv5ggl");
+    ("Input.interleaved", "css-5jblis");
+    ("Input.mediaInterleaved", "css-bx3aix");
+    ("Input.shorthandReset", "css-11jz9wk");
+    ("Input.nested", "css-1nsx6rt");
+    ("Input.twice", "css-2lh2vc");
+    ("Input.custom", "css-1jd6lr0");
+    ("Input.A.x", "css-wb1jsp");
+    ("Input.B.x", "css-10nngyc");
+    ("Input.vars", "css-1crn56w")]]
+  let dup = CSS.make "css-fa6rym" []
+  let fallback = CSS.make "css-qv5ggl" []
+  let interleaved = CSS.make "css-5jblis" []
+  let mediaInterleaved = CSS.make "css-bx3aix" []
+  let shorthandReset = CSS.make "css-11jz9wk" []
+  let nested = CSS.make "css-1nsx6rt" []
+  let twice = CSS.make "css-2lh2vc" []
+  let custom = CSS.make "css-1jd6lr0" []
+  module A = struct let x = CSS.make "css-wb1jsp" [] end
+  module B = struct let x = CSS.make "css-10nngyc" [] end
   let c = "10px"
   let vars =
-    CSS.make "css-zwzjs7-vars" [("--c-kv4uq2", (CSS.Types.Margin.toString c))]
+    CSS.make "css-1crn56w" [("--1crn56w-0", (CSS.Types.Margin.toString c))]

@@ -18,19 +18,21 @@ If you want to understand *why* the build is shaped this way, read [How it works
 
 ## The stylesheet rule
 
-The ppx leaves the extracted CSS inside the **post-ppx files** (`*.pp.ml`) that dune produces in its build tree. One rule feeds them to `styled-ppx.generate`:
+The ppx leaves the extracted CSS inside the **post-ppx files** (`*.pp.ml`) that dune produces in its build tree. One rule feeds them to `styled-ppx.generate`, with one glob per library, in dependency order (a library before the libraries that depend on it):
 
 ```dune
 (rule
  (mode promote)
  (target styles.css)
  (deps
-  (glob_files_rec *.pp.ml))
+  (glob_files_rec design-system/*.pp.ml)
+  (glob_files_rec app/*.pp.ml))
  (action
   (run styled-ppx.generate --output %{target} --log info %{deps})))
 ```
 
-- `(glob_files_rec *.pp.ml)` picks up every preprocessed file below the rule's directory. Place the rule at (or above) the root of the code that uses styled-ppx, or point the glob at it (e.g. `(glob_files_rec lib/*.pp.ml)`). Reason sources produce `<name>.re.pp.ml`.
+- Each `(glob_files_rec <dir>/*.pp.ml)` picks up every preprocessed file below one library's directory. Reason sources produce `<name>.re.pp.ml`.
+- **The order of the globs is the order of the stylesheet.** `styled-ppx.generate` writes its input files in argument order and each file's blocks in source order; dune keeps the order of the `deps` entries and sorts the files of each glob by path. When two blocks set the same property, the later one in the stylesheet wins, whatever the order of `CSS.merge`'s arguments. Listing a library before the libraries that depend on it lets a component override the blocks it imports. One recursive glob over the whole tree (`(glob_files_rec *.pp.ml)`) orders all files by path instead, across libraries. styled-ppx does not check the order: keep the globs in the order of your `(libraries ...)` fields by hand. See [Which declaration wins](/reference/runtime#which-declaration-wins).
 - `(mode promote)` copies `styles.css` back into your source tree so your dev server / bundler can serve it. Drop it if you consume the file straight from `_build`.
 - `--log info` prints the output path on every run; use `--log error` (the default) for silence.
 
@@ -135,7 +137,7 @@ Code inside `shared/` must only use APIs that exist on both sides (`CSS`, `React
 
 ### One stylesheet for both
 
-Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**. Globbing both build trees is harmless (rules are content-deduplicated), but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
+Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**. Globbing both build trees is harmless (a block compiled twice has the same class, and `styled-ppx.generate` writes it once), but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
 
 The [repository demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is exactly this setup: `lib/native/shared/Main.re` renders in the browser through `lib_js` and to a string through the native `print` executable, with one promoted `public/styles.css` serving both.
 
@@ -162,9 +164,9 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 | Flag | Effect |
 | --- | --- |
 | `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
-| `--minify` | Minify the generated CSS and drop the readable `-<label>` suffix from class names (`css-1tyndxa` instead of `css-1tyndxa-layout`) |
+| `--minify` | Minify the generated CSS |
 | `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames in development; no effect on the extracted CSS |
-| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers + readable labels), `production` = `--minify` (no labels, minified CSS) |
+| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers), `production` = `--minify` (minified CSS, no markers) |
 | `--debug` | Verbose ppx logging |
 
 <Callout type="default">
@@ -175,9 +177,7 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 
 ## Production setup
 
-For a release build, pass `--env production` to the ppx. It enables `--minify` (drops the `-<label>` suffix, minifies rule bodies), disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Minification never changes the hashes: `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
-
-The label switch lives on the **ppx** because labels are baked into the class names at compile time, in both the `className` your components carry and the extracted CSS. No downstream tool could drop them without desyncing the two.
+For a release build, pass `--env production` to the ppx. It enables `--minify`, disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. The environment never changes the classes: a class seen in production is the same class in a dev build.
 
 Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards (same fields, different flags):
 
@@ -231,9 +231,13 @@ Either the binding doesn't exist, or its file wasn't passed to the rule: extend 
 Error: cross-library [%css] selector references are not supported.
 The reference `Foreign.thing` resolves to module `Foreign` which is not
 part of the current library. Move the [%css] binding into the current
-library, or inline the class chain literally.
+library, or inline the class name literally.
 ```
 
 Selector references can't cross dune library boundaries. Co-locate the coupled styles in one library, and see [class references in selectors](/reference/selectors#class-references-in-selectors).
 
-**Styles apply in the wrong order.** With atomic CSS the tiebreaker is stylesheet source order, not class-name order or merge order. See [Which declaration wins](/reference/runtime#which-declaration-wins).
+**Styles apply in the wrong order.** The tiebreaker is stylesheet order, not class-name order or merge order. Check that the globs of the stylesheet rule list each library before the libraries that depend on it. See [Which declaration wins](/reference/runtime#which-declaration-wins).
+
+**`styled-ppx.generate` reports `class css-... is used by two different blocks`.** Two different blocks got the same class. The error gives the binding (or says the block is anonymous) and the location of each. Change the content of one block, or bind one of them to a different name.
+
+**``Selector interpolation `$(M.b)` refers to a function or to a binding with several [%css] blocks``.** A selector references a binding that has no single class. Bind the block you mean to its own name and reference that.

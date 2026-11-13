@@ -13,21 +13,24 @@ bare `$(marker)` resolves to the included `Css.marker` binding.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-ik1kdg-wrapper.css-tokvmb-marker{color:blue;}"];
-  [@css.bindings
+  [@css ".css-17viirv{color:red;}"];
+  [@css ".css-xmvpm3.css-17viirv{color:blue;}"];
+  [@css.classes
     [
-      ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.wrapper", "css-ik1kdg-wrapper"),
+      ("css-17viirv", 0, "Input.Css.marker", "input.re", 2, 24, 2, 36),
+      ("css-xmvpm3", 1, "Input.wrapper", "input.re", 8, 2, 9, 0),
     ]
   ];
+  [@css.bindings
+    [("Input.Css.marker", "css-17viirv"), ("Input.wrapper", "css-xmvpm3")]
+  ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("css-17viirv", []);
   };
   
   include Css;
   
-  let wrapper = CSS.make("css-ik1kdg-wrapper", []);
+  let wrapper = CSS.make("css-xmvpm3", []);
   
   let _ = (Css.marker, wrapper);
 

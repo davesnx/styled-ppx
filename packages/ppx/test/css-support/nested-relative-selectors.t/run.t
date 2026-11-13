@@ -17,28 +17,39 @@ Each pair below must render and hash to the same atom.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-6r0lf8 .parent > .child{color:red;}"];
-  [@css ".css-1hamckf .parent + .sibling{color:red;}"];
-  [@css ".css-n0wq26 .parent ~ .sibling{color:red;}"];
-  [@css ".css-n5qd0b .parent > .a.b:hover{color:red;}"];
-  [@css ".css-1haviu8 .parent > .a{color:red;}"];
-  [@css ".css-1ym0uum .parent + .b{color:red;}"];
-  [@css "@media (min-width: 1px) {.css-h19ouy .parent > .child{color:red;}}"];
+  [@css ".css-ea4l9v .parent > .child{color:red;}"];
+  [@css ".css-1sl1lmt .parent + .sibling{color:red;}"];
+  [@css ".css-87opuf .parent ~ .sibling{color:red;}"];
+  [@css ".css-1cw7z7t .parent > .a.b:hover{color:red;}"];
+  [@css
+    ".css-1o9ckul .parent > .a{color:red;}.css-1o9ckul .parent + .b{color:red;}"
+  ];
+  [@css "@media (min-width: 1px) {.css-1q6v2t4 .parent > .child{color:red;}}"];
+  [@css.classes
+    [
+      ("css-ea4l9v", 0, "", "input.re", 7, 9, 7, 46),
+      ("css-1sl1lmt", 1, "", "input.re", 10, 9, 10, 48),
+      ("css-87opuf", 2, "", "input.re", 13, 9, 13, 48),
+      ("css-1cw7z7t", 3, "", "input.re", 17, 9, 17, 50),
+      ("css-1o9ckul", 4, "", "input.re", 21, 9, 21, 48),
+      ("css-1q6v2t4", 5, "", "input.re", 25, 9, 25, 74),
+    ]
+  ];
   
-  CSS.make("css-6r0lf8", []);
-  CSS.make("css-6r0lf8", []);
+  CSS.make("css-ea4l9v", []);
+  CSS.make("css-ea4l9v", []);
   
-  CSS.make("css-1hamckf", []);
-  CSS.make("css-1hamckf", []);
+  CSS.make("css-1sl1lmt", []);
+  CSS.make("css-1sl1lmt", []);
   
-  CSS.make("css-n0wq26", []);
-  CSS.make("css-n0wq26", []);
+  CSS.make("css-87opuf", []);
+  CSS.make("css-87opuf", []);
   
-  CSS.make("css-n5qd0b", []);
-  CSS.make("css-n5qd0b", []);
+  CSS.make("css-1cw7z7t", []);
+  CSS.make("css-1cw7z7t", []);
   
-  CSS.make("css-1haviu8 css-1ym0uum", []);
-  CSS.make("css-1haviu8 css-1ym0uum", []);
+  CSS.make("css-1o9ckul", []);
+  CSS.make("css-1o9ckul", []);
   
-  CSS.make("css-h19ouy", []);
-  CSS.make("css-h19ouy", []);
+  CSS.make("css-1q6v2t4", []);
+  CSS.make("css-1q6v2t4", []);

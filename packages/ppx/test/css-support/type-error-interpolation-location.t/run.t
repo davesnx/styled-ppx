@@ -31,21 +31,24 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --cosas-112i897{syntax:\"*\";inherits:false;}"];
+  [@css "@property --1bs88ve-0{syntax:\"*\";inherits:false;}"];
   [@css
-    ".css-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
+    ".css-1p1cd7i{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
   [@css
-    ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
+    ".css-1bs88ve{-webkit-text-decoration:var(--1bs88ve-0);text-decoration:var(--1bs88ve-0);}"
   ];
-  [@css
-    ".css-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
+  [@css.classes
+    [
+      ("css-1p1cd7i", 1, "", "input.re", 5, 4, 7, 2),
+      ("css-1bs88ve", 2, "", "input.re", 11, 4, 12, 2),
+    ]
   ];
   let cosas = `bold;
   
-  CSS.make("css-1gtanqs css-1jqkbxn", []);
+  CSS.make("css-1p1cd7i", []);
   
   CSS.make(
-    "css-1wxdqmz",
-    [("--cosas-112i897", CSS.Types.TextDecoration.toString(cosas))],
+    "css-1bs88ve",
+    [("--1bs88ve-0", CSS.Types.TextDecoration.toString(cosas))],
   );

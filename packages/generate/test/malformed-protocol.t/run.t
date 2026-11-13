@@ -39,3 +39,32 @@ Malformed extraction attributes are protocol errors, not silent skips.
   $ styled-ppx.generate unterminated_sentinel.ml
   styled-ppx: unterminated_sentinel.ml: malformed [@@@css]: unterminated cross-module selector sentinel
   [1]
+
+  $ cat > malformed_classes.ml <<EOF
+  > [@@@css ".css-a{color:red;}"]
+  > [@@@css.classes [("css-a", "0", "a.ml:1")]]
+  > EOF
+
+  $ styled-ppx.generate malformed_classes.ml
+  styled-ppx: malformed_classes.ml: malformed [@@@css.classes]: malformed css.classes payload at entry 0: expected (class, rule_index, binding, file, start_line, start_col, end_line, end_col) tuple
+  [1]
+
+A rule index must name one of the file's [@@@css] rules.
+
+  $ cat > classes_out_of_range.ml <<EOF
+  > [@@@css ".css-a{color:red;}"]
+  > [@@@css.classes [("css-a", 1, "A.a", "a.re", 1, 0, 1, 10)]]
+  > EOF
+
+  $ styled-ppx.generate classes_out_of_range.ml
+  styled-ppx: classes_out_of_range.ml: malformed [@@@css.classes]: rule index 1 out of range
+  [1]
+
+  $ cat > classes_negative_index.ml <<EOF
+  > [@@@css ".css-a{color:red;}"]
+  > [@@@css.classes [("css-a", -1, "A.a", "a.re", 1, 0, 1, 10)]]
+  > EOF
+
+  $ styled-ppx.generate classes_negative_index.ml
+  styled-ppx: classes_negative_index.ml: malformed [@@@css.classes]: malformed css.classes payload at entry 0: expected a rule index of 0 or more, got -1
+  [1]

@@ -61,12 +61,10 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --grid-1sb4gse{syntax:\"*\";inherits:false;}"];
-  [@css ".css-48ak65-a{display:var(--grid-1sb4gse);}"];
-  [@css.bindings [("Input.a", "css-48ak65-a")]];
+  [@css "@property --94l21-0{syntax:\"*\";inherits:false;}"];
+  [@css ".css-94l21{display:var(--94l21-0);}"];
+  [@css.classes [("css-94l21", 1, "Input.a", "input.re", 2, 17, 2, 35)]];
+  [@css.bindings [("Input.a", "css-94l21")]];
   let grid = `gri;
   let a =
-    CSS.make(
-      "css-48ak65-a",
-      [("--grid-1sb4gse", CSS.Types.Display.toString(grid))],
-    );
+    CSS.make("css-94l21", [("--94l21-0", CSS.Types.Display.toString(grid))]);

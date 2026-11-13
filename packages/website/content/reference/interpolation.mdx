@@ -159,7 +159,7 @@ Since `Size.small` is `` `px(int){:reason} ``, the type-checker allows it. Inter
 
 ## How it works: CSS custom properties
 
-The extracted rule references a CSS custom property (`color: var(--color-<hash>)`), and the element supplies its *value* through the inline `style` attribute. Variable names are derived from your source and stable between builds. The full mechanics (naming, scoping, `@property` registration, and the positions where interpolation is rejected) live in [How it works](/how-it-works#dynamic-values-css-custom-properties).
+The extracted rule references a CSS custom property (`color: var(--<hash>-0)`), and the element supplies its *value* through the inline `style` attribute. Each block has its own variables, and their names are derived from your source and stable between builds. The full mechanics (naming, scoping, `@property` registration, and the positions where interpolation is rejected) live in [How it works](/how-it-works#dynamic-values-css-custom-properties).
 
 ## A note about the polymorphism of CSS
 

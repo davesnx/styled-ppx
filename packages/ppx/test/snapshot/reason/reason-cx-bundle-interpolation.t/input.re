@@ -1,14 +1,14 @@
-/* Selective atomization: a block's interpolating declarations share one
-   content-addressed bundle class and one var per (source-path, runtime-type)
-   across base / :hover / @media. Static declarations keep their own shared
-   atom class. Identical bundles dedup to identical class + var; different
-   bundles never collide, so cross-module identity and CSS.merge stay correct. */
+/* A block has one class and one var per (source path, runtime type), shared
+   by its base, :hover and @media rules. Static and interpolated declarations
+   sit in the same rule. Two blocks never share a var, even when their content
+   is the same, so a merge of two blocks keeps both values apart.
+*/
 
 let color = CSS.Types.Color.toString(`hex("3A57FC"));
 let width = CSS.px(10);
 
 /* One value across base / :hover / @media collapses to one var, one inline
-   custom property, three rules sharing the bundle class. */
+   custom property, three rules on the block's class. */
 let multiVariant = [%css
   {|
   color: $(color);
@@ -21,8 +21,8 @@ let multiVariant = [%css
 |}
 ];
 
-/* Interpolating declarations bundle; static `display: flex` keeps its own
-   shared atom class. */
+/* Static `display: flex` and the interpolated `color` are in one rule on the
+   block's class. */
 let mixed = [%css
   {|
   display: flex;
@@ -34,7 +34,7 @@ let mixed = [%css
 ];
 
 /* Same path, different serializers (Width vs Height): two distinct vars in one
-   bundle. */
+   block. */
 let twoTypes = [%css
   {|
   width: $(width);
@@ -44,8 +44,8 @@ let twoTypes = [%css
 |}
 ];
 
-/* Two anonymous blocks with a byte-identical interpolating bundle emit the same
-   bundle class and var; the shared hover rule dedups to one. */
+/* Two anonymous blocks with the same interpolated hover rule: each block has
+   its own class and its own var. */
 let _ = [%css {|
   color: red;
   &:hover {

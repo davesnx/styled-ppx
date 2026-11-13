@@ -1,7 +1,7 @@
-/* Without the --dev flag, [%css] output is identical to before:
-   no `cx-<name>` marker class, only the atomized hashes. The atom
-   hashes themselves are dev-mode-invariant, so the post-marker
-   substring of dev-on output equals the no-marker dev-off output. */
+/* Without the --dev flag, [%css] output has no `cx-<name>` marker
+   class, only the block's class. The class does not depend on the
+   flag, so the post-marker substring of dev-on output equals the
+   no-marker dev-off output. */
 
 let layout = [%css {| display: flex; padding: 12px; |}];
 

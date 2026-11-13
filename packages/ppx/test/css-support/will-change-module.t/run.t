@@ -15,12 +15,20 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1i4dt3q{will-change:scroll-position;}"];
-  [@css ".css-ef3vel{will-change:contents;}"];
-  [@css ".css-1x5bobx{will-change:transform;}"];
-  [@css ".css-6fxfnd{will-change:top, left;}"];
+  [@css ".css-15elqts{will-change:scroll-position;}"];
+  [@css ".css-1h16xht{will-change:contents;}"];
+  [@css ".css-tr515w{will-change:transform;}"];
+  [@css ".css-dmtnkz{will-change:top, left;}"];
+  [@css.classes
+    [
+      ("css-15elqts", 0, "", "input.re", 2, 8, 2, 36),
+      ("css-1h16xht", 1, "", "input.re", 3, 8, 3, 29),
+      ("css-tr515w", 2, "", "input.re", 4, 8, 4, 30),
+      ("css-dmtnkz", 3, "", "input.re", 5, 8, 5, 30),
+    ]
+  ];
   
-  CSS.make("css-1i4dt3q", []);
-  CSS.make("css-ef3vel", []);
-  CSS.make("css-1x5bobx", []);
-  CSS.make("css-6fxfnd", []);
+  CSS.make("css-15elqts", []);
+  CSS.make("css-1h16xht", []);
+  CSS.make("css-tr515w", []);
+  CSS.make("css-dmtnkz", []);

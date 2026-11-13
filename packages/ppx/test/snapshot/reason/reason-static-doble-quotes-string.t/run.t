@@ -1,16 +1,11 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-k008qs-SingleQuoteStrings{display:flex;}"];
-  [@css ".css-1tyndxa-SingleQuoteStrings{justify-content:center;}"];
-  [@css.bindings
-    [
-      (
-        "Output.SingleQuoteStrings",
-        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
-      ),
-    ]
+  [@css ".css-nqdaql{display:flex;justify-content:center;}"];
+  [@css.classes
+    [("css-nqdaql", 0, "Output.SingleQuoteStrings", "output.ml", 3, 2, 5, 0)]
   ];
+  [@css.bindings [("Output.SingleQuoteStrings", "css-nqdaql")]];
   module SingleQuoteStrings = {
     [@deriving abstract]
     [@warning "-69"]
@@ -994,11 +989,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles =
-      CSS.make(
-        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
-        [],
-      );
+    let styles = CSS.make("css-nqdaql", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

@@ -30,16 +30,16 @@ defines, and the PPX output is byte-identical across both paths:
 
   $ refmt --parse ml --print re native/Anim_Css.ml
   [@css
-    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"
+    "@keyframes keyframe-xq7k2l{0%{height:var(--hftwzv);}100%{height:var(--14y9cfq);}}"
   ];
   let h0 = `px(0);
   let h1 = `px(100);
   let grow =
     CSS.Types.AnimationName.make(
       ~vars=[
-        ("--h0-hftwzv", CSS.Types.Height.toString(h0)),
-        ("--h1-14y9cfq", CSS.Types.Height.toString(h1)),
+        ("--hftwzv", CSS.Types.Height.toString(h0)),
+        ("--14y9cfq", CSS.Types.Height.toString(h1)),
       ],
-      "keyframe-t5c4er",
+      "keyframe-xq7k2l",
     );
   $ diff native/Anim_Css.ml js/Anim_Css.ml

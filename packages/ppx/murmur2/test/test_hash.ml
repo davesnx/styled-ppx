@@ -52,6 +52,28 @@ let tests =
           expected (Murmur2.default input)))
     data
 
+let distinct_inputs =
+  [
+    [ "\xe2\x80\xa6"; "\xe2\x9c\xa6"; "&" ];
+    [
+      "content: \"\xe2\x80\xa6\";";
+      "content: \"\xe2\x9c\xa6\";";
+      "content: \"&\";";
+    ];
+  ]
+
+let distinct_tests =
+  List.map
+    (fun inputs ->
+      let name = String.concat " / " (List.map (Printf.sprintf "%S") inputs) in
+      Alcotest_extra.test ("distinct " ^ name) (fun () ->
+        let hashes = List.map Murmur2.default inputs in
+        (Alcotest.check Alcotest.int)
+          ("distinct hashes for " ^ name)
+          (List.length inputs)
+          (List.length (List.sort_uniq compare hashes))))
+    distinct_inputs
+
 let () =
   Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited "murmur2"
-    tests
+    (tests @ distinct_tests)

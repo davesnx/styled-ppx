@@ -3,7 +3,16 @@
    before typing: same-file modules, aliases, opens/includes, named [%css]
    bindings, and literal string selectors seen earlier in the file. */
 
-let table: Hashtbl.t((string, string), list(string)) = Hashtbl.create(64);
+type binding =
+  | Not_css
+  | Literal(string)
+  | Block(string)
+  | Function
+  | Several(int)
+  | Alias
+  | In_rec_group;
+
+let table: Hashtbl.t((string, string), binding) = Hashtbl.create(64);
 let local_modules: Hashtbl.t((string, string), unit) = Hashtbl.create(64);
 let aliases: Hashtbl.t((string, string), list(string)) =
   Hashtbl.create(32);
@@ -39,19 +48,12 @@ let register_alias =
   Hashtbl.replace(aliases, (file, join_path(scope @ [name])), target);
 };
 
-let register =
-    (
-      ~file: string,
-      ~scope: list(string),
-      ~name: string,
-      ~classNames: list(string),
-    ) =>
-  if (name != "_") {
-    List.iter(path => register_module(~file, ~path), prefixes(scope));
-    Hashtbl.replace(table, (file, join_path(scope @ [name])), classNames);
-  };
+let set_binding = (~file, ~scope, ~name, binding) => {
+  List.iter(path => register_module(~file, ~path), prefixes(scope));
+  Hashtbl.replace(table, (file, join_path(scope @ [name])), binding);
+};
 
-let lookup = (~file: string, ~path: list(string)): option(list(string)) =>
+let lookup = (~file: string, ~path: list(string)): option(binding) =>
   Hashtbl.find_opt(table, (file, join_path(path)));
 
 let module_exists = (~file: string, ~path: list(string)): bool =>
@@ -68,7 +70,7 @@ let include_module =
   let current_prefix = join_path(scope);
   let copied = ref([]);
   Hashtbl.iter(
-    ((entry_file, entry_path), classNames) =>
+    ((entry_file, entry_path), binding) =>
       if (entry_file == file) {
         let suffix =
           if (entry_path == module_prefix) {
@@ -97,15 +99,15 @@ let include_module =
         | Some(suffix) =>
           let included_path =
             current_prefix == "" ? suffix : current_prefix ++ "." ++ suffix;
-          copied := [(included_path, classNames), ...copied^];
+          copied := [(included_path, binding), ...copied^];
         | None => ()
         };
       },
     table,
   );
   List.iter(
-    ((included_path, classNames)) =>
-      Hashtbl.replace(table, (file, included_path), classNames),
+    ((included_path, binding)) =>
+      Hashtbl.replace(table, (file, included_path), binding),
     copied^,
   );
 };
@@ -197,7 +199,9 @@ let local_candidates = (~file, ~scope, ~opens, segments) => {
 let lookup_local_class_ref = (~file, ~scope, ~opens, path_str) => {
   let segments = path_segments(path_str);
   local_candidates(~file, ~scope, ~opens, segments)
-  |> List.find_map(path => lookup(~file, ~path));
+  |> List.find_map(path =>
+       Option.map(binding => (path, binding), lookup(~file, ~path))
+     );
 };
 
 let ref_matches_local_module = (~file, ~scope, ~opens, path_str) => {
@@ -224,6 +228,15 @@ let ref_matches_local_module = (~file, ~scope, ~opens, path_str) => {
   };
 };
 
+let not_a_css_binding = (~loc, path_str) =>
+  Ppxlib.Location.raise_errorf(
+    ~loc,
+    "Selector interpolation `$(%s)` does not refer to a [%%css] binding or string literal earlier in this module.\n- If `%s` is bound to a [%%css] or string literal later in the file, reorder the bindings.\n- If `%s` is a computed string, inline the class name literally.",
+    path_str,
+    path_str,
+    path_str,
+  );
+
 let resolve_selector_class_ref =
     (
       ~file: string,
@@ -233,7 +246,34 @@ let resolve_selector_class_ref =
       path_str: string,
     ) => {
   switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
-  | Some(classNames) => classNames
+  | Some((path, Function)) =>
+    Ppxlib.Location.raise_errorf(
+      ~loc,
+      "Selector interpolation `$(%s)` refers to a function. A selector needs a class name: bind one [%%css] block to a value (`let %s = [%%css \"...\"]`) or a string, and reference that.",
+      path_str,
+      List.nth(path, List.length(path) - 1),
+    )
+  | Some((_, Not_css)) => not_a_css_binding(~loc, path_str)
+  | Some((_, Block(class_name) | Literal(class_name))) => class_name
+  | Some((_, In_rec_group)) =>
+    Ppxlib.Location.raise_errorf(
+      ~loc,
+      "Selector interpolation `$(%s)` refers to a binding of its own `let rec` group, which is not defined yet. Move the referenced block out of the `let rec` group, before this binding.",
+      path_str,
+    )
+  | Some((_, Several(blocks))) =>
+    Ppxlib.Location.raise_errorf(
+      ~loc,
+      "`$(%s)` names a binding with %d [%%css] blocks. A selector can only reference a binding with one block; bind the block you mean to its own name, or use an empty marker binding.",
+      path_str,
+      blocks,
+    )
+  | Some((_, Alias)) =>
+    Ppxlib.Location.raise_errorf(
+      ~loc,
+      "Selector interpolation `$(%s)` refers to an alias of another binding. Aliases are not followed: reference the block itself (`$(a)` or `$(M.a)`).",
+      path_str,
+    )
   | None
       when
         String.contains(path_str, '.')
@@ -249,15 +289,8 @@ let resolve_selector_class_ref =
       | _ => path_str
       };
     Cross_module_refs.record(~file, ~longident, ~loc);
-    [Cross_module_refs.sentinel(longident)];
-  | None =>
-    Ppxlib.Location.raise_errorf(
-      ~loc,
-      "Selector interpolation `$(%s)` does not refer to a [%%css] binding or string literal earlier in this module.\n- If `%s` is bound to a [%%css] or string literal later in the file, reorder the bindings.\n- If `%s` is a computed string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
-      path_str,
-      path_str,
-      path_str,
-    )
+    Cross_module_refs.sentinel(longident);
+  | None => not_a_css_binding(~loc, path_str)
   };
 };
 
