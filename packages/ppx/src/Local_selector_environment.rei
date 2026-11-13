@@ -11,14 +11,22 @@ let register_alias:
   ) =>
   unit;
 
-let register:
-  (
-    ~file: string,
-    ~scope: list(string),
-    ~name: string,
-    ~classNames: list(string)
-  ) =>
-  unit;
+/** What a selector reference to a binding resolves to: a value with no
+    [%css] block, a string literal, the class of the one block it holds, a
+    function, a value with several blocks, an alias of another binding (not
+    followed), or a member of the [let rec] group being expanded. */
+type binding =
+  | Not_css
+  | Literal(string)
+  | Block(string)
+  | Function
+  | Several(int)
+  | Alias
+  | In_rec_group;
+
+/** The latest binding of [name] in [scope]; it replaces any earlier one. */
+let set_binding:
+  (~file: string, ~scope: list(string), ~name: string, binding) => unit;
 
 let include_module:
   (~file: string, ~scope: list(string), ~module_path: list(string)) => unit;
@@ -38,6 +46,6 @@ let resolve_selector_class_ref:
     ~loc: Ppxlib.Location.t,
     string
   ) =>
-  list(string);
+  string;
 
 let clear: unit => unit;

@@ -2,19 +2,23 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "@media (min-width: 600px) {.css-99qt2j-SelectorsMediaQueries{background:blue;}}"
+    "@media (min-width: 600px) {.css-ajyi50{background:blue;}}.css-ajyi50:hover{background:green;}.css-ajyi50 > p{color:pink;font-size:24px;}"
   ];
-  [@css ".css-hxxfxf-SelectorsMediaQueries:hover{background:green;}"];
-  [@css ".css-qzw9gh-SelectorsMediaQueries > p{color:pink;}"];
-  [@css ".css-z0beaj-SelectorsMediaQueries > p{font-size:24px;}"];
-  [@css.bindings
+  [@css.classes
     [
       (
+        "css-ajyi50",
+        0,
         "Output.SelectorsMediaQueries",
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "output.ml",
+        4,
+        2,
+        11,
+        0,
       ),
     ]
   ];
+  [@css.bindings [("Output.SelectorsMediaQueries", "css-ajyi50")]];
   module SelectorsMediaQueries = {
     [@deriving abstract]
     [@warning "-69"]
@@ -998,11 +1002,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles =
-      CSS.make(
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
-        [],
-      );
+    let styles = CSS.make("css-ajyi50", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

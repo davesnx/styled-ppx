@@ -1,19 +1,15 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-1uix7by{syntax:\"*\";inherits:false;}"];
-  [@css "@property --id-1ks2xuv{syntax:\"*\";inherits:false;}"];
-  [@css ".css-fhnx1u-DynamicComponent{color:var(--var-1uix7by);}"];
-  [@css ".css-k008qs-DynamicComponent{display:flex;}"];
-  [@css ".css-fhnx1u-DynamicComponent{background-color:var(--id-1ks2xuv);}"];
-  [@css.bindings
-    [
-      (
-        "Output.DynamicComponent",
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
-      ),
-    ]
+  [@css "@property --60za40-0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --60za40-1{syntax:\"*\";inherits:false;}"];
+  [@css
+    ".css-60za40{color:var(--60za40-0);display:flex;background-color:var(--60za40-1);}"
   ];
+  [@css.classes
+    [("css-60za40", 2, "Output.DynamicComponent", "output.ml", 6, 2, 9, 0)]
+  ];
+  [@css.bindings [("Output.DynamicComponent", "css-60za40")]];
   module DynamicComponent = {
     [@deriving abstract]
     [@warning "-69"]
@@ -1005,10 +1001,10 @@
       "Object.assign";
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
+        "css-60za40",
         [
-          ("--var-1uix7by", CSS.Types.Color.toString(var)),
-          ("--id-1ks2xuv", CSS.Types.Color.toString(id)),
+          ("--60za40-0", CSS.Types.Color.toString(var)),
+          ("--60za40-1", CSS.Types.Color.toString(id)),
         ],
       );
     let make = (props: makeProps('id, 'var)) => {

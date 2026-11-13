@@ -20,15 +20,15 @@ All CSS lives in the generated static stylesheet. You need a `styled-ppx.generat
 
 ## Why do my elements have an inline `style` attribute?
 
-When a block interpolates values (`color: $(c)`), the extracted CSS references a CSS custom property, and the element supplies its *value* through the inline `style` attribute (`style="--color-xk29fh: #f00"`). Only variable definitions live there, never declarations. See [How it works](/how-it-works#dynamic-values-css-custom-properties).
+When a block interpolates values (`color: $(c)`), the extracted CSS references a CSS custom property, and the element supplies its *value* through the inline `style` attribute (`style="--zvphd3-0:#f00"`). Only variable definitions live there, never declarations. See [How it works](/how-it-works#dynamic-values-css-custom-properties).
 
 ## Do I need `@emotion/css` or any JavaScript dependency?
 
 No. Since 0.62.0 the runtime is minimal: it only carries class names and custom-property values.
 
-## Why do my components have several class names?
+## Why does my component have several class names?
 
-Styles are atomic: each declaration becomes its own content-addressed class, so identical declarations across your app share one rule. Treat the class list as opaque. See [How it works](/how-it-works#atomization-one-declaration-one-class).
+Each `[%css]` block has one class. An element has several classes when you merge blocks with `CSS.merge`, or when `--dev` adds a `cx-<binding>` marker class. Treat the class list as opaque. See [How it works](/how-it-works#blocks-one-block-one-class).
 
 ## Can I use it without React?
 
@@ -40,7 +40,7 @@ Yes: server-reason-react renders your components to an HTML string, and your ser
 
 ## Why did my class names change between builds?
 
-They shouldn't have, unless something real changed: hashes are content-addressed from the CSS text (plus the main module name for interpolation variables). Names change exactly when the styles change, when a binding is renamed (the cosmetic `-label` suffix only), or when the ppx `--minify` flag differs between the builds you're comparing. Dev and prod names differ only by that label suffix; the hash is identical.
+They shouldn't have, unless something real changed: a class is a hash of the module name, the submodule path, the binding name and the block's CSS (with its selector references resolved, and its interpolated expressions). Names change exactly when one of those changes: the styles, what a `.$(x)` reference names, an interpolated expression, the binding name, or the module or submodule that holds the block. Dev and prod give the same class; `--dev` only adds a `cx-<binding>` marker class next to it.
 
 ## Can I extract the CSS for only part of my project?
 

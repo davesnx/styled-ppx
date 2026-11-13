@@ -22,7 +22,5 @@
   %{bin:node}
   ./compare.sh
   ./murmur2.js
-  ./compare-malformed.sh
-  ./malformed.js
   ./malformed.exe
   ./cli_murmur2.js))

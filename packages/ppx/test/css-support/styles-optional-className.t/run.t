@@ -25,5 +25,5 @@ free of development labels. Needs server-reason-react at 82c52e8a or later
   $ dune build
 
   $ ./_build/default/input.exe
-  <div class="css-k008qs" style="">ok</div>
-  <div class="css-k008qs base" style="">ok</div>
+  <div class="css-pqt4w9" style="">ok</div>
+  <div class="css-pqt4w9 base" style="">ok</div>

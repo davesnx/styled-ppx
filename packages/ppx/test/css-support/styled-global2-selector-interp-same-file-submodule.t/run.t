@@ -13,11 +13,14 @@ Same-file submodule selector interpolation resolves locally in
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "body .css-tokvmb-marker{font-weight:bold;}"];
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css.bindings [("Input.Css.marker", "css-tokvmb-marker")]];
+  [@css "body .css-17viirv{font-weight:bold;}"];
+  [@css ".css-17viirv{color:red;}"];
+  [@css.classes
+    [("css-17viirv", 1, "Input.Css.marker", "input.re", 2, 24, 2, 36)]
+  ];
+  [@css.bindings [("Input.Css.marker", "css-17viirv")]];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("css-17viirv", []);
   };
   
   module Globals = {

@@ -1,14 +1,12 @@
-Regression test for cx2 deep-nested selector atomization.
+Regression test for deep-nested selectors in a [%css] block.
 
 When a [%css ...] block contains a Style_rule nested inside another
 Style_rule (depth >= 2 of selector nesting), every parent prelude must
-be merged into the inner selector when atomizing for static extraction.
+be merged into the inner selector of the extracted rule.
 
-`extract_atomic_rules` (packages/ppx/src/Css_file.re) threads the
-accumulated parent prelude through its recursion and merges each child
-selector into it via `Selector_nesting.compute_new_prefix`, so `&`,
-`::pseudo-element`, and descendant combinators all resolve correctly at
-any depth. See styled-ppx-bug-report-4.md.
+Each child selector is merged into the accumulated parent prelude via
+`Selector_nesting.compute_new_prefix`, so `&`, `::pseudo-element`, and
+descendant combinators all resolve correctly at any depth.
 
 Selectors covered here:
 - single                -> :hover                 (control, single-level)
@@ -19,30 +17,26 @@ Selectors covered here:
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-tokvmb-single{color:red;}"]
-  [@@@css ".css-12qnfjo-single:hover{color:blue;}"]
-  [@@@css ".css-tokvmb-twoLevel{color:red;}"]
-  [@@@css ".css-11jzudz-twoLevel:focus-visible::after{content:\"\";}"]
-  [@@@css ".css-tokvmb-twoLevelPseudoClass{color:red;}"]
-  [@@@css ".css-1srf6vm-twoLevelPseudoClass:hover:focus{color:green;}"]
-  [@@@css ".css-tokvmb-threeLevel{color:red;}"]
-  [@@@css ".css-1tfmvqw-threeLevel:hover .child:focus{color:green;}"]
-  [@@@css ".css-tokvmb-descendantUnderPseudo{color:red;}"]
-  [@@@css ".css-nqbkm2-descendantUnderPseudo:hover .child{color:blue;}"]
+  [@@@css ".css-18ytvmo{color:red;}.css-18ytvmo:hover{color:blue;}"]
+  [@@@css
+    ".css-1i1u80y{color:red;}.css-1i1u80y:focus-visible::after{content:\"\";}"]
+  [@@@css ".css-1ieqvcf{color:red;}.css-1ieqvcf:hover:focus{color:green;}"]
+  [@@@css ".css-2i4e5{color:red;}.css-2i4e5:hover .child:focus{color:green;}"]
+  [@@@css ".css-1optnb0{color:red;}.css-1optnb0:hover .child{color:blue;}"]
+  [@@@css.classes
+    [("css-18ytvmo", 0, "Input.single", "input.ml", 10, 2, 14, 0);
+    ("css-1i1u80y", 1, "Input.twoLevel", "input.ml", 20, 2, 26, 0);
+    ("css-1ieqvcf", 2, "Input.twoLevelPseudoClass", "input.ml", 32, 2, 38, 0);
+    ("css-2i4e5", 3, "Input.threeLevel", "input.ml", 44, 2, 52, 0);
+    ("css-1optnb0", 4, "Input.descendantUnderPseudo", "input.ml", 58, 2, 64, 0)]]
   [@@@css.bindings
-    [("Input.single", "css-tokvmb-single css-12qnfjo-single");
-    ("Input.twoLevel", "css-tokvmb-twoLevel css-11jzudz-twoLevel");
-    ("Input.twoLevelPseudoClass",
-      "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass");
-    ("Input.threeLevel", "css-tokvmb-threeLevel css-1tfmvqw-threeLevel");
-    ("Input.descendantUnderPseudo",
-      "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo")]]
-  let single = CSS.make "css-tokvmb-single css-12qnfjo-single" []
-  let twoLevel = CSS.make "css-tokvmb-twoLevel css-11jzudz-twoLevel" []
-  let twoLevelPseudoClass =
-    CSS.make "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass"
-      []
-  let threeLevel = CSS.make "css-tokvmb-threeLevel css-1tfmvqw-threeLevel" []
-  let descendantUnderPseudo =
-    CSS.make
-      "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo" []
+    [("Input.single", "css-18ytvmo");
+    ("Input.twoLevel", "css-1i1u80y");
+    ("Input.twoLevelPseudoClass", "css-1ieqvcf");
+    ("Input.threeLevel", "css-2i4e5");
+    ("Input.descendantUnderPseudo", "css-1optnb0")]]
+  let single = CSS.make "css-18ytvmo" []
+  let twoLevel = CSS.make "css-1i1u80y" []
+  let twoLevelPseudoClass = CSS.make "css-1ieqvcf" []
+  let threeLevel = CSS.make "css-2i4e5" []
+  let descendantUnderPseudo = CSS.make "css-1optnb0" []

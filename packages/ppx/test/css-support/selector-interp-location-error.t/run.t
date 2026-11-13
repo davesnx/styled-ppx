@@ -20,8 +20,10 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1c21bcw-_className .lolaso :nth-child(2n){color:red;}"];
-  [@css.bindings [("Input._className", "css-1c21bcw-_className")]];
-  let _className = CSS.make("css-1c21bcw-_className", []);
+  [@css ".css-x6t2p2 .lolaso :nth-child(2n){color:red;}"];
+  [@css.classes
+    [("css-x6t2p2", 0, "Input._className", "input.re", 2, 2, 5, 0)]
+  ];
+  let _className = CSS.make("css-x6t2p2", []);
   
   let _className = [%ocaml.error "Parse error while reading token '2'"];

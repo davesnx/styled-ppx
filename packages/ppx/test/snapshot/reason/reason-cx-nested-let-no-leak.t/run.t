@@ -5,13 +5,13 @@ function args, and other inner expressions stay private.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "@property --active-f7rv17{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-tokvmb-inner{color:red;}"]
-  [@@@css ".css-ythpkc-make_button{color:var(--active-f7rv17);}"]
-  [@@@css.bindings
-    [("Input.outer", "css-tokvmb-inner");
-    ("Input.make_button", "css-ythpkc-make_button")]]
-  let outer = let inner = CSS.make "css-tokvmb-inner" [] in inner
+  [@@@css "@property --11j2eur-0{syntax:\"*\";inherits:false;}"]
+  [@@@css ".css-1ytlvso{color:red;}"]
+  [@@@css ".css-11j2eur{color:var(--11j2eur-0);}"]
+  [@@@css.classes
+    [("css-1ytlvso", 1, "Input.outer.inner", "input.ml", 10, 23, 10, 35);
+    ("css-11j2eur", 2, "Input.make_button", "input.ml", 15, 34, 15, 52)]]
+  [@@@css.bindings [("Input.outer", "css-1ytlvso"); ("Input.make_button", "")]]
+  let outer = let inner = CSS.make "css-1ytlvso" [] in inner
   let make_button active =
-    CSS.make "css-ythpkc-make_button"
-      [("--active-f7rv17", (CSS.Types.Color.toString active))]
+    CSS.make "css-11j2eur" [("--11j2eur-0", (CSS.Types.Color.toString active))]

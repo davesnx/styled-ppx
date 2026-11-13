@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body{color:var(--accent-vx0fk9);}"];
+  [@css "body{color:var(--96ns0y);}"];
   [@css "*{box-sizing:border-box;}"];
   [@css "div.container#main{padding:0;}"];
   [@css ".btn.primary.large{font-weight:bold;}"];
@@ -13,7 +13,7 @@
   [@css "[data-state]{opacity:0.5;}"];
   [@css "[href^=\"https\"]{color:green;}"];
   [@css "a[target=\"_blank\"]::after{content:\" ↗\";}"];
-  [@css "a:hover{color:var(--accent-vx0fk9);}"];
+  [@css "a:hover{color:var(--96ns0y);}"];
   [@css "input:focus-visible{outline:2px solid blue;}"];
   [@css "li:nth-child(2n){background:#eee;}"];
   [@css "button:not(:disabled){cursor:pointer;}"];
@@ -24,7 +24,7 @@
   [@css "h1{font-family:serif;}"];
   [@css "h2{font-family:serif;}"];
   [@css "h3{font-family:serif;}"];
-  [@css "form input[type=\"submit\"]:hover{background:var(--accent-ki23tf);}"];
+  [@css "form input[type=\"submit\"]:hover{background:var(--1fhdsy3);}"];
   [@css "*{box-sizing:inherit;}"];
   [@css "*::before{box-sizing:inherit;}"];
   [@css "*::after{box-sizing:inherit;}"];
@@ -35,13 +35,10 @@
         (
           (
             (
-              (
-                (":root{" ++ "--accent-vx0fk9:")
-                ++ CSS.Types.Color.toString(accent)
-              )
+              ((":root{" ++ "--96ns0y:") ++ CSS.Types.Color.toString(accent))
               ++ ";"
             )
-            ++ "--accent-ki23tf:"
+            ++ "--1fhdsy3:"
           )
           ++ CSS.Types.Background.toString(accent)
         )

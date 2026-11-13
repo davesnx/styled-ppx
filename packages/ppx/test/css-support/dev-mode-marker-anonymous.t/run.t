@@ -15,16 +15,23 @@ behavior; this keeps the two debug affordances symmetric.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-14ksm7b{color:blue;}"];
-  [@css ".css-bjcoli-named{color:green;}"];
-  [@css.bindings [("Input.named", "css-bjcoli-named")]];
+  [@css ".css-iug1x9{color:red;}"];
+  [@css ".css-fylqy{color:blue;}"];
+  [@css ".css-wkeppf{color:green;}"];
+  [@css.classes
+    [
+      ("css-iug1x9", 0, "", "input.re", 9, 17, 9, 29),
+      ("css-fylqy", 1, "", "input.re", 11, 9, 11, 22),
+      ("css-wkeppf", 2, "Input.named", "input.re", 14, 21, 14, 35),
+    ]
+  ];
+  [@css.bindings [("Input.named", "css-wkeppf")]];
   
-  let _ = CSS.make("css-tokvmb", []);
+  let _ = CSS.make("css-iug1x9", []);
   
-  CSS.make("css-14ksm7b", []);
+  CSS.make("css-fylqy", []);
   
-  let named = CSS.make("cx-named css-bjcoli-named", []);
+  let named = CSS.make("cx-named css-wkeppf", []);
   
   let _ = named;
 

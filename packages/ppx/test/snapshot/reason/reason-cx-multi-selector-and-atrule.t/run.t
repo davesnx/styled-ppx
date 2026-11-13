@@ -1,57 +1,42 @@
-Coverage for cx2 atomization edge cases.
+Selector lists and nested at-rules in a block.
 
-Multi-selector preludes must split into one atom per selector at every depth
-(CSS-nesting Cartesian semantics). Nested at-rules must carry the parent
-selector chain into the at-rule's contents instead of dropping it.
+A selector list in a nested rule expands to one rule per selector at every
+depth (CSS-nesting Cartesian semantics). A nested at-rule carries the parent
+selector chain into its contents instead of dropping it.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-rmy2q8-multiTop .a{color:red;}"]
-  [@@@css ".css-alyv6j-multiTop .b{color:red;}"]
-  [@@@css ".css-xuam0t-multiNested .parent .a{color:blue;}"]
-  [@@@css ".css-1400cim-multiNested .parent .b{color:blue;}"]
-  [@@@css ".css-1v5vtx3-cartesian .a .c{color:green;}"]
-  [@@@css ".css-1hhu78w-cartesian .a .d{color:green;}"]
-  [@@@css ".css-1ehtzuk-cartesian .b .c{color:green;}"]
-  [@@@css ".css-1nvjsnn-cartesian .b .d{color:green;}"]
-  [@@@css ".css-rmy2q8-multiMixed .a{color:red;}"]
-  [@@@css ".css-alyv6j-multiMixed .b{color:red;}"]
-  [@@@css ".css-bij269-multiMixed .a:hover{color:blue;}"]
-  [@@@css ".css-1k1r9ux-multiMixed .b:hover{color:blue;}"]
+  [@@@css ".css-3ovpo5 .a{color:red;}.css-3ovpo5 .b{color:red;}"]
   [@@@css
-    "@media (min-width: 768px) {.css-14bi921-mediaUnderSelector .a{color:red;}}"]
+    ".css-e3cfct .parent .a{color:blue;}.css-e3cfct .parent .b{color:blue;}"]
   [@@@css
-    "@media (max-width: 600px) {.css-godogz-mediaDeep .a .b{color:red;}}"]
-  [@@@css ".css-1c0hjb1-mediaWithNested .a{color:black;}"]
+    ".css-1x1gs0d .a .c{color:green;}.css-1x1gs0d .a .d{color:green;}.css-1x1gs0d .b .c{color:green;}.css-1x1gs0d .b .d{color:green;}"]
   [@@@css
-    "@media (max-width: 600px) {.css-1x7bng1-mediaWithNested .a{color:red;}}"]
+    ".css-1cfk6lx .a{color:red;}.css-1cfk6lx .a:hover{color:blue;}.css-1cfk6lx .b{color:red;}.css-1cfk6lx .b:hover{color:blue;}"]
+  [@@@css "@media (min-width: 768px) {.css-p14ia4 .a{color:red;}}"]
+  [@@@css "@media (max-width: 600px) {.css-1kioole .a .b{color:red;}}"]
   [@@@css
-    "@media (max-width: 600px) {.css-pjtxwe-mediaWithNested .a:hover{color:blue;}}"]
+    ".css-1t0xo06 .a{color:black;}@media (max-width: 600px) {.css-1t0xo06 .a{color:red;}.css-1t0xo06 .a:hover{color:blue;}}"]
+  [@@@css.classes
+    [("css-3ovpo5", 0, "Input.multiTop", "input.ml", 13, 2, 16, 0);
+    ("css-e3cfct", 1, "Input.multiNested", "input.ml", 21, 2, 26, 0);
+    ("css-1x1gs0d", 2, "Input.cartesian", "input.ml", 32, 2, 37, 0);
+    ("css-1cfk6lx", 3, "Input.multiMixed", "input.ml", 44, 2, 50, 0);
+    ("css-p14ia4", 4, "Input.mediaUnderSelector", "input.ml", 57, 2, 62, 0);
+    ("css-1kioole", 5, "Input.mediaDeep", "input.ml", 68, 2, 75, 0);
+    ("css-1t0xo06", 6, "Input.mediaWithNested", "input.ml", 82, 2, 91, 0)]]
   [@@@css.bindings
-    [("Input.multiTop", "css-rmy2q8-multiTop css-alyv6j-multiTop");
-    ("Input.multiNested", "css-xuam0t-multiNested css-1400cim-multiNested");
-    ("Input.cartesian",
-      "css-1v5vtx3-cartesian css-1hhu78w-cartesian css-1ehtzuk-cartesian css-1nvjsnn-cartesian");
-    ("Input.multiMixed",
-      "css-rmy2q8-multiMixed css-alyv6j-multiMixed css-bij269-multiMixed css-1k1r9ux-multiMixed");
-    ("Input.mediaUnderSelector", "css-14bi921-mediaUnderSelector");
-    ("Input.mediaDeep", "css-godogz-mediaDeep");
-    ("Input.mediaWithNested",
-      "css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested")]]
-  let multiTop = CSS.make "css-rmy2q8-multiTop css-alyv6j-multiTop" []
-  let multiNested =
-    CSS.make "css-xuam0t-multiNested css-1400cim-multiNested" []
-  let cartesian =
-    CSS.make
-      "css-1v5vtx3-cartesian css-1hhu78w-cartesian css-1ehtzuk-cartesian css-1nvjsnn-cartesian"
-      []
-  let multiMixed =
-    CSS.make
-      "css-rmy2q8-multiMixed css-alyv6j-multiMixed css-bij269-multiMixed css-1k1r9ux-multiMixed"
-      []
-  let mediaUnderSelector = CSS.make "css-14bi921-mediaUnderSelector" []
-  let mediaDeep = CSS.make "css-godogz-mediaDeep" []
-  let mediaWithNested =
-    CSS.make
-      "css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested"
-      []
+    [("Input.multiTop", "css-3ovpo5");
+    ("Input.multiNested", "css-e3cfct");
+    ("Input.cartesian", "css-1x1gs0d");
+    ("Input.multiMixed", "css-1cfk6lx");
+    ("Input.mediaUnderSelector", "css-p14ia4");
+    ("Input.mediaDeep", "css-1kioole");
+    ("Input.mediaWithNested", "css-1t0xo06")]]
+  let multiTop = CSS.make "css-3ovpo5" []
+  let multiNested = CSS.make "css-e3cfct" []
+  let cartesian = CSS.make "css-1x1gs0d" []
+  let multiMixed = CSS.make "css-1cfk6lx" []
+  let mediaUnderSelector = CSS.make "css-p14ia4" []
+  let mediaDeep = CSS.make "css-1kioole" []
+  let mediaWithNested = CSS.make "css-1t0xo06" []

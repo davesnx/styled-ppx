@@ -20,30 +20,19 @@ carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-14kiwtd-_test .\\31 a{color:red;}"];
-  [@css ".css-10mby7r-_test .-\\31 a{color:red;}"];
-  [@css ".css-1vlbr1m-_test #\\31 a{color:red;}"];
-  [@css ".css-1klhelx-_test .a\\.b{color:red;}"];
-  [@css ".css-1jd2wma-_test .foo\\:bar{color:red;}"];
-  [@css ".css-67142b-_test .a\\/b{color:red;}"];
-  [@css ".css-nxfkpb-_test .foo\\ bar{color:red;}"];
-  [@css ".css-r5hrsz-_test .héllo{color:red;}"];
-  [@css ".css-hufzp0-_test .foo:not(.a\\.b){color:red;}"];
-  [@css ".css-1x6t703{--custom\\ prop:red;}"];
-  [@css.bindings
+  [@css
+    ".css-9g1ibu .\\31 a{color:red;}.css-9g1ibu .-\\31 a{color:red;}.css-9g1ibu #\\31 a{color:red;}.css-9g1ibu .a\\.b{color:red;}.css-9g1ibu .foo\\:bar{color:red;}.css-9g1ibu .a\\/b{color:red;}.css-9g1ibu .foo\\ bar{color:red;}.css-9g1ibu .héllo{color:red;}.css-9g1ibu .foo:not(.a\\.b){color:red;}"
+  ];
+  [@css ".css-1cxbe3a{--custom\\ prop:red;}"];
+  [@css.classes
     [
-      (
-        "Input._test",
-        "css-14kiwtd-_test css-10mby7r-_test css-1vlbr1m-_test css-1klhelx-_test css-1jd2wma-_test css-67142b-_test css-nxfkpb-_test css-r5hrsz-_test css-hufzp0-_test",
-      ),
+      ("css-9g1ibu", 0, "Input._test", "input.re", 3, 2, 12, 0),
+      ("css-1cxbe3a", 1, "", "input.re", 15, 8, 15, 28),
     ]
   ];
-  let _test =
-    CSS.make(
-      "css-14kiwtd-_test css-10mby7r-_test css-1vlbr1m-_test css-1klhelx-_test css-1jd2wma-_test css-67142b-_test css-nxfkpb-_test css-r5hrsz-_test css-hufzp0-_test",
-      [],
-    );
+  [@css.bindings [("Input._test", "css-9g1ibu")]];
+  let _test = CSS.make("css-9g1ibu", []);
   
-  CSS.make("css-1x6t703", []);
+  CSS.make("css-1cxbe3a", []);
 
   $ dune build

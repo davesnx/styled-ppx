@@ -2,28 +2,19 @@ Regression guard: cross-module [%keyframe] interpolation does not collide.
 
 Two modules define the byte-identical interpolated keyframe `grow` plus a
 `[%css animation-name: $(grow)]` binding, differing only in a sibling
-declaration. This confirms the keyframe path is free of the atomic class/var
-collision that affected [%css] backgrounds.
+declaration.
 
-Two hashing schemes meet here, both routed through Hash_class.
-First, the `animation-name: $(grow)` atom is hashed from its own declaration
-content (Hash_class.class_and_namespace), so its class (css-14rjjsz-box) AND
-its variable (--var-1ugf6s8) are identical in both modules and the aggregator
-dedupes the rule to a single line.
-Second, the keyframe itself is namespaced by kind+module+scope
-(Hash_class.scoped_namespace), so its internal height variables - and thus its
-content-hashed keyframe-<hash> name - differ per module (keyframe-1l2n74q vs
-keyframe-5ilju1); the two keyframes are emitted under distinct names. The
-namespace is keyed on the compilation-unit module name, not the physical file
-path, so the same module compiled from two paths agrees on one keyframe name.
+The `animation-name: $(grow)` block has its own class and its own variable
+in each module (the variable seed is the block class: module, scope,
+binding, content). The keyframe itself is namespaced by kind+module+scope
+(Hash_class.scoped_namespace), so its internal height variables, and thus
+its content-hashed keyframe-<hash> name, differ per module. The namespace is
+keyed on the compilation-unit module name, not the file path, so the same
+module compiled from two paths agrees on one keyframe name.
 
-Why this is safe: custom properties resolve per element. Each module's `grow`
-sets the shared `--var-1ugf6s8` to ITS OWN keyframe name and, on the same
-element, sets that keyframe's internal height variables. Every element thus
-resolves the animation-name variable and the keyframe body against values it
-actually set - no element references a variable it did not set. The
-per-module divergence lives in the keyframe NAME (a value), never in a shared
-class pointing at a missing variable.
+Each element sets the animation-name variable of its own block to its own
+keyframe name and sets that keyframe's height variables, so no element reads
+a variable it did not set.
 
   $ refmt --parse re --print ml a.re > a.ml
   $ ../../standalone.exe --impl a.ml -o a.ml
@@ -31,42 +22,40 @@ class pointing at a missing variable.
   $ ../../standalone.exe --impl b.ml -o b.ml
   $ cat a.ml
   [@@@css
-    "@keyframes keyframe-1h1i3op{0%{height:var(--h0-9tm5yy);}100%{height:var(--h1-mjt56l);}}"]
+    "@keyframes keyframe-19lbv5m{0%{height:var(--9tm5yy);}100%{height:var(--mjt56l);}}"]
   [@@@css
-    ".css-14rjjsz-box{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
-  [@@@css ".css-k008qs-box{display:flex;}"]
-  [@@@css.bindings [("A.box", "css-14rjjsz-box css-k008qs-box")]]
+    ".css-1ec30su{-webkit-animation-name:var(--1ec30su-0);animation-name:var(--1ec30su-0);display:flex;}"]
+  [@@@css.classes [("css-1ec30su", 1, "A.box", "a.ml", 4, 19, 4, 59)]]
+  [@@@css.bindings [("A.box", "css-1ec30su")]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =
     CSS.Types.AnimationName.make
-      ~vars:[("--h0-9tm5yy", (CSS.Types.Height.toString h0));
-            ("--h1-mjt56l", (CSS.Types.Height.toString h1))] "keyframe-1h1i3op"
+      ~vars:[("--9tm5yy", (CSS.Types.Height.toString h0));
+            ("--mjt56l", (CSS.Types.Height.toString h1))] "keyframe-19lbv5m"
   let box =
-    CSS.make "css-14rjjsz-box css-k008qs-box"
-      (CSS.Types.AnimationName.toStyleVars "--grow-1ugf6s8" grow)
+    CSS.make "css-1ec30su"
+      (CSS.Types.AnimationName.toStyleVars "--1ec30su-0" grow)
   $ cat b.ml
   [@@@css
-    "@keyframes keyframe-1arknxa{0%{height:var(--h0-yrpn7p);}100%{height:var(--h1-1oxv8aa);}}"]
+    "@keyframes keyframe-1axzt86{0%{height:var(--yrpn7p);}100%{height:var(--1oxv8aa);}}"]
   [@@@css
-    ".css-14rjjsz-box{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
-  [@@@css ".css-hpgf8j-box{padding:8px;}"]
-  [@@@css.bindings [("B.box", "css-14rjjsz-box css-hpgf8j-box")]]
+    ".css-fpqbeq{-webkit-animation-name:var(--fpqbeq-0);animation-name:var(--fpqbeq-0);padding:8px;}"]
+  [@@@css.classes [("css-fpqbeq", 1, "B.box", "b.ml", 4, 19, 4, 58)]]
+  [@@@css.bindings [("B.box", "css-fpqbeq")]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =
     CSS.Types.AnimationName.make
-      ~vars:[("--h0-yrpn7p", (CSS.Types.Height.toString h0));
-            ("--h1-1oxv8aa", (CSS.Types.Height.toString h1))]
-      "keyframe-1arknxa"
+      ~vars:[("--yrpn7p", (CSS.Types.Height.toString h0));
+            ("--1oxv8aa", (CSS.Types.Height.toString h1))] "keyframe-1axzt86"
   let box =
-    CSS.make "css-14rjjsz-box css-hpgf8j-box"
-      (CSS.Types.AnimationName.toStyleVars "--grow-1ugf6s8" grow)
+    CSS.make "css-fpqbeq"
+      (CSS.Types.AnimationName.toStyleVars "--fpqbeq-0" grow)
   $ styled-ppx.generate a.ml b.ml > styles.css
   $ cat styles.css
   /* This file is generated by styled-ppx, do not edit manually */
-  @keyframes keyframe-1h1i3op{0%{height:var(--h0-9tm5yy);}100%{height:var(--h1-mjt56l);}}
-  .css-14rjjsz-box{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}
-  .css-k008qs-box{display:flex;}
-  @keyframes keyframe-1arknxa{0%{height:var(--h0-yrpn7p);}100%{height:var(--h1-1oxv8aa);}}
-  .css-hpgf8j-box{padding:8px;}
+  @keyframes keyframe-19lbv5m{0%{height:var(--9tm5yy);}100%{height:var(--mjt56l);}}
+  .css-1ec30su{-webkit-animation-name:var(--1ec30su-0);animation-name:var(--1ec30su-0);display:flex;}
+  @keyframes keyframe-1axzt86{0%{height:var(--yrpn7p);}100%{height:var(--1oxv8aa);}}
+  .css-fpqbeq{-webkit-animation-name:var(--fpqbeq-0);animation-name:var(--fpqbeq-0);padding:8px;}

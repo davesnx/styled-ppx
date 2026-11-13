@@ -66,30 +66,31 @@ extraction:
 
 1. Parse declaration lists with `packages/parser`
 2. Type-check declarations against `packages/css-grammar`
-3. Atomize declarations in `packages/ppx/src/Css_file.re` (`Css_file.push`)
+3. Give the block one class in `packages/ppx/src/Css_file.re` (`Css_file.push`)
 4. Lower value interpolation `$(expr)` to CSS custom properties,
    collecting `dynamic_vars`
 5. Resolve class-name interpolation in selectors against the per-file
    `Local_selector_environment` so `$(name)` is
-   replaced with the actual minted class names before the CSS AST is rendered
+   replaced with the referenced binding's class before the CSS AST is rendered
 6. Generate `CSS.make(...)` calls (carrying the class names and the
    dynamic vars) and record the extracted rules for the end-of-CU
    `[@@@css ...]` attributes
 
 `Local_selector_environment` is populated as each `[%css]` extension expands:
 the enclosing `let`-binding name (recovered by the ordered structure pass in
-`ppx.re`, which walks bindings in source order) is mapped to the list of class
-names that atomization produced. Later `[%css]` blocks in the same file resolve
-`&.$(name)` and similar selector interpolations against that environment,
-fanning a multi-declaration source binding into a chained compound selector
-(`&.cssA.cssB`). Unresolved local references (undefined or forward) raise a
+`ppx.re`, which walks bindings in source order) is mapped to the block's class.
+Later `[%css]` blocks in the same file resolve `&.$(name)` and similar selector
+interpolations against that environment. A reference to a function, or to a
+binding with several blocks, is an error: a selector needs one class.
+Aliases (`let x = a`) are not followed.
+Unresolved local references (undefined or forward) raise a
 clear PPX error; cross-module references are recorded in `Cross_module_refs`
 and resolved by the aggregator (see `documents/css-extraction.md`).
 
 ### `[%styled.<tag>]`
 
 `module Button = [%styled.button "..."]` runs the same extraction path as
-`[%css]` (`Css_file.push`, same atomization and interpolation lowering) and
+`[%css]` (`Css_file.push`, one class per block, same interpolation lowering) and
 wraps the resulting `CSS.make` call in a generated React component for the
 given HTML tag (`Generate.staticComponent`). Function payloads
 (`[%styled.div (~color) => "color: $(color)"]`) also extract: the CSS string
@@ -111,12 +112,12 @@ selector-interpolation walks. Differs from `[%css]` in two ways:
   (`map_ordered_module_expr` in `ppx.re`). Uses in other positions are
   left unexpanded (no dedicated migration diagnostic exists today).
 - Splits each interpolated rule into two complementary outputs:
-  the static rule with `var(--<prefix>-<hash>)` substituted in value
-  positions and resolved class chains substituted in selector
+  the static rule with `var(--<hash>)` substituted in value
+  positions and resolved classes substituted in selector
   positions (extracted via `Buffer.add_global_rule` like a static
   global) plus a generated module containing
   `to_string`/`makeProps`/`make` that emit a single
-  `:root { --<prefix>-<hash>: <value>; ... }` block at runtime to supply
+  `:root { --<hash>: <value>; ... }` block at runtime to supply
   the values. Selector interpolation has no runtime side; class
   names resolve fully at PPX time (same module) or aggregator time
   (cross-module).
@@ -157,8 +158,8 @@ the only new artifact.
 
 | Half    | Shape                                                                                | Where it lives                                                                  |
 | ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| Static  | The user's rule, with `var(--<prefix>-<hash>)` in interpolation positions            | Aggregated `styles.css` via `[@@@css ...]`                                      |
-| Dynamic | A single `:root { --<prefix>-<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make`                              |
+| Static  | The user's rule, with `var(--<hash>)` in interpolation positions            | Aggregated `styles.css` via `[@@@css ...]`                                      |
+| Dynamic | A single `:root { --<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make`                              |
 
 The dynamic side does **not** re-emit the user's selectors or
 non-interpolated declarations. Those live in the static stylesheet.
@@ -182,14 +183,14 @@ module Foo = [%styled.global {| ... |}]
 Css_file.push_global ~file rule_list:
   reject parentless `&`; flatten nesting (Resolve.resolve_selectors)
   for each Style_rule / At_rule:
-    Css_transform.transform_rule ($(path) → var(--<prefix>-<hash>); collect dynamic_vars)
+    Css_transform.transform_rule ($(path) → var(--<hash>); collect dynamic_vars)
     render and push to Buffer.add_global_rule
   return dynamic_vars
   │
   ▼
 build module structure (in ppx.re):
   to_string  = Css_global_to_string.render_root_block(dynamic_vars)
-               (emits ":root{--<prefix>-<hash>:<call expr>;...}" or "" if no vars)
+               (emits ":root{--<hash>:<call expr>;...}" or "" if no vars)
   makeProps  = (~key=?, ()) => Js.Obj.empty()
   make       = _props => CSS.global_style_tag(to_string())
   │
@@ -231,12 +232,9 @@ typed OCaml expressions are interpolated.
 
 #### Hashing
 
-Custom-property names are `--<prefix>-<hash>` (e.g.
-`--themeColor-1ppd0ds`), minted in `packages/ppx/src/Hash_class.ml`.
-The prefix is a readable, CSS-identifier-safe rendering of the
-interpolation's source path (falling back to `var` when nothing
-identifier-like survives); it is purely cosmetic. The murmur2 hash owns
-uniqueness and covers the scoped namespace
+Custom-property names are `--<hash>` (e.g. `--1vrtjuf`), minted in
+`packages/ppx/src/Hash_class.ml`. The murmur2 hash covers the scoped
+namespace
 (`Hash_class.scoped_namespace`: kind, module name, submodule scope,
 rendered rules), the expression path, and the resolved runtime type, so
 the same expression interpolated at two different target types gets two
@@ -257,8 +255,7 @@ module Theme = [%styled.global {|
   /* Bare $(name) - resolves to a class type-selector */
   body $(card) { line-height: 1.5; }
 
-  /* .$(name) - class-position; multi-decl bindings fan out into a
-     compound chain (.atom1.atom2). */
+  /* .$(name) - class-position; each binding is one class. */
   .$(card).$(active) { color: white; }
 
   /* Combinators, pseudo, attribute selectors, comma lists, nesting,
@@ -267,7 +264,7 @@ module Theme = [%styled.global {|
 
   /* Cross-module $(M.binding) emits a NUL-delimited sentinel that
      the post-build aggregator (styled-ppx.generate) substitutes
-     using the index it harvests from M's post-PPX file. */
+     using the index it reads from M's post-PPX file. */
   body .$(OtherModule.marker) { background: red; }
 
   /* Selector interp inside @media / @supports works the same way -
@@ -295,8 +292,11 @@ Resolution rules (identical to `[%css]`):
   location (via the synthetic `let _ = M.binding` line the PPX emits
   alongside `[@@@css.refs ...]`).
 - Bare `$(name)` (no leading dot) in selector position resolves the
-  binding and emits a `.classname` type-selector. Multi-class bindings
-  are rejected here (use `.$(name)` for the chain instead).
+  binding and emits a `.classname` class selector, like `.$(name)`.
+- A binding with several blocks (for example a conditional with two
+  inline blocks) has no single class: a reference to it is an error, in
+  the PPX for a same-module reference and in the aggregator for a
+  cross-module one. A reference to a function is an error too.
 
 Selector interpolation has no effect on the generated module's
 `to_string`: `dynamic_vars` only collects value-position
@@ -331,7 +331,7 @@ module ThemeStyles = [%styled.global {|
 | Interpolation in an at-rule prelude (e.g. `@media (max-width: $(bp))`)   | `raise_errorf` pointing at the interpolation.                                                                                             |
 | Parentless `&` (top level, or under an at-rule with no style rule above)  | `raise_errorf`: `&` has no parent selector to resolve against.                                                                            |
 | Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Local_selector_environment.resolve_selector_class_ref` pointing at the interpolation.                                                  |
-| Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
+| Selector interp `$(name)` references a function or a binding with several blocks | `raise_errorf`: a selector needs one class. Across modules, the aggregator reports both (they are exported with an empty class string), and the compiler also rejects a function through the typed `let _: CSS.styles = M.x`. |
 | Cross-module `$(M.x)` where `M.x` doesn't exist at link time              | `Unbound module` / `Unbound value` from OCaml typechecker via the synthetic `let _ = M.x`; aggregator also reports a missing-binding error using the location stored in `[@@@css.refs ...]`. |
 
 #### Code map
@@ -339,7 +339,7 @@ module ThemeStyles = [%styled.global {|
 | File                                            | Role                                                                                                                                                                                                                                |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/ppx/src/ppx.re`                       | `map_ordered_module_expr` matches `Pmod_extension` nodes named `styled.global`; `expand_global_module` does the work.                                                                                                              |
-| `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--<prefix>-<hash>)` already substituted) into the global buffer. Also hosts the `Css_transform` submodule doing the interpolation walks. |
+| `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--<hash>)` already substituted) into the global buffer. Also hosts the `Css_transform` submodule doing the interpolation walks. |
 | `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%css]` and `[%styled.global]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
 | `packages/ppx/src/Css_global_to_string.re`      | `render_root_block ~loc dynamic_vars` builds the `to_string` body: a single `:root { ... }` rule with one declaration per entry, or `""` when `dynamic_vars` is empty.                                                              |
 | `packages/runtime/{native,melange}/CSS.ml`      | `CSS.global_style_tag : string -> React.element`.                                                                                                                                                                                   |

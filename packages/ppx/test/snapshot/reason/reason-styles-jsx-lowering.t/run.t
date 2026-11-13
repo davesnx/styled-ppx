@@ -3,7 +3,8 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".css-1smrodm{margin-top:32px;}"];
+  [@css.classes [("css-1smrodm", 0, "", "output.ml", 18, 42, 18, 60)]];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -26,9 +27,9 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   let _ =
     <p
       className={CSS.className(
-        Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])),
+        Cn2.(Css.bodyLg +++ CSS.make("css-1smrodm", [])),
       )}
-      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-1smrodm", [])))}
     />;
   let _ =
     <div
@@ -43,7 +44,8 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".css-1smrodm{margin-top:32px;}"];
+  [@css.classes [("css-1smrodm", 0, "", "output.ml", 18, 42, 18, 60)]];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -66,9 +68,9 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   let _ =
     <p
       className={CSS.className(
-        Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])),
+        Cn2.(Css.bodyLg +++ CSS.make("css-1smrodm", [])),
       )}
-      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-1smrodm", [])))}
     />;
   let _ =
     <div

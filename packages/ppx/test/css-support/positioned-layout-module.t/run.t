@@ -15,6 +15,7 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1oy4rvw{position:sticky;}"];
+  [@css ".css-1epkybz{position:sticky;}"];
+  [@css.classes [("css-1epkybz", 0, "", "input.re", 2, 8, 2, 24)]];
   
-  CSS.make("css-1oy4rvw", []);
+  CSS.make("css-1epkybz", []);

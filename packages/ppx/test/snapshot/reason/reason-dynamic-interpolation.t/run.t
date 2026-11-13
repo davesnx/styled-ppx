@@ -1,17 +1,12 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-17zksex{syntax:\"*\";inherits:false;}"];
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
-  [@css ".css-13o7eu2-DynamicComponent{display:block;}"];
-  [@css.bindings
-    [
-      (
-        "Output.DynamicComponent",
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
-      ),
-    ]
+  [@css "@property --qni3t2-0{syntax:\"*\";inherits:false;}"];
+  [@css ".css-qni3t2{color:var(--qni3t2-0);display:block;}"];
+  [@css.classes
+    [("css-qni3t2", 1, "Output.DynamicComponent", "output.ml", 3, 4, 5, 2)]
   ];
+  [@css.bindings [("Output.DynamicComponent", "css-qni3t2")]];
   module DynamicComponent = {
     [@deriving abstract]
     [@warning "-69"]
@@ -1001,8 +996,8 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
-        [("--var-17zksex", CSS.Types.Color.toString(var))],
+        "css-qni3t2",
+        [("--qni3t2-0", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {
       let className =

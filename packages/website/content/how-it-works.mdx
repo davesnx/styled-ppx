@@ -32,7 +32,7 @@ your .re / .ml source
   ▼
 ① ppx expansion (while compiling each file)
    ─ parse & type-check the CSS
-   ─ split into atomic rules, one class per declaration
+   ─ give each [%css] block one class
    ─ lower $(expr) interpolations to CSS custom properties
    ─ park the rendered CSS in [@@@css "..."] attributes
   │
@@ -50,11 +50,12 @@ Your components carry the class names the ppx minted at step ①, plus, when you
 
 See [Setting up the dune rules](/getting-started/dune-setup) for the concrete build configuration.
 
-## Atomization: one declaration, one class
+## Blocks: one block, one class
 
-Every declaration inside a `[%css]` or `[%styled.<tag>]` block becomes its own rule with its own class:
+Each `[%css]` or `[%styled.<tag>]` block becomes one class. Its declarations stay together in one rule, in source order:
 
 ```reason
+/* card.re */
 let layout = [%css {|
   display: flex;
   align-items: center;
@@ -64,23 +65,28 @@ let layout = [%css {|
 extracts to:
 
 ```css
-.css-k008qs-layout { display: flex; }
-.css-1tyndxa-layout { align-items: center; }
+.css-1upa9t7{display:flex;align-items:center;}
 ```
 
-and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
+and `layout`'s className is `"css-1upa9t7"`. A block with nested selectors or at-rules gives one rule for each of them, all on the same class.
 
-Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components. That's the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
-
-Repeated fallback declarations for the same property (e.g. `display: -webkit-box; display: flex;`) are kept together in a single atom, so their intra-rule order, which the fallback depends on, is preserved.
+Because a block is one rule, duplicate declarations of one property keep their order: in `display: -webkit-box; display: flex;` the later one wins, as in plain CSS.
 
 ### Class names
 
-The format is `css-<hash>-<label>`, where the label is the `let` binding or module name (`layout` above). The label is purely cosmetic, for debuggability: hashes alone determine identity and deduplication. Running the ppx with the `--minify` flag drops the label, emitting bare `css-<hash>` names for production.
+The format is `css-<hash>`. The hash covers the module name, the submodule path, the binding name, the block's rules after its selector references (`.$(x)`) are resolved, and its interpolated expressions. So:
+
+- the same block compiled twice (for example a native and a Melange copy of one module) gets the same class, and `styled-ppx.generate` writes it once;
+- two blocks with the same content in different modules or bindings get different classes;
+- an empty block (`let marker = [%css {||}]`) writes no rule but still has a class, which selectors can reference.
+
+The class has no label. Use the `--dev` flag (or `--env development`) to add a `cx-<binding>` marker class next to it, which you can search for in the DOM inspector.
+
+If two different blocks get the same class, `styled-ppx.generate` fails and names both blocks.
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+Every block rule has the same specificity (one class), unless its selector adds more. The tiebreaker is stylesheet order: the later rule wins. `styled-ppx.generate` writes files in the order of its arguments, and the rules of a file in source order. When `CSS.merge` combines two blocks that set the same property, the block that comes later in the stylesheet wins; the argument order of `CSS.merge` has no effect. The full rules and the `:where()` pattern for defaults live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -94,15 +100,14 @@ let title = (~color) => [%css {|
 ```
 
 ```css
-.css-abc123-title { font-size: 2rem; }
-.css-def456-title { color: var(--color-xk29fh); }
+.css-zvphd3{font-size:2rem;color:var(--zvphd3-0);}
 ```
 
-The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--color-xk29fh: #667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
+The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--zvphd3-0:#667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
 
 A few details worth knowing:
 
-- Variable names are readable and stable: `--<source-name>-<hash>`, identical in dev and prod, so `$(Theme.spacing.md)` becomes `--spacing-md-<hash>`.
+- Variable names are `--<class hash>-<n>`, where `n` numbers the block's distinct interpolations in order (`--zvphd3-0` above), identical in dev and prod. Each block has its own variables: two blocks that interpolate the same expression use two different variables. The same expression read with the same type in several rules of one block (base, `&:hover`, `@media`) is one variable.
 - The expression is wrapped in the typed `toString` for the property it's used in, so a `Color.t` where a length is expected is a compile error.
 - Variables scoped to the element itself are registered with `@property { inherits: false }`, so updating one only recalculates that element's style, not its whole subtree.
 - In `[%styled.global]`, interpolated values are supplied through a `:root { ... }` block rendered by the generated component instead of inline styles.
@@ -116,10 +121,11 @@ Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`
 The ppx runs one file at a time and cannot see the rest of your project, so each compiled file carries its extracted CSS in top-level attributes (`[@@@css "..."]`) that ride along in the build artifacts. `styled-ppx.generate` is a small CLI that:
 
 1. walks the post-ppx `.ml`/`.pp.ml` files you point it at,
-2. harvests every extracted rule and binding export,
+2. collects every extracted rule and binding export,
 3. resolves cross-module selector references,
-4. deduplicates rules (order-preserving), and
-5. writes the final stylesheet.
+4. checks that no two different blocks have the same class,
+5. deduplicates rules (order-preserving), and
+6. writes the final stylesheet.
 
 You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting live in [Setting up the dune rules](/getting-started/dune-setup).
 

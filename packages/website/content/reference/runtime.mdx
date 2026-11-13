@@ -76,13 +76,13 @@ let styles = CSS.merge button (if active then highlight else CSS.empty)
 
 If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
 
-Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only source position matters.
+Each `[%css]` block is one class, and `CSS.merge` concatenates classes. When two merged blocks set the same property with the same specificity, the CSS cascade breaks the tie by **stylesheet order**: the block that comes later in the stylesheet wins. The stylesheet keeps the order of the files given to `styled-ppx.generate`, and the order of the blocks in each file. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only the stylesheet position matters.
 
 ```reason
 let danger = [%css "background-color: red"];  /* defined FIRST */
 let button = [%css "background-color: gray"]; /* defined second */
 
-/* Both of these render a GRAY background: button's atom
+/* Both of these render a GRAY background: button's block
    comes later in the stylesheet, so it wins the tie. */
 <div styles={CSS.merge(button, danger)} />;
 <div styles={CSS.merge(danger, button)} />;
@@ -92,13 +92,39 @@ let button = [%css "background-color: gray"]; /* defined second */
 let danger = [%css "background-color: red"]  (* defined FIRST *)
 let button = [%css "background-color: gray"] (* defined second *)
 
-(* Both of these render a GRAY background: button's atom
+(* Both of these render a GRAY background: button's block
    comes later in the stylesheet, so it wins the tie. *)
 let a = <div styles=(CSS.merge button danger) />
 let b = <div styles=(CSS.merge danger button) />
 ```
 
-The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
+The convention to follow: **define base styles before the styles that override them**. Within a module, that is source order. Across modules, the override must be in a file that comes later in the stylesheet: in a later file of the same library, or in a library that depends on the base's library (see [the stylesheet rule](/getting-started/dune-setup#the-stylesheet-rule)). When an override doesn't stick, check the definition order first; run the ppx with `--dev` to add a `cx-<binding>` marker class that shows in DevTools which binding each class came from.
+
+### Defaults that must lose: `:where()`
+
+A rule with a selector is more specific than a plain block, so it wins over a later override. When such a rule is only a default, put its condition inside `:where()`, which adds no specificity, and write the override as a plain declaration in a block defined later.
+
+For example, table cells have 8px of right padding, except the last cell of a row with `edge`; a compact table overrides the padding:
+
+```reason
+let edge = [%css {||}];
+let cell = [%css {|
+  padding-right: 8px;
+  &:where(.$(edge):last-child) { padding-right: 0; }
+|}];
+let compactCell = [%css "padding-right: 4px"];
+```
+
+```mlx
+let edge = [%css {||}]
+let cell = [%css {|
+  padding-right: 8px;
+  &:where(.$(edge):last-child) { padding-right: 0; }
+|}]
+let compactCell = [%css "padding-right: 4px"]
+```
+
+The extracted rules are `.css-faq8q2:where(.css-1b4q54l:last-child){padding-right:0;}` (one class of specificity) and `.css-qjr0r8{padding-right:4px;}`, written later. So `CSS.merge(cell, compactCell)` gives 4px on every cell, the edge cell too. Without `:where()`, the edge rule would be `.css-faq8q2.css-1b4q54l:last-child` (three classes of specificity) and would keep 0 on the edge cell.
 
 ### Patterns
 

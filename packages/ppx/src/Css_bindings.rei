@@ -3,8 +3,8 @@
     Every named [%css] binding records a [(longident, class_string)] entry
     here. The longident is the fully-qualified path users would write to
     reference the binding from another module (e.g. ["M.Css.marker"]); the
-    class string is the space-separated list of atomized class names the
-    PPX minted for it.
+    class string is the binding's class, one per [%css] block, space-separated
+    when the binding holds several blocks (for example two branch arms).
 
     The impl transformer drains this buffer at end-of-CU and emits one
     [\[\@\@\@css.bindings ...\]] attribute carrying every entry. The
@@ -24,6 +24,9 @@ type entry = {
     fully-qualified longident. No-op if [longident] is empty (anonymous
     binding). Last-write-wins for duplicate longidents within a CU. */
 let record: (~longident: string, ~class_string: string) => unit;
+
+/** Drops the export of [longident], when a later binding replaces it. */
+let remove: (~longident: string) => unit;
 
 /** Drain and clear all recorded entries, in insertion order. */
 let drain: unit => list(entry);

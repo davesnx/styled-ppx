@@ -63193,7 +63193,7 @@ var JsxRuntime = __toESM(require_jsx_runtime(), 1);
 var pageBackground = hex2("faf7f2");
 var textColor = hex2("141414");
 function to_string6(param) {
-  return ":root{--pageBackground-171dvmc:" + Color.toString(pageBackground) + ";--textColor-a4prc9:" + Color.toString(textColor) + ";}";
+  return ":root{--171dvmc:" + Color.toString(pageBackground) + ";--a4prc9:" + Color.toString(textColor) + ";}";
 }
 function makeProps(key, param) {
   return {};
@@ -63207,7 +63207,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "css-k008qs-stack css-cgq59l-stack",
+  "css-7r8b34",
   /* [] */
   0
 );
@@ -63220,9 +63220,9 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("css-k008qs-Cositas css-cgq59l-Cositas css-r0vq9t-Cositas", {
+  return make7("css-1y54i4q", {
     hd: [
-      "--lola-8erbae",
+      "--1y54i4q-0",
       Gap.toString(lola)
     ],
     tl: (
@@ -63252,41 +63252,41 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "css-tokvmb-selectors css-12qnfjo-selectors",
+  "css-6bsgc8",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
 var clx = make7(
-  "css-1e8vzlw-clx css-u70tf2-clx css-1j9jp3a-clx",
+  "css-1tvj7bo",
   /* [] */
   0
 );
 var post = make7(
-  "css-1y5r52a-post css-3qzm71-post",
+  "css-uglrwk",
   /* [] */
   0
 );
 var card = make7(
-  "css-eaeacs-card css-25k368-card css-3fuzg5-card",
+  "css-1attsqa",
   /* [] */
   0
 );
 var container = make7(
-  "css-nqqinc-container css-w3aeeb-container css-5x3p37-container css-stwpj2-container",
+  "css-tpj1xl",
   /* [] */
   0
 );
 var gradiend = make7(
-  "css-1wlyyxm-gradiend css-qelxhy-gradiend",
+  "css-tx17uk",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("css-19kzrtu-keyframeDemoShell css-i3pbo-keyframeDemoShell css-3kft4e-keyframeDemoShell css-1fi1jeb-keyframeDemoShell css-205zh2-keyframeDemoShell css-kusjgz-keyframeDemoShell css-1e8vzlw-keyframeDemoShell", {
+  return make7("css-1qbdz9z", {
     hd: [
-      "--color-1a279q8",
+      "--1qbdz9z-0",
       Color.toString(color)
     ],
     tl: (
@@ -63305,12 +63305,12 @@ var current = {
 };
 var resize2 = AnimationName.make({
   hd: [
-    "--previous-1lvxfkr",
+    "--1lvxfkr",
     Height.toString(previous)
   ],
   tl: {
     hd: [
-      "--current-hx3drb",
+      "--hx3drb",
       Height.toString(current)
     ],
     tl: (
@@ -63318,8 +63318,8 @@ var resize2 = AnimationName.make({
       0
     )
   }
-}, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("css-1h7bkao-keyframeDemoCard css-65ee5x-keyframeDemoCard css-3pa72f-keyframeDemoCard css-iovuyg-keyframeDemoCard css-1c3l4rb-keyframeDemoCard css-i6bazn-keyframeDemoCard css-k008qs-keyframeDemoCard css-zcxndt-keyframeDemoCard css-1tyndxa-keyframeDemoCard css-1vw7svr-keyframeDemoCard css-1p3fawg-keyframeDemoCard css-kbn7if-keyframeDemoCard css-8c92kl-keyframeDemoCard", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+}, "keyframe-1bwl2l1");
+var keyframeDemoCard = make7("css-djkt5h", AnimationName.toStyleVars("--djkt5h-0", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

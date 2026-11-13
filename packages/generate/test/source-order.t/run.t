@@ -1,8 +1,9 @@
 Source declaration order must be preserved through the aggregator.
 
-When [%css] atomizes `margin: 10px; margin-top: 20px;` into two rules,
-the longhand override must be emitted *after* the shorthand so the cascade
-picks the user's intended winner. Previously, the aggregator deduped
+When a file has two rules that set related properties (`margin: 10px`,
+then `margin-top: 20px`, for example from two blocks merged on one
+element), the later rule must be emitted *after* the earlier one so the
+cascade picks the user's intended winner. Previously, the aggregator deduped
 through `Set.Make(String)`, which sorted by the rendered rule's hash
 prefix — destroying source order and silently miscompiling.
 
@@ -17,7 +18,7 @@ prefix — destroying source order and silently miscompiling.
   .css-eaeacs-x{margin:10px;}
   .css-1xaekgw-x{margin-top:20px;}
 
-Repeated property within a single binding: "blue" must win.
+Repeated property in two rules of one file: "blue" must win.
 
   $ cat > b.ml <<EOF
   > [@@@css ".css-A-y{color:red;}"]
