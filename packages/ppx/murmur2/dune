@@ -1,4 +1,3 @@
 (library
  (name murmur2)
- ; Private PPX dependency used for class-name generation.
  (package styled-ppx))

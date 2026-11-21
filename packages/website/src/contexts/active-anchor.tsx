@@ -26,8 +26,6 @@ IntersectionObserverContext.displayName = 'IntersectionObserver'
 const slugs = new WeakMap()
 const SlugsContext = createContext<WeakMap<any, any>>(slugs)
 SlugsContext.displayName = 'Slugs'
-// Separate the state as 2 contexts here to avoid
-// re-renders of the content triggered by the state update.
 export const useActiveAnchor = () => useContext(ActiveAnchorContext)
 export const useSetActiveAnchor = () => useContext(SetActiveAnchorContext)
 

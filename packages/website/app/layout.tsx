@@ -22,8 +22,6 @@ export const metadata: Metadata = {
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
   const pageMap = await getPageMap();
-  // `dir` is required: the theme's ltr:/rtl: Tailwind variants compile to
-  // `[dir="ltr"] &` selectors, which never match without it.
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>

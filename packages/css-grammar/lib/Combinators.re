@@ -30,8 +30,6 @@ let static = rules => {
   match_everything([], rules);
 };
 
-/* Merge structured errors from failed alternatives into a single error_info.
-   Collects all expected values and picks the first 'got' value. */
 let merge_errors = (errors: list(Rule.error)): Rule.error => {
   let all_infos = errors |> List.concat;
   let all_expected =
@@ -39,7 +37,6 @@ let merge_errors = (errors: list(Rule.error)): Rule.error => {
     |> List.concat_map((info: Rule.error_info) => info.expected)
     |> List.filter(
          fun
-         /* Filter out '$' from interpolation xor — not a user-facing suggestion */
          | Rule.Keyword("$") => false
          | _ => true,
        )
@@ -77,7 +74,6 @@ let xor_with_expected = rules_with_expected =>
         let all_rules =
           all_rules_with_expected |> List.map(((_, rule)) => rule);
 
-        /* Evaluate each rule exactly once, collecting both successes and errors */
         let results =
           all_rules
           |> List.map(rule => {
@@ -85,7 +81,6 @@ let xor_with_expected = rules_with_expected =>
                (data, remaining);
              });
 
-        /* Separate successes from failures */
         let successes =
           results
           |> List.filter_map(
@@ -96,7 +91,6 @@ let xor_with_expected = rules_with_expected =>
 
         switch (successes) {
         | [] =>
-          /* All rules failed - merge structured errors */
           let errors =
             results
             |> List.filter_map(
@@ -107,18 +101,14 @@ let xor_with_expected = rules_with_expected =>
           let combined_error = merge_errors(errors);
           Rule.Data.return(Error(combined_error), tokens);
         | [single] =>
-          /* Exactly one match - use it directly */
           let (value, remaining) = single;
           Rule.Data.return(Ok(value), remaining);
         | [first, ...rest] =>
-          /* Multiple matches - pick the longest (fewest remaining tokens) */
           let best =
             List.fold_left(
               (acc, current) => {
                 let (_, acc_remaining) = acc;
                 let (_, curr_remaining) = current;
-                /* Use <= to prefer later alternatives on tie, matching the
-                   original match_longest right-biased tie-breaking behavior */
                 if (Rule.remaining_length(curr_remaining)
                     <= Rule.remaining_length(acc_remaining)) {
                   current;
@@ -141,7 +131,6 @@ let xor = rules =>
   | [] => failwith("xor doesn't makes sense without a single value")
   | all_rules => (
       tokens => {
-        /* Evaluate each rule exactly once, collecting both successes and errors */
         let results =
           all_rules
           |> List.map(rule => {
@@ -149,7 +138,6 @@ let xor = rules =>
                (data, remaining);
              });
 
-        /* Separate successes from failures */
         let successes =
           results
           |> List.filter_map(
@@ -160,7 +148,6 @@ let xor = rules =>
 
         switch (successes) {
         | [] =>
-          /* All rules failed - merge structured errors */
           let errors =
             results
             |> List.filter_map(
@@ -171,18 +158,14 @@ let xor = rules =>
           let combined_error = merge_errors(errors);
           Rule.Data.return(Error(combined_error), tokens);
         | [single] =>
-          /* Exactly one match - use it directly */
           let (value, remaining) = single;
           Rule.Data.return(Ok(value), remaining);
         | [first, ...rest] =>
-          /* Multiple matches - pick the longest (fewest remaining tokens) */
           let best =
             List.fold_left(
               (acc, current) => {
                 let (_, acc_remaining) = acc;
                 let (_, curr_remaining) = current;
-                /* Use <= to prefer later alternatives on tie, matching the
-                   original match_longest right-biased tie-breaking behavior */
                 if (Rule.remaining_length(curr_remaining)
                     <= Rule.remaining_length(acc_remaining)) {
                   current;
@@ -201,7 +184,6 @@ let xor = rules =>
   };
 
 let and_ = rules => {
-  // TODO: an array is a better choice
   let rec match_everything = (values, rules) =>
     switch (rules) {
     | [] => return_match(values |> List.rev)
@@ -218,6 +200,5 @@ let and_ = rules => {
   |> List.map(((_, v)) => v);
 };
 
-// [ A || B ] = [ A? && B? ]!
 let or_ = rules =>
   rules |> List.map(Modifier.optional) |> and_ |> Modifier.at_least_one;

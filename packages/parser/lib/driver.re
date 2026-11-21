@@ -1,5 +1,3 @@
-/* Parse entry points. [~source_position_start] is the file position of
-   [input]'s first character; lexing and parse errors are rebased onto it. */
 let run = (~source_position_start, parse_fn, input) =>
   try(Ok(parse_fn(input))) {
   | Lexer.LexingError((start_pos, end_pos, msg))

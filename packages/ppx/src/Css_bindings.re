@@ -3,11 +3,6 @@ type entry = {
   class_string: string,
 };
 
-/* Insertion-ordered list of entries; reversed on drain. The companion
-   [seen] hashtable suppresses duplicate longidents from late writes
-   (e.g. shadowing within the same CU) so [record] runs in amortized
-   O(1) and the drained list is a sane index export. Last-write-wins
-   semantics match [Local_selector_environment]'s same-module behavior. */
 let entries: ref(list(entry)) = ref([]);
 let seen: Hashtbl.t(string, unit) = Hashtbl.create(16);
 
@@ -19,8 +14,6 @@ let reset = () => {
 let record = (~longident: string, ~class_string: string) =>
   if (longident != "") {
     if (Hashtbl.mem(seen, longident)) {
-      /* Last-write-wins: replace the older entry in-place instead of
-         emitting two index keys for the same longident. */
       entries :=
         List.map(
           e =>

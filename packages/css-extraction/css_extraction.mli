@@ -14,16 +14,7 @@ type ref_loc = private {
 val css_attribute_name : string
 val bindings_attribute_name : string
 val refs_attribute_name : string
-
-(** [[@@@css.config [(key, value); ...]]] carries PPX-side settings that the
-    aggregator must honor. Currently the only key is {!config_env_key}: the PPX
-    emits [("env", "production")] when it runs in production mode (labels
-    dropped, CSS minified), and the aggregator minifies its output accordingly.
-    The attribute is omitted entirely in development mode, so absence means
-    development. Unknown keys are ignored by the aggregator (forward
-    compatibility). *)
 val config_attribute_name : string
-
 val config_env_key : string
 val config_env_production : string
 val sentinel_byte : char

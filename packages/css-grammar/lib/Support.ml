@@ -64,18 +64,12 @@ let pack_module (module M : RULE) : packed_rule =
     match M.type_check input with Ok _ -> Ok () | Error info -> Error info
   in
   let infer_interpolation_types input =
-    (* First: check for whole-value interpolation (e.g., "$(myWidth)").
-       Use the property/module's runtime_module_path for the type.
-       This ensures full-value interpolation returns the property type
-       (e.g., Css_types.Width) rather than a sub-type (e.g., Css_types.Percentage). *)
     let whole =
       detect_whole_value_interpolation
         ~runtime_module_path:M.runtime_module_path input
     in
     if whole <> [] then whole
     else (
-      (* Not a whole-value interpolation - parse and extract.
-         Delegation to sub-types via registry handles partial interpolation. *)
       match M.type_check input with
       | Ok ast ->
         let result = M.infer_interpolation_types ast in

@@ -7,19 +7,14 @@ const fs = require("fs");
 const platform = process.platform;
 
 function find_arch() {
-  // The running binary is 64-bit, so the OS is clearly 64-bit.
   if (process.arch === "x64") {
     return "x64";
   }
 
-  // All recent versions of Mac OS are 64-bit.
   if (process.platform === "darwin") {
     return "x64";
   }
 
-  // On Windows, the most reliable way to detect a 64-bit OS from within a 32-bit
-  // app is based on the presence of a WOW64 file: %SystemRoot%\SysNative.
-  // See: https://twitter.com/feross/status/776949077208510464
   if (process.platform === "win32") {
     var useEnv = false;
     try {
@@ -30,7 +25,6 @@ function find_arch() {
 
     const sysRoot = useEnv ? process.env.SYSTEMROOT : "C:\\Windows";
 
-    // If %SystemRoot%\SysNative exists, we are in a WOW64 FS Redirected application.
     const isWOW64 = false;
     try {
       isWOW64 = !!fs.statSync(path.join(sysRoot, "sysnative"));
@@ -47,7 +41,6 @@ function find_arch() {
   return "x86";
 }
 
-// Implementing it b/c we don"t want to depend on fs.copyFileSync which appears only in node@8.x
 function copyFileSync(sourcePath, destPath) {
   const data = fs.readFileSync(sourcePath);
   const stat = fs.statSync(sourcePath);

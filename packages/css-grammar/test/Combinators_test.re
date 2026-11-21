@@ -50,7 +50,6 @@ let string_contains = (str, substr) => {
   check_from(0);
 };
 
-// TODO: check static order
 let tests = [
   test("A B", _ => {
     let parser = parse_exn([%spec "A B"]);
@@ -58,7 +57,6 @@ let tests = [
     ();
   }),
   test("A B C", _ => {
-    // TODO: fix this type
     let ((), (), ()) = parse_exn([%spec "A B C"], "A B C");
     ();
   }),
@@ -66,13 +64,6 @@ let tests = [
     let (number, ()) = parse_exn([%spec "<number> B"], "15 B");
     Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 15.0);
   }),
-  /* test{
-       let parser = parse_exn([%spec "<number> B"]);
-       check_raises("should throw", Failure(), () => {
-         let _ = parser("B 15");
-         ();
-       });
-     }), */
   test("A | B", _ => {
     let parser = parse_exn([%spec "A | B"]);
     let () =
@@ -149,7 +140,6 @@ let tests = [
   test("A && B && C", _ => {
     let parser = parse_exn([%spec "A && B && C"]);
     let ((), (), ()) = parser("A B C");
-    // TODO: and isn't associative
     let ((), (), ()) = parser("A C B");
     let ((), (), ()) = parser("B A C");
     let ((), (), ()) = parser("B C A");
@@ -218,7 +208,6 @@ let tests = [
     };
     ();
   }),
-  // TODO: check invalid cases
   test("A || B", _ => {
     let parser = parse_exn([%spec "A || B"]);
     let () =
@@ -387,7 +376,6 @@ let tests = [
   }),
   test("xor prefers longest match", _ => {
     let parser = parse_exn([%spec "A | A B"]);
-    /* When both match, xor should prefer the longer match */
     switch (parser("A B")) {
     | `Static((), ()) => ()
     | _ => Alcotest.fail("should prefer longer match A B")

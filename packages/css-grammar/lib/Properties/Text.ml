@@ -103,10 +103,6 @@ module Property_text_decoration_color =
 let property_text_decoration_color : property_text_decoration_color Rule.rule =
   Property_text_decoration_color.rule
 
-(* Spec doesn't contain spelling-error module grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference *)
-(* module this definition has changed from the origianl, it might be a bug on the spec or our Generator,
-   but simplifying to "|" simplifies it module solves the bug *)
-
 module Property_text_decoration_line =
   [%spec_module
   "'none' | <interpolation> | [ 'underline' || 'overline' || 'line-through' || \
@@ -358,8 +354,6 @@ module Property_text_decoration_inset =
   "[ <extended-length> ]{1,2} | 'auto'", (module Css_types.Cascading)]
 
 let property_text_decoration_inset = Property_text_decoration_inset.rule
-
-(* Print module paged media properties *)
 
 module Property_text_edge =
   [%spec_module

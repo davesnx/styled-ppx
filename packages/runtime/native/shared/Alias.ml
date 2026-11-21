@@ -1,5 +1,3 @@
-(* Alias is used to have a few utilities for users that are not aware of the underlying type *)
-
 open Css_types
 
 let initial = `initial
@@ -296,8 +294,6 @@ let lineNames (x : string) = `lineNames x
 module Shadow = struct
   type box = Css_types.Shadow.box Css_types.Shadow.t
   type text = Css_types.Shadow.text Css_types.Shadow.t
-
-  (* [t] is an alias for [box] for backwards compatibility. *)
   type t = box
 
   let box ?x ?y ?blur ?spread ?inset color =
@@ -307,7 +303,6 @@ module Shadow = struct
 end
 
 module Animation = struct
-  (* backwards compatibility *)
   let shorthand ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
     ?iterationCount ?name () =
     Css_types.Animation.Value.make ?duration ?delay ?direction ?timingFunction
@@ -315,7 +310,6 @@ module Animation = struct
 end
 
 module Transition = struct
-  (* backwards compatibility *)
   let shorthand ?behavior ?duration ?delay ?timingFunction ?property () =
     Css_types.Transition.Value.make ?behavior ?duration ?delay ?timingFunction
       ?property ()

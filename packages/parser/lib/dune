@@ -4,7 +4,6 @@
  (libraries
   sedlex
   ppxlib
-  (re_export ppx_deriving.runtime) ; We expose show_token from ppx_deriving
-  )
+  (re_export ppx_deriving.runtime))
  (preprocess
   (pps sedlex.ppx ppx_deriving.show)))

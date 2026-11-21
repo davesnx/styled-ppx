@@ -4,19 +4,6 @@ import { useCallback, useDeferredValue, useEffect, useState } from 'react'
 import type { SearchResult } from '../types'
 import { Search } from './search'
 
-/**
- * Pagefind-backed search: nextra v4 dropped flexsearch (which powered the
- * vendored v3 <Flexsearch> component) in favour of Pagefind, whose index is
- * produced from the built `.html` files by the `postbuild` script and served
- * from `public/_pagefind`.
- *
- * This component owns the data layer (loading the Pagefind runtime, querying,
- * mapping results) and delegates rendering to the vendored <Search> UI, which
- * is styled by this site's Tailwind v3 pipeline. nextra v4's own <Search>
- * component can't be used directly: it is styled with Tailwind v4 `x:`
- * classes that this pipeline doesn't generate.
- */
-
 type PagefindSubResult = {
   title: string
   url: string
@@ -49,14 +36,10 @@ const DEV_SEARCH_NOTICE = (
   </>
 )
 
-// Cache the loading promise so parallel instances (navbar + mobile sidebar)
-// only import the Pagefind runtime once.
 let pagefindPromise: Promise<void> | undefined
 
 function loadPagefind(): Promise<void> {
   pagefindPromise ??= (async () => {
-    // The runtime only exists after `postbuild`; the bundler must leave this
-    // import alone (same trick as nextra v4's Search component).
     window.pagefind = (await import(
       /* webpackIgnore: true */
       // @ts-expect-error -- runtime asset produced by the postbuild script
@@ -65,7 +48,6 @@ function loadPagefind(): Promise<void> {
     await window.pagefind.options({ baseUrl: '/' })
   })()
   pagefindPromise.catch(() => {
-    // Allow retrying (e.g. once an index has been generated).
     pagefindPromise = undefined
   })
   return pagefindPromise
@@ -146,7 +128,6 @@ export function PagefindSearch({
       await preload()
       if (cancelled || !window.pagefind) return
       const response = await window.pagefind.debouncedSearch(deferredSearch)
-      // Superseded by a newer debounced query.
       if (!response || cancelled) return
       const data = await Promise.all(
         response.results.map(result => result.data())

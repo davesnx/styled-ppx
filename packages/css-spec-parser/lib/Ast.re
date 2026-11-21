@@ -9,31 +9,31 @@ type range = (range_bound, range_bound);
 
 [@deriving show({ with_path: false })]
 type multiplier =
-  | One /* */
-  | Zero_or_more /* * */
-  | One_or_more /* + */
-  | Optional /* ? */
-  | Repeat(int, option(int)) /* {A} {A,B} {A,} */
-  | Repeat_by_comma(int, option(int)) /* # #{A, B} */
-  | At_least_one /* ! */;
+  | One
+  | Zero_or_more
+  | One_or_more
+  | Optional
+  | Repeat(int, option(int))
+  | Repeat_by_comma(int, option(int))
+  | At_least_one;
 
 [@deriving show({ with_path: false })]
 type terminal =
-  | Delim(string) /* ',' */
-  | Keyword(string) /* auto */
-  | Data_type(string, option(range)) /* <color> or <number [0, 1]> */
-  | Property_type(string) /* <'color'> */;
+  | Delim(string)
+  | Keyword(string)
+  | Data_type(string, option(range))
+  | Property_type(string);
 
 [@deriving show({ with_path: false })]
 type combinator =
-  | Static /* a b */
-  | And /* a && b */
-  | Or /* a || b */
-  | Xor; /* a | b */
+  | Static
+  | And
+  | Or
+  | Xor;
 
 [@deriving show({ with_path: false })]
 type value =
   | Terminal(terminal, multiplier)
   | Combinator(combinator, list(value))
-  | Group(value, multiplier) /* [ A ] */
-  | Function_call(string, value) /* F( A ) */;
+  | Group(value, multiplier)
+  | Function_call(string, value);

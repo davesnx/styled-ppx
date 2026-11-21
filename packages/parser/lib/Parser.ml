@@ -351,18 +351,15 @@ let parse_wq_name stream =
 
 type nth_suffix =
   | Nth_suffix_n
-  | Nth_suffix_n_dash (* requires a following integer *)
-  | Nth_suffix_n_dash_digits of int (* b from n-<digits> *)
+  | Nth_suffix_n_dash
+  | Nth_suffix_n_dash_digits of int
 
 let raise_invalid_nth function_name (token : token_with_location) =
   let message = Printf.sprintf "Invalid an+b value in :%s()" function_name in
   raise (Parse_error (token.start_pos, token.end_pos, message))
 
 let nth_int_of_number function_name (token : token_with_location) value =
-  let max_exact_float_int =
-    9007199254740992.
-    (* 2^53 *)
-  in
+  let max_exact_float_int = 9007199254740992. in
   if Float.is_integer value && Float.abs value <= max_exact_float_int then
     int_of_float value
   else raise_invalid_nth function_name token

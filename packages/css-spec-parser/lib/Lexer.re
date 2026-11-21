@@ -8,7 +8,7 @@ let range_restriction = [%sedlex.regexp?
   (
     '[',
     Opt(' '),
-    number | 0x221E /* ∞ */ | ('-', 0x221E),
+    number | 0x221E | ('-', 0x221E),
     ',',
     Opt(' '),
     number | 0x221E | ('-', 0x221E),
@@ -124,13 +124,11 @@ let rec tokenizer = buf =>
   | '#' => RANGE((`Comma, 1, None))
   | range => eat_range(lexeme(buf))
   | '!' => EXCLAMATION_POINT
-  // combinators
   | "&&" => DOUBLE_AMPERSAND
   | "||" => DOUBLE_BAR
   | "|" => BAR
   | "[" => LEFT_BRACKET
   | "]" => RIGHT_BRACKET
-  // functions
   | '(' => LEFT_PARENS
   | ')' => RIGHT_PARENS
   | quoted_delimiter => CHAR(lexeme(buf) |> slice(1, -1))

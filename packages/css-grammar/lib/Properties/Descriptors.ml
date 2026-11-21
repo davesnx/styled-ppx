@@ -70,8 +70,6 @@ module Property_size_adjust =
 
 let property_size_adjust = Property_size_adjust.rule
 
-(* Additional modern properties *)
-
 let entries : (kind * packed_rule) list =
   [
     Property "inherits", pack_module (module Property_inherits);

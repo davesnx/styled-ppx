@@ -1,6 +1,3 @@
-/** CSS lexer
-  * Reference:
-  * https://www.w3.org/TR/css-syntax-3/ */
 module Types = Ast;
 module Location = Ppxlib.Location;
 
@@ -8,13 +5,10 @@ open Tokens;
 
 let (let.ok) = Result.bind;
 
-/** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, Lexing.position, string));
 
-/* Regexes */
 let newline = [%sedlex.regexp? '\n' | "\r\n" | '\r' | '\012'];
 
-// comment \/\*[^*]*\*+([^/*][^*]*\*+)*\/ (https://www.w3.org/TR/CSS21/grammar.html)
 let comment = [%sedlex.regexp?
   (
     "/*",
@@ -44,7 +38,6 @@ let escape = [%sedlex.regexp? '\\'];
 
 let alpha = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z'];
 
-// https://drafts.csswg.org/css-syntax-3/#non-ascii-ident-code-point
 let non_ascii = [%sedlex.regexp?
   0x00B7 | 0x00C0 .. 0x00D6 | 0x00D8 .. 0x00F6 | 0x00F8 .. 0x037D |
   0x037F .. 0x1FFF |
@@ -70,7 +63,6 @@ let ident = [%sedlex.regexp?
   (Opt('-'), Opt('-'), ident_start, Star(ident_char))
 ];
 
-/* Interpolation start sequence \$( - the rest is handled by consume_interpolation */
 let interpolation_start = [%sedlex.regexp? ('$', '(')];
 
 let string_quote = [%sedlex.regexp?
@@ -106,7 +98,6 @@ let starts_an_identifier = [%sedlex.regexp?
   ('-', '-' | identifier_start_code_point | starts_with_a_valid_escape) |
   identifier_start_code_point
 ];
-/* Added "'" to identifier to enable Language Variables */
 let identifier_code_point = [%sedlex.regexp?
   identifier_start_code_point | digit | '-' | "'"
 ];
@@ -132,7 +123,6 @@ let important = [%sedlex.regexp?
   ("!", whitespaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
-// https://drafts.csswg.org/css-syntax-3/#starts-with-a-valid-escape
 let check_if_two_code_points_are_a_valid_escape = lexbuf =>
   switch%sedlex (lexbuf) {
   | ("\\", '\n') => false
@@ -140,18 +130,15 @@ let check_if_two_code_points_are_a_valid_escape = lexbuf =>
   | _ => false
   };
 
-// https://drafts.csswg.org/css-syntax-3/#would-start-an-identifier
 let check_if_three_codepoints_would_start_an_identifier = lexbuf => {
   switch%sedlex (lexbuf) {
   | ('-', identifier_start_code_point | '-') => true
-  // TODO: test the code_points case
   | '-' => check_if_two_code_points_are_a_valid_escape(lexbuf)
   | identifier_start_code_point => true
   | _ => check_if_two_code_points_are_a_valid_escape(lexbuf)
   };
 };
 
-// https://drafts.csswg.org/css-syntax-3/#starts-with-a-number
 let check_if_three_code_points_would_start_a_number = lexbuf =>
   switch%sedlex (lexbuf) {
   | ("+" | "-", digit)
@@ -161,7 +148,6 @@ let check_if_three_code_points_would_start_a_number = lexbuf =>
   };
 
 let check = (f, lexbuf) => {
-  // TODO: why this second int?
   Sedlexing.mark(lexbuf, 0);
   let value = f(lexbuf);
   let _ = Sedlexing.backtrack(lexbuf);
@@ -178,8 +164,6 @@ let uchar_of_int = n => Uchar.of_int(n) |> string_of_uchar;
 
 let is_surrogate = char_code => char_code >= 0xD800 && char_code <= 0xDFFF;
 
-/* sedlex needs a last case as wildcard _. If this error appears, means that
-   there's a bug in the lexer and there cases that aren't matched */
 let unreachable = lexbuf => {
   let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   raise(
@@ -206,17 +190,14 @@ let skip_whitespace_after_escape = lexbuf =>
   | _ => ()
   };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-an-escaped-code-point
 let consume_escaped = lexbuf => {
   switch%sedlex (lexbuf) {
-  // TODO: spec typo? No more than 5?
   | Rep(hex_digit, 1 .. 6) =>
     let hex_string = "0x" ++ lexeme(lexbuf);
     let char_code = int_of_string(hex_string);
     let char = uchar_of_int(char_code);
     let _ = skip_whitespace_after_escape(lexbuf);
     char_code == 0 || is_surrogate(char_code)
-      // U+FFFD is a character used as a substitute for an uninterpretable character from another encoding
       ? Error(("U+FFFD", Tokens.Invalid_code_point)) : Ok(char);
   | eof => Error(("U+FFFD", Tokens.Eof))
   | any => Ok(lexeme(lexbuf))
@@ -224,13 +205,11 @@ let consume_escaped = lexbuf => {
   };
 };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-name
 let consume_name = lexbuf => {
   let rec read = acc =>
     switch%sedlex (lexbuf) {
     | identifier_code_point => read(acc ++ lexeme(lexbuf))
     | escape =>
-      // TODO: spec, what should happen when fails?
       let.ok char = consume_escaped(lexbuf);
       read(acc ++ char);
     | _ => Ok(acc)
@@ -241,7 +220,6 @@ let consume_name = lexbuf => {
 let consume_identifier = lexbuf =>
   consume_name(lexbuf) |> Result.map(Tokens.serialize_identifier);
 
-// https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
 let rec consume_remnants_bad_url = lexbuf =>
   switch%sedlex (lexbuf) {
   | ")"
@@ -266,7 +244,6 @@ let skip_whitespace_and_comments = lexbuf =>
   | _ => ()
   };
 
-// https://www.w3.org/TR/css-syntax-3/#consume-a-number
 let consume_number = lexbuf => {
   let append = repr => repr ++ lexeme(lexbuf);
 
@@ -307,7 +284,6 @@ let consume_number = lexbuf => {
   (value, kind);
 };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-url-token
 let consume_url = lexbuf => {
   let _ = skip_whitespace_and_comments(lexbuf);
   let rec read = acc => {
@@ -345,18 +321,13 @@ let consume_url = lexbuf => {
   read(lexeme(lexbuf));
 };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-string-token
-// TODO: when EOF is bad-string-token or string-token
-// TODO: currently it is a little bit different than the specification
 let consume_string = (ending_code_point, lexbuf) => {
   let rec read = acc => {
-    // TODO: fix sedlex nested problem
     let read_escaped = () =>
       switch%sedlex (lexbuf) {
       | eof => Error((acc, Tokens.Eof))
       | '\n' => read(acc)
       | _ =>
-        // TODO: is that tail call recursive? I'm not sure
         let.ok char = consume_escaped(lexbuf);
         read(acc ++ char);
       };
@@ -391,7 +362,6 @@ type token_with_location = {
   end_pos: Lexing.position,
 };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
 let function_token: string => Tokens.token =
   fun
   | ("nth-last-child" | "nth-child" | "nth-of-type" | "nth-last-of-type") as name =>
@@ -444,12 +414,9 @@ let scan_ident_like = lexbuf => {
   };
 };
 
-// https://drafts.csswg.org/css-syntax-3/#consume-numeric-token
 let consume_numeric = lexbuf => {
-  // TODO: kind matters?
   let (number, _kind) = consume_number(lexbuf);
   if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
-    // TODO: should it be BAD_IDENT?
     let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
     Ok(Tokens.DIMENSION((number, string)));
   } else {
@@ -890,7 +857,6 @@ let rec consume_token = lexbuf => {
   };
 };
 
-/* Convert sedlex UTF-8 failures into located lexer errors. */
 let invalid_utf8 = lexbuf => {
   let (_, error_pos) = Sedlexing.lexing_positions(lexbuf);
   let error_end = {

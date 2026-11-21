@@ -14,8 +14,6 @@ export default {
   content: [
     './src/**/*.tsx',
     './pages/**/*.tsx',
-    // '../nextra/src/client/icons/*.{tsx,svg}',
-    // '../nextra/src/client/components/**/*.tsx'
   ],
   theme: {
     screens: {

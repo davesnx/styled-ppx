@@ -30,8 +30,6 @@ module Property_ruby_overhang =
 let property_ruby_overhang : property_ruby_overhang Rule.rule =
   Property_ruby_overhang.rule
 
-(* Timeline scope *)
-
 let entries : (kind * packed_rule) list =
   [
     Property "ruby-merge", pack_module (module Property_ruby_merge);

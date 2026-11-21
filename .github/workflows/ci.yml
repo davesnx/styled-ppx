@@ -25,7 +25,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest] # windows-latest
+        os: [ubuntu-latest, macos-latest]
         ocaml-compiler:
           - 4.14.1
           - 5.4.0
@@ -96,6 +96,3 @@ jobs:
         with:
           path: node_modules
           key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
-
-#      - name: Run demo tests
-#        run: make test-demo

@@ -1,11 +1,5 @@
-(* Generates compile-time checks for property-level runtime witness paths.
-   Compiling the references against styled-ppx.native catches missing modules
-   and, where required, incompatible unary [toString] functions. *)
-
 module String_set = Set.Make (String)
 
-(* Border shorthand modules expose curried [toString] functions, so this
-   audit checks only that the modules exist. *)
 let existence_only =
   String_set.of_list
     [

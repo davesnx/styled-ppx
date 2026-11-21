@@ -18,8 +18,6 @@ let optional = rule => {
 };
 
 let match_n_values = ((min, max), sep, rule) => {
-  // TODO: this definitly needs to be cleaned up
-
   let rule_with_comma = {
     let.bind_match () = sep;
     rule;
@@ -67,7 +65,6 @@ let at_least_one = rule => {
   let have_one = List.exists(Option.is_some, values);
   return_data(have_one ? Ok(values) : Rule.err_desc("at least one match"));
 };
-// TODO: make that more dynamic
 let at_least_one_2 = rule => {
   let.bind_match (a, b) = rule;
   let.bind_match _ = {

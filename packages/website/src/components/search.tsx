@@ -58,10 +58,9 @@ export function Search({
       if (
         event.key === '/' ||
         (event.key === 'k' &&
-          (event.metaKey /* for Mac */ || /* for non-Mac */ event.ctrlKey))
+          (event.metaKey || event.ctrlKey))
       ) {
         event.preventDefault()
-        // prevent to scroll to top
         input.focus({ preventScroll: true })
       }
     }
@@ -113,11 +112,8 @@ export function Search({
   const handleSelect = useCallback(
     (searchResult: SearchResult | null) => {
       if (!searchResult) return
-      // Calling before navigation so selector `html:not(:has(*:focus))` in styles.css will work,
-      // and we'll have padding top since input is not focused
       inputRef.current?.blur()
       router.push(searchResult.route)
-      // Clear input after navigation completes
       setMenu(false)
       onChange('')
     },
@@ -128,7 +124,7 @@ export function Search({
     <Combobox onChange={handleSelect}>
       <div
         className={cn(
-          '_not-prose', // for blog
+          '_not-prose',
           '_relative _flex _items-center',
           '_text-gray-900 dark:_text-gray-300',
           'contrast-more:_text-gray-800 contrast-more:dark:_text-gray-300',
@@ -166,7 +162,7 @@ export function Search({
         anchor={{ to: 'top end', gap: 10, padding: 16 }}
         className={({ open }) =>
           cn(
-            'nextra-search-results', // for userspace styling
+            'nextra-search-results',
             'nextra-scrollbar max-md:_h-full',
             '_border _border-gray-200 _text-gray-100 dark:_border-neutral-800',
             '_z-20 _rounded-xl _py-2.5 _shadow-xl',
@@ -176,8 +172,7 @@ export function Search({
             open ? '_opacity-100' : '_opacity-0',
             error || loading || !results.length
               ? 'md:_h-[100px]'
-              : // headlessui adds max-height as style, use !important to override
-              'md:!_max-h-[min(calc(100vh-5rem),400px)]',
+              : 'md:!_max-h-[min(calc(100vh-5rem),400px)]',
             '_w-full md:_w-[576px]',
             'empty:_invisible'
           )

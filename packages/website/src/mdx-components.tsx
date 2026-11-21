@@ -100,7 +100,6 @@ function Pre({
   )
 }
 
-// Anchor links
 const createHeading = (
   Tag: `h${2 | 3 | 4 | 5 | 6}`,
   context: { index: number }
@@ -137,7 +136,6 @@ const createHeading = (
       <Tag
         id={id}
         className={
-          // can be added by footnotes
           className === 'sr-only'
             ? '_sr-only'
             : cn(
@@ -174,7 +172,6 @@ function Details({
   ...props
 }: ComponentProps<'details'>): ReactElement {
   const [isOpen, setIsOpen] = useState(() => !!open)
-  // To animate the close animation we have to delay the DOM node state here.
   const [delayedOpenState, setDelayedOpenState] = useState(isOpen)
   const animationRef = useRef(0)
 
@@ -202,7 +199,7 @@ function Details({
 
       const rest = Children.map(list, child => {
         if (
-          !summary && // Add onClick only for first summary
+          !summary &&
           child &&
           typeof child === 'object' &&
           'type' in child
@@ -236,8 +233,6 @@ function Details({
         className
       )}
       {...props}
-      // `isOpen ||` fix issue on mobile devices while clicking on details, open attribute is still
-      // false, and we can't calculate child.clientHeight
       open={isOpen || delayedOpenState}
       data-expanded={isOpen ? '' : undefined}
     >
@@ -257,8 +252,7 @@ function Summary({
       className={cn(
         'nextra-focus',
         '_flex _items-center _cursor-pointer _p-1 _transition-colors hover:_bg-gray-100 dark:hover:_bg-neutral-800',
-        '[&::-webkit-details-marker]:_hidden', // Safari
-        // display: flex removes whitespace when `<summary>` contains text with other elements, like `foo <strong>bar</strong>`
+        '[&::-webkit-details-marker]:_hidden',
         '_whitespace-pre-wrap',
         '_select-none',
         className
@@ -268,7 +262,7 @@ function Summary({
       {children}
       <ArrowRightIcon
         className={cn(
-          '_order-first', // if prettier formats `summary` it will have unexpected margin-top
+          '_order-first',
           '_h-4 _shrink-0 _mx-1.5 motion-reduce:_transition-none',
           'rtl:_rotate-180 [[data-expanded]>summary:first-child>&]:_rotate-90 _transition'
         )}
@@ -323,7 +317,6 @@ function Body({ children }: { children: ReactNode }): ReactElement {
       : null
 
   const gitTimestampEl =
-    // Because a user's time zone may be different from the server page
     mounted && date ? (
       <div className="_mt-12 _mb-8 _block _text-xs _text-gray-500 ltr:_text-right rtl:_text-left dark:_text-gray-400">
         {renderComponent(themeConfig.gitTimestamp, { timestamp: date })}
@@ -397,8 +390,6 @@ export const H1 = (props: ComponentProps<'h1'>) => (
   />
 )
 
-// Shared, monotonically increasing counter: the active-anchor logic only
-// compares heading indexes relatively, so it survives client navigations.
 const headingContext = { index: 0 }
 export const H2 = createHeading('h2', headingContext)
 export const H3 = createHeading('h3', headingContext)
@@ -455,7 +446,6 @@ export const P = (props: ComponentProps<'p'>) => (
   <p className="[&:not(:first-child)]:_mt-6 _leading-7" {...props} />
 )
 
-// nextra v4 exposes table sub-elements as properties of `Table`
 export const Tr = Table.Tr
 export const Th = Table.Th
 export const Td = Table.Td

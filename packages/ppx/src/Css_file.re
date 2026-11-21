@@ -1,22 +1,14 @@
 type var_type =
   | Selector
   | MediaQuery
-  /* Passthrough string interpolation for `--*: $(expr)` declarations in
-     [%css] / [%styled.global]. `expr` is required to be a [string] and is
-     emitted verbatim in the value position - no `toString` wrap, no
-     validation. This is the unsafe escape hatch for custom properties;
-     when we later support typed custom properties (e.g. via
-     `@property` / a codec registry) a new variant will sit next to this
-     one and this one remains the "unknown / unsafe" fallback. */
   | CustomProperty
   | RuntimeModule(string);
 
-/* A `$(expr)` value interpolation hoisted to a CSS custom property. */
 type dynamic_var = {
-  name: string, /* hashed custom-property name, without `--` */
-  path: string, /* the expression's source, e.g. "Theme.color" */
+  name: string,
+  path: string,
   var_type,
-  loc: Ppxlib.Location.t /* file location of the expression inside `$()` */
+  loc: Ppxlib.Location.t,
 };
 
 let render_rule = Styled_ppx_css_parser.Render.rule;
@@ -25,10 +17,6 @@ let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
 module Buffer = {
   type rule = (string, string);
-  /* Rules are deduped by className on insert. [seen] mirrors the
-     classNames present in [rules] so membership is amortized O(1)
-     instead of an O(n) [List.exists] scan per call, which made rule
-     accumulation quadratic in the number of [%css] atoms per file. */
   type target = {
     mutable rules: list(rule),
     seen: Hashtbl.t(string, unit),
@@ -68,13 +56,6 @@ module Buffer = {
 module Css_transform = {
   open Styled_ppx_css_parser.Ast;
 
-  /* Maps an interpolation's resolved kind to the stable [type_key] string
-     that `Hash_class.variable` mixes into the custom-property hash, so two
-     interpolations differing only by target type get distinct variables.
-     Kept here rather than in `Hash_class` because `var_type` is a domain
-     type that also drives runtime emission (`Css_to_runtime`,
-     `Css_global_to_string`); `Hash_class` stays free of that coupling and
-     consumes the opaque [type_key] string. */
   let var_type_key = (var_type: var_type) =>
     switch (var_type) {
     | Selector => "selector"
@@ -83,8 +64,6 @@ module Css_transform = {
     | RuntimeModule(name) => "runtime:" ++ name
     };
 
-  /* Increment the count for [name] in an assoc list, returning the new
-     count and the updated list. */
   let bump = (name, counts) => {
     let next = 1 + Option.value(List.assoc_opt(name, counts), ~default=0);
     (next, [(name, next), ...List.remove_assoc(name, counts)]);
@@ -115,9 +94,6 @@ module Css_transform = {
     loop([], items);
   };
 
-  /* Threaded unchanged through the whole transform walk: resolution
-     inputs, the position AST locations are rebased against, and the
-     accumulator for hoisted interpolations. */
   type ctx = {
     file: string,
     scope: list(string),
@@ -141,10 +117,6 @@ module Css_transform = {
       ctx.dynamic_vars := [dynamic_var, ...ctx.dynamic_vars^];
     };
 
-  /* Detect a `$(name)` interpolation anywhere in a component-value list,
-     recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
-     The naive top-level check misses interpolations nested inside those
-     groupings (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
   let rec component_value_has_interpolation = (cv: component_value) =>
     switch (cv) {
     | Variable(_, _) => true
@@ -160,16 +132,9 @@ module Css_transform = {
       values,
     );
 
-  /* A declaration hoists a custom property iff its *value* carries a
-     `$(…)` interpolation. Selector-position interpolations (`.$(name)`)
-     are resolved statically and never hoisted, so they are irrelevant
-     here — we only inspect the declaration value. */
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
 
-  /* The single declaration an atom carries: bare (top-level), nested under a
-     selector (`Style_rule`), or under an at-rule. None for an atom with no
-     declaration body (e.g. an empty at-rule). */
   let rec atom_declaration = (rule: rule): option(declaration) =>
     switch (rule) {
     | Declaration(decl) => Some(decl)
@@ -190,28 +155,12 @@ module Css_transform = {
       }
     };
 
-  /* True when the atom's declaration interpolates a runtime value. Such atoms
-     are bundled (one shared class + var namespace) rather than atomized, so the
-     same value across base/`:hover`/`@media` collapses to one custom property. */
   let atom_has_value_interpolation = (rule: rule): bool =>
     switch (atom_declaration(rule)) {
     | Some(decl) => declaration_has_value_interpolation(decl)
     | None => false
     };
 
-  /* @property{inherits:false} support for `&`-local interpolation vars. A
-     non-inheriting custom property does not reach descendants, so changing it
-     invalidates only the element, not its subtree. Safe only when the var is
-     read on `&`'s own box, never through inheritance — which excludes both
-     descendant elements (`& .child`) AND pseudo-elements (`&::before`,
-     `&::placeholder`): a pseudo-element is a separate box that receives the
-     originating element's custom properties via inheritance, so an
-     inherits:false var set inline on `&` is invisible to it.
-
-     [selector_subject_is_ampersand]: the subject (rightmost compound) of [sel]
-     is `&`'s own box, so the rule matches the styled element itself. `&:hover`,
-     `&.foo`, `.ancestor &` qualify; `& .child`, `& > .x`, `&::before`,
-     `&:after` do not. */
   let selector_subject_is_ampersand = (sel: selector): bool =>
     switch (
       List.rev(
@@ -225,10 +174,6 @@ module Css_transform = {
       )
     };
 
-  /* True when every declaration in an atom is read on `&` itself, so its
-     interpolation vars need not inherit. A bare declaration is on `&`; a nested
-     rule iff its subject is `&`; an at-rule defers to its inner rule. Unknown
-     shapes default to false (keep inherits:true). */
   let rec atom_is_ampersand_local = (rule: rule): bool =>
     switch (rule) {
     | Declaration(_) => true
@@ -256,9 +201,6 @@ module Css_transform = {
     || c == '_'
     || c == '-';
 
-  /* The `--<name>` tokens in rendered CSS, without the leading `--`. Finds which
-     dynamic vars an atom reads even when cross-atom dedup hides a reference, so
-     a var read by any descendant atom can be excluded from inherits:false. */
   let custom_property_names_in_text = (text: string): list(string) => {
     let n = String.length(text);
     let names = ref([]);
@@ -281,9 +223,6 @@ module Css_transform = {
     names^;
   };
 
-  /* A var may register @property{inherits:false} only if it is a declaration
-     value (a `RuntimeModule` serializer or a `--custom: $(...)` feeder), not an
-     animation-name or a selector/media-prelude var. */
   let var_type_supports_inherits_false = (var_type: var_type): bool =>
     switch (var_type) {
     | RuntimeModule("AnimationName") => false
@@ -329,14 +268,6 @@ module Css_transform = {
         { name: (fn_name, _), body: (body_values, body_loc), _ } as fn,
       )
         when fn_name == "url" =>
-      /* CSS `url()` does not perform `var()` substitution: browsers consume
-         the body as a literal token, so `url(var(--x))` resolves to the
-         string "var(--x)" not the value the custom property holds. Allowing
-         the recursive rewrite below would silently emit broken CSS (see
-         documents/css-extraction.md). When the body contains an
-         interpolation, reject with a clear error pointing the user at
-         literal-string alternatives the static extractor can serialize
-         correctly; otherwise fall through to the generic Function rewrite. */
       let interp_loc =
         List.find_map(
           ((inner: component_value, loc)) =>
@@ -409,12 +340,6 @@ module Css_transform = {
     };
   }
 
-  /* Resolve `ClassVariable(name)` (i.e. `.$(name)`) by replacing it with
-     the chain of `Class(c)` subclass selectors corresponding to the
-     classNames the referenced [%css] binding minted. Multi-declaration
-     bindings expand to a compound chain (`&.cssA.cssB`) which matches the
-     "AND" semantics: every consumer of the referenced binding has all of
-     its atomized classes applied to the same element. */
   and transform_compound_selector = (ctx, compound: compound_selector) => {
     let transformed_type_selector =
       Option.map(
@@ -436,9 +361,6 @@ module Css_transform = {
     };
   }
 
-  /* Rewrite a `simple_selector` in compound-internal position (slotted
-     into `type_selector`). The selector-wrapping variant below is
-     `transform_simple_selector_to_selector`. */
   and transform_simple_selector =
       (ctx, simple: simple_selector): simple_selector => {
     switch (simple) {
@@ -467,9 +389,6 @@ module Css_transform = {
     };
   }
 
-  /* When a `simple_selector` appears outside a compound (i.e. as a
-     `SimpleSelector(...)` whole-selector wrapping it), we still need to
-     express the resolution. Same lookup, wraps the result. */
   and transform_simple_selector_to_selector =
       (ctx, simple: simple_selector): selector => {
     switch (simple) {
@@ -479,9 +398,6 @@ module Css_transform = {
     };
   }
 
-  /* `transform_subclass_selector_to_list` returns a *list* of subclass
-     selectors so `ClassVariable` can fan out into a compound chain
-     (`.cssA.cssB`) for multi-declaration source bindings. */
   and transform_subclass_selector_to_list =
       (ctx, subclass: subclass_selector): list(subclass_selector) => {
     switch (subclass) {
@@ -502,10 +418,6 @@ module Css_transform = {
     };
   }
 
-  /* Pseudo-classes like `:not(...)`, `:is(...)`, `:where(...)`,
-     `:has(...)`, `:nth-child(of ...)` etc. carry nested selector lists.
-     Recurse into the payload so `:not(&.$(foo))` resolves the same way as
-     a top-level `&.$(foo)`. */
   and transform_pseudo_selector =
       (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
@@ -656,14 +568,6 @@ module Css_transform = {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
-    /* Detect any `$(name)` interpolation anywhere in the at-rule prelude
-       (recursing into nested groupings — see `component_value_has_interpolation`)
-       — e.g. the canonical `@media (max-width: $(bp))` form, where `$(bp)`
-       lives inside a `Paren_block` of the `(max-width: $(bp))` group.
-
-        Static extraction can't bind `var(--x)` into a media query (CSS
-        custom properties are not valid in media-query conditions), so we
-        reject the whole shape with a hard error. */
     let has_interpolation =
       component_value_list_has_interpolation(prelude_values);
 
@@ -694,23 +598,6 @@ module Css_transform = {
     };
   };
 
-  /* Detect whether `selector` starts with a pseudo-only compound and
-     contains no `&` anywhere. Such selectors are spec-correct (per
-     CSS Nesting Level 1 §3.1 they descendant-join with the parent),
-     but the descendant interpretation almost never matches author
-     intent at the top of an atomization context: `.X :hover` matches
-     descendants of `.X` when hovered, not `.X` itself when hovered.
-
-     Walks past `ComplexSelector(Selector(_))` wrappers and the `left`
-     of `Combinator`s to find the leading compound. Returns `true`
-     iff the leading compound has `type_selector = None`, every
-     subclass selector is a `Pseudo_class`, and the compound has at
-     least one pseudo (subclass or pseudo-element). Mixed compounds
-     like `:hover.foo` (which contain a `Class`) are not flagged
-     because the author has clearly written a more specific selector.
-
-     `&:hover`, `&[disabled]`, `& :hover`, etc. all contain `&` and
-     so are accepted unchanged via the `replace_ampersand` path. */
   let rec leading_compound = sel =>
     switch (sel) {
     | CompoundSelector(c) => Some(c)
@@ -756,9 +643,6 @@ module Css_transform = {
     );
   };
 
-  /* Mirrors the `@media`-prelude rejection: a value interpolation under a
-     subtree-escaping selector cannot be reached by the `var(--…)`
-     indirection, so reject it instead of emitting silently-broken CSS. */
   let raise_subtree_escaping_interpolation_error =
       (~loc, ~source_position_start, ~property, sel) => {
     let rendered = Styled_ppx_css_parser.Render.selector(sel);
@@ -774,20 +658,10 @@ module Css_transform = {
     );
   };
 
-  /* Same-property declarations of a block group into ONE atom so the
-     winner is decided by intra-atom source order (emotion parity) —
-     fallback pairs like `display: -webkit-box; display: flex` stay
-     together; splitting them would let stylesheet position pick the
-     winner. Groups anchor at the LAST occurrence (a group cascades like
-     its last member; first-anchoring would hoist duplicates past
-     intervening rules). Singletons keep the historical atom shape and
-     hash. */
   type block_item =
     | Declaration_group(list(declaration))
     | Nested_rule(rule);
 
-  /* Property names are case-insensitive; custom properties (`--*`) are
-     case-sensitive. */
   let declaration_group_key = ({ name: (name, _), _ }: declaration) =>
     if (String.length(name) >= 2 && String.sub(name, 0, 2) == "--") {
       name;
@@ -796,7 +670,6 @@ module Css_transform = {
     };
 
   let group_declarations_by_property = (rules: list(rule)): list(block_item) => {
-    /* Pass 1: collect declarations per key + each key's last index. */
     let decls_by_key: Hashtbl.t(string, ref(list(declaration))) =
       Hashtbl.create(8);
     let last_index_by_key: Hashtbl.t(string, int) = Hashtbl.create(8);
@@ -814,7 +687,6 @@ module Css_transform = {
         },
       rules,
     );
-    /* Pass 2: emit each group at its last occurrence. */
     List.mapi(
       (index, rule) =>
         switch (rule) {
@@ -836,15 +708,6 @@ module Css_transform = {
   let atomize_rules =
       (~source_position_start, ~label=?, rules: list(rule))
       : list((string, string, rule)) => {
-    /* Merge a child selector-list prelude under a parent selector-list prelude.
-       For each (parent, child) pair, run `compute_new_prefix` so `&`,
-       `::pseudo`, and descendant combinators all resolve correctly. The
-       Cartesian product matches CSS-nesting semantics:
-       `a, b { c, d { ... } }` desugars to `a c, a d, b c, b d`.
-
-       Folded with prepend then reversed once at the end — equivalent
-       output to the prior `concat_map`/`map` combination but avoids the
-       per-parent intermediate list and the final concat pass. */
     let merge_preludes =
         (
           ~parent: list((selector, Ppxlib.Location.t)),
@@ -870,12 +733,6 @@ module Css_transform = {
       |> List.rev;
     };
 
-    /* Wrap a same-property `Declaration` group (see
-       `group_declarations_by_property`) as one atom. No parent:
-       singleton keeps the historical bare `Declaration` atom (hash
-       stability); a group becomes `& { ... }` (`&` resolves to the
-       className). With a parent: one `Style_rule(parent){group}` atom
-       per parent selector. */
     let wrap_declaration_group_under_parent = (~parent_prelude=?, decls) => {
       switch (parent_prelude) {
       | None =>
@@ -905,8 +762,6 @@ module Css_transform = {
           [(className, namespace, style_rule)];
         }
       | Some(parent_selectors) =>
-        /* Computed once: depends on the declarations, not on which parent
-           selector they pair with. */
         let interpolated_property =
           decls
           |> List.find_opt(declaration_has_value_interpolation)
@@ -946,9 +801,6 @@ module Css_transform = {
       };
     };
 
-    /* Atomize one block's rules: same-property declarations group into a
-       single atom (see `group_declarations_by_property`); everything
-       else atomizes rule by rule. */
     let rec extract_atomic_rules_from_block =
             (~parent_prelude=?, rules: list(rule))
             : list((string, string, rule)) =>
@@ -972,17 +824,6 @@ module Css_transform = {
           block: (rules, _),
           loc: _,
         }) =>
-        /* CSS Nesting Level 1 §3.1 desugars a bare leading pseudo
-           selector via descendant combinator, so `:hover { ... }` and
-           `::after { ... }` produce `<parent> :hover` / `<parent>
-           ::after`. That's almost never what authors want; the typical
-           intent is the compound form (`<parent>:hover` / `<parent>::after`).
-           Reject these with a precise location and steer authors toward
-           `&:hover` (compound) or `& :hover` (explicit descendant).
-
-           The check runs at every nesting level (with or without a
-           parent prelude) because the same footgun applies whether the
-           parent is the implicit className or another selector. */
         List.iter(
           ((sel, sel_loc)) =>
             if (is_bare_leading_pseudo(sel)) {
@@ -994,9 +835,6 @@ module Css_transform = {
             },
           child_selectors,
         );
-        /* Merge any accumulated parent prelude into this Style_rule's
-           selector list. At the top level (no parent) this preserves the
-           original prelude verbatim, including multi-selector lists. */
         let effective_selectors =
           switch (parent_prelude) {
           | None => child_selectors
@@ -1008,12 +846,6 @@ module Css_transform = {
         );
 
       | At_rule({ name: (name, name_loc), prelude, block, loc }) =>
-        /* Only conditional group rules can be atomized (the condition
-           distributes over the block). Everything else errors like the
-           runtime path — splitting @font-face/@keyframes/@property or
-           @layer produces broken CSS. Accepted set is a deliberate
-           superset of the runtime's (@supports/@starting-style are
-           extraction-only). */
         let raise_at_rule_error = message =>
           Ppxlib.Location.raise_errorf(
             ~loc=
@@ -1053,17 +885,6 @@ module Css_transform = {
             ),
           )
 
-        /* Both Rule_list and Stylesheet payloads are atomized the same way:
-           recurse into the inner rules, then re-wrap each atom in a fresh
-           `At_rule(... Rule_list ...)`. We normalize Stylesheet → Rule_list
-           on output because each atom carries exactly one inner rule.
-
-           The accumulated parent prelude is threaded through so that any
-           Style_rule (or bare Declaration) nested inside an at-rule still
-           carries the full selector chain. The Declaration arm above turns
-           a bare Declaration with a parent into a Style_rule, which is what
-           lets `.a .b { @media (...) { color: red } }` render correctly as
-           `@media (...) { .css-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
           extract_atomic_rules_from_block(~parent_prelude?, rules)
@@ -1087,11 +908,6 @@ module Css_transform = {
     extract_atomic_rules_from_block(~parent_prelude=?None, rules);
   };
 
-  /* Lower a single atom into its concrete CSS rules, resolving `&` /
-     descendant nesting against [effective_class] and substituting
-     interpolations under [effective_namespace]. A bare `Declaration` atom is
-     wrapped under `.effective_class`; nested / at-rule atoms run through
-     `Transform.run`. */
   let lower_atom = (ctx, ~effective_class, ~effective_namespace, ~loc, rule) => {
     let single_rule_list = ([rule], loc);
     let transformed =
@@ -1151,16 +967,6 @@ module Css_transform = {
 
     let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
 
-    /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class `css-<B>-<label>` and var namespace
-       `css-<B>` (label-free) shared across base/`:hover`/`@media`. Both derive
-       from the same bundle content, so identical bundles dedup to identical
-       rules + vars and different bundles never collide, preserving the
-       cross-module atomic invariant (see Hash_class.ml) and `CSS.merge`.
-
-       Static declarations keep their own per-content atom class (still shared
-       across blocks). A block with no interpolation produces no bundle and is
-       byte-for-byte identical to the pre-bundle output. */
     let bundle =
       switch (
         atomic_rules
@@ -1188,7 +994,7 @@ module Css_transform = {
                 when atom_has_value_interpolation(rule) => (
                 bundle_class,
                 bundle_namespace,
-                None /* content-keyed: many bundle rules share one class */,
+                None,
               )
             | _ => (className, var_namespace, Some(className))
             };
@@ -1207,9 +1013,6 @@ module Css_transform = {
             List.mem(effective_class, classes_acc)
               ? classes_acc : [effective_class, ...classes_acc];
 
-          /* Record the atom's `&`-locality and the vars it references (scanned
-             from rendered text so cross-atom dedup can't hide a reference), for
-             the inherits:false decision below. */
           let atom_local = atom_is_ampersand_local(rule);
           let referenced =
             processed
@@ -1230,8 +1033,6 @@ module Css_transform = {
     let atom_infos = atom_infos_rev;
     let dynamic_vars_final = List.rev(ctx.dynamic_vars^);
 
-    /* A var registers @property{inherits:false} iff its type supports it and
-       every atom that reads it is `&`-local. */
     let safe_inherits_false_vars =
       dynamic_vars_final
       |> List.filter_map(({ name, var_type, _ }) =>
@@ -1256,12 +1057,6 @@ module Css_transform = {
   };
 };
 
-/* Empty `[%css {||}]` bound to a named `let` mints a class handle
-   (`Hash_class.marker_class`) so consumers can resolve `&.$(name)` against
-   it.
-   No `[@@@css ...]` is emitted — there's no rule to write. Anonymous (`_`)
-   and statement-position bindings return `[]`, preserving the historical
-   `CSS.make("", [])` shape. */
 let mint_empty_class = (~main_module, ~scope, ~binding_name, ~label) =>
   switch (binding_name) {
   | Some(name) when name != "_" => [
@@ -1296,10 +1091,6 @@ let push =
       declarations,
     );
 
-  /* Ship every rule, deduped by its key. Static atoms key by class name (class
-     and content are 1:1). Bundle rules carry `None` and key by rendered content,
-     since many share one bundle class and class-name keying would drop all but
-     the first. */
   List.iter(
     ((dedup_key, rule)) => {
       let rendered_css = render_prefixed_rule(rule);
@@ -1313,11 +1104,6 @@ let push =
     shipped_rules,
   );
 
-  /* Register each `&`-local var with @property{inherits:false} so a value change
-     invalidates only the element, not its subtree. `syntax:"*"` accepts any
-     value and needs no `initial-value`; the var is always set inline by
-     `CSS.make`, so it is never unset. Deduped by content here and across units
-     by `generate`, so a name reused N times ships one registration. */
   List.iter(
     var_name =>
       Buffer.add_global_rule(
@@ -1390,20 +1176,6 @@ let push_keyframe =
   (keyframe_name, List.rev(ctx.dynamic_vars^));
 };
 
-/* Walk every rule in a [%styled.global] block, substitute
-   `$(expr)` interpolations with scoped `var(--var-<hash>)` names on the static
-   side, and accumulate the corresponding dynamic_vars.
-
-   Each rule (whether or not it contains interpolation) is pushed to
-   `Buffer.add_global_rule` so it ships through the existing
-   `[@@@css ...]` channel. The returned dynamic_vars feeds the
-   generated module's `to_string`, which emits a single
-   `:root { --var-<hash>: <value>; ... }` block for callers that explicitly
-    request the dynamic custom-property CSS; one declaration per dynamic_var
-    entry (already deduplicated by `Css_transform.add_dynamic_var`).
-
-   Static-only blocks return an empty dynamic_vars list, which makes
-   `to_string` emit `""`. */
 let push_global =
     (
       ~file,
@@ -1453,9 +1225,6 @@ let push_global =
     };
   List.iter(reject_parentless_ampersand, rules);
 
-  /* Flatten CSS-nesting before rendering (literal nesting only works in
-     modern browsers). Same order-preserving flattener as `[%css]`;
-     @font-face/@keyframes/@import pass through verbatim. */
   let flattened_rules =
     Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
   let var_namespace =
@@ -1466,16 +1235,6 @@ let push_global =
       ~rendered_rules=List.map(render_rule, flattened_rules),
     );
 
-  /* transform_rule walks the rule, replacing every Variable(path) in
-     declaration values with a namespace/type-scoped var(--hash) and appending
-     the corresponding dynamic_var to the context accumulator.
-
-     The caller in [ppx.re] pre-checks the rule list for top-level
-     Declaration nodes and bails before invoking this function, so the
-     Declaration arm here is unreachable in practice. We keep it as a
-     defensive no-op rather than partial-matching, so a future caller
-     bypassing the pre-check still produces well-formed CSS instead of
-     raising. */
   flattened_rules
   |> List.iter(rule =>
        switch (rule) {

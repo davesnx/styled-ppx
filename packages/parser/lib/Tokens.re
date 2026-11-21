@@ -1,12 +1,12 @@
 [@deriving show({ with_path: false })]
 type token =
   | EOF
-  | IDENT(string) // <ident-token>
-  | FUNCTION(string) // <function-token>
-  | NTH_FUNCTION(string) // <function-token> (nth-*)
-  | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
+  | IDENT(string)
+  | FUNCTION(string)
+  | NTH_FUNCTION(string)
+  | AT_KEYFRAMES(string)
   | AT_RULE(string)
-  | UNICODE_RANGE(string) // <unicode-range-token>
+  | UNICODE_RANGE(string)
   | HASH(
       (
         string,
@@ -15,56 +15,29 @@ type token =
           | `UNRESTRICTED
         ],
       ),
-    ) // <hash-token>
-  | STRING(string) // <string-token>
-  | URL(string) // <url-token>
-  | INTERPOLATION((string, [@opaque] Ppxlib.Location.t)) // <interpolation-token> (non-standard)
-  | DELIM(string) // <delim-token> for all delimiter characters
-  | NUMBER(float) // <number-token>
-  | PERCENTAGE(float) // <percentage-token>
-  | DIMENSION((float, string)) // <dimension-token>
-  | WS // <whitespace-token>
-  | COLON // <colon-token>
-  | DOUBLE_COLON // <double-colon-token>
-  | IMPORTANT // <important-token>
-  | SEMI_COLON // <semicolon-token>
-  | COMMA // <comma-token>
-  | LEFT_BRACKET // <[-token>
-  | RIGHT_BRACKET // <]-token>
-  | LEFT_PAREN // <(-token>
-  | RIGHT_PAREN // <)-token>
-  | LEFT_BRACE // <{-token>
-  | RIGHT_BRACE; // <}-token>;
+    )
+  | STRING(string)
+  | URL(string)
+  | INTERPOLATION((string, [@opaque] Ppxlib.Location.t))
+  | DELIM(string)
+  | NUMBER(float)
+  | PERCENTAGE(float)
+  | DIMENSION((float, string))
+  | WS
+  | COLON
+  | DOUBLE_COLON
+  | IMPORTANT
+  | SEMI_COLON
+  | COMMA
+  | LEFT_BRACKET
+  | RIGHT_BRACKET
+  | LEFT_PAREN
+  | RIGHT_PAREN
+  | LEFT_BRACE
+  | RIGHT_BRACE;
 
 let string_of_char = c => String.make(1, c);
 
-// Re-encode lexer-decoded byte strings into the canonical CSS
-// double-quoted form. The lexer (consume_string) decodes source
-// escapes and stores raw bytes; the renderer must re-encode them or
-// the emitted CSS will be malformed.
-//
-// CSS Syntax serialization rules require the following bytes to be
-// escaped inside a <string-token>:
-//   - U+0000 NUL          -> replaced with U+FFFD REPLACEMENT CHARACTER
-//   - U+0001..U+001F      -> hex escape (e.g. \A for LF, \D for CR)
-//   - U+007F DEL          -> hex escape \7F
-//   - U+0022 double-quote -> \"
-//   - U+005C backslash    -> \\
-//
-// Hex escapes are emitted with a trailing space so the next character
-// is not consumed as another hex digit (CSS hex escapes are 1-6 hex
-// digits and consume an optional trailing whitespace as terminator).
-//
-// String.iter walks bytes, not codepoints, which is correct here: the
-// only escapable bytes are ASCII, and UTF-8 continuation/lead bytes
-// (>= 0x80) fall through the catch-all and pass through verbatim,
-// preserving multi-byte sequences.
-//
-// We always emit double quotes -- CSS treats single- and double-quoted
-// strings as equivalent, so this is observably identical for any
-// conforming consumer.
-
-// Whether [c] requires escaping in a CSS <string-token>'s output.
 let needs_string_escape = c =>
   c == '"'
   || c == '\\'
@@ -72,17 +45,14 @@ let needs_string_escape = c =>
   || Char.code(c) == 0x7F
   || Char.code(c) == 0x00;
 
-// Append the escaped form of [c] (which must satisfy [needs_string_escape])
-// to [buf]. The two-digit hex form is enough for U+007F and below.
 let add_escaped_char = (buf, c) =>
   switch (c) {
   | '"' => Buffer.add_string(buf, "\\\"")
   | '\\' => Buffer.add_string(buf, "\\\\")
-  | '\000' => Buffer.add_string(buf, "\xEF\xBF\xBD") // U+FFFD
+  | '\000' => Buffer.add_string(buf, "\xEF\xBF\xBD")
   | c => Buffer.add_string(buf, Printf.sprintf("\\%X ", Char.code(c)))
   };
 
-// Append the escaped contents of [s] (without surrounding quotes) to [buf].
 let add_escaped_string = (buf, s) =>
   for (i in 0 to String.length(s) - 1) {
     let c = String.unsafe_get(s, i);
@@ -93,8 +63,6 @@ let add_escaped_string = (buf, s) =>
     };
   };
 
-// Whether [s] contains any byte that needs escaping. Fast-path for the
-// common case (no escaping needed) avoids the buffer allocation.
 let needs_string_serialization = s => {
   let len = String.length(s);
   let rec scan = i =>
@@ -119,11 +87,6 @@ let serialize_string = s =>
     Buffer.contents(buf);
   };
 
-// Serialize a URI value as url("..."). CSS allows unquoted url()
-// tokens, but the renderer never emits them, and the quoted form is
-// safe for arbitrary bytes once the inner string is properly escaped.
-// Single-pass into one buffer to avoid the intermediate allocations of
-// "url(" ++ serialize_string(s) ++ ")".
 let serialize_uri = s =>
   if (!needs_string_serialization(s)) {
     "url(\"" ++ s ++ "\")";
@@ -135,7 +98,6 @@ let serialize_uri = s =>
     Buffer.contents(buf);
   };
 
-// https://drafts.csswg.org/cssom/#serialize-an-identifier
 let serialize_identifier = ident => {
   let len = String.length(ident);
   let buf = Buffer.create(len);
@@ -216,7 +178,6 @@ let show_error =
 
 let token_of_delimiter_string =
   fun
-  /* Structural tokens */
   | "(" => Some(LEFT_PAREN)
   | ")" => Some(RIGHT_PAREN)
   | "[" => Some(LEFT_BRACKET)
@@ -226,7 +187,6 @@ let token_of_delimiter_string =
   | ":" => Some(COLON)
   | ";" => Some(SEMI_COLON)
   | "," => Some(COMMA)
-  /* Single-character delimiters */
   | s when String.length(s) == 1 => Some(DELIM(s))
   | _ => None;
 

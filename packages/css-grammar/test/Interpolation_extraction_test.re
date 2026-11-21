@@ -21,9 +21,6 @@ let infer_interpolation_types = (name, value) =>
   );
 
 let test_box_shadow_partial_interp = () => {
-  /* Test box-shadow with partial interpolation in color position.
-     Extraction delegates through the registry to find interpolation types
-     from inner type positions (e.g., <color> inside <shadow>). */
   let result =
     infer_interpolation_types("box-shadow", "0 1px 0 0 $(myColor)");
 
@@ -35,7 +32,6 @@ let test_box_shadow_partial_interp = () => {
 };
 
 let test_box_shadow_full_interp = () => {
-  /* Test box-shadow with full interpolation */
   let value = "$(shadow)";
   let result = infer_interpolation_types("box-shadow", value);
 
@@ -58,9 +54,6 @@ let test_text_shadow_full_interp = () => {
 };
 
 let test_box_shadow_length_interp = () => {
-  /* Test box-shadow with interpolation in length position.
-     Extraction delegates through the registry to find interpolation types
-     from inner type positions (e.g., <extended-length> inside <shadow>). */
   let value = "$(xOffset) 1px 0 0 red";
   let result = infer_interpolation_types("box-shadow", value);
 
@@ -72,9 +65,6 @@ let test_box_shadow_length_interp = () => {
 };
 
 let test_text_shadow_partial_interp = () => {
-  /* Test text-shadow with partial interpolation in color position.
-     Extraction delegates through the registry to find interpolation types
-     from inner type positions (e.g., <color> inside <shadow-t>). */
   let value = "1px 1px 2px $(myColor)";
   let result = infer_interpolation_types("text-shadow", value);
 
@@ -171,7 +161,6 @@ let test_flex_duplicate_interpolation_names_component_values = () => {
   );
 };
 
-/* Test infer_interpolation_types for properties WITH runtime_module_path */
 let test_color_full_interp = () => {
   let result = infer_interpolation_types("color", "$(myColor)");
   Alcotest.(check(list(pair(string, string))))(
@@ -199,7 +188,6 @@ let test_width_full_interp = () => {
   );
 };
 
-/* Test infer_interpolation_types for properties with derived runtime_module_path */
 let test_background_color_full_interp = () => {
   let result = infer_interpolation_types("background-color", "$(myBg)");
   Alcotest.(check(list(pair(string, string))))(
@@ -227,7 +215,6 @@ let test_opacity_full_interp = () => {
   );
 };
 
-/* Test non-interpolated values return empty */
 let test_color_no_interp = () => {
   let result = infer_interpolation_types("color", "red");
   Alcotest.(check(list(pair(string, string))))(

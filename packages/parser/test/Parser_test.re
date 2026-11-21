@@ -4,7 +4,6 @@ module Ast = Styled_ppx_css_parser.Ast;
 module Driver = Styled_ppx_css_parser.Driver;
 module Parser_location = Styled_ppx_css_parser.Parser_location;
 
-/* Parse the input as a whole file, so error positions come back unshifted. */
 let source_position_start = Parser_location.file_start();
 
 let parse = input => {
@@ -113,12 +112,10 @@ let nth_payload_tests_data =
     ("li:nth-child(2n+1) { color: red; }", Ast.ANB(2, "+", 1)),
     ("li:nth-child(-n+6) { color: red; }", Ast.ANB(-1, "+", 6)),
     ("li:nth-child(3n-6) { color: red; }", Ast.ANB(3, "-", 6)),
-    /* Preserve b from "n-<digits>" idents. */
     ("li:nth-child(n-3) { color: red; }", Ast.ANB(1, "-", 3)),
     ("li:nth-child(-n-3) { color: red; }", Ast.ANB(-1, "-", 3)),
     ("li:nth-child(2n- 3) { color: red; }", Ast.ANB(2, "-", 3)),
     ("li:nth-child(n- 3) { color: red; }", Ast.ANB(1, "-", 3)),
-    /* "n", "odd", and "even" are ASCII-case-insensitive. */
     ("li:nth-child(2N) { color: red; }", Ast.AN(2)),
     ("li:nth-child(2N-1) { color: red; }", Ast.ANB(2, "-", 1)),
     ("li:nth-child(-N+3) { color: red; }", Ast.ANB(-1, "+", 3)),
@@ -141,7 +138,6 @@ let nth_payload_tests_data =
        test_case(input, `Quick, assertion);
      });
 
-/* Invalid An+B regression cases return located parse errors. */
 let nth_error_tests_data =
   [
     (
@@ -180,7 +176,6 @@ let nth_error_tests_data =
       "li:nth-child(3n-1_0) { color: red; }",
       "Invalid an+b value in :nth-child() on line 1 at position 13",
     ),
-    /* "an-" requires a signless integer after it. */
     (
       "li:nth-child(2n-) { color: red; }",
       "Parse error while reading token ')' on line 1 at position 16",
@@ -931,7 +926,6 @@ let ambiguity_regression_tests = [
   }),
 ];
 
-/* Malformed UTF-8 is reported at the offending byte. */
 let invalid_utf8_tests = [
   test_case("stylesheet with invalid UTF-8 in a string errors", `Quick, () => {
     check(

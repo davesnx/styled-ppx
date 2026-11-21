@@ -1,6 +1,5 @@
 type combinator('a, 'b) = list(Rule.rule('a)) => Rule.rule('b);
 
-// TODO: docs for infix operators
 let static: combinator('a, list('a));
 
 let xor: combinator('a, 'a);

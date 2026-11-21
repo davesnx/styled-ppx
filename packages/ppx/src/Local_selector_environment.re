@@ -1,8 +1,3 @@
-/* Per-compilation-unit selector environment for [%css] and
-   [%styled.global]. It models the subset of OCaml name lookup available
-   before typing: same-file modules, aliases, opens/includes, named [%css]
-   bindings, and literal string selectors seen earlier in the file. */
-
 let table: Hashtbl.t((string, string), list(string)) = Hashtbl.create(64);
 let local_modules: Hashtbl.t((string, string), unit) = Hashtbl.create(64);
 let aliases: Hashtbl.t((string, string), list(string)) =

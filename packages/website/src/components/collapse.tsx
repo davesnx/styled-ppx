@@ -29,7 +29,6 @@ export function Collapse({
     const child = container.children[0] as HTMLDivElement
 
     if (horizontal) {
-      // save initial width to avoid word wrapping when container width will be changed
       child.style.width = `${child.clientWidth}px`
       container.style.width = `${child.clientWidth}px`
     } else {
@@ -37,7 +36,6 @@ export function Collapse({
     }
     if (isOpen) {
       animationRef.current = window.setTimeout(() => {
-        // should be style property in kebab-case, not CSS class name
         container.style.removeProperty('height')
       }, openDuration)
     } else {

@@ -1,5 +1,3 @@
-/* Levenshtein distance algorithm */
-
 let distance = (s1, s2) => {
   let len1 = String.length(s1);
   let len2 = String.length(s2);
@@ -23,11 +21,8 @@ let distance = (s1, s2) => {
         };
       matrix[i][j] =
         min(
-          min(
-            matrix[i - 1][j] + 1, /* deletion */
-            matrix[i][j - 1] + 1 /* insertion */
-          ),
-          matrix[i - 1][j - 1] + cost /* substitution */
+          min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1),
+          matrix[i - 1][j - 1] + cost,
         );
     };
   };
@@ -42,7 +37,6 @@ let find_closest_match = (target, candidates) => {
     |> List.map(candidate => {
          let candidate_lower = String.lowercase_ascii(candidate);
          let distance = distance(target_lower, candidate_lower);
-         /* lower distance is better */
          let max_len = max(String.length(target), String.length(candidate));
          let similarity_ratio =
            if (max_len == 0) {

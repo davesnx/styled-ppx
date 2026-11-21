@@ -72,11 +72,8 @@ dev: ## Run the project in dev mode
 release-static:
 	$(DUNE) build --root . --ignore-promoted-rules --profile release-static --only-packages styled-ppx
 
-# Testing commands
-
 TEST_TARGETS := test-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-generate
 
-# Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test
 .PHONY: $(1)
 $(1): ## Run $(1) tests
@@ -105,8 +102,6 @@ test: build
 		make --no-print-directory $${target} || status=1; \
 	done; exit $$status
 
-# Demo
-
 .PHONY: demo-static
 demo-static: ## Build the melange demo (esbuild bundle + stylesheet via dune)
 	$(DUNE) build --root . @demo/melange/static
@@ -122,8 +117,6 @@ demo-exe: ## Run the melange demo native executable (prints SSR markup to stdout
 .PHONY: demo-exe-watch
 demo-exe-watch: ## Run (and watch) the melange demo native executable
 	$(DUNE) exec --root . demo/melange/print.exe --watch
-
-# Debug commands
 
 .PHONY: ast
 ast: ## Print the command to debug the ast

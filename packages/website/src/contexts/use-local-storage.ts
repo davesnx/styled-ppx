@@ -9,7 +9,6 @@ import {
 } from "react";
 import type { Dispatch, SetStateAction, RefObject } from "react";
 
-// MediaQueryList Event based useEventListener interface
 function useEventListener<K extends keyof MediaQueryListEventMap>(
   eventName: K,
   handler: (event: MediaQueryListEventMap[K]) => void,
@@ -17,7 +16,6 @@ function useEventListener<K extends keyof MediaQueryListEventMap>(
   options?: boolean | AddEventListenerOptions
 ): void;
 
-// Window Event based useEventListener interface
 function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
   handler: (event: WindowEventMap[K]) => void,
@@ -25,7 +23,6 @@ function useEventListener<K extends keyof WindowEventMap>(
   options?: boolean | AddEventListenerOptions
 ): void;
 
-// Element Event based useEventListener interface
 function useEventListener<
   K extends keyof HTMLElementEventMap & keyof SVGElementEventMap,
   T extends Element = K extends keyof HTMLElementEventMap
@@ -40,7 +37,6 @@ function useEventListener<
   options?: boolean | AddEventListenerOptions
 ): void;
 
-// Document Event based useEventListener interface
 function useEventListener<K extends keyof DocumentEventMap>(
   eventName: K,
   handler: (event: DocumentEventMap[K]) => void,
@@ -66,7 +62,6 @@ function useEventListener<
   element?: RefObject<T>,
   options?: boolean | AddEventListenerOptions
 ) {
-  // Create a ref that stores handler
   const savedHandler = useRef(handler);
 
   useIsomorphicLayoutEffect(() => {
@@ -74,19 +69,16 @@ function useEventListener<
   }, [handler]);
 
   useEffect(() => {
-    // Define the listening target
     const targetElement: T | Window = element?.current ?? window;
 
     if (!(targetElement && targetElement.addEventListener)) return;
 
-    // Create event listener that calls handler function stored in ref
     const listener: typeof handler = (event) => {
       savedHandler.current(event);
     };
 
     targetElement.addEventListener(eventName, listener, options);
 
-    // Remove event listener on cleanup
     return () => {
       targetElement.removeEventListener(eventName, listener, options);
     };
@@ -156,7 +148,6 @@ export function useLocalStorage<T>(
       if (options.deserializer) {
         return options.deserializer(value);
       }
-      // Support 'undefined' as a value
       if (value === "undefined") {
         return undefined as unknown as T;
       }
@@ -169,7 +160,7 @@ export function useLocalStorage<T>(
         parsed = JSON.parse(value);
       } catch (error) {
         console.error("Error parsing JSON:", error);
-        return defaultValue; // Return initialValue if parsing fails
+        return defaultValue;
       }
 
       return parsed as T;
@@ -177,13 +168,10 @@ export function useLocalStorage<T>(
     [options, initialValue]
   );
 
-  // Get from local storage then
-  // parse stored json or return initialValue
   const readValue = useCallback((): T => {
     const initialValueToUse =
       initialValue instanceof Function ? initialValue() : initialValue;
 
-    // Prevent build error "window is undefined" but keeps working
     if (IS_SERVER) {
       return initialValueToUse;
     }
@@ -204,10 +192,7 @@ export function useLocalStorage<T>(
     return initialValue instanceof Function ? initialValue() : initialValue;
   });
 
-  // Return a wrapped version of useState's setter function that ...
-  // ... persists the new value to localStorage.
   const setValue: Dispatch<SetStateAction<T>> = useEventCallback((value) => {
-    // Prevent build error "window is undefined" but keeps working
     if (IS_SERVER) {
       console.warn(
         `Tried setting localStorage key “${key}” even though environment is not a client`
@@ -215,16 +200,12 @@ export function useLocalStorage<T>(
     }
 
     try {
-      // Allow value to be a function so we have the same API as useState
       const newValue = value instanceof Function ? value(readValue()) : value;
 
-      // Save to local storage
       window.localStorage.setItem(key, serializer(newValue));
 
-      // Save state
       setStoredValue(newValue);
 
-      // We dispatch a custom event so every similar useLocalStorage hook is notified
       window.dispatchEvent(new StorageEvent("local-storage", { key }));
     } catch (error) {
       console.warn(`Error setting localStorage key “${key}”:`, error);
@@ -246,11 +227,8 @@ export function useLocalStorage<T>(
     [key, readValue]
   );
 
-  // this only works for other documents, not the current one
   useEventListener("storage", handleStorageChange);
 
-  // this is a custom event, triggered in writeValueToLocalStorage
-  // See: useLocalStorage()
   useEventListener("local-storage", handleStorageChange);
 
   return [storedValue, setValue];

@@ -35,7 +35,6 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   chat: {
     icon: (
       <>
-        {/* nextra v4 icons ship without intrinsic dimensions */}
         <DiscordIcon height="24" />
         <span className="_sr-only">Discord</span>
       </>
@@ -78,7 +77,6 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     link: repoLink,
     icon: (
       <>
-        {/* nextra v4 icons ship without intrinsic dimensions */}
         <GitHubIcon height="24" />
         <span className="_sr-only">GitHub</span>
       </>

@@ -8,8 +8,6 @@ module Property_print_color_adjust =
 let property_print_color_adjust : property_print_color_adjust Rule.rule =
   Property_print_color_adjust.rule
 
-(* Ruby *)
-
 let entries : (kind * packed_rule) list =
   [
     ( Property "print-color-adjust",

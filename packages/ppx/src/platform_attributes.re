@@ -1,5 +1,3 @@
-/* This file centralizes attributes emitted for Reason/Melange output. */
-
 open Ppxlib;
 
 module Helper = Ast_helper;
@@ -22,16 +20,13 @@ module ReasonAttributes = {
 };
 
 module MelangeAttributes = {
-  /* [@optional] */
   let optional = (~loc) =>
     Helper.Attr.mk(withLoc("optional", ~loc), PStr([]));
 
-  /* fn(. ) */
   let uncurried = (~loc) => {
     Builder.attribute(~name=withLoc(~loc, "u"), ~loc, ~payload=PStr([]));
   };
 
-  /* [@deriving abstract] */
   let derivingAbstract = (~loc) =>
     Helper.Attr.mk(
       withLoc("deriving", ~loc),
@@ -46,7 +41,6 @@ module MelangeAttributes = {
       ]),
     );
 
-  /* [mel.as ""] */
   let alias = (~loc, alias) =>
     Helper.Attr.mk(
       withLoc("mel.as", ~loc),

@@ -43,7 +43,6 @@ function assertUnchangedTokens(testFixurePath, done) {
                   throw e;
                 }
               }
-              // different but no tokenization ot color change: no failure
             } else {
               throw e;
             }
@@ -73,7 +72,6 @@ suite("colorization", () => {
   if (fs.existsSync(extensionColorizeFixturePath)) {
     let fixturesFiles = fs.readdirSync(extensionColorizeFixturePath);
     fixturesFiles.forEach((fixturesFile) => {
-      // define a test for each fixture
       test(fixturesFile, function (done) {
         assertUnchangedTokens(
           join(extensionColorizeFixturePath, fixturesFile),

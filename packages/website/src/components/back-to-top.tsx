@@ -12,8 +12,6 @@ const scrollToTop: ComponentProps<'button'>['onClick'] = event => {
   window.scrollTo(SCROLL_TO_OPTIONS)
   tocElement.scrollTo(SCROLL_TO_OPTIONS)
 
-  // Fixes https://github.com/facebook/react/issues/20770
-  // Fixes https://github.com/shuding/nextra/issues/2917
   buttonElement.disabled = true
 }
 
@@ -28,14 +26,13 @@ export function BackToTop({
 }): ReactElement {
   return (
     <Button
-      // elements with `aria-hidden: true` must not be focusable or contain focusable elements
       aria-hidden={hidden ? 'true' : undefined}
       onClick={scrollToTop}
       disabled={hidden}
       className={({ disabled }) =>
         cn(
           '_flex _items-center _gap-1.5',
-          '_whitespace-nowrap', // Safari
+          '_whitespace-nowrap',
           disabled ? '_opacity-0' : '_opacity-100',
           className
         )

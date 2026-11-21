@@ -19,8 +19,6 @@ module Array = struct
 
   external length : 'a array -> int = "length" [@@mel.get]
 
-  (* Public API *)
-
   let reduce ~init ~f t = array_reduce t ~init ~f:(fun a b -> f a b)
   let map ~f t = array_map t ~f:(fun a -> f a)
 

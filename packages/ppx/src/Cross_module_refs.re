@@ -6,9 +6,6 @@ type entry = {
 let sentinel = (longident: string): string =>
   Css_extraction.sentinel(longident);
 
-/* Insertion-ordered list of entries; reversed on drain. The companion
-   [seen] hashtable dedups by [(longident, file, cnum)] so [record] runs
-   in amortized O(1) instead of an O(n) [List.exists] scan per call. */
 let entries: ref(list(entry)) = ref([]);
 let seen: Hashtbl.t((string, string, int), unit) = Hashtbl.create(16);
 
@@ -17,11 +14,6 @@ let reset = () => {
   Hashtbl.clear(seen);
 };
 
-/* Rewrite [loc]'s pos_fname to [file] on both ends. The CSS parser produces
-   locations relative to the [%css] string payload with an empty pos_fname;
-   the surrounding [%css] knows the actual file via Code_path.file_path. We
-   attach it here so the aggregator can later format errors against the
-   original source. */
 let with_filename = (~file: string, loc: Ppxlib.Location.t): Ppxlib.Location.t => {
   let loc_start = {
     ...loc.loc_start,

@@ -2,8 +2,6 @@ let to_ppxlib_location ?(loc_ghost = false) (start_pos : Lexing.position)
   (end_pos : Lexing.position) : Ppxlib.location =
   { loc_start = start_pos; loc_end = end_pos; loc_ghost }
 
-(* Location covering both inputs, for AST nodes synthesized by merging two
-   source-adjacent nodes (e.g. nested @media preludes joined with `and`). *)
 let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
   {
     loc_start = loc1.loc_start;
@@ -11,8 +9,6 @@ let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
     loc_ghost = loc1.loc_ghost || loc2.loc_ghost;
   }
 
-(* Position of a file's first character. Rebasing against it is the
-   identity; [Location.none] is not ([pos_cnum] is [-1]). *)
 let file_start ?(filename = "") () : Lexing.position =
   { pos_fname = filename; pos_lnum = 1; pos_bol = 0; pos_cnum = 0 }
 
@@ -24,12 +20,6 @@ let source_position_start ~delimiter ~loc_includes_delimiters
   in
   { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
 
-(* Rebase a source-relative position (line 1, column 0 = first parsed
-   character) onto [source_position_start]. The source is a contiguous
-   byte range of the file, so offsets shift by [pos_cnum]; line 1
-   continues [source_position_start]'s file line, later lines start their
-   own. Escape sequences in quoted strings break the 1:1 byte mapping and
-   shift positions after them. *)
 let to_file_position ~(source_position_start : Lexing.position)
   (pos : Lexing.position) : Lexing.position =
   {
@@ -41,7 +31,6 @@ let to_file_position ~(source_position_start : Lexing.position)
     pos_cnum = pos.pos_cnum + source_position_start.pos_cnum;
   }
 
-(* Rebase a source-relative location onto the file. *)
 let to_file_location ~(source_position_start : Lexing.position)
   (relative_loc : Ppxlib.location) : Ppxlib.location =
   {

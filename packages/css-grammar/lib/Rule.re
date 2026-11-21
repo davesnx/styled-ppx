@@ -43,7 +43,6 @@ let rec drop_leading_whitespace = values =>
 let remaining_length = values =>
   List.length(drop_leading_whitespace(values));
 
-/* Error construction helpers */
 let err = (~got=?, expected) =>
   Error([
     {
@@ -265,11 +264,6 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
     Pattern.component(
       fun
       | (Ast.Variable(name, _loc), _) => Ok(`Interpolation(name))
-      /* Use Description here so the grammar-internal "value" alternative
-         doesn't leak into user-facing "Expected ..." suggestion lists.
-         Description entries are filtered out of suggestions in
-         [format_expected]; only the inner rule's specific keyword/token
-         expectations make it to the user. */
       | _ => err([Description("a CSS value or `$(interpolation)`")]),
     );
   switch (interp_rule(values)) {
@@ -282,8 +276,6 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
     };
   };
 };
-
-/* === Serialization (only called at edges) === */
 
 let expected_to_string =
   fun

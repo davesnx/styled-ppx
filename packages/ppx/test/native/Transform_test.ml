@@ -112,8 +112,6 @@ let mediaqueries_and_selectors () =
      .test{display:block;}}"
     (render list_of_rules)
 
-(* Adjacent `@media` blocks with an identical prelude merge into one;
-   contents keep their relative order, so the cascade is unchanged. *)
 let nested_mediaqueries_and_selectors () =
   let input =
     "margin: 10px; @media (min-width: 768px) { display: block; .test { \
@@ -710,11 +708,6 @@ let missing_semicolon_before_nested_media_query_after_interpolation_in_declarati
     ".copy{margin-bottom:$(Size.lg);}@media $(Media.wide) {.copy{width:50%;}}"
     (render list_of_rules)
 
-(* Source order is preserved: the declaration written *after* the nested
-   block flushes after it, so the cascade matches what a nesting-capable
-   browser computes for the input. (The old pipeline hoisted all
-   declarations above the hoisted media blocks, inverting the cascade
-   when both targeted the same subject.) *)
 let declaration_after_nested_block_in_declaration_list () =
   let input =
     {|
@@ -768,10 +761,6 @@ let focus_within_and_focus_visible () =
      solid orange;}"
     (render list_of_rules)
 
-(* Per CSS Nesting Level 1 §3.1, a bare nested pseudo selector
-   descendant-joins with the parent. The PPX's `[%css]` extraction path
-   rejects these with a clear error, but the runtime `Transform.run`
-   path accepts them and emits the spec-correct descendant form. *)
 let bare_leading_pseudo_descendant_joins () =
   let input = {| :hover { color: red; } |} in
   let rule_list = parse input in
@@ -791,15 +780,12 @@ let bare_leading_pseudo_nested_under_class () =
   check ~pos:__POS__ ".box .outer :hover{color:red;}" (render list_of_rules)
 
 let amp_pseudo_inside_amp_pseudo_compound_chain () =
-  (* Spec-correct: `&:hover { &::after }` -> `&:hover::after`. The two
-     compounds merge because each side carries an explicit `&`. *)
   let input = {| &:hover { &::after { content: "*"; } } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
   check ~pos:__POS__ ".box:hover::after{content:\"*\";}" (render list_of_rules)
 
 let amp_pseudo_with_descendant_inner () =
-  (* `&:hover { .child }` -> `&:hover .child` (descendant). *)
   let input = {| &:hover { .child { color: red; } } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
