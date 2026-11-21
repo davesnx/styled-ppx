@@ -19,7 +19,6 @@ let ( lsl ) = Int.shift_left
 let ( lxor ) = Int.logxor
 let ( lsr ) = Int.shift_right_logical
 
-(* JavaScript uses UTF-16 not UTF-8 *)
 let get_utf16_char_codes s =
   let length = String.length s in
 
@@ -36,24 +35,19 @@ let get_utf16_char_codes s =
       in
       let mask_char_code c = c land 0x3F in
       match code_length with
-      | 1 ->
-        (* 1-byte character (ASCII) *)
-        loop (i + 1) (Char.code s.[i] :: acc)
+      | 1 -> loop (i + 1) (Char.code s.[i] :: acc)
       | 2 ->
-        (* 2-byte character *)
         let c1 = Char.code s.[i] land 0x07 in
         let c2 = mask_char_code (Char.code s.[i + 1]) in
         let uchar = (c1 lsl 6) lor c2 in
         loop (i + 2) (uchar :: acc)
       | 3 ->
-        (* 3-byte character *)
         let c1 = Char.code s.[i] land 0x07 in
         let c2 = mask_char_code (Char.code s.[i + 1]) in
         let c3 = mask_char_code (Char.code s.[i + 2]) in
         let uchar = (c1 lsl 12) lor (c2 lsl 6) lor c3 in
         loop (i + 3) (uchar :: acc)
       | 4 ->
-        (* 4-byte character (requires surrogate pair) *)
         let c1 = Char.code s.[i] land 0x07 in
         let c2 = mask_char_code (Char.code s.[i + 1]) in
         let c3 = mask_char_code (Char.code s.[i + 2]) in
@@ -69,16 +63,12 @@ let get_utf16_char_codes s =
   in
   try loop 0 [] with _ -> List.init (String.length s) (fun _ -> 0xFFFD)
 
-(* The murmur2 hashing algorithm is based on @emotion/hash https://github.com/emotion-js/emotion/blob/main/packages/hash/src/index.js *)
 let murmur2 str =
-  (* 'm' and 'r' are mixing constants generated offline.
-     They're not really 'magic', they just happen to work well. *)
   let m = 0x5bd1e995 in
   let r = 24 in
 
   let mix_int k = Int32.to_int (Int32.mul (Int32.of_int k) (Int32.of_int m)) in
 
-  (* Initialize the hash *)
   let h = ref 0 in
   let i = ref 0 in
 
@@ -108,7 +98,6 @@ let murmur2 str =
     len := !len - 4
   done;
 
-  (* Handle the last few bytes of the input array *)
   let () =
     if !len = 3 then h := !h lxor ((str_char_code_at (!i + 2) land 0xff) lsl 16);
     if !len >= 2 then h := !h lxor ((str_char_code_at (!i + 1) land 0xff) lsl 8);

@@ -1,10 +1,3 @@
-/*
-   Contains all HTML attributes for all elements and ReactDOM specifics.
-   This list is part of the `makeProps` that generates the component API for HTML elements
-   Taken from: https://github.com/reasonml/reason-react/blob/master/src/ReactDOM.re
-   Snapshot: https://gist.github.com/davesnx/22f0e81b6d7450e3e0dcc157595426f2
- */
-
 open Ppxlib;
 
 type alias = option(string);
@@ -2165,7 +2158,7 @@ let data = [
     type_: Media,
   }),
   Event({
-    name: "onEncrypetd", /* TODO: fix this misspelling after https://github.com/reasonml/reason-react/pull/930 */
+    name: "onEncrypetd",
     type_: Media,
   }),
   Event({
@@ -2333,8 +2326,6 @@ let hasName = (prop, propName) => {
   };
 };
 
-/* If a name from props collide with an attribute, we exclude it from the list
-   of available makeProps */
 let get = propsToExclude => {
   let findInExclude = prop => List.find_opt(hasName(prop), propsToExclude);
 

@@ -29,7 +29,6 @@ import cn from 'clsx'
 import type { ComponentProps, ReactElement } from 'react'
 import { forwardRef } from 'react'
 
-// TODO: Change the DEFAULT_ID for `nextra-skip-nav` or something else on the next major version (v3.x). The DEFAULT_ID must be 'reach-skip-nav' because changing this value is a breaking change for users that use v2.0.1 and earlier
 const DEFAULT_ID = 'reach-skip-nav'
 const DEFAULT_LABEL = 'Skip to content'
 
@@ -53,8 +52,8 @@ export const SkipNavLink = forwardRef<HTMLAnchorElement, SkipNavLinkProps>(
     forwardedRef
   ): ReactElement => {
     const className =
-      providedClassName === undefined // Give the option to the user to pass a falsy other than undefined to remove the default styles
-        ? styled // Give the user a way to opt-in the default style provided with the theme. Probably remove this option in the next major version (v3.x) and just do a check to use the providedClassName or the default
+      providedClassName === undefined
+        ? styled
           ? cn(
               '_sr-only',
               'nextra-focus',

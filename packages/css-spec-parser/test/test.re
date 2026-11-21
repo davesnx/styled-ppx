@@ -72,7 +72,6 @@ let parse_tests =
         ],
       ),
     ),
-    // groups
     ("[A]", Terminal(Keyword("A"), One)),
     (
       "[A && B]",
@@ -107,7 +106,6 @@ let parse_tests =
         ],
       ),
     ),
-    // multipliers
     ("A*", Terminal(Keyword("A"), Zero_or_more)),
     ("A+", Terminal(Keyword("A"), One_or_more)),
     ("A?", Terminal(Keyword("A"), Optional)),
@@ -115,9 +113,7 @@ let parse_tests =
     ("A{4,5}", Terminal(Keyword("A"), Repeat(4, Some(5)))),
     ("A{4,}", Terminal(Keyword("A"), Repeat(4, None))),
     ("[A]!", Group(Terminal(Keyword("A"), One), At_least_one)),
-    // why Group exists:
     ("[A?]!", Group(Terminal(Keyword("A"), Optional), At_least_one)),
-    // property name
     (
       "<font-weight-absolute> | bolder | lighter",
       Combinator(
@@ -130,7 +126,6 @@ let parse_tests =
       ),
     ),
     (
-      // function call
       "rgb( <percentage>{3} [ / <alpha-value> ]? )",
       Function_call(
         "rgb",
@@ -153,7 +148,6 @@ let parse_tests =
       ),
     ),
     (
-      // special characters
       "'[' <custom-ident>* ']'",
       Combinator(
         Static,
@@ -165,7 +159,6 @@ let parse_tests =
       ),
     ),
     ("<rgb()>", Terminal(Data_type("rgb()", None), One)),
-    // ident with number
     (
       "[ jis04 | simplified | traditional ]",
       Combinator(
@@ -177,9 +170,7 @@ let parse_tests =
         ],
       ),
     ),
-    // at keyword
     ("@stylistic", Terminal(Keyword("@stylistic"), One)),
-    // range restriction
     (
       "<number [1, 5]>",
       Terminal(
@@ -195,9 +186,7 @@ let parse_tests =
       "<number [-\xe2\x88\x9e, \xe2\x88\x9e]>",
       Terminal(Data_type("number", Some((Neg_infinity, Infinity))), One),
     ),
-    // escaped combinator
     ("'||'", Terminal(Keyword("||"), One)),
-    // function without space
     (
       "minmax(min, max)",
       Function_call(
@@ -223,12 +212,7 @@ let parse_tests =
         ],
       ),
     ),
-    (
-      // special characters
-      "','",
-      Terminal(Delim(","), One),
-    ),
-    // stacked multipliers (CSS Values 4 §2.3)
+    ("','", Terminal(Delim(","), One)),
     (
       "A+#",
       Group(Terminal(Keyword("A"), One_or_more), Repeat_by_comma(1, None)),

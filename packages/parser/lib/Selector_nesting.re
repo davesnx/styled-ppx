@@ -47,11 +47,6 @@ let is_sibling_combinator =
   | Selector_descendant
   | Selector_child => false;
 
-/* Flatten a complex selector into a left-to-right list of
-   `(combinator_before, segment)` pairs; the head carries `None`. So
-   `& + .a .b` becomes [(None, &), (Some(+), .a), (Some(descendant), .b)].
-   A leading-combinator `RelativeSelector` (`+ .x`) has an implicit `&` on
-   its left, which we synthesise as the head. */
 let rec flatten_selector_chain =
         (sel: selector): list((option(selector_combinator), selector)) => {
   let with_lead = (combinator, chain) =>
@@ -77,12 +72,6 @@ let rec flatten_selector_chain =
   };
 };
 
-/* Pseudo-elements are separate boxes that receive custom properties
-   from their originating element via *inheritance* — a
-   `@property{inherits:false}` var set inline on `&` is invisible to
-   `&::before`/`&::placeholder`. Both `::x` and the CSS2 legacy
-   single-colon spellings (`:before`, `:after`, `:first-line`,
-   `:first-letter`, parsed as pseudo-classes) count. */
 let pseudo_selector_is_element =
   fun
   | Pseudoelement(_)
@@ -97,17 +86,6 @@ let pseudo_selector_is_element =
     }
   | Pseudoclass(_) => false;
 
-/* Segment matches the styled element's OWN box and nothing else: a bare
-   `&` or a compound whose type position is `&`, restricted only by
-   pseudo-classes/subclasses (`&:hover`, `&.foo`) — never by a
-   pseudo-element (`&::before` styles a separate box that reads vars via
-   inheritance). Strictly stronger than `subject_within_ampersand`
-   below, which also accepts elements merely *inside* `&`'s subtree
-   (e.g. `:is(& .child)`) — those too read inline custom properties via
-   inheritance. Callers deciding whether a var may register
-   `@property{inherits:false}` must use this strict form. `:is(&)`-style
-   proofs are conservatively rejected (false only misses an
-   optimization, never breaks a style). */
 let rec selector_is_ampersand_own_box = (sel: selector) =>
   switch (sel) {
   | SimpleSelector(Ampersand) => true
@@ -128,9 +106,6 @@ let rec selector_is_ampersand_own_box = (sel: selector) =>
   | _ => false
   };
 
-/* Segment provably denotes an element inside `&`'s subtree: `&`,
-   `&`-typed compounds, or `:is()`/`:where()` whose every branch stays
-   inside. `:not()`/`:has()` prove nothing — conservatively ignored. */
 let rec subject_within_ampersand = (sel: selector) =>
   switch (sel) {
   | SimpleSelector(Ampersand) => true
@@ -160,8 +135,6 @@ and pseudo_proves_within_ampersand = pseudo =>
        )
   | _ => false
   }
-/* Subject is inside `&`'s subtree when itself within `&`, or after a
-   within-`&` segment followed by a descendant/child step. */
 and subject_inside_ampersand = segments =>
   switch (segments) {
   | [] => false
@@ -173,10 +146,6 @@ and subject_inside_ampersand = segments =>
   | [_, ...rest] => subject_inside_ampersand(rest)
   };
 
-/* Subject sits outside `&`'s subtree (sibling combinator, `div:not(&)`,
-   `:has(& + div)`, ...) — it can't read the custom property `[%css]`
-   sets inline on `&`. `contains_ampersand` sees inside pseudo payloads,
-   so payload-only `&` is analyzed, not silently accepted. */
 let subject_escapes_ampersand_subtree = (sel: selector): bool => {
   contains_ampersand(sel)
   && !subject_inside_ampersand(flatten_selector_chain(sel));
@@ -192,9 +161,6 @@ let needs_parent_selector = (selector: selector): bool => {
   );
 };
 
-/* Flatten nested combinator trees into head + flat segment steps.
-   Purely structural (no `&` synthesis, unlike `flatten_selector_chain`);
-   nested trees arise from joins/substitutions of complex selectors. */
 let rec flatten_combinator_tree =
         (sel: selector): (selector, list((selector_combinator, selector))) =>
   switch (sel) {
@@ -244,12 +210,6 @@ let join_selector_with_combinator =
   );
 };
 
-/* Extend a prefix compound preserving literal-substitution order: the
-   nested compound renders *after* the prefix. When the prefix ends in
-   pseudo selectors, nested pseudo-classes append to the pseudo chain
-   (`.a::before { &:hover }` -> `.a::before:hover`, not
-   `.a:hover::before`). Non-pseudo subclasses stay in subclass position
-   (`::before.foo` is invalid and unrepresentable). */
 let merge_compound_selectors =
     (
       ~last_type_selector,
@@ -280,11 +240,6 @@ let merge_compound_selectors =
     });
   };
 
-/* Extend the last compound of `selector` with `compound`'s
-   subclass/pseudo lists (used by `replace_ampersand` for `&:hover`-style
-   substitution). Unhandled shapes (e.g. `RelativeSelector`) fall back to
-   a descendant join rather than crashing — the parser layer can't
-   raise. */
 let join_compound_selector =
     (selector, { subclass_selectors, pseudo_selectors, _ } as compound) => {
   let (last, before_last) = pop_last_selector(selector);
@@ -375,12 +330,6 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
       })
     };
   | RelativeSelector({ combinator, complex_selector }) =>
-    /* `replace_ampersand` preserves the outer `ComplexSelector` wrapper
-       on every recursive arm that handles a `ComplexSelector` input,
-       so the result is always `ComplexSelector(_)`. The fallback
-       `Selector(_)` rewrap is defensive: if a future arm is added that
-       returns a bare selector, we keep the `RelativeSelector`
-       structure intact rather than crashing. */
     let complex_selector =
       switch (
         replace_ampersand(replaced_with, ComplexSelector(complex_selector))
@@ -417,10 +366,6 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
         payload: (NthSelector({ nth, selectors }), payload_loc),
       }),
     ) =>
-    /* See the parallel `RelativeSelector` arm above for why the result
-       of `replace_ampersand` on a `ComplexSelector(_)` is always a
-       `ComplexSelector(_)`. The `Selector(other)` rewrap is defensive
-       against future arms that might return a bare selector. */
     let selectors =
       selectors
       |> List.map(complex_selector =>
@@ -497,10 +442,6 @@ let join_media =
   );
 };
 
-/* `join_media` builds `LEFT and RIGHT`, only sound for single
-   conjunctive queries: top-level comma/`or`/`not`/`$()` (and, on the
-   right, media types like `screen`) would change meaning or fail the
-   media-query grammar. Rejected preludes nest literally instead. */
 let media_prelude_meaningful_values =
     ((values, _loc): with_loc(component_value_list)) =>
   List.filter_map(
@@ -508,7 +449,6 @@ let media_prelude_meaningful_values =
     values,
   );
 
-/* LEFT operand: single conjunctive query (media-type head is fine). */
 let media_prelude_is_combinable = prelude => {
   let meaningful = media_prelude_meaningful_values(prelude);
   let conjunctive_only =
@@ -530,7 +470,6 @@ let media_prelude_is_combinable = prelude => {
   };
 };
 
-/* RIGHT operand: pure `(...)` condition chain — it follows an `and`. */
 let media_prelude_is_condition_only = prelude => {
   let meaningful = media_prelude_meaningful_values(prelude);
   let condition_chain =

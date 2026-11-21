@@ -74,7 +74,7 @@ type FolderProps = {
 function FolderImpl({ item, anchors, onFocus }: FolderProps): ReactElement {
   const routeOriginal = useFSRoute()
   const [route] = routeOriginal.split('#')
-  const hasRoute = !!item.route // for item.type === 'menu' will be ''
+  const hasRoute = !!item.route
   const active = hasRoute && [route, route + '/'].includes(item.route + '/')
   const activeRouteInside =
     active || (hasRoute && route.startsWith(item.route + '/'))
@@ -144,7 +144,6 @@ function FolderImpl({ item, anchors, onFocus }: FolderProps): ReactElement {
   }
 
   const isLink = 'withIndexPage' in item && item.withIndexPage
-  // use button when link don't have href because it impacts on SEO
   const ComponentToUse = isLink ? Anchor : Button
 
   return (
@@ -166,7 +165,6 @@ function FolderImpl({ item, anchors, onFocus }: FolderProps): ReactElement {
             e.preventDefault()
           }
           if (isLink) {
-            // If it's focused, we toggle it. Otherwise, always open it.
             if (active || clickedToggleIcon) {
               TreeState[item.route] = !open
             } else {
@@ -236,7 +234,6 @@ function File({
 }): ReactElement {
   const route = useFSRoute()
 
-  // It is possible that the item doesn't have any route - for example an external link.
   const active = item.route && [route, route + '/'].includes(item.route + '/')
   const activeAnchor = useActiveAnchor()
   const { setMenu } = useMenu()
@@ -371,7 +368,6 @@ export function Sidebar({
         })
       }
       if (menu) {
-        // needs for mobile since menu has transition transform
         setTimeout(scroll, 300)
       } else {
         scroll()
@@ -425,15 +421,11 @@ export function Sidebar({
               )}
               ref={sidebarRef}
             >
-              {/* without asPopover check <Collapse />'s inner.clientWidth on `layout: "raw"` will be 0 and element will not have width on initial loading */}
               {(!asPopover || !showSidebar) && (
                 <Collapse isOpen={showSidebar} horizontal>
                   <Menu
                     className="nextra-menu-desktop max-md:_hidden"
-                    // The sidebar menu, shows only the docs directories.
                     directories={docsDirectories}
-                    // When the viewport size is larger than `md`, hide the anchors in
-                    // the sidebar when `floatTOC` is enabled.
                     anchors={themeConfig.toc.float ? [] : anchors}
                     onlyCurrentDocs
                   />
@@ -442,9 +434,7 @@ export function Sidebar({
               {mounted && window.innerWidth < 768 && (
                 <Menu
                   className="nextra-menu-mobile md:_hidden"
-                  // The mobile dropdown menu, shows all the directories.
                   directories={fullDirectories}
-                  // Always show the anchor links on mobile (`md`).
                   anchors={anchors}
                 />
               )}
@@ -457,7 +447,7 @@ export function Sidebar({
             className={cn(
               'nextra-sidebar-footer _sticky _bottom-0',
               '_flex _items-center _gap-2 _py-4',
-              '_mx-3 _px-1', // to hide focused sidebar links
+              '_mx-3 _px-1',
               showSidebar
                 ? hasI18n && '_justify-end'
                 : '_py-4 _flex-wrap _justify-center'

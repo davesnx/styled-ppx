@@ -154,10 +154,6 @@ let make_synthetic_dep = ((longident_str: string, loc: Ppxlib.Location.t)) => {
         loc,
       },
     );
-  /* `let _ = M.Css.marker` â purely for ocamldep + early type errors.
-     Carrying the original [%css] location through here means
-     "Unbound module" / "Unbound value" errors point at the user's
-     selector ref rather than at [_none_]. */
   Builder.pstr_value(
     ~loc,
     Nonrecursive,
@@ -990,8 +986,6 @@ let () = {
       | _ => [make_refs_attribute(cross_module_entries)]
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
-    /* Declares production mode in the wire protocol so the aggregator can
-       minify without a flag of its own; absence means development. */
     let config_items =
       switch (rule_items, bindings_items) {
       | ([], []) => []
@@ -1000,13 +994,6 @@ let () = {
         ]
       | _ => []
       };
-    /* Order:
-       - extraction config (production marker)
-       - extracted CSS rules
-       - binding exports
-       - cross-module refs descriptor
-       - dep-tracking synthetic lets
-       - user's source. */
     config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
   };
 

@@ -53,8 +53,6 @@ let property_contain_intrinsic_inline_size :
   property_contain_intrinsic_inline_size Rule.rule =
   Property_contain_intrinsic_inline_size.rule
 
-(* Print *)
-
 let entries : (kind * packed_rule) list =
   [
     ( Property "contain-intrinsic-size",

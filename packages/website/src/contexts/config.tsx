@@ -8,7 +8,6 @@ import { MenuProvider } from "./menu";
 type Config = {
   hideSidebar: boolean;
   normalizePagesResult: ReturnType<typeof normalizePages>;
-  /** Front matter of the active page, from the page map. */
   frontMatter: Record<string, unknown>;
   filePath: string;
   timestamp?: number;

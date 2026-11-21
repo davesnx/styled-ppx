@@ -185,7 +185,6 @@ let () =
       in
       let key =
         match kind with
-        (* Properties use prefixed keys to avoid collisions with values. *)
         | Property _ -> "property_" ^ css_name
         | Value _ | Function _ | Media_query _ -> css_name
       in

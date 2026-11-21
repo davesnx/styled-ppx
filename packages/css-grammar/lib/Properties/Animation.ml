@@ -131,8 +131,6 @@ module Property_animation_trigger = struct
   let infer_interpolation_types_with_context (_ : string) (_ : t) = []
 end
 
-(* Custom properties for at-rules *)
-
 let entries : (kind * packed_rule) list =
   [
     Property "animation", pack_module (module Property_animation);

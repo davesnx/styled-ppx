@@ -36,7 +36,6 @@ let render_angle = (x: angle) => {
 };
 
 let tests = [
-  // TODO: case insensitive
   test("integer", () => {
     let parse = parse([%spec "<integer>"]);
     check(
@@ -417,7 +416,6 @@ let tests = [
       Ok("https://duckduckgo.com"),
     );
   }),
-  // css-color-4
   test("<hex-color>", () => {
     let parse = parse([%spec "<hex-color>"]);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
@@ -428,7 +426,6 @@ let tests = [
   }),
   test("<linenames>", () => {
     let parse = parse([%spec "'[' <custom-ident>+ ']'"]);
-    /* Static combinator uses unwrapped custom_ident (string) directly */
     let to_check =
       Alcotest.result(
         Alcotest.triple(
@@ -445,7 +442,6 @@ let tests = [
   }),
   test("chars", () => {
     let parse = parse([%spec "<string>? ',' <string>"]);
-    /* Static combinator already unwraps string_token, so no need to unwrap again */
     let to_check =
       Alcotest.result(
         Alcotest.triple(
@@ -486,11 +482,6 @@ let tests = [
     let expect = check(~__POS__, to_check);
     expect(parse("$(Module.value)"), Ok(["Module.value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'.value'"]));
-    /* When the interpolation parser doesn't match a `$(...)` token, it
-       contributes only a Description to the expected set. Description
-       entries are filtered out of user-facing suggestion lists, so the
-       fallback message is the generic one rather than the leaky
-       "Expected 'value'." pre-fix output. */
     expect(parse("asd"), Error("Expected a valid value."));
   }),
 ];

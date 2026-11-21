@@ -1,6 +1,3 @@
-; This tests ensure the transformation goes right and doesn't need to type-check.
-; If you are looking for CSS Support tests check packages/ppx/test/native folder.
-
 (subdir
  reason
  (cram
@@ -9,11 +6,6 @@
    %{exe:../../standalone.exe}
    %{bin:refmt}
    (package styled-ppx))))
-
-; These snapshots contain error locations and source excerpts into the
-; refmt-generated output.ml. refmt prints that file through the host
-; compiler's Pprintast, whose layout differs between OCaml versions, so they
-; run only on OCaml 5.4. Gating is by folder: put a snapshot here to gate it.
 
 (subdir
  locations

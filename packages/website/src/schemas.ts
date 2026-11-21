@@ -91,7 +91,6 @@ export type DocsThemeConfig = {
     emptyResult: ReactNode | FC
     error: string | (() => string)
     loading: ReactNode | FC
-    // Can't be React component
     placeholder: string | (() => string)
   }
   sidebar: {
@@ -121,6 +120,5 @@ type DeepPartial<T> = T extends (...args: never[]) => unknown
       : T
 
 export type PartialDocsThemeConfig = DeepPartial<DocsThemeConfig> & {
-  // keep `locale` and `name` as required properties of each entry
   i18n?: I18nEntry[]
 }

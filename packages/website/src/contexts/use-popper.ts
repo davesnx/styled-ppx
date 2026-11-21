@@ -3,10 +3,6 @@ import { createPopper } from "@popperjs/core";
 import type { RefCallback } from "react";
 import { useCallback, useMemo, useRef } from "react";
 
-/**
- * https://github.com/tailwindlabs/headlessui/issues/59
- * Example implementation to use Popper: https://popper.js.org
- */
 export function usePopper(
   options?: Partial<Options>
 ): [RefCallback<Element | null>, RefCallback<HTMLElement | null>] {

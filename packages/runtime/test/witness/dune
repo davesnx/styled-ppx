@@ -1,6 +1,3 @@
-; Generate and compile property-level runtime witness references. Missing
-; modules and incompatible unary toString functions fail the build.
-
 (executable
  (name gen_css_types_witnesses)
  (modules gen_css_types_witnesses)

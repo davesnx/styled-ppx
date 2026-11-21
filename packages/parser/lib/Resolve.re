@@ -4,14 +4,6 @@ let loc_none = Ppxlib.Location.none;
 
 let split_by_kind = Selector_nesting.split_by_kind;
 
-/* Order-preserving CSS-nesting flattener: lowers nested CSS into flat,
-   source-ordered rules (source order = cascade order). `@media` hoists
-   to the top and combines when statically safe, otherwise stays
-   literally nested. Empty rules are dropped; blockless at-rules are
-   not. */
-
-/* Blocks hold descriptors/keyframe selectors, not style rules:
-   pass through verbatim. */
 let is_descriptor_at_rule = name =>
   switch (String.lowercase_ascii(name)) {
   | "keyframes"
@@ -31,7 +23,6 @@ let style_rule = (~prefix: selector, rules: list(rule)) =>
     loc: loc_none,
   });
 
-/* `loc: snd(prelude)` keeps diagnostics pointing into the user's CSS. */
 let media_rule = (~prelude, rules: list(rule)) =>
   At_rule({
     name: ("media", loc_none),
@@ -40,7 +31,6 @@ let media_rule = (~prelude, rules: list(rule)) =>
     loc: snd(prelude),
   });
 
-/* Prelude equality by rendered form (ignores locations). */
 let media_preludes_equal = ((left, _), (right, _)) =>
   Render.component_value_list(Render.strip_leading_whitespace(left))
   == Render.component_value_list(Render.strip_leading_whitespace(right));
@@ -83,8 +73,6 @@ let rec flatten_rules =
           rules: list(rule),
         )
         : list(rule) => {
-  /* Flush pending declarations at their source position, wrapped in
-     prefix and media context. */
   let flush = (pending: list(rule)) =>
     switch (List.rev(pending)) {
     | [] => []
@@ -133,7 +121,6 @@ let rec flatten_rules =
 and flatten_at_rule = (~prefix, ~media, at_rule: at_rule): list(rule) => {
   let { name: (name, _), prelude, block, _ } = at_rule;
   switch (block) {
-  /* Statement at-rules (`@import`, `@charset`): pass through verbatim. */
   | Empty => [At_rule(at_rule)]
   | Rule_list((inner, _))
   | Stylesheet((inner, _)) =>
@@ -158,7 +145,6 @@ and flatten_at_rule = (~prefix, ~media, at_rule: at_rule): list(rule) => {
       | Some(combined) =>
         flatten_rules(~prefix, ~media=Some(combined), inner)
       | None =>
-        /* Not statically combinable: nest literally (nested media conjoin). */
         switch (flatten_rules(~prefix, ~media=None, inner)) {
         | [] => []
         | inner_rules => wrap_in_media([media_rule(~prelude, inner_rules)])
@@ -167,8 +153,6 @@ and flatten_at_rule = (~prefix, ~media, at_rule: at_rule): list(rule) => {
     } else if (is_descriptor_at_rule(name)) {
       wrap_in_media([At_rule(at_rule)]);
     } else {
-      /* Group at-rule (`@supports`, `@container`, ...): flatten inside
-         with a fresh media context (media must not hoist past it). */
       switch (flatten_rules(~prefix, ~media=None, inner)) {
       | [] => []
       | inner_rules =>
@@ -183,6 +167,5 @@ and flatten_at_rule = (~prefix, ~media, at_rule: at_rule): list(rule) => {
   };
 };
 
-/* `[%styled.global]` entry point: no implicit prefix or media context. */
 let resolve_selectors = (rules: list(rule)) =>
   flatten_rules(~prefix=None, ~media=None, rules);

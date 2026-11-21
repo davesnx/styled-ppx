@@ -10,7 +10,6 @@ let withLoc = (~loc, txt) => {
   txt,
 };
 
-/* (~a, ~b, ~c, _) => args */
 let rec fnWithLabeledArgs = (list, args) =>
   switch (list) {
   | [] => args
@@ -21,7 +20,6 @@ let rec fnWithLabeledArgs = (list, args) =>
     )
   };
 
-/* let styles = Emotion.(css(exp)) */
 let styles = (~loc, ~name, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
   Helper.Str.mk(
@@ -30,7 +28,6 @@ let styles = (~loc, ~name, ~expr) => {
   );
 };
 
-/* let styles = (~arg1, ~arg2) => Emotion.(css(exp)) */
 let dynamicStylesDecl = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
   let ppatAnyArg = (
@@ -41,7 +38,6 @@ let dynamicStylesDecl = (~loc, ~name, ~args, ~expr) => {
     Location.none,
     None,
   );
-  /* Last argument needs to be ignored, since it's a unit to remove the warning of optional labelled arguments */
   let argsWithLastAny = [ppatAnyArg, ...args];
 
   Helper.Str.mk(
@@ -59,11 +55,6 @@ let dynamicStylesDecl = (~loc, ~name, ~args, ~expr) => {
   );
 };
 
-/*
-  [@mel.module "react"] external createVariadicElement:
-  (string, Js.t({ .. })) => React.element =
-  "createElement";
- */
 let bindingCreateVariadicElement = (~loc) => {
   Helper.Str.primitive({
     pval_loc: loc,
@@ -132,7 +123,6 @@ let defineGetOrEmptyFn = (~loc) => {
   ];
 };
 
-/* ignore() */
 let applyIgnore = (~loc, expr) => {
   Helper.Exp.apply(
     ~loc,
@@ -143,14 +133,12 @@ let applyIgnore = (~loc, expr) => {
 
 let abstractGetProp = (~loc, name) =>
   if (Settings.Get.native()) {
-    /* props.propName */
     Helper.Exp.field(
       ~loc,
       Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)),
       withLoc(Lident(name), ~loc),
     );
   } else {
-    /* propNameGet(props) */
     Helper.Exp.apply(
       ~loc,
       Helper.Exp.ident(~loc, withLoc(Lident(name ++ "Get"), ~loc)),
@@ -174,8 +162,6 @@ let generateSequence = (~loc, fns) => {
   generate(~loc, fns);
 };
 
-/* deleteProp(newProps, key) |> ignore; */
-/* TODO: Replace with Js.Dict.unsafeDeleteKey */
 let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,
@@ -195,11 +181,6 @@ let asAttribute = () =>
     alias: Some("as"),
   });
 
-/*
- let asTag = props.as_;
- deleteProp(newProps, "as") |> ignore;
- createVariadicElement(finalHtmlTag, newProps)
- */
 let variadicElement = (~loc, ~htmlTag) => {
   let asAttributeName =
     switch (asAttribute()) {
@@ -316,7 +297,6 @@ let stylesAndRefObject = (~loc) => {
   );
 };
 
-/* let newProps = Object.assign({}, props, stylesObject); */
 let newProps = (~loc) => {
   let valueName = Helper.Pat.mk(~loc, Ppat_var(withLoc("newProps", ~loc)));
   let value = [%expr assign2(Js.Obj.empty(), props, stylesObject)];
@@ -324,7 +304,6 @@ let newProps = (~loc) => {
   Helper.Vb.mk(~loc, valueName, value);
 };
 
-/* let className = fst(styles) ++ props.className; */
 let className = (~loc, expr) => {
   let classNameProp = propItem(~loc, "className");
   Helper.Vb.mk(
@@ -341,11 +320,6 @@ let style = (~loc, expr) =>
     [%expr snd([%e expr])],
   );
 
-/*
-  let className = styles ++ props.className;
-  let newProps = Object.assign({}, props, stylesObject);
-  createVariadicElement(finalHtmlTag, newProps);
- */
 let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   let attrs = Platform_attributes.preserveBraces(~loc);
   let sequence =
@@ -389,14 +363,12 @@ let getIsOptional = str =>
   | _ => false
   };
 
-/* let make = (props: makeProps) => + makeBodyServer */
 let makeFnJSXServer =
     (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
     None,
-    /* props: makeProps */
     Helper.Pat.constraint_(
       ~loc,
       Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
@@ -410,13 +382,11 @@ let makeFnJSXServer =
   );
 };
 
-/* let make = (props: makeProps) => + makeBody */
 let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
   Helper.Exp.fun_(
     ~loc,
     Nolabel,
     None,
-    /* props: makeProps */
     Helper.Pat.constraint_(
       ~loc,
       Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
@@ -430,7 +400,6 @@ let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
   );
 };
 
-/* [@react.component] + makeFn */
 let component =
     (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
   let variableNames =
@@ -458,23 +427,18 @@ let optionalType = (~loc, type_) => {
   Helper.Typ.constr(~loc, withLoc(Lident("option"), ~loc), [type_]);
 };
 
-/* color: string */
 let customPropLabel = (~loc, ~optional, name, type_) => {
   let attrs = optional ? [Platform_attributes.optional(~loc)] : [];
   Helper.Type.field(
     ~loc,
     ~attrs,
     withLoc(name, ~loc),
-    /* when is melange, fields need to be annotated as option() when added [@mel.optional] */
     optional && File.get() == Some(Reason)
       ? optionalType(~loc, type_) : type_,
   );
 };
 
-/* href: string */
-/* Melange expects record fields to be optional */
 let recordLabel = (~loc, ~isOptional, name, kind, alias) => {
-  /* optional attribute is always present (unrelated with isOptional flag), while the option(type_) changes the type and it's based on isOptional */
   let attrs =
     switch (alias) {
     | Some(alias) => [
@@ -495,9 +459,7 @@ let recordLabel = (~loc, ~isOptional, name, kind, alias) => {
   Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
 
-/* innerRef: domRef */
 let domRefLabel = (~loc, ~isOptional) => {
-  /* TODO: is innerRef in JSX4? */
   let reactDOM_domRef =
     Helper.Typ.constr(
       ~loc,
@@ -506,12 +468,10 @@ let domRefLabel = (~loc, ~isOptional) => {
     );
   let type_ =
     isOptional ? optionalType(~loc, reactDOM_domRef) : reactDOM_domRef;
-  /* Attribute optional is always present */
   let attrs = [Platform_attributes.optional(~loc)];
   Helper.Type.field(~loc, ~attrs, withLoc("innerRef", ~loc), type_);
 };
 
-/* children: React.element */
 let childrenLabel = (~loc, ~isOptional) => {
   let react_element =
     Helper.Typ.constr(
@@ -534,7 +494,6 @@ let childrenLabel = (~loc, ~isOptional) => {
       );
 };
 
-/* onDragOver: React.Event.Mouse.t => unit */
 let recordEventLabel = (~loc, ~isOptional, name, kind) => {
   let arrow_type =
     Helper.Typ.arrow(
@@ -544,7 +503,6 @@ let recordEventLabel = (~loc, ~isOptional, name, kind) => {
       Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
     );
   let type_ = isOptional ? optionalType(~loc, arrow_type) : arrow_type;
-  /* Attribute optional is always present */
   let attrs = [Platform_attributes.optional(~loc)];
   Helper.Type.field(~loc, ~attrs, withLoc(name, ~loc), type_);
 };
@@ -573,8 +531,6 @@ let asLabel = (~loc, ~isOptional) => {
   domPropLabel(~loc, ~isOptional, asAttribute());
 };
 
-/* type makeProps = { ... } */
-/* type makeProps('a, 'b) = { ... } */
 let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
   let (params, dynamicProps) =
     switch (customProps) {
@@ -588,7 +544,6 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
     MakeProps.get(dynamicPropNames)
     |> map_tr(domPropLabel(~loc, ~isOptional=areAllFieldsOptional));
 
-  /* List of `prop: type` */
   let reactProps =
     List.append(
       [
@@ -632,8 +587,6 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
   );
 };
 
-/* type props = { ... } */
-/* type props('a, 'b) = { ... } */
 let makeProps = (~loc, customProps) => {
   makeMakeProps(~loc, ~areAllFieldsOptional=true, customProps);
 };
@@ -785,7 +738,6 @@ let defineGetterFns = (~loc, ~makePropTypes, ~customProps) => {
   coreGetters @ customGetters;
 };
 
-/* [%stri external assign2 : Js.t({ .. }) => makeProps => Js.t({ .. }) => Js.t({ .. }) = "Object.assign"] */
 let defineAssign2 = (~loc, ~makePropTypes) => {
   Helper.Str.primitive({
     pval_loc: loc,
@@ -875,15 +827,12 @@ let rec getArgs = (expr, list) => {
 
 let getIsEmpty = param => {
   switch (param.ppat_desc) {
-  /* Not completly sure if this checks emptyness */
   | Ppat_construct(_, _) => true
   | _ => false
   };
 };
 
 let getLabeledArgs = (label, defaultValue, param, expr) => {
-  /* Get the first argument of the Pexp_fun, since it's a recursive type.
-     getArgs gets all the function parameters from the next parsetree */
   let alias = getAlias(param, label);
   let type_ = getType(param);
   let firstArg = (label, defaultValue, param, alias, param.ppat_loc, type_);
@@ -1033,8 +982,6 @@ let validationErrorExpr = (~loc, ~source_position_start, ~description, errors) =
 };
 
 let stylesCall = (~loc, ~labeledArguments) => {
-  /* native: (~arg1, ~arg2, ...) */
-  /* client: (~arg1=props.arg1, ~arg2=props.arg2, ...) */
   let styledArguments =
     List.map(
       ((argumentName, _defaultValue, _, _, loc, _)) => {
@@ -1044,7 +991,6 @@ let stylesCall = (~loc, ~labeledArguments) => {
       labeledArguments,
     );
 
-  /* let styles = styles(...) */
   Builder.pexp_apply(
     ~loc,
     Builder.pexp_ident(
@@ -1054,7 +1000,6 @@ let stylesCall = (~loc, ~labeledArguments) => {
         loc,
       },
     ),
-    /* Last argument is a unit to avoid the warning of optinal labeled args */
     styledArguments @ [(Nolabel, [%expr ()])],
   );
 };
@@ -1080,7 +1025,6 @@ let customPropsFromLabeledArguments = (~loc, labeledArguments) => {
          | _ => None,
        );
 
-  /* type makeProps('a) = { a: 'a } */
   let propGenericFields =
     variableList
     |> List.map(((arg, defaultValue, _, type_)) =>

@@ -1,7 +1,5 @@
 let split_by_kind = Selector_nesting.split_by_kind;
 
-/* Resolve a `[%css]`/`[%cx]` rule list against the binding's className:
-   prefix every rule, flatten nesting, hoist `@media` — in source order. */
 let resolve_selectors = (~className, rules: list(Ast.rule)) => {
   let initial_prefix =
     Ast.CompoundSelector({

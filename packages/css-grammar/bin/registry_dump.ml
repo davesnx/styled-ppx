@@ -1,6 +1,3 @@
-(* Prints the css-grammar registry keys, one per line. *)
-
-(* Force [Registry] initialization before reading [registry_tbl]. *)
 let () = assert (Css_grammar.registry <> [])
 
 let () =

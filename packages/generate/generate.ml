@@ -1,38 +1,3 @@
-(** styled-ppx generator: walk every post-PPX [.ml] file in a dune library,
-    collect [[\@\@\@css ...]] CSS rules and any cross-module references embedded
-    as NUL-delimited sentinels, resolve those sentinels against a global index
-    of [%css] bindings, and emit the final stylesheet.
-
-    The generator runs once per `dune build` invocation, after the PPX has
-    produced the post-PPX [.ml] files for every module in the library.
-
-    Two-pass design:
-
-    Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
-    global index mapping [longident -> class_string]. The PPX itself populates
-    these payloads with the fully-qualified longident ([["M.Css.marker"]]) and
-    the space-separated class names it minted, so the generator only has to read
-    them — it does not re-derive module names from filenames or pattern-match
-    [CSS.make] calls.
-
-    Pass 2 — For each rule string in [[\@\@\@css ...]], scan for NUL-delimited
-    sentinels [\x00LONGIDENT\x00]. Look the longident up in the index and
-    substitute its class chain (multi-class bindings produce a dot-chain like
-    [cssA.cssB], a valid CSS compound selector). Resolution failures emit a hard
-    error pointing at the original [.re]/[.ml] source via the location
-    descriptors in [[\@\@\@css.refs ...]] attributes.
-
-    See [documents/cross-module-selector-interpolation.md]. *)
-
-(** All generator diagnostics go through this module. Every message is written
-    to stderr prefixed with ["styled-ppx:"] and gated on the current log level:
-
-    - [Error] ([--log error]): resolution/protocol/IO errors only.
-    - [Warning] (default): same as [Error] plus warnings (e.g. input files
-      disagreeing on their [[@@@css.config]] environment).
-    - [Info] ([--log info]): additionally prints the output file.
-    - [Debug] ([--debug] or [--log debug]): additionally prints the whole
-      generated stylesheet. *)
 module Logger = struct
   type level =
     | Error
@@ -64,17 +29,11 @@ module Logger = struct
   let debug fmt = log Debug fmt
 end
 
-(** Root module segment of a dotted longident. [["M.Css.marker"]] -> [["M"]];
-    [["foo"]] -> [["foo"]]. *)
 let longident_head longident =
   match String.split_on_char '.' longident with
   | head :: _ -> head
   | [] -> longident
 
-(** Global index of [%css] bindings, populated from [[\@\@\@css.bindings ...]]
-    attribute payloads. Keyed by the dotted longident exactly as users write it
-    in their [%css] selector refs (e.g. [["M.Css.marker"]]) so resolution is a
-    direct [Hashtbl.find_opt]. *)
 module Index = struct
   type t = (string, string) Hashtbl.t
 
@@ -91,21 +50,12 @@ module Index = struct
       Ok ()
 end
 
-(** Every
-    [[\@\@\@css.refs [(longident, file, start_line, start_col, end_col); ...]]]
-    attribute decoded into a list of records. The generator uses these locations
-    when reporting unresolvable refs. *)
 module Refs = struct
   type ref_loc = Css_extraction.ref_loc
 
   let of_list_expr = Css_extraction.decode_refs_payload
 end
 
-(** Per-file harvest: rules with potential sentinels, all cross-module ref
-    descriptors seen in this file, and the file's declared environment from
-    [[@@@css.config]] ([None] when absent, i.e. development). The bindings
-    attribute is consumed directly into the global [Index] during the same walk.
-*)
 type harvest = {
   filename : string;
   rules : string list;
@@ -158,10 +108,6 @@ let harvest_structure ~filename ~idx structure : harvest =
     protocol_errors = List.rev !protocol_errors;
   }
 
-(** Read a post-PPX [.ml] file or its serialized [.pp.ml] AST into a ppxlib
-    structure. File-read and parse errors are surfaced at [Error] level (always
-    printed) so a mistyped path produces a clear generator-level diagnostic
-    instead of silent empty output. *)
 let read_structure filename : Ppxlib.structure option =
   try
     if String.ends_with filename ~suffix:".pp.ml" then (
@@ -188,17 +134,10 @@ let read_structure filename : Ppxlib.structure option =
     Logger.error "cannot parse %s: %s" filename (Printexc.to_string exn);
     None
 
-(** Format a generator error in the OCaml [File "..."] convention (prefixed with
-    ["styled-ppx:"] by {!Logger} when printed) so the original source location
-    is easy to locate. *)
 let format_location (r : Refs.ref_loc) : string =
   Printf.sprintf "File %S, line %d, characters %d-%d:" r.file r.start_line
     r.start_col r.end_col
 
-(** Derive the module name from a file path the way dune/OCaml does: take the
-    basename, strip the [.ml] / [.re] / [.pp.ml] extension, and capitalize the
-    first letter. This matches how a user writes [M.foo] when the source file is
-    [m.re]. *)
 let module_of_filename filename =
   let base = Filename.basename filename in
   let stem =
@@ -208,18 +147,9 @@ let module_of_filename filename =
   in
   if stem = "" then stem else String.capitalize_ascii stem
 
-(** Detect cross-library references: a longident whose root module is NOT one of
-    the input files passed to the generator. The generator only sees files from
-    the current library invocation, so any longident whose root segment doesn't
-    correspond to one of those files must point outside the library. Note: we
-    check the input file set rather than [idx] (the [%css] binding index),
-    because a file may be in-library yet contain no [%css] bindings at all (and
-    therefore contribute nothing to [idx]). Conflating those two cases would
-    produce a misleading "not part of the current library" error for a reference
-    whose target module IS in the library, just not as a [%css]. *)
 let is_cross_library ~in_library_modules longident =
   match String.split_on_char '.' longident with
-  | [] | [ _ ] -> false (* No dot — single-segment, can't be cross-anything. *)
+  | [] | [ _ ] -> false
   | _ ->
     let head = longident_head longident in
     not (List.mem head in_library_modules)
@@ -246,15 +176,6 @@ let unresolved_message ~longident ~ref_loc ~in_library_modules =
        reference."
       (format_location ref_loc) longident head longident
 
-(** Decide the output mode from the harvested [[@@@css.config]] attributes.
-
-    The PPX declares [("env", "production")] in every file it processes with
-    production settings and omits the attribute in development, so the
-    aggregator needs no mode flag of its own. Output is minified (inter-rule
-    newlines dropped) only when every contributing input file — every file with
-    harvested rules or an explicit config — was compiled for production. Mixed
-    inputs mean some library stanzas ran the PPX with production settings and
-    some did not: warn and emit readable output. *)
 let production_mode harvests =
   let contributing =
     List.filter (fun h -> h.rules <> [] || h.env <> None) harvests
@@ -275,7 +196,6 @@ let production_mode harvests =
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
 
-(** Collect, index, resolve, dedup, output. *)
 let run ~output_file input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
@@ -292,7 +212,6 @@ let run ~output_file input_files =
       input_files
   in
 
-  (* Resolve all rules across all harvests, collecting errors with locations. *)
   let errors =
     ref (List.concat_map (fun harvest -> harvest.protocol_errors) harvests)
   in
@@ -338,23 +257,6 @@ let run ~output_file input_files =
     List.iter (fun msg -> Logger.error "%s" msg) (List.rev !errors);
     exit 1);
 
-  (* Dedup the resolved CSS rules while preserving source order.
-
-     Source order matters because every atomized rule shares the same
-     specificity (one class, no qualifiers). The cascade tiebreaker is
-     "later in stylesheet wins", so a longhand override written after a
-     shorthand (`margin: 10px; margin-top: 20px`) must appear *after* the
-     shorthand in the emitted stylesheet to survive. Earlier versions
-     deduped through `Set.Make(String)`, which sorted by murmur2-prefixed
-     rule text and silently destroyed declaration order.
-
-     [resolved_rules] is in reverse traversal order (rules pushed via
-     `r :: !resolved_rules`); reverse once to walk forward, then keep
-     the first forward occurrence of each rule string. Keeping the
-     first forward occurrence (rather than the last) places shared
-     rules at the position dune first encounters them, which makes the
-     output stable regardless of which file's later occurrence is
-     deduped. *)
   let ordered_rules =
     let seen = Hashtbl.create 64 in
     List.rev !resolved_rules
@@ -388,9 +290,6 @@ let run ~output_file input_files =
   output_string out_channel stylesheet;
   match output_file with Some _ -> close_out out_channel | None -> ()
 
-(** The aggregator deliberately has no mode flag: output minification follows
-    the [[@@@css.config]] attributes the PPX embeds in its input files, so the
-    environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
   let rec parse acc ~output_file ~log_level = function
     | "-o" :: file :: rest

@@ -344,8 +344,6 @@ module Property_border_left_width =
 let property_border_left_width : property_border_left_width Rule.rule =
   Property_border_left_width.rule
 
-(* border-radius supports 1-4 values with optional "/" for horizontal/vertical radii *)
-
 module Property_border_radius =
   [%spec_module
   "[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ \
@@ -407,8 +405,6 @@ module Property_border_start_start_radius =
 let property_border_start_start_radius :
   property_border_start_start_radius Rule.rule =
   Property_border_start_start_radius.rule
-
-(* bs-css doesn't support list of styles, the original spec is: `[ <line-style> ]{1,4}` *)
 
 module Property_border_style =
   [%spec_module

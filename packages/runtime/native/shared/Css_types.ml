@@ -55,7 +55,6 @@ module Var = struct
 end
 
 module Calc = struct
-  (* Since calc is recursive, we need to have some abstract functions to print depending on each type: calc of time, length, angle, etc. *)
   let max_or_min_values fn values =
     Kloth.Array.map_and_join ~sep:{js|, |js}
       ~f:(fun v -> {js| |js} ^ fn v)
@@ -102,11 +101,8 @@ module Time = struct
     | `sub of calc_value * calc_value
     | `mult of calc_value * calc_value
     | `div of calc_value * float
-    | (* calc_value can be a nested `calc.
-         Ej. width: calc(100vh - calc(2rem + 120px))) *)
-      `calc of calc_value
-    | (* `num is used to represent a number in a calc expression, necessary for mult and div *)
-      `num of float
+    | `calc of calc_value
+    | `num of float
     ]
 
   and t =
@@ -192,11 +188,8 @@ module Length = struct
     | `sub of calc_value * calc_value
     | `mult of calc_value * calc_value
     | `div of calc_value * float
-    | (* calc_value can be a nested `calc.
-         Ej. width: calc(100vh - calc(2rem + 120px))) *)
-      `calc of calc_value
-    | (* `num is used to represent a number in a calc expression, necessary for mult and div *)
-      `num of float
+    | `calc of calc_value
+    | `num of float
     ]
 
   and t =
@@ -314,7 +307,6 @@ module Direction = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
-(* Don't confuse with Position (from object-position or background-position) *)
 module PropertyPosition = struct
   type t =
     [ `absolute
@@ -713,11 +705,6 @@ module EasingFunction = struct
     | `jumpNone -> {js|jump-none|js}
     | `jumpBoth -> {js|jump-both|js}
 end
-
-(* ListStyleType is defined later, after CounterStyle, because per the CSS Lists
-   Level 3 spec [list-style-type = <counter-style> | <string> | none] depends on
-   <counter-style>, which in turn depends on <counter-style-name>. See the
-   block near the Counter modules below. *)
 
 module ListStylePosition = struct
   type t =
@@ -2010,7 +1997,6 @@ module LineWidth = struct
 end
 
 module WordSpacing = struct
-  (* https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing *)
   type t =
     [ `normal
     | Var.t
@@ -2176,7 +2162,6 @@ module TextEmphasisStyle = struct
 end
 
 module TextEmphasisPosition = struct
-  (* MDN syntax: [ 'over' | 'under' ] && [ 'right' | 'left' ]? *)
   type t =
     [ `over
     | `under
@@ -3768,7 +3753,6 @@ module Gradient = struct
     Kloth.Array.map_and_join ~sep:{js|, |js}
       ~f:(fun (c, l) ->
         match c, l with
-        (* This is the consequence of having wrong spec, we can generate broken CSS for gradients, very unlickely that manually you construct a gradient with (None, None), but still. *)
         | None, None -> {| |}
         | None, Some l -> Length.toString l
         | Some c, None -> Color.toString c
@@ -3928,7 +3912,6 @@ module BackgroundImage = struct
 end
 
 module Background = struct
-  (* https://developer.mozilla.org/en-US/docs/Web/CSS/background *)
   type t =
     [ BackgroundImage.t
     | Color.t
@@ -4047,7 +4030,6 @@ module GeometryBox = struct
 end
 
 module ClipPath = struct
-  (* https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path *)
   type t =
     [ None.t
     | Url.t
@@ -4280,25 +4262,9 @@ module Symbols = struct
       ^ {js|)|js}
 end
 
-(* === CSS Counter Styles Level 3 + CSS Lists Level 3 ======================
-   The runtime hierarchy mirrors the spec:
-
-     <counter-style-name>  CounterStyleName.t  predefined idents + `Custom`
-     <counter-style>       CounterStyle.t      name | symbols()
-     <counter-name>        CounterName.t       <custom-ident>
-     counter()             Counter.t           consumer of CounterStyle
-     counters()            Counters.t          consumer of CounterStyle
-     list-style-type       ListStyleType.t     CounterStyle | <string> | none
-   ============================================================================ *)
-
 module CounterStyleName = struct
-  (* Predefined counter-style names from CSS Counter Styles Level 3 §6
-     plus the additional ready-made names CSS Lists Level 3 registers. The
-     `Custom` constructor preserves the @counter-style escape hatch for user
-     defined names. *)
   type t =
-    [ (* Numeric *)
-      `decimal
+    [ `decimal
     | `decimalLeadingZero
     | `arabicIndic
     | `armenian
@@ -4325,7 +4291,7 @@ module CounterStyleName = struct
     | `tamil
     | `telugu
     | `thai
-    | `tibetan (* Alphabetic *)
+    | `tibetan
     | `lowerAlpha
     | `lowerLatin
     | `upperAlpha
@@ -4336,13 +4302,12 @@ module CounterStyleName = struct
     | `hiragana
     | `hiraganaIroha
     | `katakana
-    | `katakanaIroha (* Symbolic *)
+    | `katakanaIroha
     | `disc
     | `circle
     | `square
     | `disclosureOpen
     | `disclosureClosed
-      (* Complex / additional predefined names commonly available in browsers *)
     | `cjkIdeographic
     | `hangul
     | `hangulConsonant
@@ -4361,7 +4326,6 @@ module CounterStyleName = struct
     | `simpChineseFormal
     | `tradChineseInformal
     | `tradChineseFormal
-      (* Escape hatch for @counter-style user-defined names *)
     | `Custom of string
     ]
 
@@ -4433,16 +4397,12 @@ module CounterStyleName = struct
 end
 
 module CounterName = struct
-  (* <counter-name> = <custom-ident>. A counter instance name like "chapter"
-     or "list-item". Modeled as a bare string so users can interpolate a name
-     directly: [content: counter($(name))] with [let name = "chapter"]. *)
   type t = string
 
   let toString (x : t) = x
 end
 
 module CounterStyle = struct
-  (* <counter-style> = <counter-style-name> | <symbols()> *)
   type t =
     [ CounterStyleName.t
     | `Symbols of Symbols.t
@@ -4454,10 +4414,6 @@ module CounterStyle = struct
     | `Symbols s -> Symbols.toString s
 end
 
-(* Deprecated alias: pre-existing name from before the counter modules were
-   aligned with the spec. New code should use [CounterStyle.t] directly. The
-   alias additionally allows [`unset], which is what [counters()] historically
-   used as a sentinel for "no explicit style supplied". *)
 module CounterStyleType = struct
   type t =
     [ CounterStyle.t
@@ -4471,11 +4427,6 @@ module CounterStyleType = struct
 end
 
 module Counter = struct
-  (* counter() = counter( <counter-name> [, <counter-style>]? ).
-     Two surface forms map to two constructors, mirroring how [attr] and
-     [attrWithType] split the optional argument: [`counter "x"] for the
-     style-less form, [`counterWithStyle ("x", style)] for the styled form.
-     This keeps call sites free of [None]/[Some] noise. *)
   type t =
     [ `counter of string
     | `counterWithStyle of string * CounterStyle.t
@@ -4493,8 +4444,6 @@ module Counter = struct
 end
 
 module Counters = struct
-  (* counters() = counters( <counter-name>, <string> [, <counter-style>]? ).
-     Same split-by-arity convention as [Counter]. *)
   type t =
     [ `counters of string * string
     | `countersWithStyle of string * string * CounterStyle.t
@@ -4515,9 +4464,6 @@ module Counters = struct
 end
 
 module ListStyleType = struct
-  (* list-style-type = <counter-style> | <string> | none.
-     `text` carries the <string> alternative so the constructor matches how the
-     Content module spells the same primitive. *)
   type t =
     [ CounterStyle.t
     | `text of string
@@ -4530,7 +4476,6 @@ module ListStyleType = struct
     match x with
     | #CounterStyle.t as c -> CounterStyle.toString c
     | `text s ->
-      (* Wrap in double quotes if not already quoted *)
       let len = Kloth.String.length s in
       if len >= 2 && (Kloth.String.get s 0 = '"' || Kloth.String.get s 0 = '\'')
       then s
@@ -4595,7 +4540,6 @@ module CounterSet = struct
 end
 
 module Content = struct
-  (* A single content token, per <content-list> element in CSS GCM L3. *)
   type one =
     [ None.t
     | `normal
@@ -4613,16 +4557,13 @@ module Content = struct
     | Cascading.t
     ]
 
-  (* The user-facing content value. Accepts either a single token (most common)
-     or a sequence — `multi [| ... |]` — when the value is a content-list with
-     multiple tokens such as [counter(list-item) "."]. *)
   type t =
     [ one
     | `multi of one array
     ]
 
   let text_to_string value =
-    if Kloth.String.length value = 0 then {js|''|js} (* value = "" -> '' *)
+    if Kloth.String.length value = 0 then {js|''|js}
     else if Kloth.String.length value = 1 && Kloth.String.get value 0 = '"' then
       {js|'"'|js}
     else if Kloth.String.length value = 1 && Kloth.String.get value 0 = '\''
@@ -5225,14 +5166,6 @@ module Translate = struct
     | #Cascading.t as x -> Cascading.toString x
 end
 
-(* The CSS `rotate` property (CSS Transforms Module Level 2).
-
-   Grammar (https://drafts.csswg.org/css-transforms-2/#propdef-rotate):
-     none | <angle> | [ x | y | z | <number>{3} ] && <angle>
-
-   Note: the variant tags here describe the `rotate` *property*, not the
-   `rotate()` / `rotateX()` / `rotate3d()` *transform functions* used inside
-   the `transform` property. *)
 module Rotate = struct
   type t =
     [ None.t
@@ -6141,7 +6074,6 @@ module AlignmentBaseline = struct
 end
 
 module AnchorName = struct
-  (* MDN syntax: 'none' | [ <dashed-ident> ]# *)
   type t =
     [ `none
     | `value of string
@@ -6158,7 +6090,6 @@ module AnchorName = struct
 end
 
 module AnchorScope = struct
-  (* MDN syntax: 'none' | 'all' | [ <dashed-ident> ]# *)
   type t =
     [ `none
     | `all
@@ -6177,7 +6108,6 @@ module AnchorScope = struct
 end
 
 module AnimationComposition = struct
-  (* MDN syntax: [ 'replace' | 'add' | 'accumulate' ]# *)
   type t =
     [ `replace
     | `add
@@ -6205,7 +6135,6 @@ module AnimationRangeStart = Gap
 module AnimationTimeline = AnimationName
 
 module Azimuth = struct
-  (* MDN syntax: <extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | \ 'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || \ 'behind' | 'leftwards' | 'rightwards' *)
   type t =
     [ `leftSide
     | `farLeft
@@ -6274,7 +6203,6 @@ module BorderBlockStartStyle = BorderStyle
 module BorderBlockStyle = BorderStyle
 
 module BorderImage = struct
-  (* MDN syntax: <'border-image-source'> || <'border-image-slice'> [ '/' \ <'border-image-width'> | '/' [ <'border-image-width'> ]? '/' \ <'border-image-outset'> ]? || <'border-image-repeat'> *)
   type t =
     [ `borderImageSource
     | `borderImageSlice
@@ -6505,7 +6433,6 @@ module ColorRendering = struct
 end
 
 module ColorScheme = struct
-  (* MDN syntax: 'normal' | [ 'dark' | 'light' | <custom-ident> ]+ && 'only'? *)
   type t =
     [ `normal
     | `dark
@@ -6546,7 +6473,6 @@ module ColumnFill = struct
 end
 
 module ColumnRule = struct
-  (* MDN syntax: <'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'> *)
   type t =
     [ `columnRuleWidth
     | `columnRuleStyle
@@ -6586,7 +6512,6 @@ module ColumnSpan = struct
 end
 
 module Columns = struct
-  (* MDN syntax: <'column-width'> || <'column-count'> *)
   type t =
     [ `columnWidth
     | `columnCount
@@ -6605,7 +6530,6 @@ module Columns = struct
 end
 
 module Contain = struct
-  (* MDN syntax: 'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint' *)
   type t =
     [ `none
     | `strict
@@ -6688,7 +6612,6 @@ module ContainIntrinsicInlineSize = struct
 end
 
 module ContainIntrinsicSize = struct
-  (* MDN syntax: 'none' | [ 'auto' ]? <extended-length>{1,2} *)
   type t =
     [ `none
     | `auto
@@ -6727,7 +6650,6 @@ module ContainIntrinsicWidth = struct
 end
 
 module Container = struct
-  (* MDN syntax: <'container-name'> [ '/' <'container-type'> ]? *)
   type t =
     [ `containerName
     | `containerType
@@ -6746,7 +6668,6 @@ module Container = struct
 end
 
 module ContainerName = struct
-  (* MDN syntax: <custom-ident>+ | 'none' *)
   type t =
     [ `none
     | `value of string
@@ -6763,7 +6684,6 @@ module ContainerName = struct
 end
 
 module ContainerNameComputed = struct
-  (* MDN syntax: 'none' | [ <custom-ident> ]# *)
   type t =
     [ `none
     | `value of string
@@ -6800,7 +6720,6 @@ end
 module ContentVisibility = Overflow
 
 module Cue = struct
-  (* MDN syntax: <'cue-before'> [ <'cue-after'> ]? *)
   type t =
     [ `cueBefore
     | `cueAfter
@@ -6819,7 +6738,6 @@ module Cue = struct
 end
 
 module CueAfter = struct
-  (* MDN syntax: <url> [ <decibel> ]? | 'none' *)
   type t =
     [ `none
     | `value of string
@@ -6838,7 +6756,6 @@ module CueAfter = struct
 end
 
 module CueBefore = struct
-  (* MDN syntax: <url> [ <decibel> ]? | 'none' *)
   type t =
     [ `none
     | `value of string
@@ -6943,7 +6860,6 @@ module FillRule = struct
 end
 
 module FlexFlow = struct
-  (* MDN syntax: <'flex-direction'> || <'flex-wrap'> *)
   type t =
     [ `flexDirection
     | `flexWrap
@@ -6962,7 +6878,6 @@ module FlexFlow = struct
 end
 
 module Font = struct
-  (* MDN syntax: [ <'font-style'> || <font-variant-css21> || <'font-weight'> || \ <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? <'font-family'> \ | 'caption' | 'icon' | 'menu' | 'message-box' | 'small-caption' | \ 'status-bar' *)
   type t =
     [ `fontStyle
     | `fontWeight
@@ -7001,7 +6916,6 @@ module Font = struct
 end
 
 module FontFeatureSettings = struct
-  (* MDN syntax: 'normal' | [ <feature-tag-value> ]# *)
   type t =
     [ `normal
     | `value of string
@@ -7090,7 +7004,6 @@ module FontStretch = struct
 end
 
 module FontSynthesis = struct
-  (* MDN syntax: 'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ] *)
   type t =
     [ `none
     | `weight
@@ -7115,7 +7028,6 @@ module FontSynthesis = struct
 end
 
 module FontVariantAlternates = struct
-  (* MDN syntax: 'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || \ styleset( [ <feature-value-name> ]# ) || character-variant( [ \ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( \ <feature-value-name> ) || annotation( <feature-value-name> ) *)
   type t =
     [ `normal
     | `historicalForms
@@ -7134,7 +7046,6 @@ module FontVariantAlternates = struct
 end
 
 module FontVariantEastAsian = struct
-  (* MDN syntax: 'normal' | <east-asian-variant-values> || <east-asian-width-values> || \ 'ruby' *)
   type t =
     [ `normal
     | `ruby
@@ -7153,7 +7064,6 @@ module FontVariantEastAsian = struct
 end
 
 module FontVariantLigatures = struct
-  (* MDN syntax: 'normal' | 'none' | <common-lig-values> || <discretionary-lig-values> || \ <historical-lig-values> || <contextual-alt-values> *)
   type t =
     [ `normal
     | `none
@@ -7172,7 +7082,6 @@ module FontVariantLigatures = struct
 end
 
 module FontVariantNumeric = struct
-  (* MDN syntax: 'normal' | <numeric-figure-values> || <numeric-spacing-values> || \ <numeric-fraction-values> || 'ordinal' || 'slashed-zero' *)
   type t =
     [ `normal
     | `ordinal
@@ -7193,7 +7102,6 @@ module FontVariantNumeric = struct
 end
 
 module FontVariationSettings = struct
-  (* MDN syntax: 'normal' | [ <string> <number> ]# *)
   type t =
     [ `normal
     | `num of float
@@ -7230,7 +7138,6 @@ module ForcedColorAdjust = struct
 end
 
 module HangingPunctuation = struct
-  (* MDN syntax: 'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last' *)
   type t =
     [ `none
     | `first
@@ -7255,7 +7162,6 @@ module HangingPunctuation = struct
 end
 
 module HyphenateCharacter = struct
-  (* MDN syntax: 'auto' | <string-token> *)
   type t =
     [ `auto
     | `value of string
@@ -7314,7 +7220,6 @@ end
 module HyphenateLimitZone = LengthPercentage
 
 module ImageResolution = struct
-  (* MDN syntax: [ 'from-image' || <resolution> ] && [ 'snap' ]? *)
   type t =
     [ `fromImage
     | `snap
@@ -7371,7 +7276,6 @@ module Inherits = struct
 end
 
 module InitialLetter = struct
-  (* MDN syntax: 'normal' | <number> [ <integer> ]? *)
   type t =
     [ `normal
     | `num of float
@@ -7415,7 +7319,6 @@ module InitialValue = WebkitTextFillColor
 module Inset = Top
 
 module InsetArea = struct
-  (* MDN syntax: 'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' | \ 'self-end' | 'start' | 'end' ]{1,2} *)
   type t =
     [ `none
     | `top
@@ -7469,7 +7372,6 @@ module Kerning = Margin
 module LayoutGrid = GridLine
 
 module LayoutGridChar = struct
-  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
   type t =
     [ `auto
     | `value of string
@@ -7486,7 +7388,6 @@ module LayoutGridChar = struct
 end
 
 module LayoutGridLine = struct
-  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
   type t =
     [ `auto
     | `value of string
@@ -7503,7 +7404,6 @@ module LayoutGridLine = struct
 end
 
 module LayoutGridMode = struct
-  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
   type t =
     [ `auto
     | `value of string
@@ -7520,7 +7420,6 @@ module LayoutGridMode = struct
 end
 
 module LayoutGridType = struct
-  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
   type t =
     [ `auto
     | `value of string
@@ -7553,7 +7452,6 @@ module LineClamp = struct
 end
 
 module ListStyle = struct
-  (* MDN syntax: <'list-style-type'> || <'list-style-position'> || <'list-style-image'> *)
   type t =
     [ `listStyleType
     | `listStylePosition
@@ -7597,7 +7495,6 @@ module MarkerMid = ListStyleImage
 module MarkerStart = ListStyleImage
 
 module Marks = struct
-  (* MDN syntax: 'none' | 'crop' || 'cross' *)
   type t =
     [ `none
     | `crop
@@ -7632,7 +7529,6 @@ module Mask = struct
 end
 
 module MaskBorder = struct
-  (* MDN syntax: <'mask-border-source'> || <'mask-border-slice'> [ '/' [ \ <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \ <'mask-border-repeat'> || <'mask-border-mode'> | [ <url> | <gradient> | 'none' ] [ [ <extended-length> | \ <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]? *)
   type t =
     [ `maskBorderSource
     | `maskBorderSlice
@@ -7681,7 +7577,6 @@ module MaskBorderSource = BorderImageSource
 module MaskBorderWidth = BorderImageWidth
 
 module MaskClip = struct
-  (* MDN syntax: [ <box> | 'border' | 'padding' | 'content' | 'text' ]# | [ <geometry-box> | 'no-clip' ]# *)
   type t =
     [ `noClip
     | `value of string
@@ -7745,7 +7640,6 @@ module MaskType = struct
 end
 
 module MasonryAutoFlow = struct
-  (* MDN syntax: [ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ] *)
   type t =
     [ `pack
     | `next
@@ -7768,7 +7662,6 @@ module MasonryAutoFlow = struct
 end
 
 module MathDepth = struct
-  (* MDN syntax: 'auto-add' | 'add(' <integer> ')' | <integer> *)
   type t =
     [ `autoAdd
     | `add
@@ -8408,7 +8301,6 @@ module NavRight = ZIndex
 module NavUp = ZIndex
 
 module Offset = struct
-  (* MDN syntax: [ <'offset-position'>? [ <'offset-path'> [ <'offset-distance'> || \ <'offset-rotate'> ]? ]? ]? [ '/' <'offset-anchor'> ]? *)
   type t =
     [ `offsetPosition
     | `offsetPath
@@ -8433,7 +8325,6 @@ module Offset = struct
 end
 
 module OffsetPath = struct
-  (* MDN syntax: 'none' | ray( <extended-angle> && [ <ray-size> ]? && [ 'contain' ]? ) | \ <path()> | <url> | <basic-shape> || <geometry-box> *)
   type t =
     [ `none
     | `contain
@@ -8458,7 +8349,6 @@ end
 module OffsetPosition = OffsetAnchor
 
 module OffsetRotate = struct
-  (* MDN syntax: [ 'auto' | 'reverse' ] || <extended-angle> *)
   type t =
     [ `auto
     | `reverse
@@ -8481,7 +8371,6 @@ end
 module Orphans = Order
 
 module Outline = struct
-  (* MDN syntax: 'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ \ <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]] *)
   type t =
     [ `none
     | `outlineWidth
@@ -8510,7 +8399,6 @@ module OverscrollBehaviorX = OverscrollBehavior
 module OverscrollBehaviorY = OverscrollBehavior
 
 module PaintOrder = struct
-  (* MDN syntax: 'normal' | 'fill' || 'stroke' || 'markers' *)
   type t =
     [ `normal
     | `fill
@@ -8533,7 +8421,6 @@ module PaintOrder = struct
 end
 
 module Page = struct
-  (* MDN syntax: 'auto' | <custom-ident> *)
   type t =
     [ `auto
     | `value of string
@@ -8554,7 +8441,6 @@ module PageBreakBefore = BreakBefore
 module PageBreakInside = BreakInside
 
 module Pause = struct
-  (* MDN syntax: <'pause-before'> [ <'pause-after'> ]? *)
   type t =
     [ `pauseBefore
     | `pauseAfter
@@ -8625,35 +8511,24 @@ module PauseBefore = struct
 end
 
 module PlaceContent = struct
-  (* MDN syntax: <'align-content'> [ <'justify-content'> ]?
-     The single-value form is just an align-content value applied to both
-     axes; the two-value form is decomposed at PPX time into separate
-     align-content + justify-content declarations. *)
   type t = AlignContent.t
 
   let toString = AlignContent.toString
 end
 
 module PlaceItems = struct
-  (* MDN syntax: <'align-items'> [ <'justify-items'> ]?
-     Single-value form mirrors align-items; two-value form is decomposed
-     at PPX time. *)
   type t = AlignItems.t
 
   let toString = AlignItems.toString
 end
 
 module PlaceSelf = struct
-  (* MDN syntax: <'align-self'> [ <'justify-self'> ]?
-     Single-value form mirrors align-self; two-value form is decomposed
-     at PPX time. *)
   type t = AlignSelf.t
 
   let toString = AlignSelf.toString
 end
 
 module PositionAnchor = struct
-  (* MDN syntax: 'auto' | <dashed-ident> *)
   type t =
     [ `auto
     | `value of string
@@ -8670,7 +8545,6 @@ module PositionAnchor = struct
 end
 
 module PositionArea = struct
-  (* MDN syntax: 'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' | \ 'self-end' | 'start' | 'end' ] *)
   type t =
     [ `none
     | `top
@@ -8705,7 +8579,6 @@ module PositionArea = struct
 end
 
 module PositionTry = struct
-  (* MDN syntax: 'none' | [ <dashed-ident> | <try-tactic> ]# *)
   type t =
     [ `none
     | `value of string
@@ -8722,7 +8595,6 @@ module PositionTry = struct
 end
 
 module PositionTryFallbacks = struct
-  (* MDN syntax: 'none' | [ <dashed-ident> | <try-tactic> ]# *)
   type t =
     [ `none
     | `value of string
@@ -8739,7 +8611,6 @@ module PositionTryFallbacks = struct
 end
 
 module PositionTryOptions = struct
-  (* MDN syntax: 'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ] *)
   type t =
     [ `none
     | `flipBlock
@@ -8798,7 +8669,6 @@ module PrintColorAdjust = struct
 end
 
 module Quotes = struct
-  (* MDN syntax: 'none' | 'auto' | [ <string> <string> ]+ *)
   type t =
     [ `none
     | `auto
@@ -8841,7 +8711,6 @@ module ReadingFlow = struct
 end
 
 module Rest = struct
-  (* MDN syntax: <'rest-before'> [ <'rest-after'> ]? *)
   type t =
     [ `restBefore
     | `restAfter
@@ -8974,7 +8843,6 @@ end
 module ScrollPadding = Margin
 
 module ScrollSnapAlign = struct
-  (* MDN syntax: [ 'none' | 'start' | 'end' | 'center' ]{1,2} *)
   type t =
     [ `none
     | `start
@@ -8997,7 +8865,6 @@ module ScrollSnapAlign = struct
 end
 
 module ScrollSnapCoordinate = struct
-  (* MDN syntax: 'none' | [ <position> ]# *)
   type t =
     [ `none
     | `value of string
@@ -9018,7 +8885,6 @@ end
 module ScrollSnapDestination = Position
 
 module ScrollSnapPointsX = struct
-  (* MDN syntax: 'none' | repeat( <extended-length> | <extended-percentage> ) | snapInterval( <length-percentage> , <length-percentage> ) | snapList( [ \ <length-percentage> ]# ) *)
   type t =
     [ `none
     | `value of string
@@ -9037,7 +8903,6 @@ module ScrollSnapPointsX = struct
 end
 
 module ScrollSnapPointsY = struct
-  (* MDN syntax: 'none' | repeat( <extended-length> | <extended-percentage> ) | snapInterval( <length-percentage> , <length-percentage> ) | snapList( [ \ <length-percentage> ]# ) *)
   type t =
     [ `none
     | `value of string
@@ -9072,7 +8937,6 @@ module ScrollSnapStop = struct
 end
 
 module ScrollSnapType = struct
-  (* MDN syntax: 'none' | [ 'x' | 'y' | 'block' | 'inline' | 'both' ] [ 'mandatory' | \ 'proximity' ]? *)
   type t =
     [ `none
     | `x
@@ -9227,7 +9091,6 @@ module ScrollStartY = struct
 end
 
 module ScrollTimeline = struct
-  (* MDN syntax: [ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]# *)
   type t =
     [ `none
     | `block
@@ -9252,7 +9115,6 @@ module ScrollTimeline = struct
 end
 
 module ScrollTimelineAxis = struct
-  (* MDN syntax: [ 'block' | 'inline' | 'x' | 'y' ]# *)
   type t =
     [ `block
     | `inline
@@ -9280,7 +9142,6 @@ module ShapeImageThreshold = Opacity
 module ShapeMargin = Length
 
 module ShapeOutside = struct
-  (* MDN syntax: 'none' | <shape-box> || <basic-shape> | <image> *)
   type t =
     [ `none
     | `value of string
@@ -9317,7 +9178,6 @@ module ShapeRendering = struct
 end
 
 module Size = struct
-  (* MDN syntax: <extended-length>{1,2} | 'auto' | [ 'A5' | 'A4' | 'A3' | 'B5' | 'B4' | \ 'JIS-B5' | 'JIS-B4' | 'letter' | 'legal' | 'ledger' ] [ 'portrait' | \ 'landscape' ]? *)
   type t =
     [ `auto
     | `A5
@@ -9362,7 +9222,6 @@ end
 module Speak = FontKerning
 
 module SpeakAs = struct
-  (* MDN syntax: 'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \ 'no-punctuation' ] *)
   type t =
     [ `normal
     | `spellOut
@@ -9528,7 +9387,6 @@ module TextBoxTrim = struct
 end
 
 module TextCombineUpright = struct
-  (* MDN syntax: 'none' | 'all' | 'digits' [ <integer> ]? *)
   type t =
     [ `none
     | `all
@@ -9551,7 +9409,6 @@ module TextCombineUpright = struct
 end
 
 module TextDecorationSkip = struct
-  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
   type t =
     [ `none
     | `objects
@@ -9580,7 +9437,6 @@ module TextDecorationSkip = struct
 end
 
 module TextDecorationSkipSelf = struct
-  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
   type t =
     [ `none
     | `objects
@@ -9609,7 +9465,6 @@ module TextDecorationSkipSelf = struct
 end
 
 module TextDecorationSkipSpaces = struct
-  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
   type t =
     [ `none
     | `objects
@@ -9638,7 +9493,6 @@ module TextDecorationSkipSpaces = struct
 end
 
 module TextEdge = struct
-  (* MDN syntax: [ 'leading' | <'text-box-edge'> ]{1,2} *)
   type t =
     [ `leading
     | `textBoxEdge
@@ -9657,7 +9511,6 @@ module TextEdge = struct
 end
 
 module TextEmphasis = struct
-  (* MDN syntax: <'text-emphasis-style'> || <'text-emphasis-color'> *)
   type t =
     [ `textEmphasisStyle
     | `textEmphasisColor
@@ -9676,7 +9529,6 @@ module TextEmphasis = struct
 end
 
 module TextIndent = struct
-  (* MDN syntax: [<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \ 'each-line' ]? *)
   type t =
     [ `hanging
     | `eachLine
@@ -9796,7 +9648,6 @@ end
 module TextUnderlineOffset = InsetBlock
 
 module TextUnderlinePosition = struct
-  (* MDN syntax: 'auto' | 'from-font' | 'under' || [ 'left' | 'right' ] *)
   type t =
     [ `auto
     | `fromFont
@@ -9865,7 +9716,6 @@ module TextWrapStyle = struct
 end
 
 module TimelineScope = struct
-  (* MDN syntax: [ 'none' | <custom-ident> | <dashed-ident> ]# *)
   type t =
     [ `none
     | `value of string
@@ -9944,7 +9794,6 @@ module VectorEffect = struct
 end
 
 module ViewTimeline = struct
-  (* MDN syntax: [ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]# *)
   type t =
     [ `none
     | `block
@@ -9969,7 +9818,6 @@ module ViewTimeline = struct
 end
 
 module ViewTimelineAxis = struct
-  (* MDN syntax: [ 'block' | 'inline' | 'x' | 'y' ]# *)
   type t =
     [ `block
     | `inline
@@ -10036,7 +9884,6 @@ module VoiceDuration = struct
 end
 
 module VoiceFamily = struct
-  (* MDN syntax: [ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | \ <generic-voice> ] | 'preserve' *)
   type t =
     [ `preserve
     | `value of string
@@ -10053,7 +9900,6 @@ module VoiceFamily = struct
 end
 
 module VoicePitch = struct
-  (* MDN syntax: <extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' \ | 'x-high' ] || [ <extended-frequency> | <semitones> | \ <extended-percentage> ] *)
   type t =
     [ `absolute
     | `xLow
@@ -10082,7 +9928,6 @@ module VoicePitch = struct
 end
 
 module VoiceRange = struct
-  (* MDN syntax: <extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' \ | 'x-high' ] || [ <extended-frequency> | <semitones> | \ <extended-percentage> ] *)
   type t =
     [ `absolute
     | `xLow
@@ -10111,7 +9956,6 @@ module VoiceRange = struct
 end
 
 module VoiceRate = struct
-  (* MDN syntax: [ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || \ <extended-percentage> *)
   type t =
     [ `normal
     | `xSlow
@@ -10162,7 +10006,6 @@ module VoiceStress = struct
 end
 
 module VoiceVolume = struct
-  (* MDN syntax: 'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || <decibel> *)
   type t =
     [ `silent
     | `xSoft
@@ -10248,7 +10091,6 @@ end
 module Widows = Order
 
 module WillChange = struct
-  (* MDN syntax: 'auto' | [ <animateable-feature> ]# *)
   type t =
     [ `auto
     | `value of string

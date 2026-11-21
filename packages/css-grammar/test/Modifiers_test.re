@@ -30,7 +30,6 @@ let parse_exn = (prop, str) =>
   | Error(message) => Alcotest.fail(message)
   };
 
-/* check is shadowed by Parser.check */
 let check = Alcotest_extra.check;
 
 let tests: tests = [
@@ -45,7 +44,6 @@ let tests: tests = [
   }),
   test("[<integer> A]?", () => {
     let parse = parse_exn([%spec "[<integer> A]?"]);
-    /* And combinator already unwraps integer, so no need to unwrap again */
     check(
       ~__POS__,
       Alcotest.option(Alcotest.pair(Alcotest.int, Alcotest.unit)),
@@ -73,7 +71,6 @@ let tests: tests = [
   }),
   test("[<integer> A]*", () => {
     let parse = parse_exn([%spec "[<integer> A]*"]);
-    /* And combinator already unwraps integer, so no need to unwrap again */
     check(
       ~__POS__,
       Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
@@ -116,7 +113,6 @@ let tests: tests = [
   }),
   test("[<integer> A]+", () => {
     let parse = parse([%spec "[<integer> A]+"]);
-    /* And combinator already unwraps integer, so no need to unwrap again */
     let to_check =
       Alcotest.result(
         Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
@@ -152,7 +148,6 @@ let tests: tests = [
   }),
   test("<integer>{2} <integer>", () => {
     let parse = parse([%spec "<integer>{2} <integer>"]);
-    /* Static combinator already unwraps integer, so no need to unwrap again */
     let to_check =
       Alcotest.result(
         Alcotest.pair(Alcotest.list(Alcotest.int), Alcotest.int),
@@ -236,7 +231,6 @@ let tests: tests = [
   }),
   test("<integer>#{2}, <integer>", () => {
     let parse = parse([%spec "<integer>#{2} ',' <integer>"]);
-    /* Static combinator already unwraps integer, so no need to unwrap again */
     let to_check =
       Alcotest.result(
         Alcotest.triple(
@@ -307,12 +301,3 @@ let tests: tests = [
     );
   }),
 ];
-
-// TODO: at_least_one
-// describe("at_least_one", ({test, _}) => {
-//   test("[A? B?]!", `Quick, () => {
-//     let parse = parse([%spec "[A? B?]!"]);
-//     let x = parse("A");
-//     ();
-//   })
-// }),

@@ -13,8 +13,6 @@ module Property_y =
 
 let property_y : property_y Rule.rule = Property_y.rule
 
-(* Contain intrinsic sizing *)
-
 let entries : (kind * packed_rule) list =
   [
     Property "x", pack_module (module Property_x);

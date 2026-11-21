@@ -1,12 +1,5 @@
-(* Checks that registry-backed references in [%spec] and [%spec_module]
-   payloads resolve.
-
-   Usage: registry_closure_check <file.ml|file.re>... *)
-
-(* Reuse the key derivation used by generated parser lookups. *)
 module G = Generate.Make ((val Ppxlib.Ast_builder.make Ppxlib.Location.none))
 
-(* Force [Registry] initialization before reading [registry_tbl]. *)
 let () = assert (Css_grammar.registry <> [])
 let errors = ref 0
 let specs_checked = ref 0
@@ -51,7 +44,6 @@ let collect_specs (structure : Ppxlib.structure) ~path : (int * string) list =
           (match spec_string_of_payload payload with
           | Some spec -> specs := (line, spec) :: !specs
           | None ->
-            (* Reject unsupported payload shapes instead of skipping them. *)
             report
               "%s:%d: unrecognized [%%%s] payload; extend \
                registry_closure_check"
@@ -99,7 +91,6 @@ let check_ocaml_file path =
   in
   List.iter (check_spec ~path) (collect_specs structure ~path)
 
-(* Reject Reason sources containing [%spec]; this checker only parses OCaml. *)
 let check_reason_file path =
   let contents = In_channel.with_open_text path In_channel.input_all in
   if contains_substring contents "[%spec" then

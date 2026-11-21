@@ -35,7 +35,6 @@ type best('left_in, 'left_ok, 'right_in, 'right_ok, 'out) =
 
 let remaining_length: input => int;
 
-/* Error construction helpers */
 let err: (~got: Ast.component_value=?, list(expected)) => data('ignored);
 let err_keyword: (string, located_component_value) => data('ignored);
 let err_kind: string => data('ignored);
@@ -44,7 +43,6 @@ let err_fn: (string, located_component_value) => data('ignored);
 let err_desc: string => data('ignored);
 let err_desc_got: (string, located_component_value) => data('ignored);
 
-/* Error merging */
 let merge_error_infos: list(error_info) => error_info;
 
 module Data: {
@@ -99,7 +97,6 @@ let interpolatable:
     ],
   );
 
-/* Serialization (only called at edges) */
 let expected_to_string: expected => string;
 let format_expected: list(expected) => string;
 let find_suggestion: (string, list(expected)) => option(string);

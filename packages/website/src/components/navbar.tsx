@@ -66,7 +66,6 @@ function NavbarMenu({
             '_border _border-black/5 dark:_border-white/20',
             '_backdrop-blur-lg _bg-[rgb(var(--nextra-bg),.8)]',
             '_z-20 _rounded-md _py-1 _text-sm _shadow-lg',
-            // headlessui adds max-height as style, use !important to override
             '!_max-h-[min(calc(100vh-5rem),256px)]'
           )
         }
@@ -145,7 +144,6 @@ export function Navbar({ items }: NavBarProps): ReactElement {
             const page = pageOrMenu as PageItem
             let href = page.href || page.route || '#'
 
-            // If it's a directory
             if (page.children) {
               href =
                 (page.withIndexPage ? page.route : page.firstChildRoute) || href

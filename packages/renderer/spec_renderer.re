@@ -5,10 +5,10 @@ let spec = read_line() |> value_of_string;
 
 let render_combinator =
   fun
-  | Static => "Static" /* a b */
-  | And => "And" /* a && b */
-  | Or => "Or" /* a || b */
-  | Xor => "Xor"; /* a | b */
+  | Static => "Static"
+  | And => "And"
+  | Or => "Or"
+  | Xor => "Xor";
 
 let render_multiplier =
   fun

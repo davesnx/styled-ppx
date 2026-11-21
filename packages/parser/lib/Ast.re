@@ -1,4 +1,3 @@
-/* We have records with identical field names. Type inference can sometimes struggle to determine which field you're referring to. This ambiguity can lead to compiler warnings or errors, we disable it with -30 because we always construct this with annotations. */
 [@warning "-30"];
 
 [@deriving show({ with_path: false })]
@@ -228,7 +227,7 @@ and complex_selector =
 and compound_selector = {
   type_selector: option(simple_selector),
   subclass_selectors: list(subclass_selector),
-  pseudo_selectors: list(pseudo_selector) /* TODO: (string, pseudoclass_kind) */
+  pseudo_selectors: list(pseudo_selector),
 }
 [@deriving show({ with_path: false })]
 and relative_selector = {
@@ -303,8 +302,6 @@ and nth =
   | A(int)
   | AN(int)
   | ANB(int, string, int);
-
-/* --- Dimension unit classifiers --- */
 
 let length_unit_of_string =
   fun
@@ -407,8 +404,6 @@ let dimension_make = ((value, unit)): dimension => {
   unit,
   kind: dimension_kind_of_unit(unit),
 };
-
-/* --- Delimiter conversion functions --- */
 
 let delimiter_of_string =
   fun

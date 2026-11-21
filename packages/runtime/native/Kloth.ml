@@ -26,8 +26,6 @@ module Array = struct
     done;
     if !k = length t then !r else if !k > 0 then sub ~pos:0 ~len:!k !r else [||]
 
-  (* Public API *)
-
   let reduce ~init ~f t =
     let r = ref init in
     for i = 0 to Stdlib.Array.length t - 1 do
@@ -69,10 +67,6 @@ end
 
 module Float = struct
   let to_string t =
-    (* round x rounds x to the nearest integer with ties (fractional values of 0.5) rounded away from zero, regardless of the current rounding direction. If x is an integer, +0., -0., nan, or infinite, x itself is returned.
-
-       On 64-bit mingw-w64, this function may be emulated owing to a bug in the C runtime library (CRT) on this platform. *)
-    (* if round(f) == f, print the integer (since string_of_float 1.0 => "1.") *)
     if Stdlib.Float.equal (Stdlib.Float.round t) t then
       t |> int_of_float |> string_of_int
     else Printf.sprintf "%g" t

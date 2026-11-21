@@ -79,7 +79,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   };
 
   let keyword_to_css = str => {
-    /* Handle special characters that can't be OCaml identifiers */
     let str =
       if (String.length(str) > 0 && str.[0] == '@') {
         "at_" ++ String.sub(str, 1, String.length(str) - 1);
@@ -103,7 +102,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  // TODO: multiplier name
   let rec variant_name = value => {
     let value_name =
       switch (value) {
@@ -123,7 +121,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   };
 
   let variant_names = values => {
-    // TODO: not exactly a fast algorithm
     let values = values |> List.map(variant_name);
     let occurrences = (values, value) =>
       values |> List.filter((==)(value)) |> List.length;
@@ -162,24 +159,12 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     rtag(txt(name), constructor, types);
   };
 
-  /* Standard spec kinds - categorizes how types are handled during code generation:
-     - Valid: Types with proper Css_value_types.re implementations returning proper OCaml types
-     - Primitive: Types that unwrap to simple OCaml types (int, float, string, etc.)
-     - Invalid: Unimplemented types that return unit as placeholder
-
-     NOTE: extended-length, extended-angle, extended-percentage, extended-time, extended-frequency
-     are NOT in this list. They reference shared grammar rules re-exported from Css_grammar
-     which include calc(), min(), and max() support.
-
-     NOTE: ratio, declaration, declaration-list, zero ARE defined as shared rules in Css_grammar
-     and should use direct references, not Css_value_types.invalid. */
   type standard_spec_kind =
     | Valid
     | Primitive
     | Invalid;
 
   let spec_names: list((string, standard_spec_kind)) = [
-    /* Primitive types - unwrap to simple OCaml types */
     ("integer", Primitive),
     ("number", Primitive),
     ("percentage", Primitive),
@@ -195,7 +180,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     ("string-token", Primitive),
     ("url-no-interp", Primitive),
     ("string", Primitive),
-    /* Valid types - return proper OCaml types from Css_value_types.re */
     ("length", Valid),
     ("angle", Valid),
     ("time", Valid),
@@ -204,7 +188,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     ("flex-value", Valid),
     ("css-wide-keywords", Valid),
     ("declaration-value", Primitive),
-    /* Invalid/unimplemented types - return unit placeholder */
     ("any-value", Invalid),
     ("function-token", Invalid),
     ("hash-token", Invalid),
@@ -216,22 +199,16 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     ("url-token", Invalid),
   ];
 
-  /* Helper to look up kind in spec_names using snake_case name */
   let find_spec_kind = snake_name => {
-    /* Convert snake_case back to CSS name for lookup */
     let css_name = String.map(c => c == '_' ? '-' : c, snake_name);
     List.assoc_opt(css_name, spec_names);
   };
 
-  /* Helper to check if a type is unimplemented (always fails at parse time).
-     These should generate `unit` as a placeholder type. */
   let is_invalid_type = name => find_spec_kind(name) == Some(Invalid);
 
-  /* Helper to check if a type is a primitive wrapper. */
   let is_primitive_wrapper_type = name =>
     find_spec_kind(name) == Some(Primitive);
 
-  /* Helper to get the inner type of a primitive wrapper */
   let get_primitive_inner_type = name => {
     switch (name) {
     | "integer" => [%type: int]
@@ -248,7 +225,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "container_name"
     | "ident_token"
     | "string_token"
-    | "string" /* string is an alias to string_token */ => [%type: string]
+    | "string" => [%type: string]
     | "declaration_value" => [%type: string]
     | _ => failwith("Not a primitive wrapper type")
     };
@@ -281,12 +258,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       make_variant_branch(type_, is_constructor, params);
     };
 
-  /* Check if a name is a standard spec. */
   let is_standard_spec = name => List.mem_assoc(name, spec_names);
 
   let property_registry_prefix = "property_";
 
-  /* Return the key used by generated lookups and the closure check, if any. */
   let registry_key_of_terminal = kind =>
     switch (kind) {
     | Data_type(name, _) =>
@@ -315,27 +290,16 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Keyword(_name) => (type_name, false, [])
         | Data_type(name, _) =>
           let snake_name = value_name_of_css(name);
-          /* Priority order:
-             1. Invalid/unimplemented types -> unit
-             2. Primitive wrappers (integer, number, etc.) -> unwrapped OCaml types
-             3. Everything else -> direct type reference (defined in Parser.ml) */
           let params =
             if (is_invalid_type(snake_name)) {
-              [
-                /* Unimplemented types get unit as placeholder */
-                [%type: unit],
-              ];
+              [[%type: unit]];
             } else if (is_primitive_wrapper_type(snake_name)) {
               [get_primitive_inner_type(snake_name)];
             } else {
-              [
-                /* Direct type reference - all types are in the same recursive block */
-                ptyp_constr(txt @@ Lident(snake_name), []),
-              ];
+              [ptyp_constr(txt @@ Lident(snake_name), [])];
             };
           (type_name, false, params);
         | Property_type(name) =>
-          /* Property types - direct reference */
           let snake_name = value_name_of_css(name);
           let property_type_name = "property_" ++ snake_name;
           let params = [ptyp_constr(txt @@ Lident(property_type_name), [])];
@@ -355,16 +319,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         apply_modifier(multiplier, t);
       | Data_type(name, _) =>
         let snake_name = value_name_of_css(name);
-        /* Priority order:
-           1. Invalid/unimplemented types -> unit
-           2. Primitive wrappers (integer, number, etc.) -> unwrapped OCaml types with modifiers
-           3. Everything else -> direct type reference (defined in Parser.ml) */
         if (is_invalid_type(snake_name)) {
-          /* Unimplemented types get unit as placeholder */
-          apply_modifier(
-            multiplier,
-            [%type: unit],
-          );
+          apply_modifier(multiplier, [%type: unit]);
         } else if (is_primitive_wrapper_type(snake_name)) {
           switch (multiplier) {
           | One => get_primitive_inner_type(snake_name)
@@ -384,12 +340,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             )
           };
         } else {
-          /* Direct type reference - all types are in the same recursive block */
           let t = ptyp_constr(txt @@ Lident(snake_name), []);
           apply_modifier(multiplier, t);
         };
       | Property_type(name) =>
-        /* Property types - direct reference */
         let snake_name = value_name_of_css(name);
         let property_type_name = "property_" ++ snake_name;
         let t = ptyp_constr(txt @@ Lident(property_type_name), []);
@@ -549,7 +503,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       eapply(evar("Rule.Match.map"), [block_rule, map_fn]);
     };
     let terminal_op = (kind, modifier) => {
-      // as everyrule is in the same namespace
       let rule =
         switch (kind) {
         | Delim(delim) when delim == "," => evar("Css_value_types.comma")
@@ -567,7 +520,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       apply_modifier(modifier, rule);
     };
     let group_op = (value, modifier) => {
-      /* Primitives now return unwrapped values directly, no need for special handling */
       let base_rule = make_value(value);
       apply_modifier(modifier, base_rule);
     };
@@ -623,7 +575,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                    )
                  | None => pexp_construct(txt(Lident("None")), None)
                  };
-               /* Unwrap primitives in Xor */
                let rule_expr = map_value(has_content, true, pair);
                pexp_tuple([expected_expr, rule_expr]);
              });
@@ -632,7 +583,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         let combinator_args =
           values
           |> List.mapi((index, v) => ("V" ++ string_of_int(index), v))
-          /* Unwrap primitives in Static/And/Or runtime code */
           |> List.map(map_value(true, true));
         let combinator = apply(op_ident(kind), combinator_args);
         let (args, body) =
@@ -690,7 +640,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
     };
     let function_call = (name, value) => {
-      /* Primitives now return unwrapped values directly */
       let arg_expr = make_value(value);
       eapply(
         evar("Css_value_types.function_call"),
@@ -710,8 +659,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Extract the module name from a full path like "Css_types.BoxShadow" -> Some("BoxShadow")
-     or return None if the path is empty or invalid */
   let extract_module_name_from_path = (path: string): option(string) =>
     if (String.length(path) == 0) {
       None;
@@ -722,8 +669,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
     };
 
-  /* Create a type expression from a full runtime module path.
-     If we can parse the path as Css_types.X, we keep [%module_path] verification. */
   let make_type_path_expr = (path: string): Parsetree.expression => {
     switch (extract_module_name_from_path(path)) {
     | Some(module_name) =>
@@ -733,15 +678,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         txt("module_path"),
         PStr([pstr_eval(construct_expr, [])]),
       ));
-    | None =>
-      /* Fallback to plain string for non-standard paths */
-      estring(path)
+    | None => estring(path)
     };
   };
 
-  /* Check if a type name is a primitive type without a runtime module.
-     These types are CSS grammar primitives that don't have corresponding
-     Css_types modules with toString functions. */
   let is_primitive_type = name => {
     switch (name) {
     | "integer"
@@ -771,9 +711,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Check if a spec may contain interpolation - either explicit <interpolation>
-     or non-primitive/non-standard Data_type references that may internally
-     accept interpolation (e.g., <color>, <shadow>, <extended-length>). */
   let rec spec_may_contain_interpolation = (spec: Css_spec_parser.value): bool => {
     switch (spec) {
     | Terminal(Data_type("interpolation", _), _) => true
@@ -788,15 +725,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Helper to extract the registry key from a spec for interpolation type tracking.
-     Runtime module paths must come from the grammar registry because helper types
-     like font_families and bg-image do not necessarily match their Css_types
-     module names. */
   let rec get_registry_key_from_spec =
           (spec: Css_spec_parser.value): option(string) => {
     switch (spec) {
     | Terminal(Data_type(name, _), _) =>
-      /* Skip primitive types that don't have runtime modules */
       if (is_primitive_type(name)) {
         None;
       } else {
@@ -805,8 +737,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Terminal(Property_type(name), _) => Some("property_" ++ name)
     | Group(inner, _) => get_registry_key_from_spec(inner)
     | Combinator(Xor, [single]) => get_registry_key_from_spec(single)
-    /* For multi-element Xor (like [ <color> | <interpolation> ]),
-       find the first non-interpolation type */
     | Combinator(Xor, options) =>
       List.find_map(
         opt =>
@@ -832,10 +762,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | None => fallback_expr
     };
 
-  /* Generate infer_interpolation_types function from spec.
-     Returns (variable_name, type_path) pairs for partial interpolation support.
-     The type_path is determined by looking at sibling types in Xor combinators
-     and resolving their runtime module paths through the parser registry. */
   let generate_extract_interpolations_function =
       (
         spec: Css_spec_parser.value,
@@ -844,8 +770,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         ~loc as _: Location.t,
       )
       : Parsetree.expression => {
-    /* Helper to generate extraction expression with type tracking.
-       type_context_expr is an expression that evaluates to the type path string. */
     let rec generate_typed_extraction =
             (
               spec: Css_spec_parser.value,
@@ -854,7 +778,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             )
             : Parsetree.expression => {
       switch (spec) {
-      /* Direct interpolation - return (name, type_context) pair */
       | Terminal(Data_type("interpolation", _), modifier) =>
         let name_expr = [%expr String.concat(".", [%e var_expr])];
         let pair = [%expr ([%e name_expr], [%e type_context_expr])];
@@ -879,12 +802,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ]
         };
 
-      /* Non-primitive, non-standard Data_type - delegate extraction to the
-          type's module via the registry. These types are defined as [%spec_module]
-          in the shared Css_grammar grammar surface and may contain interpolation internally.
-         Pass along the current type context so generic calc/extended-* wrappers
-         can keep the enclosing property's type when extracting inner
-         interpolations. */
       | Terminal(Data_type(name, _), modifier)
           when !is_primitive_type(name) && !is_standard_spec(name) =>
         let css_name = estring(name);
@@ -914,8 +831,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ]
         };
 
-      /* Property_type references (<'border'>, etc.) also need delegated
-         extraction so shorthand properties preserve interpolated child types. */
       | Terminal(Property_type(name), modifier) =>
         let css_name = estring("property_" ++ name);
         let generate_delegation = inner_expr => [%expr
@@ -944,10 +859,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ]
         };
 
-      /* Other terminals (keywords, delims, primitives) - no interpolations */
       | Terminal(_, _) => [%expr []]
 
-      /* Groups - recurse with same context */
       | Group(inner, modifier) =>
         let inner_extract =
           generate_typed_extraction(inner, var_expr, type_context_expr);
@@ -981,12 +894,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ]
         };
 
-      /* Xor combinator - track sibling type for interpolation branches */
       | Combinator(Xor, values) =>
         let names = variant_names(values);
         let pairs = List.combine(names, values);
 
-        /* Find the non-interpolation sibling type if this is a <type> | <interpolation> pattern */
         let sibling_type =
           List.find_map(
             inner_spec =>
@@ -1012,13 +923,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 | _ => true
                 };
               if (has_content && spec_may_contain_interpolation(inner_spec)) {
-                /* Whole-value interpolation at property level is already handled
-                   by pack_module before AST extraction. Most direct
-                   <interpolation> branches should still use the module's own
-                   runtime type (e.g. Color -> Css_types.Color). However some
-                   shorthand runtime modules, such as Css_types.Border, don't
-                   expose a unary toString helper for cx2 dynamic vars, so those
-                   branches must keep the sibling-derived context instead. */
                 let context_for_this_spec =
                   switch (inner_spec, runtime_module_path) {
                   | (
@@ -1055,7 +959,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           );
         pexp_match(var_expr, cases);
 
-      /* Static/And combinator - tuple, track type for each position */
       | Combinator(Static, values)
       | Combinator(And, values) =>
         let extractions =
@@ -1094,7 +997,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           combined,
         );
 
-      /* Or combinator - tuple of options */
       | Combinator(Or, values) =>
         let extractions =
           List.mapi(
@@ -1137,15 +1039,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           combined,
         );
 
-      /* Function call - recurse */
       | Function_call(_, inner) =>
         generate_typed_extraction(inner, var_expr, type_context_expr)
       };
     };
 
-    /* Generate the function body.
-       Use spec_may_contain_interpolation to also handle types that
-       internally accept interpolation via registry delegation. */
     let body =
       if (spec_may_contain_interpolation(spec)) {
         generate_typed_extraction(
@@ -1167,7 +1065,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         ~loc: Location.t,
       )
       : list(Ppxlib.structure_item) => {
-    /* Always generate inline type from the spec */
     let core_type = create_type_parser(spec);
     let type_decl =
       Ast_helper.Str.type_(
@@ -1231,7 +1128,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         [Ast_helper.Vb.mk(~loc, pvar("type_check"), type_check_body)],
       );
 
-    /* Generate infer_interpolation_types - returns (name, type_path) pairs */
     let string_string_pair_type = ptyp_tuple([string_type, string_type]);
     let string_string_list_type =
       ptyp_constr(txt @@ Lident("list"), [string_string_pair_type]);

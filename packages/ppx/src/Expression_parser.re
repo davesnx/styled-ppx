@@ -1,9 +1,5 @@
 open Ppxlib;
 
-/* `$( ... )` interpolations are re-parsed from source. The lexbufs are
-   seeded with [start], the expression's file position, so every location
-   in the resulting AST is file-correct from birth - no remapping pass. */
-
 let parse_ocaml = (~start: Lexing.position, source) => {
   let lexbuf = Lexing.from_string(source);
   Lexing.set_filename(lexbuf, start.pos_fname);
@@ -19,8 +15,6 @@ module Reason_parser_explain = Reason.Reason_parser_explain;
 let parse_reason = (~start: Lexing.position, source) => {
   let lexbuf = Lexing.from_string(source);
   Lexing.set_filename(lexbuf, start.pos_fname);
-  /* [set_position] also sets [lex_abs_pos], which the engine uses to
-     derive [pos_cnum]; assigning [lex_curr_p] alone would not. */
   Lexing.set_position(lexbuf, start);
   lexbuf.Lexing.lex_start_p = start;
   let lexer = Reason.Reason_lexer.init(lexbuf);

@@ -75,7 +75,6 @@ let legacy_repeating_radial_gradient :
   legacy_repeating_radial_gradient Rule.rule =
   Legacy_repeating_radial_gradient.rule
 
-(* Legacy_gradient depends on all the above, so it must come last *)
 module Legacy_gradient =
   [%spec_module
   "<-webkit-gradient()> | <legacy-linear-gradient> | \
@@ -329,7 +328,6 @@ module Bg_position =
 
 let bg_position : bg_position Rule.rule = Bg_position.rule
 
-(* one_bg_size isn't part of the spec, helps us with Type generation *)
 module One_bg_size =
   [%spec_module
   "[ <extended-length> | <extended-percentage> | 'auto' ] [ <extended-length> \
@@ -353,7 +351,6 @@ module Blend_mode =
 
 let blend_mode : blend_mode Rule.rule = Blend_mode.rule
 
-(* border_radius value supports 1-4 values with optional "/" for horizontal/vertical *)
 module Box =
   [%spec_module
   "'border-box' | 'padding-box' | 'content-box'", (module Css_types.Box)]
@@ -439,12 +436,6 @@ module Color_stop_length =
 
 let color_stop_length : color_stop_length Rule.rule = Color_stop_length.rule
 
-(* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen:
-
-   The current impl allows values that aren't really supported such as: `linear-gradient(0deg, 10%, blue)` which is invalid, but we allow it for now to make it easier to generate the types. The correct value would require always a color to be in the first position `linear-gradient(0deg, red, 10%, blue);`
-
-   The original spec is `color_stop_list = [%spec_module "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]`
-   *)
 module Color_stop_list =
   [%spec_module
   "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#",
@@ -484,7 +475,6 @@ module Color_interpolation_method =
 let color_interpolation_method : color_interpolation_method Rule.rule =
   Color_interpolation_method.rule
 
-(* TODO: Use <extended-percentage> *)
 module Combinator =
   [%spec_module
   "'>' | '+' | '~' | '||'", (module Css_types.Combinator)]
@@ -782,7 +772,6 @@ module Feature_value_name =
 
 let feature_value_name : feature_value_name Rule.rule = Feature_value_name.rule
 
-(* <zero> represents the literal value 0, used in contexts like rotate(0) *)
 module Zero = [%spec_module "'0'"]
 
 let zero : zero Rule.rule = Zero.rule
@@ -861,8 +850,6 @@ module Font_weight_absolute =
 let font_weight_absolute : font_weight_absolute Rule.rule =
   Font_weight_absolute.rule
 
-(* We don't support attr() with fallback value (since it's a declaration value) yet, original spec is: "attr(<attr-name> <attr-type>? , <declaration-value>?)" *)
-(* drop-shadow can have 2 length module order doesn't matter, we changed to be more restrict module always expect 3 *)
 module Predefined_color_space =
   [%spec_module
   " 'srgb' | 'srgb-linear' | 'display-p3' | 'a98-rgb' | 'prophoto-rgb' | \
@@ -1558,11 +1545,6 @@ module Single_animation =
 
 let single_animation : single_animation Rule.rule = Single_animation.rule
 
-(* Uses || (any order) per CSS spec. The or_ combinator's match_longest
-   tie-breaking assigns the FIRST input <time> to position 3 (last matching
-   rule) and the SECOND input <time> to position 1 (first matching rule).
-   This means: tuple position 1 = delay, tuple position 3 = duration.
-   Consumers rendering this tuple must respect that ordering. *)
 module Single_animation_no_interp =
   [%spec_module
   "[ <keyframes-name> | 'none' ] || <extended-time-no-interp> || \
@@ -1792,7 +1774,6 @@ module Url =
 
 let url : url Rule.rule = Url.rule
 
-(* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length-percentage#use_in_calc *)
 module Extended_length =
   [%spec_module
   "<length> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()> | \
@@ -1801,7 +1782,6 @@ module Extended_length =
 
 let extended_length : extended_length Rule.rule = Extended_length.rule
 
-(* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length-percentage#use_in_calc *)
 module Length_percentage =
   [%spec_module
   "<extended-length> | <extended-percentage>",
@@ -2048,8 +2028,6 @@ module Syntax_component =
 
 let syntax_component : syntax_component Rule.rule = Syntax_component.rule
 
-(* (*
- We don't support type() yet, original spec is: "type( <syntax> ) | 'raw-string' | <attr-unit>" *) *)
 module Attr_type =
   [%spec_module
   "'raw-string' | <attr-unit>", (module Css_types.AttrType)]

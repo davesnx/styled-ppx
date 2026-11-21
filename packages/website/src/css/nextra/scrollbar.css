@@ -1,6 +1,6 @@
 .nextra-scrollbar {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(115, 115, 115, 0.4) transparent; /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(115, 115, 115, 0.4) transparent;
   scrollbar-gutter: stable;
 
   &::-webkit-scrollbar {
@@ -23,12 +23,11 @@
   }
 }
 
-/* Hide scrollbar */
 .no-scrollbar {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
-    @apply _hidden; /* Chrome, Safari and Opera */
+    @apply _hidden;
   }
 }

@@ -1,6 +1,5 @@
 import Esbuild from "esbuild";
 
-/* Minimal argv parser supporting `--key=value`, `--key value` and `--flag`. */
 function parseArgv(argv) {
 	const args = argv.slice(2);
 	const result = { _: [] };

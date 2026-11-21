@@ -27,8 +27,6 @@ module Permissive_timeline_trigger = struct
   let infer_interpolation_types_with_context (_ : string) (_ : t) = []
 end
 
-(* Scroll driven animations *)
-
 let entries : (kind * packed_rule) list =
   [
     Property "timeline-scope", pack_module (module Property_timeline_scope);

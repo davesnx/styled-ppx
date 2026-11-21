@@ -35,13 +35,13 @@ let multiplier_of_lex :=
   | m = multiplier; EOF; { Some m }
 
 let multiplier :=
-  | ASTERISK; // *
+  | ASTERISK;
     { Zero_or_more }
-  | PLUS; // +
+  | PLUS;
     { One_or_more }
-  | QUESTION_MARK; // ?
+  | QUESTION_MARK;
     { Optional }
-  | r = RANGE; // 1..4
+  | r = RANGE;
     {
       match r with
       | (`Space, min, max) -> Repeat (min, max)
@@ -50,10 +50,10 @@ let multiplier :=
 
 
 let terminal ==
-  | c = CHAR; { Delim c } // 'a'
-  | l = LITERAL; { Keyword l } // "absolute"
-  | d = DATA; { let (name, range) = d in Data_type (name, range) } // <color>
-  | p = PROPERTY; { Property_type p } // <'border'>
+  | c = CHAR; { Delim c }
+  | l = LITERAL; { Keyword l }
+  | d = DATA; { let (name, range) = d in Data_type (name, range) }
+  | p = PROPERTY; { Property_type p }
 
 let range_to_multiplier ==
   | r = RANGE;
@@ -67,30 +67,26 @@ let terminal_multiplier(terminal) ==
   | t = terminal; { Terminal(t, One) }
   | t = terminal; ASTERISK; { Terminal(t, Zero_or_more) }
   | t = terminal; QUESTION_MARK; { Terminal(t, Optional) }
-  (* PLUS: with lookahead for stacked +# *)
   | t = terminal; PLUS; { Terminal(t, One_or_more) }
   | t = terminal; PLUS; m = range_to_multiplier;
     { Group(Terminal(t, One_or_more), m) }
-  (* RANGE: with lookahead for stacked #? / {A}? / {A,B}? *)
   | t = terminal; m = range_to_multiplier; { Terminal(t, m) }
   | t = terminal; m = range_to_multiplier; QUESTION_MARK;
     { Group(Terminal(t, m), Optional) }
 
 let function_call :=
   | terminal_multiplier(terminal)
-  | l = LITERAL; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call(l, v) } // rgb(1,2,3)
+  | l = LITERAL; LEFT_PARENS; v = value; RIGHT_PARENS; { Function_call(l, v) }
 
 let group :=
   | function_call
-  | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v } // [ v ]
+  | LEFT_BRACKET; v = value; RIGHT_BRACKET; { v }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; ASTERISK; { Group(v, Zero_or_more) }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; QUESTION_MARK; { Group(v, Optional) }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; EXCLAMATION_POINT; { Group(v, At_least_one) }
-  (* PLUS: with lookahead for stacked +# *)
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; PLUS; { Group(v, One_or_more) }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; PLUS; m = range_to_multiplier;
     { Group(Group(v, One_or_more), m) }
-  (* RANGE: with lookahead for stacked #? / {A}? / {A,B}? *)
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = range_to_multiplier; { Group(v, m) }
   | LEFT_BRACKET; v = value; RIGHT_BRACKET; m = range_to_multiplier; QUESTION_MARK;
     { Group(Group(v, m), Optional) }
@@ -100,15 +96,14 @@ let combinator(sep, sub, kind) ==
     { match vs with | v::[] -> v | vs -> Combinator(kind, vs) }
 
 let static_expr ==
-  | combinator(| {}, group, | { Static }) // A B
+  | combinator(| {}, group, | { Static })
 let and_expr ==
-  | combinator(DOUBLE_AMPERSAND, static_expr, | { And }) // A && B
+  | combinator(DOUBLE_AMPERSAND, static_expr, | { And })
 let or_expr ==
-  | combinator(DOUBLE_BAR, and_expr, | { Or }) // A || B
+  | combinator(DOUBLE_BAR, and_expr, | { Or })
 let xor_expr ==
-  | combinator(BAR, or_expr, | { Xor }) // A | B
+  | combinator(BAR, or_expr, | { Xor })
 
 let value :=
   | xor_expr
-  (* TODO: this is clearly a workaround *)
   | terminal_multiplier(| RIGHT_PARENS; { Keyword ")" } | LEFT_PARENS; { Keyword "(" })
