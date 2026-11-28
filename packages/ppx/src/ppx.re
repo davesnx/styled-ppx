@@ -1060,10 +1060,16 @@ let name_blocks = str => {
   let file = file_of_structure(str);
   let main_module = module_name_of_file(file);
   Css_file.Naming.reset();
+  let views =
+    Platform_view.has_platform_code(str)
+      ? List.map(
+          platform => Platform_view.structure(platform, str),
+          [Platform_view.Native, Platform_view.Js],
+        )
+      : [str];
   List.iter(
-    platform => {
+    view => {
       Css_file.Naming.collect();
-      let view = Platform_view.structure(platform, str);
       switch (map_ordered_structure(~file, ~main_module, ~scope=[], view)) {
       | _ => ()
       | exception _ => ()
@@ -1072,7 +1078,7 @@ let name_blocks = str => {
       ignore(Css_bindings.drain());
       ignore(Cross_module_refs.drain());
     },
-    [Platform_view.Native, Platform_view.Js],
+    views,
   );
   Css_file.Naming.finish();
 };

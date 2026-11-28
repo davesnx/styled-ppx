@@ -7,7 +7,8 @@
    removed expression becomes [()].
 
    The naming pass in [Ppx] runs on both views (see [Css_file.Naming]), so
-   it sees every block of the module, whichever build compiles it. *)
+   it sees every block of the module, whichever build compiles it. A file
+   without platform code runs it once, on the source. *)
 
 open Ppxlib
 
@@ -194,3 +195,31 @@ let view platform =
   end
 
 let structure platform str = (view platform)#structure str
+
+exception Found
+
+(* Whether [view] could change [str]: a superset of what it rewrites. When
+   it is false, both views are [str] itself. *)
+let has_platform_code str =
+  let scan =
+    object
+      inherit Ast_traverse.iter as super
+
+      method! attribute attr =
+        if is_platform_tag attr.attr_name.txt then raise Found
+        else super#attribute attr
+
+      method! extension (name, payload) =
+        match name.txt with
+        | "platform" | "browser_only" -> raise Found
+        | _ -> super#extension (name, payload)
+
+      method! expression expr =
+        match expr.pexp_desc with
+        | Pexp_ident { txt = hook; _ }
+          when List.mem (longident_name hook) effect_hooks ->
+          raise Found
+        | _ -> super#expression expr
+    end
+  in
+  match scan#structure str with () -> false | exception Found -> true
