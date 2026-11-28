@@ -55,6 +55,7 @@ install: ## Install project dependencies
 .PHONY: pin
 pin: ## pin
 	opam pin add quickjs 0.5.1 -y
+	opam pin add ocamlformat 0.29.0 -y # the version in .ocamlformat
 	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#82c52e8a27dffa433f56753713bd699c9b31016b" -y
 
 .PHONY: init

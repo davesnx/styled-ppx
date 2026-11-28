@@ -14,23 +14,27 @@ Same-file submodule binding shadowing follows structure order: a later
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-bjcoli-marker{color:green;}"];
-  [@css ".css-59bkuc-wrapper.css-bjcoli-marker{color:blue;}"];
-  [@css.bindings
+  [@css ".css-ivpcirv{color:red;}"];
+  [@css ".css-ivpckmd{color:green;}"];
+  [@css ".css-ivpcs2j.css-ivpckmd{color:blue;}"];
+  [@css.classes
     [
-      ("Input.Css.marker", "css-bjcoli-marker"),
-      ("Input.wrapper", "css-59bkuc-wrapper"),
+      ("css-ivpcirv", 0, "Input.Css.marker", "input.re", 2, 24, 2, 36),
+      ("css-ivpckmd", 1, "Input.Css.marker", "input.re", 5, 24, 5, 38),
+      ("css-ivpcs2j", 2, "Input.wrapper", "input.re", 9, 2, 10, 0),
     ]
   ];
+  [@css.bindings
+    [("Input.Css.marker", "css-ivpckmd"), ("Input.wrapper", "css-ivpcs2j")]
+  ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("css-ivpcirv", []);
     let _ = marker;
   
-    let marker = CSS.make("css-bjcoli-marker", []);
+    let marker = CSS.make("css-ivpckmd", []);
   };
   
-  let wrapper = CSS.make("css-59bkuc-wrapper", []);
+  let wrapper = CSS.make("css-ivpcs2j", []);
   
   let _ = (Css.marker, wrapper);
 

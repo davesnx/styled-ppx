@@ -1,23 +1,27 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-16tzllb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-11zsw44{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-1e15k1a{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1oz3n15-StringInterpolation{color:var(--var-16tzllb);}"];
+  [@css "@property --vdiv1cs{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdiv6zn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivx7m{syntax:\"*\";inherits:false;}"];
   [@css
-    ".css-1oz3n15-StringInterpolation{background-color:var(--black-11zsw44);}"
+    ".css-vdivfey{color:var(--vdiv1cs);background-color:var(--vdiv6zn);border-color:var(--vdivx7m);display:block;}"
   ];
-  [@css ".css-1oz3n15-StringInterpolation{border-color:var(--black-1e15k1a);}"];
-  [@css ".css-13o7eu2-StringInterpolation{display:block;}"];
-  [@css.bindings
+  [@css.classes
     [
       (
+        "css-vdivfey",
+        3,
         "Output.StringInterpolation",
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "output.ml",
+        10,
+        2,
+        14,
+        0,
       ),
     ]
   ];
+  [@css.bindings [("Output.StringInterpolation", "css-vdivfey")]];
   module Theme = {
     let var = CSS.hex("333333");
     module Border = {
@@ -1010,11 +1014,11 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "css-vdivfey",
         [
-          ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
-          ("--black-11zsw44", CSS.Types.Color.toString(black)),
-          ("--black-1e15k1a", CSS.Types.Color.toString(Theme.Border.black)),
+          ("--vdiv1cs", CSS.Types.Color.toString(Theme.var)),
+          ("--vdiv6zn", CSS.Types.Color.toString(black)),
+          ("--vdivx7m", CSS.Types.Color.toString(Theme.Border.black)),
         ],
       );
     let make = (props: makeProps) => {

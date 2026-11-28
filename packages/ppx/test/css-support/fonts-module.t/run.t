@@ -15,139 +15,259 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --fonts-qhzb1y{syntax:\"*\";inherits:false;}"];
-  [@css "@property --fontStack-q2u8nj{syntax:\"*\";inherits:false;}"];
-  [@css "@property --font-165jgna{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1l2838t{font-family:\"Inter Semi Bold\";}"];
-  [@css ".css-1wpww9k{font-family:var(--fonts-qhzb1y);}"];
-  [@css ".css-13c8hy8{font-family:Inter;}"];
-  [@css ".css-1sbj23c{font-family:var(--fontStack-q2u8nj);}"];
-  [@css ".css-38zhkv{font-family:Inter, Sans;}"];
-  [@css ".css-e4l4c9{font-family:Inter, var(--font-165jgna);}"];
-  [@css ".css-zpvvt7{font-family:\"Gill Sans Extrabold\", sans-serif;}"];
-  [@css ".css-1nch51u{font-synthesis-weight:none;}"];
-  [@css ".css-4qo3g2{font-synthesis-style:auto;}"];
-  [@css ".css-g2uzmx{font-synthesis-small-caps:none;}"];
-  [@css ".css-1c2qsbz{font-synthesis-position:auto;}"];
-  [@css ".css-1nhq8d0{font-size:xxx-large;}"];
-  [@css ".css-o8tzp2{font-variant:none;}"];
-  [@css ".css-rrlpwk{font-variant:normal;}"];
-  [@css ".css-1ekhi6x{font-variant:all-petite-caps;}"];
-  [@css ".css-crn7po{font-variant:historical-forms;}"];
-  [@css ".css-48srpk{font-variant:super;}"];
-  [@css ".css-e1gmww{font-variant:sub lining-nums contextual ruby;}"];
-  [@css ".css-1uqlj9l{font-variant:annotation(circled);}"];
+  [@css "@property --ivpc2rq{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc5x1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcz5s{syntax:\"*\";inherits:false;}"];
+  [@css ".css-ivpctm7{font-family:\"Inter Semi Bold\";}"];
+  [@css ".css-ivpcp4m{font-family:var(--ivpc2rq);}"];
+  [@css ".css-ivpclzg{font-family:Inter;}"];
+  [@css ".css-ivpckez{font-family:var(--ivpc5x1);}"];
+  [@css ".css-ivpc5pj{font-family:Inter, Sans;}"];
+  [@css ".css-ivpc3x9{font-family:Inter, var(--ivpcz5s);}"];
+  [@css ".css-ivpca2y{font-family:\"Gill Sans Extrabold\", sans-serif;}"];
+  [@css ".css-ivpcnst{font-synthesis-weight:none;}"];
+  [@css ".css-ivpc49l{font-synthesis-style:auto;}"];
+  [@css ".css-ivpcc7i{font-synthesis-small-caps:none;}"];
+  [@css ".css-ivpc2a7{font-synthesis-position:auto;}"];
+  [@css ".css-ivpck63{font-size:xxx-large;}"];
+  [@css ".css-ivpcbuq{font-variant:none;}"];
+  [@css ".css-ivpc8g7{font-variant:normal;}"];
+  [@css ".css-ivpcciv{font-variant:all-petite-caps;}"];
+  [@css ".css-ivpc6y6{font-variant:historical-forms;}"];
+  [@css ".css-ivpc0rf{font-variant:super;}"];
+  [@css ".css-ivpcx6j{font-variant:sub lining-nums contextual ruby;}"];
+  [@css ".css-ivpcv1r{font-variant:annotation(circled);}"];
   [@css
-    ".css-1jjc25g{font-variant:discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U);}"
+    ".css-ivpclcb{font-variant:discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U);}"
   ];
-  [@css ".css-ax7x05{font-variant-alternates:normal;}"];
-  [@css ".css-1n0pxzw{font-variant-alternates:historical-forms;}"];
-  [@css ".css-xphjze{font-variant-alternates:styleset(ss01);}"];
+  [@css ".css-ivpcrbp{font-variant-alternates:normal;}"];
+  [@css ".css-ivpc9g9{font-variant-alternates:historical-forms;}"];
+  [@css ".css-ivpceo6{font-variant-alternates:styleset(ss01);}"];
   [@css
-    ".css-eqkqdt{font-variant-alternates:styleset(stacked-g, geometric-m);}"
+    ".css-ivpci83{font-variant-alternates:styleset(stacked-g, geometric-m);}"
   ];
-  [@css ".css-1a990vj{font-variant-alternates:character-variant(cv02);}"];
+  [@css ".css-ivpcoew{font-variant-alternates:character-variant(cv02);}"];
   [@css
-    ".css-15w2zxs{font-variant-alternates:character-variant(beta-3, gamma);}"
+    ".css-ivpcbj0{font-variant-alternates:character-variant(beta-3, gamma);}"
   ];
-  [@css ".css-1aecfjl{font-variant-alternates:swash(flowing);}"];
-  [@css ".css-1wxb0td{font-variant-alternates:ornaments(leaves);}"];
-  [@css ".css-31tt93{font-variant-alternates:annotation(blocky);}"];
-  [@css ".css-13mml8d{font-feature-settings:normal;}"];
-  [@css ".css-i5jzzi{font-feature-settings:\"swsh\" 2;}"];
-  [@css ".css-qlvtlx{font-language-override:normal;}"];
-  [@css ".css-p3bfe6{font-language-override:\"SRB\";}"];
-  [@css ".css-3eihfq{font-weight:1;}"];
-  [@css ".css-20g2wc{font-weight:90;}"];
-  [@css ".css-1pmzzf7{font-weight:750;}"];
-  [@css ".css-1gl946z{font-weight:1000;}"];
-  [@css ".css-o4finr{font-style:oblique 15deg;}"];
-  [@css ".css-i7h9ap{font-style:oblique -15deg;}"];
-  [@css ".css-gg4bxt{font-style:oblique 0deg;}"];
-  [@css ".css-1erno1j{font-optical-sizing:none;}"];
-  [@css ".css-pfz9v1{font-optical-sizing:auto;}"];
-  [@css ".css-nz29j8{font-palette:normal;}"];
-  [@css ".css-1rrmxeq{font-palette:light;}"];
-  [@css ".css-14pfxax{font-palette:dark;}"];
-  [@css ".css-d22ijg{font-variant-emoji:normal;}"];
-  [@css ".css-n5dp3m{font-variant-emoji:text;}"];
-  [@css ".css-p5oi24{font-variant-emoji:emoji;}"];
-  [@css ".css-16smq5j{font-variant-emoji:unicode;}"];
-  [@css ".css-d4h4h6{font-stretch:normal;}"];
-  [@css ".css-1998aej{font-stretch:ultra-condensed;}"];
-  [@css ".css-1bfh6uj{font-stretch:extra-condensed;}"];
-  [@css ".css-lp726d{font-stretch:condensed;}"];
-  [@css ".css-107ypsq{font-stretch:semi-condensed;}"];
-  [@css ".css-niryki{font-stretch:semi-expanded;}"];
-  [@css ".css-nb1ay3{font-stretch:expanded;}"];
-  [@css ".css-17uatbv{font-stretch:extra-expanded;}"];
-  [@css ".css-v1nsma{font-stretch:ultra-expanded;}"];
-  [@css ".css-yuuc3c{font-size-adjust:none;}"];
-  [@css ".css-1cymswb{font-size-adjust:0.5;}"];
-  [@css ".css-ych0bs{font-synthesis:none;}"];
-  [@css ".css-chxz73{font-synthesis:weight;}"];
-  [@css ".css-19umipp{font-synthesis:style;}"];
-  [@css ".css-wrnabk{font-synthesis:weight style;}"];
-  [@css ".css-1n2e0hd{font-synthesis:style weight;}"];
-  [@css ".css-3llltu{font-kerning:auto;}"];
-  [@css ".css-hlygkk{font-kerning:normal;}"];
-  [@css ".css-rgd4ye{font-kerning:none;}"];
-  [@css ".css-d6yro{font-variant-position:normal;}"];
-  [@css ".css-13ip6w0{font-variant-position:sub;}"];
-  [@css ".css-f4sgdl{font-variant-position:super;}"];
-  [@css ".css-1elncv3{font-variant-ligatures:normal;}"];
-  [@css ".css-rimnc1{font-variant-ligatures:none;}"];
-  [@css ".css-1oyl9n8{font-variant-ligatures:common-ligatures;}"];
-  [@css ".css-d5tjmp{font-variant-ligatures:no-common-ligatures;}"];
-  [@css ".css-1i4rq81{font-variant-ligatures:discretionary-ligatures;}"];
-  [@css ".css-1i5v26z{font-variant-ligatures:no-discretionary-ligatures;}"];
-  [@css ".css-1wiem3q{font-variant-ligatures:historical-ligatures;}"];
-  [@css ".css-1va61tv{font-variant-ligatures:no-historical-ligatures;}"];
-  [@css ".css-1vtp3ik{font-variant-ligatures:contextual;}"];
-  [@css ".css-ueadwq{font-variant-ligatures:no-contextual;}"];
+  [@css ".css-ivpc2z7{font-variant-alternates:swash(flowing);}"];
+  [@css ".css-ivpcckv{font-variant-alternates:ornaments(leaves);}"];
+  [@css ".css-ivpc69x{font-variant-alternates:annotation(blocky);}"];
+  [@css ".css-ivpcerl{font-feature-settings:normal;}"];
+  [@css ".css-ivpcobg{font-feature-settings:\"swsh\" 2;}"];
+  [@css ".css-ivpcy84{font-language-override:normal;}"];
+  [@css ".css-ivpch28{font-language-override:\"SRB\";}"];
+  [@css ".css-ivpcr2s{font-weight:1;}"];
+  [@css ".css-ivpcbzi{font-weight:90;}"];
+  [@css ".css-ivpc3m1{font-weight:750;}"];
+  [@css ".css-ivpckh8{font-weight:1000;}"];
+  [@css ".css-ivpc11e{font-style:oblique 15deg;}"];
+  [@css ".css-ivpcddc{font-style:oblique -15deg;}"];
+  [@css ".css-ivpcx30{font-style:oblique 0deg;}"];
+  [@css ".css-ivpczd2{font-optical-sizing:none;}"];
+  [@css ".css-ivpc60q{font-optical-sizing:auto;}"];
+  [@css ".css-ivpcyyq{font-palette:normal;}"];
+  [@css ".css-ivpcls6{font-palette:light;}"];
+  [@css ".css-ivpcq0x{font-palette:dark;}"];
+  [@css ".css-ivpc47h{font-variant-emoji:normal;}"];
+  [@css ".css-ivpch57{font-variant-emoji:text;}"];
+  [@css ".css-ivpc3kx{font-variant-emoji:emoji;}"];
+  [@css ".css-ivpc6u0{font-variant-emoji:unicode;}"];
+  [@css ".css-ivpchz6{font-stretch:normal;}"];
+  [@css ".css-ivpcwru{font-stretch:ultra-condensed;}"];
+  [@css ".css-ivpczoy{font-stretch:extra-condensed;}"];
+  [@css ".css-ivpc4et{font-stretch:condensed;}"];
+  [@css ".css-ivpcay4{font-stretch:semi-condensed;}"];
+  [@css ".css-ivpcmk9{font-stretch:semi-expanded;}"];
+  [@css ".css-ivpcad6{font-stretch:expanded;}"];
+  [@css ".css-ivpcwh9{font-stretch:extra-expanded;}"];
+  [@css ".css-ivpc9ke{font-stretch:ultra-expanded;}"];
+  [@css ".css-ivpcvvl{font-size-adjust:none;}"];
+  [@css ".css-ivpcj61{font-size-adjust:0.5;}"];
+  [@css ".css-ivpcwkn{font-synthesis:none;}"];
+  [@css ".css-ivpcw3v{font-synthesis:weight;}"];
+  [@css ".css-ivpc40q{font-synthesis:style;}"];
+  [@css ".css-ivpcbon{font-synthesis:weight style;}"];
+  [@css ".css-ivpc9d8{font-synthesis:style weight;}"];
+  [@css ".css-ivpcgrz{font-kerning:auto;}"];
+  [@css ".css-ivpcrlm{font-kerning:normal;}"];
+  [@css ".css-ivpcw1u{font-kerning:none;}"];
+  [@css ".css-ivpcfa2{font-variant-position:normal;}"];
+  [@css ".css-ivpc9dr{font-variant-position:sub;}"];
+  [@css ".css-ivpcmbp{font-variant-position:super;}"];
+  [@css ".css-ivpcwgq{font-variant-ligatures:normal;}"];
+  [@css ".css-ivpcl2l{font-variant-ligatures:none;}"];
+  [@css ".css-ivpcbee{font-variant-ligatures:common-ligatures;}"];
+  [@css ".css-ivpck1f{font-variant-ligatures:no-common-ligatures;}"];
+  [@css ".css-ivpc8kf{font-variant-ligatures:discretionary-ligatures;}"];
+  [@css ".css-ivpcsug{font-variant-ligatures:no-discretionary-ligatures;}"];
+  [@css ".css-ivpchbk{font-variant-ligatures:historical-ligatures;}"];
+  [@css ".css-ivpcz2z{font-variant-ligatures:no-historical-ligatures;}"];
+  [@css ".css-ivpckxs{font-variant-ligatures:contextual;}"];
+  [@css ".css-ivpc700{font-variant-ligatures:no-contextual;}"];
   [@css
-    ".css-chpu2q{font-variant-ligatures:common-ligatures discretionary-ligatures historical-ligatures contextual;}"
+    ".css-ivpcy4s{font-variant-ligatures:common-ligatures discretionary-ligatures historical-ligatures contextual;}"
   ];
-  [@css ".css-s6dg8c{font-variant-caps:normal;}"];
-  [@css ".css-1sfczn6{font-variant-caps:small-caps;}"];
-  [@css ".css-wf67x8{font-variant-caps:all-small-caps;}"];
-  [@css ".css-t6y53c{font-variant-caps:petite-caps;}"];
-  [@css ".css-j3igep{font-variant-caps:all-petite-caps;}"];
-  [@css ".css-1st5fsu{font-variant-caps:titling-caps;}"];
-  [@css ".css-d70uxy{font-variant-caps:unicase;}"];
-  [@css ".css-16quao3{font-variant-numeric:normal;}"];
-  [@css ".css-qspeun{font-variant-numeric:lining-nums;}"];
-  [@css ".css-1iy7maz{font-variant-numeric:oldstyle-nums;}"];
-  [@css ".css-12asgo0{font-variant-numeric:proportional-nums;}"];
-  [@css ".css-1ovumeb{font-variant-numeric:tabular-nums;}"];
-  [@css ".css-14ay4ib{font-variant-numeric:diagonal-fractions;}"];
-  [@css ".css-1a909vx{font-variant-numeric:stacked-fractions;}"];
-  [@css ".css-9j80vn{font-variant-numeric:ordinal;}"];
-  [@css ".css-rwu4g7{font-variant-numeric:slashed-zero;}"];
+  [@css ".css-ivpculx{font-variant-caps:normal;}"];
+  [@css ".css-ivpcfdk{font-variant-caps:small-caps;}"];
+  [@css ".css-ivpchvx{font-variant-caps:all-small-caps;}"];
+  [@css ".css-ivpc5h6{font-variant-caps:petite-caps;}"];
+  [@css ".css-ivpcaxa{font-variant-caps:all-petite-caps;}"];
+  [@css ".css-ivpc978{font-variant-caps:titling-caps;}"];
+  [@css ".css-ivpcxnj{font-variant-caps:unicase;}"];
+  [@css ".css-ivpcexx{font-variant-numeric:normal;}"];
+  [@css ".css-ivpc3t2{font-variant-numeric:lining-nums;}"];
+  [@css ".css-ivpc7zl{font-variant-numeric:oldstyle-nums;}"];
+  [@css ".css-ivpcge9{font-variant-numeric:proportional-nums;}"];
+  [@css ".css-ivpc6x1{font-variant-numeric:tabular-nums;}"];
+  [@css ".css-ivpc0y9{font-variant-numeric:diagonal-fractions;}"];
+  [@css ".css-ivpcruu{font-variant-numeric:stacked-fractions;}"];
+  [@css ".css-ivpcabe{font-variant-numeric:ordinal;}"];
+  [@css ".css-ivpcuk6{font-variant-numeric:slashed-zero;}"];
   [@css
-    ".css-1e1eltn{font-variant-numeric:lining-nums proportional-nums diagonal-fractions;}"
-  ];
-  [@css
-    ".css-1w7gh45{font-variant-numeric:oldstyle-nums tabular-nums stacked-fractions ordinal slashed-zero;}"
+    ".css-ivpctsk{font-variant-numeric:lining-nums proportional-nums diagonal-fractions;}"
   ];
   [@css
-    ".css-26ogoi{font-variant-numeric:slashed-zero ordinal tabular-nums stacked-fractions oldstyle-nums;}"
+    ".css-ivpczga{font-variant-numeric:oldstyle-nums tabular-nums stacked-fractions ordinal slashed-zero;}"
   ];
-  [@css ".css-c09p3j{font-variant-east-asian:normal;}"];
-  [@css ".css-1t7gmiy{font-variant-east-asian:jis78;}"];
-  [@css ".css-11j0lxz{font-variant-east-asian:jis83;}"];
-  [@css ".css-1tjwqjo{font-variant-east-asian:jis90;}"];
-  [@css ".css-12fmffc{font-variant-east-asian:jis04;}"];
-  [@css ".css-sp95a9{font-variant-east-asian:simplified;}"];
-  [@css ".css-vechv1{font-variant-east-asian:traditional;}"];
-  [@css ".css-i35bhw{font-variant-east-asian:full-width;}"];
-  [@css ".css-ghw7p8{font-variant-east-asian:proportional-width;}"];
-  [@css ".css-2nc1ts{font-variant-east-asian:ruby;}"];
-  [@css ".css-1p5tn8m{font-variant-east-asian:simplified full-width ruby;}"];
-  [@css ".css-jhyne0{font-feature-settings:\"c2sc\";}"];
-  [@css ".css-1jurtd8{font-feature-settings:\"smcp\" on;}"];
-  [@css ".css-1ucpmmf{font-feature-settings:\"liga\" off;}"];
-  [@css ".css-180vt2s{font-feature-settings:\"smcp\", \"swsh\" 2;}"];
+  [@css
+    ".css-ivpc3jh{font-variant-numeric:slashed-zero ordinal tabular-nums stacked-fractions oldstyle-nums;}"
+  ];
+  [@css ".css-ivpc1kxs{font-variant-east-asian:normal;}"];
+  [@css ".css-ivpc5el{font-variant-east-asian:jis78;}"];
+  [@css ".css-ivpcxbv{font-variant-east-asian:jis83;}"];
+  [@css ".css-ivpcmrc{font-variant-east-asian:jis90;}"];
+  [@css ".css-ivpc786{font-variant-east-asian:jis04;}"];
+  [@css ".css-ivpclr8{font-variant-east-asian:simplified;}"];
+  [@css ".css-ivpcv1g{font-variant-east-asian:traditional;}"];
+  [@css ".css-ivpcrju{font-variant-east-asian:full-width;}"];
+  [@css ".css-ivpcy8l{font-variant-east-asian:proportional-width;}"];
+  [@css ".css-ivpc8rm{font-variant-east-asian:ruby;}"];
+  [@css ".css-ivpcnpf{font-variant-east-asian:simplified full-width ruby;}"];
+  [@css ".css-ivpc3vf{font-feature-settings:\"c2sc\";}"];
+  [@css ".css-ivpcxyt{font-feature-settings:\"smcp\" on;}"];
+  [@css ".css-ivpca1p{font-feature-settings:\"liga\" off;}"];
+  [@css ".css-ivpcujj{font-feature-settings:\"smcp\", \"swsh\" 2;}"];
+  [@css.classes
+    [
+      ("css-ivpctm7", 3, "", "input.re", 13, 8, 13, 39),
+      ("css-ivpcp4m", 4, "", "input.re", 14, 8, 14, 30),
+      ("css-ivpclzg", 5, "", "input.re", 15, 8, 15, 27),
+      ("css-ivpckez", 6, "", "input.re", 16, 8, 16, 34),
+      ("css-ivpc5pj", 7, "", "input.re", 17, 8, 17, 33),
+      ("css-ivpc3x9", 8, "", "input.re", 18, 8, 18, 36),
+      ("css-ivpca2y", 9, "", "input.re", 19, 8, 19, 55),
+      ("css-ivpcnst", 10, "", "input.re", 22, 8, 22, 35),
+      ("css-ivpc49l", 11, "", "input.re", 23, 8, 23, 34),
+      ("css-ivpcc7i", 12, "", "input.re", 24, 8, 24, 39),
+      ("css-ivpc2a7", 13, "", "input.re", 25, 8, 25, 37),
+      ("css-ivpck63", 14, "", "input.re", 26, 8, 26, 28),
+      ("css-ivpcbuq", 15, "", "input.re", 27, 8, 27, 26),
+      ("css-ivpc8g7", 16, "", "input.re", 28, 8, 28, 28),
+      ("css-ivpcciv", 17, "", "input.re", 29, 8, 29, 37),
+      ("css-ivpc6y6", 18, "", "input.re", 30, 8, 30, 38),
+      ("css-ivpc0rf", 19, "", "input.re", 31, 8, 31, 27),
+      ("css-ivpcx6j", 20, "", "input.re", 32, 8, 32, 53),
+      ("css-ivpcv1r", 21, "", "input.re", 33, 8, 33, 41),
+      ("css-ivpclcb", 22, "", "input.re", 35, 4, 35, 94),
+      ("css-ivpcrbp", 23, "", "input.re", 37, 8, 37, 39),
+      ("css-ivpc9g9", 24, "", "input.re", 38, 8, 38, 49),
+      ("css-ivpceo6", 25, "", "input.re", 39, 8, 39, 47),
+      ("css-ivpci83", 26, "", "input.re", 40, 8, 40, 65),
+      ("css-ivpcoew", 27, "", "input.re", 41, 8, 41, 56),
+      ("css-ivpcbj0", 28, "", "input.re", 42, 8, 42, 65),
+      ("css-ivpc2z7", 29, "", "input.re", 43, 8, 43, 47),
+      ("css-ivpcckv", 30, "", "input.re", 44, 8, 44, 50),
+      ("css-ivpc69x", 31, "", "input.re", 45, 8, 45, 51),
+      ("css-ivpcerl", 32, "", "input.re", 46, 8, 46, 37),
+      ("css-ivpcobg", 33, "", "input.re", 47, 8, 47, 39),
+      ("css-ivpcy84", 34, "", "input.re", 48, 8, 48, 38),
+      ("css-ivpch28", 35, "", "input.re", 49, 8, 49, 37),
+      ("css-ivpcr2s", 36, "", "input.re", 50, 8, 50, 22),
+      ("css-ivpcbzi", 37, "", "input.re", 51, 8, 51, 23),
+      ("css-ivpc3m1", 38, "", "input.re", 52, 8, 52, 24),
+      ("css-ivpckh8", 39, "", "input.re", 53, 8, 53, 25),
+      ("css-ivpc11e", 40, "", "input.re", 54, 8, 54, 33),
+      ("css-ivpcddc", 41, "", "input.re", 55, 8, 55, 34),
+      ("css-ivpcx30", 42, "", "input.re", 56, 8, 56, 32),
+      ("css-ivpczd2", 43, "", "input.re", 57, 8, 57, 33),
+      ("css-ivpc60q", 44, "", "input.re", 58, 8, 58, 33),
+      ("css-ivpcyyq", 45, "", "input.re", 59, 8, 59, 28),
+      ("css-ivpcls6", 46, "", "input.re", 60, 8, 60, 27),
+      ("css-ivpcq0x", 47, "", "input.re", 61, 8, 61, 26),
+      ("css-ivpc47h", 48, "", "input.re", 62, 8, 62, 34),
+      ("css-ivpch57", 49, "", "input.re", 63, 8, 63, 32),
+      ("css-ivpc3kx", 50, "", "input.re", 64, 8, 64, 33),
+      ("css-ivpc6u0", 51, "", "input.re", 65, 8, 65, 35),
+      ("css-ivpchz6", 52, "", "input.re", 68, 8, 68, 28),
+      ("css-ivpcwru", 53, "", "input.re", 69, 8, 69, 37),
+      ("css-ivpczoy", 54, "", "input.re", 70, 8, 70, 37),
+      ("css-ivpc4et", 55, "", "input.re", 71, 8, 71, 31),
+      ("css-ivpcay4", 56, "", "input.re", 72, 8, 72, 36),
+      ("css-ivpcmk9", 57, "", "input.re", 73, 8, 73, 35),
+      ("css-ivpcad6", 58, "", "input.re", 74, 8, 74, 30),
+      ("css-ivpcwh9", 59, "", "input.re", 75, 8, 75, 36),
+      ("css-ivpc9ke", 60, "", "input.re", 76, 8, 76, 36),
+      ("css-ivpcvvl", 61, "", "input.re", 77, 8, 77, 30),
+      ("css-ivpcj61", 62, "", "input.re", 78, 8, 78, 28),
+      ("css-ivpcwkn", 63, "", "input.re", 79, 8, 79, 28),
+      ("css-ivpcw3v", 64, "", "input.re", 80, 8, 80, 30),
+      ("css-ivpc40q", 65, "", "input.re", 81, 8, 81, 29),
+      ("css-ivpcbon", 66, "", "input.re", 82, 8, 82, 36),
+      ("css-ivpc9d8", 67, "", "input.re", 83, 8, 83, 36),
+      ("css-ivpcgrz", 68, "", "input.re", 84, 8, 84, 26),
+      ("css-ivpcrlm", 69, "", "input.re", 85, 8, 85, 28),
+      ("css-ivpcw1u", 70, "", "input.re", 86, 8, 86, 26),
+      ("css-ivpcfa2", 71, "", "input.re", 87, 8, 87, 37),
+      ("css-ivpc9dr", 72, "", "input.re", 88, 8, 88, 34),
+      ("css-ivpcmbp", 73, "", "input.re", 89, 8, 89, 36),
+      ("css-ivpcwgq", 74, "", "input.re", 90, 8, 90, 38),
+      ("css-ivpcl2l", 75, "", "input.re", 91, 8, 91, 36),
+      ("css-ivpcbee", 76, "", "input.re", 92, 8, 92, 48),
+      ("css-ivpck1f", 77, "", "input.re", 93, 8, 93, 51),
+      ("css-ivpc8kf", 78, "", "input.re", 94, 8, 94, 55),
+      ("css-ivpcsug", 79, "", "input.re", 95, 8, 95, 58),
+      ("css-ivpchbk", 80, "", "input.re", 96, 8, 96, 52),
+      ("css-ivpcz2z", 81, "", "input.re", 97, 8, 97, 55),
+      ("css-ivpckxs", 82, "", "input.re", 98, 8, 98, 42),
+      ("css-ivpc700", 83, "", "input.re", 99, 8, 99, 45),
+      ("css-ivpcy4s", 84, "", "input.re", 101, 4, 101, 100),
+      ("css-ivpculx", 85, "", "input.re", 103, 8, 103, 33),
+      ("css-ivpcfdk", 86, "", "input.re", 104, 8, 104, 37),
+      ("css-ivpchvx", 87, "", "input.re", 105, 8, 105, 41),
+      ("css-ivpc5h6", 88, "", "input.re", 106, 8, 106, 38),
+      ("css-ivpcaxa", 89, "", "input.re", 107, 8, 107, 42),
+      ("css-ivpc978", 90, "", "input.re", 108, 8, 108, 39),
+      ("css-ivpcxnj", 91, "", "input.re", 109, 8, 109, 34),
+      ("css-ivpcexx", 92, "", "input.re", 110, 8, 110, 36),
+      ("css-ivpc3t2", 93, "", "input.re", 111, 8, 111, 41),
+      ("css-ivpc7zl", 94, "", "input.re", 112, 8, 112, 43),
+      ("css-ivpcge9", 95, "", "input.re", 113, 8, 113, 47),
+      ("css-ivpc6x1", 96, "", "input.re", 114, 8, 114, 42),
+      ("css-ivpc0y9", 97, "", "input.re", 115, 8, 115, 48),
+      ("css-ivpcruu", 98, "", "input.re", 116, 8, 116, 47),
+      ("css-ivpcabe", 99, "", "input.re", 117, 8, 117, 37),
+      ("css-ivpcuk6", 100, "", "input.re", 118, 8, 118, 42),
+      ("css-ivpctsk", 101, "", "input.re", 120, 4, 120, 74),
+      ("css-ivpczga", 102, "", "input.re", 123, 4, 123, 91),
+      ("css-ivpc3jh", 103, "", "input.re", 126, 4, 126, 91),
+      ("css-ivpc1kxs", 104, "", "input.re", 128, 8, 128, 39),
+      ("css-ivpc5el", 105, "", "input.re", 129, 8, 129, 38),
+      ("css-ivpcxbv", 106, "", "input.re", 130, 8, 130, 38),
+      ("css-ivpcmrc", 107, "", "input.re", 131, 8, 131, 38),
+      ("css-ivpc786", 108, "", "input.re", 132, 8, 132, 38),
+      ("css-ivpclr8", 109, "", "input.re", 133, 8, 133, 43),
+      ("css-ivpcv1g", 110, "", "input.re", 134, 8, 134, 44),
+      ("css-ivpcrju", 111, "", "input.re", 135, 8, 135, 43),
+      ("css-ivpcy8l", 112, "", "input.re", 136, 8, 136, 51),
+      ("css-ivpc8rm", 113, "", "input.re", 137, 8, 137, 37),
+      ("css-ivpcnpf", 114, "", "input.re", 138, 8, 138, 59),
+      ("css-ivpc3vf", 115, "", "input.re", 140, 8, 140, 37),
+      ("css-ivpcxyt", 116, "", "input.re", 141, 8, 141, 40),
+      ("css-ivpca1p", 117, "", "input.re", 142, 8, 142, 41),
+      ("css-ivpcujj", 118, "", "input.re", 143, 8, 143, 47),
+    ]
+  ];
   
   let fonts: array(CSS.Types.FontFamilyName.t) = [|
     `quoted("Inter"),
@@ -156,131 +276,131 @@ If this test fail means that the module is not in sync with the ppx
   let fontStack: array(CSS.Types.FontFamilyName.t) = [|`quoted("Inter")|];
   let font: CSS.Types.FontFamily.t = `quoted("Inter");
   
-  CSS.make("css-1l2838t", []);
+  CSS.make("css-ivpctm7", []);
   CSS.make(
-    "css-1wpww9k",
-    [("--fonts-qhzb1y", CSS.Types.FontFamilies.toString(fonts))],
+    "css-ivpcp4m",
+    [("--ivpc2rq", CSS.Types.FontFamilies.toString(fonts))],
   );
-  CSS.make("css-13c8hy8", []);
+  CSS.make("css-ivpclzg", []);
   CSS.make(
-    "css-1sbj23c",
-    [("--fontStack-q2u8nj", CSS.Types.FontFamilies.toString(fontStack))],
+    "css-ivpckez",
+    [("--ivpc5x1", CSS.Types.FontFamilies.toString(fontStack))],
   );
-  CSS.make("css-38zhkv", []);
+  CSS.make("css-ivpc5pj", []);
   CSS.make(
-    "css-e4l4c9",
-    [("--font-165jgna", CSS.Types.FontFamily.toString(font))],
+    "css-ivpc3x9",
+    [("--ivpcz5s", CSS.Types.FontFamily.toString(font))],
   );
-  CSS.make("css-zpvvt7", []);
+  CSS.make("css-ivpca2y", []);
   
-  CSS.make("css-1nch51u", []);
-  CSS.make("css-4qo3g2", []);
-  CSS.make("css-g2uzmx", []);
-  CSS.make("css-1c2qsbz", []);
-  CSS.make("css-1nhq8d0", []);
-  CSS.make("css-o8tzp2", []);
-  CSS.make("css-rrlpwk", []);
-  CSS.make("css-1ekhi6x", []);
-  CSS.make("css-crn7po", []);
-  CSS.make("css-48srpk", []);
-  CSS.make("css-e1gmww", []);
-  CSS.make("css-1uqlj9l", []);
-  CSS.make("css-1jjc25g", []);
-  CSS.make("css-ax7x05", []);
-  CSS.make("css-1n0pxzw", []);
-  CSS.make("css-xphjze", []);
-  CSS.make("css-eqkqdt", []);
-  CSS.make("css-1a990vj", []);
-  CSS.make("css-15w2zxs", []);
-  CSS.make("css-1aecfjl", []);
-  CSS.make("css-1wxb0td", []);
-  CSS.make("css-31tt93", []);
-  CSS.make("css-13mml8d", []);
-  CSS.make("css-i5jzzi", []);
-  CSS.make("css-qlvtlx", []);
-  CSS.make("css-p3bfe6", []);
-  CSS.make("css-3eihfq", []);
-  CSS.make("css-20g2wc", []);
-  CSS.make("css-1pmzzf7", []);
-  CSS.make("css-1gl946z", []);
-  CSS.make("css-o4finr", []);
-  CSS.make("css-i7h9ap", []);
-  CSS.make("css-gg4bxt", []);
-  CSS.make("css-1erno1j", []);
-  CSS.make("css-pfz9v1", []);
-  CSS.make("css-nz29j8", []);
-  CSS.make("css-1rrmxeq", []);
-  CSS.make("css-14pfxax", []);
-  CSS.make("css-d22ijg", []);
-  CSS.make("css-n5dp3m", []);
-  CSS.make("css-p5oi24", []);
-  CSS.make("css-16smq5j", []);
+  CSS.make("css-ivpcnst", []);
+  CSS.make("css-ivpc49l", []);
+  CSS.make("css-ivpcc7i", []);
+  CSS.make("css-ivpc2a7", []);
+  CSS.make("css-ivpck63", []);
+  CSS.make("css-ivpcbuq", []);
+  CSS.make("css-ivpc8g7", []);
+  CSS.make("css-ivpcciv", []);
+  CSS.make("css-ivpc6y6", []);
+  CSS.make("css-ivpc0rf", []);
+  CSS.make("css-ivpcx6j", []);
+  CSS.make("css-ivpcv1r", []);
+  CSS.make("css-ivpclcb", []);
+  CSS.make("css-ivpcrbp", []);
+  CSS.make("css-ivpc9g9", []);
+  CSS.make("css-ivpceo6", []);
+  CSS.make("css-ivpci83", []);
+  CSS.make("css-ivpcoew", []);
+  CSS.make("css-ivpcbj0", []);
+  CSS.make("css-ivpc2z7", []);
+  CSS.make("css-ivpcckv", []);
+  CSS.make("css-ivpc69x", []);
+  CSS.make("css-ivpcerl", []);
+  CSS.make("css-ivpcobg", []);
+  CSS.make("css-ivpcy84", []);
+  CSS.make("css-ivpch28", []);
+  CSS.make("css-ivpcr2s", []);
+  CSS.make("css-ivpcbzi", []);
+  CSS.make("css-ivpc3m1", []);
+  CSS.make("css-ivpckh8", []);
+  CSS.make("css-ivpc11e", []);
+  CSS.make("css-ivpcddc", []);
+  CSS.make("css-ivpcx30", []);
+  CSS.make("css-ivpczd2", []);
+  CSS.make("css-ivpc60q", []);
+  CSS.make("css-ivpcyyq", []);
+  CSS.make("css-ivpcls6", []);
+  CSS.make("css-ivpcq0x", []);
+  CSS.make("css-ivpc47h", []);
+  CSS.make("css-ivpch57", []);
+  CSS.make("css-ivpc3kx", []);
+  CSS.make("css-ivpc6u0", []);
   
-  CSS.make("css-d4h4h6", []);
-  CSS.make("css-1998aej", []);
-  CSS.make("css-1bfh6uj", []);
-  CSS.make("css-lp726d", []);
-  CSS.make("css-107ypsq", []);
-  CSS.make("css-niryki", []);
-  CSS.make("css-nb1ay3", []);
-  CSS.make("css-17uatbv", []);
-  CSS.make("css-v1nsma", []);
-  CSS.make("css-yuuc3c", []);
-  CSS.make("css-1cymswb", []);
-  CSS.make("css-ych0bs", []);
-  CSS.make("css-chxz73", []);
-  CSS.make("css-19umipp", []);
-  CSS.make("css-wrnabk", []);
-  CSS.make("css-1n2e0hd", []);
-  CSS.make("css-3llltu", []);
-  CSS.make("css-hlygkk", []);
-  CSS.make("css-rgd4ye", []);
-  CSS.make("css-d6yro", []);
-  CSS.make("css-13ip6w0", []);
-  CSS.make("css-f4sgdl", []);
-  CSS.make("css-1elncv3", []);
-  CSS.make("css-rimnc1", []);
-  CSS.make("css-1oyl9n8", []);
-  CSS.make("css-d5tjmp", []);
-  CSS.make("css-1i4rq81", []);
-  CSS.make("css-1i5v26z", []);
-  CSS.make("css-1wiem3q", []);
-  CSS.make("css-1va61tv", []);
-  CSS.make("css-1vtp3ik", []);
-  CSS.make("css-ueadwq", []);
-  CSS.make("css-chpu2q", []);
-  CSS.make("css-s6dg8c", []);
-  CSS.make("css-1sfczn6", []);
-  CSS.make("css-wf67x8", []);
-  CSS.make("css-t6y53c", []);
-  CSS.make("css-j3igep", []);
-  CSS.make("css-1st5fsu", []);
-  CSS.make("css-d70uxy", []);
-  CSS.make("css-16quao3", []);
-  CSS.make("css-qspeun", []);
-  CSS.make("css-1iy7maz", []);
-  CSS.make("css-12asgo0", []);
-  CSS.make("css-1ovumeb", []);
-  CSS.make("css-14ay4ib", []);
-  CSS.make("css-1a909vx", []);
-  CSS.make("css-9j80vn", []);
-  CSS.make("css-rwu4g7", []);
-  CSS.make("css-1e1eltn", []);
-  CSS.make("css-1w7gh45", []);
-  CSS.make("css-26ogoi", []);
-  CSS.make("css-c09p3j", []);
-  CSS.make("css-1t7gmiy", []);
-  CSS.make("css-11j0lxz", []);
-  CSS.make("css-1tjwqjo", []);
-  CSS.make("css-12fmffc", []);
-  CSS.make("css-sp95a9", []);
-  CSS.make("css-vechv1", []);
-  CSS.make("css-i35bhw", []);
-  CSS.make("css-ghw7p8", []);
-  CSS.make("css-2nc1ts", []);
-  CSS.make("css-1p5tn8m", []);
-  CSS.make("css-13mml8d", []);
-  CSS.make("css-jhyne0", []);
-  CSS.make("css-1jurtd8", []);
-  CSS.make("css-1ucpmmf", []);
-  CSS.make("css-180vt2s", []);
+  CSS.make("css-ivpchz6", []);
+  CSS.make("css-ivpcwru", []);
+  CSS.make("css-ivpczoy", []);
+  CSS.make("css-ivpc4et", []);
+  CSS.make("css-ivpcay4", []);
+  CSS.make("css-ivpcmk9", []);
+  CSS.make("css-ivpcad6", []);
+  CSS.make("css-ivpcwh9", []);
+  CSS.make("css-ivpc9ke", []);
+  CSS.make("css-ivpcvvl", []);
+  CSS.make("css-ivpcj61", []);
+  CSS.make("css-ivpcwkn", []);
+  CSS.make("css-ivpcw3v", []);
+  CSS.make("css-ivpc40q", []);
+  CSS.make("css-ivpcbon", []);
+  CSS.make("css-ivpc9d8", []);
+  CSS.make("css-ivpcgrz", []);
+  CSS.make("css-ivpcrlm", []);
+  CSS.make("css-ivpcw1u", []);
+  CSS.make("css-ivpcfa2", []);
+  CSS.make("css-ivpc9dr", []);
+  CSS.make("css-ivpcmbp", []);
+  CSS.make("css-ivpcwgq", []);
+  CSS.make("css-ivpcl2l", []);
+  CSS.make("css-ivpcbee", []);
+  CSS.make("css-ivpck1f", []);
+  CSS.make("css-ivpc8kf", []);
+  CSS.make("css-ivpcsug", []);
+  CSS.make("css-ivpchbk", []);
+  CSS.make("css-ivpcz2z", []);
+  CSS.make("css-ivpckxs", []);
+  CSS.make("css-ivpc700", []);
+  CSS.make("css-ivpcy4s", []);
+  CSS.make("css-ivpculx", []);
+  CSS.make("css-ivpcfdk", []);
+  CSS.make("css-ivpchvx", []);
+  CSS.make("css-ivpc5h6", []);
+  CSS.make("css-ivpcaxa", []);
+  CSS.make("css-ivpc978", []);
+  CSS.make("css-ivpcxnj", []);
+  CSS.make("css-ivpcexx", []);
+  CSS.make("css-ivpc3t2", []);
+  CSS.make("css-ivpc7zl", []);
+  CSS.make("css-ivpcge9", []);
+  CSS.make("css-ivpc6x1", []);
+  CSS.make("css-ivpc0y9", []);
+  CSS.make("css-ivpcruu", []);
+  CSS.make("css-ivpcabe", []);
+  CSS.make("css-ivpcuk6", []);
+  CSS.make("css-ivpctsk", []);
+  CSS.make("css-ivpczga", []);
+  CSS.make("css-ivpc3jh", []);
+  CSS.make("css-ivpc1kxs", []);
+  CSS.make("css-ivpc5el", []);
+  CSS.make("css-ivpcxbv", []);
+  CSS.make("css-ivpcmrc", []);
+  CSS.make("css-ivpc786", []);
+  CSS.make("css-ivpclr8", []);
+  CSS.make("css-ivpcv1g", []);
+  CSS.make("css-ivpcrju", []);
+  CSS.make("css-ivpcy8l", []);
+  CSS.make("css-ivpc8rm", []);
+  CSS.make("css-ivpcnpf", []);
+  CSS.make("css-ivpcerl", []);
+  CSS.make("css-ivpc3vf", []);
+  CSS.make("css-ivpcxyt", []);
+  CSS.make("css-ivpca1p", []);
+  CSS.make("css-ivpcujj", []);

@@ -1,7 +1,8 @@
 Golden hashes: a stable pin on the classNames produced for representative
-[%css] shapes. Hashes are derived from the rendered rule text via Murmur2,
-so any change to `Render` (whitespace, escaping, numeric formatting),
-to atomization, or to Murmur2 cascades into every emitted className.
+[%css] shapes. A class is a Murmur2 hash of the module name, the scope, the
+binding name and the block's rendered rules, so any change to `Render`
+(whitespace, escaping, numeric formatting), to these inputs, or to Murmur2
+cascades into every emitted className.
 
 Without this pin, a no-op-intended refactor silently busts every cached
 className downstream — browser caches, CDN caches, persisted DOM
@@ -10,31 +11,33 @@ the diff IS the blast radius.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-tokvmb-solid{color:red;}"]
-  [@@@css ".css-eaeacs-multi{margin:10px;}"]
-  [@@@css ".css-1ruxp1v-multi{padding:20px;}"]
-  [@@@css ".css-14ksm7b-multi{color:blue;}"]
-  [@@@css ".css-1xu3tth-hovered{color:black;}"]
-  [@@@css ".css-1rwx7to-hovered:hover{color:white;}"]
-  [@@@css ".css-1r10myy-multiSel .a{color:green;}"]
-  [@@@css ".css-ltb45t-multiSel .b{color:green;}"]
-  [@@@css "@media (min-width: 768px) {.css-14bi921-withMedia .a{color:red;}}"]
-  [@@@css ".css-137pweu-units{width:1.5rem;}"]
-  [@@@css ".css-1tzeee1-units{opacity:0.5;}"]
-  [@@@css ".css-1j744k-withFallback{color:var(--theme, blue);}"]
+  [@@@css ".css-ivpcdqx{color:red;}"]
+  [@@@css ".css-ivpcxmb{margin:10px;padding:20px;color:blue;}"]
+  [@@@css ".css-ivpc6hg{color:black;}.css-ivpc6hg:hover{color:white;}"]
+  [@@@css ".css-ivpcn43 .a{color:green;}.css-ivpcn43 .b{color:green;}"]
+  [@@@css "@media (min-width: 768px) {.css-ivpcv8h .a{color:red;}}"]
+  [@@@css ".css-ivpcjgr{width:1.5rem;opacity:0.5;}"]
+  [@@@css ".css-ivpcuym{color:var(--theme, blue);}"]
+  [@@@css.classes
+    [("css-ivpcdqx", 0, "Input.solid", "input.ml", 12, 21, 12, 33);
+    ("css-ivpcxmb", 1, "Input.multi", "input.ml", 16, 2, 19, 0);
+    ("css-ivpc6hg", 2, "Input.hovered", "input.ml", 23, 2, 27, 0);
+    ("css-ivpcn43", 3, "Input.multiSel", "input.ml", 31, 2, 34, 0);
+    ("css-ivpcv8h", 4, "Input.withMedia", "input.ml", 40, 2, 45, 0);
+    ("css-ivpcjgr", 5, "Input.units", "input.ml", 49, 2, 51, 0);
+    ("css-ivpcuym", 6, "Input.withFallback", "input.ml", 55, 2, 56, 0)]]
   [@@@css.bindings
-    [("Input.solid", "css-tokvmb-solid");
-    ("Input.multi", "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi");
-    ("Input.hovered", "css-1xu3tth-hovered css-1rwx7to-hovered");
-    ("Input.multiSel", "css-1r10myy-multiSel css-ltb45t-multiSel");
-    ("Input.withMedia", "css-14bi921-withMedia");
-    ("Input.units", "css-137pweu-units css-1tzeee1-units");
-    ("Input.withFallback", "css-1j744k-withFallback")]]
-  let solid = CSS.make "css-tokvmb-solid" []
-  let multi =
-    CSS.make "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi" []
-  let hovered = CSS.make "css-1xu3tth-hovered css-1rwx7to-hovered" []
-  let multiSel = CSS.make "css-1r10myy-multiSel css-ltb45t-multiSel" []
-  let withMedia = CSS.make "css-14bi921-withMedia" []
-  let units = CSS.make "css-137pweu-units css-1tzeee1-units" []
-  let withFallback = CSS.make "css-1j744k-withFallback" []
+    [("Input.solid", "css-ivpcdqx");
+    ("Input.multi", "css-ivpcxmb");
+    ("Input.hovered", "css-ivpc6hg");
+    ("Input.multiSel", "css-ivpcn43");
+    ("Input.withMedia", "css-ivpcv8h");
+    ("Input.units", "css-ivpcjgr");
+    ("Input.withFallback", "css-ivpcuym")]]
+  let solid = CSS.make "css-ivpcdqx" []
+  let multi = CSS.make "css-ivpcxmb" []
+  let hovered = CSS.make "css-ivpc6hg" []
+  let multiSel = CSS.make "css-ivpcn43" []
+  let withMedia = CSS.make "css-ivpcv8h" []
+  let units = CSS.make "css-ivpcjgr" []
+  let withFallback = CSS.make "css-ivpcuym" []

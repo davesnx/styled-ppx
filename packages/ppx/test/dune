@@ -7,3 +7,11 @@
  (names rewriter)
  (modules rewriter)
  (libraries styled-ppx ppxlib))
+
+; styled-ppx next to server-reason-react's browser_ppx, which implements
+; switch%platform, browser_only and [@platform]; `-js` selects the client.
+
+(executables
+ (names standalone_platform)
+ (modules standalone_platform)
+ (libraries server-reason-react.browser_ppx styled-ppx ppxlib))

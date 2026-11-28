@@ -42,9 +42,11 @@ jobs:
         uses: ml-in-barcelona/gh-ci-action@v1.3.1
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          # ocamlformat: the version in .ocamlformat.
           pins: |
             quickjs 0.5.1
             server-reason-react.0.4.1 https://github.com/ml-in-barcelona/server-reason-react.git#82c52e8a27dffa433f56753713bd699c9b31016b
+            ocamlformat 0.29.0
           with-dev-setup: true
           depext-bypass: npm
 

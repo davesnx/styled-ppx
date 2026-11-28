@@ -26,13 +26,21 @@ it does not change how numbers render.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1dmpxco{margin:-0.5px;}"];
-  [@css ".css-15u1kc6{margin:0.5px;}"];
-  [@css ".css-1edr2ev{transition:opacity 0.3s ease -0.1s;}"];
-  [@css ".css-bvktvb{top:-5px;}"];
-  CSS.make("css-1dmpxco", []);
-  CSS.make("css-15u1kc6", []);
-  CSS.make("css-1edr2ev", []);
-  CSS.make("css-bvktvb", []);
+  [@css ".css-ivpcsrv{margin:-0.5px;}"];
+  [@css ".css-ivpccfk{margin:0.5px;}"];
+  [@css ".css-ivpca0l{transition:opacity 0.3s ease -0.1s;}"];
+  [@css ".css-ivpcic1{top:-5px;}"];
+  [@css.classes
+    [
+      ("css-ivpcsrv", 0, "", "input.re", 1, 8, 1, 21),
+      ("css-ivpccfk", 1, "", "input.re", 2, 8, 2, 21),
+      ("css-ivpca0l", 2, "", "input.re", 3, 8, 3, 41),
+      ("css-ivpcic1", 3, "", "input.re", 4, 8, 4, 20),
+    ]
+  ];
+  CSS.make("css-ivpcsrv", []);
+  CSS.make("css-ivpccfk", []);
+  CSS.make("css-ivpca0l", []);
+  CSS.make("css-ivpcic1", []);
 
   $ dune build

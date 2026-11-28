@@ -1128,7 +1128,6 @@ let extractedDynamicStyles =
           ~opens,
           ~source_position_start,
           ~binding_name=moduleName,
-          ~label=moduleName,
           rule_list,
         );
       onClassNames(classNames);

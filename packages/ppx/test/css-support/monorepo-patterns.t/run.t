@@ -15,103 +15,144 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --lineAlpha-14x2350{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-16iaxxw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --selectedMuted-coapl4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --flag-r97mq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1-10w4q1l{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1Bottom-1jgyvpw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-16e6nb4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation2-a9z6ve{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-1pvcfai{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation3-u89uz4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-110y8m6_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-110y8m6_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1-s7j1om{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation3-1tt1uog{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-10u4hbk{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-17j5in5{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-jfym6t{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-2dnuub{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-doha9t{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-uf1ggy{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1i61so0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-18cgk19{syntax:\"*\";inherits:false;}"];
-  [@css "@property --accent-1w0inj7{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-9kmuhm_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-9kmuhm_2{syntax:\"*\";inherits:false;}"];
-  [@css ".css-tjsoaq{transition:all 200ms ease 0ms;}"];
-  [@css ".css-9an52v{transition:all 300ms ease-in-out 0ms;}"];
-  [@css ".css-9gb0kb{transition:opacity 300ms ease-in-out 0ms;}"];
-  [@css ".css-1d2ga4{transition:left 0.15s;}"];
-  [@css ".css-9lk53a{transition:opacity 0.5s ease-in-out;}"];
+  [@css "@property --ivpcmq8{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpckrm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcz7s{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcrqa{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcmx2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpceiz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpctxg{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpclnm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcyen{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc1rl{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcy75{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcrck{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcaem{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcuw0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcxu5{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcy31{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcbdj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcl48{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc8c6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc5mm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcthc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcoai{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc3eq{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcj6z{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcss5{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcbgj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc3pw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpchkf{syntax:\"*\";inherits:false;}"];
+  [@css ".css-ivpcbv0{transition:all 200ms ease 0ms;}"];
+  [@css ".css-ivpcvv1{transition:all 300ms ease-in-out 0ms;}"];
+  [@css ".css-ivpcyvl{transition:opacity 300ms ease-in-out 0ms;}"];
+  [@css ".css-ivpc11c{transition:left 0.15s;}"];
+  [@css ".css-ivpcnzl{transition:opacity 0.5s ease-in-out;}"];
   [@css
-    ".css-1hwm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+    ".css-ivpcbuj{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
   ];
   [@css
-    ".css-1dfmtix{transition:width 200ms ease, height 200ms ease, background-color 200ms ease;}"
+    ".css-ivpcrxl{transition:width 200ms ease, height 200ms ease, background-color 200ms ease;}"
   ];
-  [@css ".css-2jhocq{transition:transform 0.3s;}"];
-  [@css ".css-z1xaab{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-14x2350);}"];
-  [@css ".css-k42oj0{box-shadow:inset 1px 0 0 0 var(--line-16iaxxw);}"];
+  [@css ".css-ivpcmhb{transition:transform 0.3s;}"];
+  [@css ".css-ivpc5ot{box-shadow:inset 0 -1px 0 0 var(--ivpcmq8);}"];
+  [@css ".css-ivpcrx5{box-shadow:inset 1px 0 0 0 var(--ivpckrm);}"];
+  [@css ".css-ivpcprd{box-shadow:inset 0 0 0 1000px var(--ivpcz7s);}"];
+  [@css ".css-ivpc5s8{box-shadow:inset 0 0 0 0.5px var(--ivpcrqa);}"];
   [@css
-    ".css-jfxwmt{box-shadow:inset 0 0 0 1000px var(--selectedMuted-coapl4);}"
-  ];
-  [@css ".css-lirt76{box-shadow:inset 0 0 0 0.5px var(--flag-r97mq);}"];
-  [@css
-    ".css-1iayzvr{box-shadow:0 0 0 1px var(--elevation1-10w4q1l), 0 1px 0 0 var(--elevation1Bottom-1jgyvpw);}"
+    ".css-ivpcxmb{box-shadow:0 0 0 1px var(--ivpcmx2), 0 1px 0 0 var(--ivpceiz);}"
   ];
   [@css
-    ".css-13ydyrw{box-shadow:0 0 0 1px var(--border-16e6nb4), 0 2px 4px 0 var(--elevation2-a9z6ve);}"
+    ".css-ivpcyf9{box-shadow:0 0 0 1px var(--ivpctxg), 0 2px 4px 0 var(--ivpclnm);}"
   ];
   [@css
-    ".css-1ga3v0v{box-shadow:0 0 0 1px var(--border-1pvcfai), 0 3px 18px 0 var(--elevation3-u89uz4);}"
+    ".css-ivpckzx{box-shadow:0 0 0 1px var(--ivpcyen), 0 3px 18px 0 var(--ivpc1rl);}"
   ];
   [@css
-    ".css-w2f2bw{box-shadow:1px 0 0 0 var(--line-1fm6v6v_1), inset 1px 0 0 0 var(--line-1fm6v6v_2), inset 0 -1px 0 0 var(--line-1fm6v6v_3);}"
+    ".css-ivpc064{box-shadow:1px 0 0 0 var(--ivpcy75), inset 1px 0 0 0 var(--ivpcrck), inset 0 -1px 0 0 var(--ivpcaem);}"
   ];
   [@css
-    ".css-uatfq{box-shadow:inset 0 1px 0 0 var(--line-110y8m6_1), inset 0 -1px 0 0 var(--line-110y8m6_2);}"
+    ".css-ivpcu3e{box-shadow:inset 0 1px 0 0 var(--ivpcuw0), inset 0 -1px 0 0 var(--ivpcxu5);}"
   ];
-  [@css ".css-k4sr4i{box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1);}"];
-  [@css ".css-2ptrw{box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5);}"];
+  [@css ".css-ivpc3un{box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1);}"];
+  [@css ".css-ivpclks{box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5);}"];
   [@css
-    ".css-itknjr{box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02);}"
-  ];
-  [@css
-    ".css-x09jpc{box-shadow:0 0 0 1px var(--elevation1-s7j1om), 0 3px 18px 0 var(--elevation3-1tt1uog);}"
-  ];
-  [@css ".css-1q2o3yi{border:1px solid var(--line-10u4hbk);}"];
-  [@css ".css-192yc9x{border:0px none transparent;}"];
-  [@css ".css-11h9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css ".css-pkcjyn{border-bottom:1px solid var(--line-jfym6t);}"];
-  [@css ".css-1ry65jw{border-left:1px solid var(--line-2dnuub);}"];
-  [@css ".css-ypjvaq{border-right:1px solid var(--line-doha9t);}"];
-  [@css ".css-1ismcmj{border:1px dashed var(--line-uf1ggy);}"];
-  [@css ".css-150towz{border:1px none var(--line-1i61so0);}"];
-  [@css ".css-188ct1l{outline:1px solid var(--line-18cgk19);}"];
-  [@css ".css-1xnyi32{outline:2px solid var(--accent-1w0inj7);}"];
-  [@css
-    ".css-w1ep28{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards;}"
+    ".css-ivpcenj{box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02);}"
   ];
   [@css
-    ".css-d9hwlt{-webkit-animation:helpMenuFadeOut 0.08s ease-out forwards;animation:helpMenuFadeOut 0.08s ease-out forwards;}"
+    ".css-ivpcnj6{box-shadow:0 0 0 1px var(--ivpcy31), 0 3px 18px 0 var(--ivpcbdj);}"
+  ];
+  [@css ".css-ivpcnz3{border:1px solid var(--ivpcl48);}"];
+  [@css ".css-ivpcpxx{border:0px none transparent;}"];
+  [@css ".css-ivpcgnd{border-top:1px solid var(--ivpc8c6);}"];
+  [@css ".css-ivpcotz{border-bottom:1px solid var(--ivpc5mm);}"];
+  [@css ".css-ivpc1uc{border-left:1px solid var(--ivpcthc);}"];
+  [@css ".css-ivpc78o{border-right:1px solid var(--ivpcoai);}"];
+  [@css ".css-ivpccf5{border:1px dashed var(--ivpc3eq);}"];
+  [@css ".css-ivpcts7{border:1px none var(--ivpcj6z);}"];
+  [@css ".css-ivpcx95{outline:1px solid var(--ivpcss5);}"];
+  [@css ".css-ivpc25d{outline:2px solid var(--ivpcbgj);}"];
+  [@css
+    ".css-ivpc00i{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards;}"
   ];
   [@css
-    ".css-1ir9788{transition:height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);}"
+    ".css-ivpcud4{-webkit-animation:helpMenuFadeOut 0.08s ease-out forwards;animation:helpMenuFadeOut 0.08s ease-out forwards;}"
   ];
   [@css
-    ".css-fwdrfx{transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);}"
+    ".css-ivpcxqb{transition:height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);}"
   ];
-  [@css ".css-t2slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
-  [@css ".css-2se9zy{box-shadow:1px 0 0 0 black !important;}"];
   [@css
-    ".css-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
+    ".css-ivpcnco{transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);}"
   ];
-  [@css ".css-keq5th{transition:transform 0.3s !important;}"];
+  [@css ".css-ivpc3xi{box-shadow:inset 1px 0 0 0 transparent !important;}"];
+  [@css ".css-ivpc0ud{box-shadow:1px 0 0 0 black !important;}"];
+  [@css
+    ".css-ivpc7wb{box-shadow:1px 0 0 0 var(--ivpc3pw), inset 0 -1px 0 0 var(--ivpchkf) !important;}"
+  ];
+  [@css ".css-ivpcxeb{transition:transform 0.3s !important;}"];
+  [@css.classes
+    [
+      ("css-ivpcbv0", 28, "", "input.re", 25, 8, 25, 38),
+      ("css-ivpcvv1", 29, "", "input.re", 26, 8, 26, 45),
+      ("css-ivpcyvl", 30, "", "input.re", 27, 8, 27, 49),
+      ("css-ivpc11c", 31, "", "input.re", 30, 8, 30, 30),
+      ("css-ivpcnzl", 32, "", "input.re", 31, 8, 31, 44),
+      ("css-ivpcbuj", 33, "", "input.re", 32, 8, 32, 73),
+      ("css-ivpcrxl", 34, "", "input.re", 33, 8, 33, 84),
+      ("css-ivpcmhb", 35, "", "input.re", 34, 8, 34, 34),
+      ("css-ivpc5ot", 36, "", "input.re", 41, 8, 41, 62),
+      ("css-ivpcrx5", 37, "", "input.re", 42, 8, 42, 56),
+      ("css-ivpcprd", 38, "", "input.re", 43, 8, 43, 72),
+      ("css-ivpc5s8", 39, "", "input.re", 44, 8, 44, 58),
+      ("css-ivpcxmb", 40, "", "input.re", 47, 8, 47, 100),
+      ("css-ivpcyf9", 41, "", "input.re", 48, 8, 48, 92),
+      ("css-ivpckzx", 42, "", "input.re", 49, 8, 49, 93),
+      ("css-ivpc064", 43, "", "input.re", 52, 8, 52, 127),
+      ("css-ivpcu3e", 44, "", "input.re", 53, 8, 53, 95),
+      ("css-ivpc3un", 45, "", "input.re", 56, 8, 56, 50),
+      ("css-ivpclks", 46, "", "input.re", 57, 8, 57, 58),
+      ("css-ivpcenj", 47, "", "input.re", 58, 8, 58, 138),
+      ("css-ivpcnj6", 48, "", "input.re", 59, 8, 59, 97),
+      ("css-ivpcnz3", 49, "", "input.re", 65, 8, 65, 46),
+      ("css-ivpcpxx", 50, "", "input.re", 66, 8, 66, 36),
+      ("css-ivpcgnd", 51, "", "input.re", 67, 8, 67, 50),
+      ("css-ivpcotz", 52, "", "input.re", 68, 8, 68, 53),
+      ("css-ivpc1uc", 53, "", "input.re", 69, 8, 69, 51),
+      ("css-ivpc78o", 54, "", "input.re", 70, 8, 70, 52),
+      ("css-ivpccf5", 55, "", "input.re", 71, 8, 71, 47),
+      ("css-ivpcts7", 56, "", "input.re", 72, 8, 72, 45),
+      ("css-ivpcx95", 57, "", "input.re", 78, 8, 78, 47),
+      ("css-ivpc25d", 58, "", "input.re", 79, 8, 79, 49),
+      ("css-ivpc00i", 59, "", "input.re", 85, 8, 85, 60),
+      ("css-ivpcud4", 60, "", "input.re", 86, 8, 86, 58),
+      ("css-ivpcxqb", 61, "", "input.re", 92, 8, 92, 119),
+      ("css-ivpcnco", 62, "", "input.re", 93, 8, 93, 103),
+      ("css-ivpc3xi", 63, "", "input.re", 100, 8, 100, 58),
+      ("css-ivpc0ud", 64, "", "input.re", 101, 8, 101, 46),
+      ("css-ivpc7wb", 65, "", "input.re", 102, 8, 102, 100),
+      ("css-ivpcxeb", 66, "", "input.re", 105, 8, 105, 45),
+    ]
+  ];
   module Color = {
     module Border = {
       let line = `rgba((0, 0, 0, `num(0.1)));
@@ -131,163 +172,138 @@ If this test fail means that the module is not in sync with the ppx
     };
   };
   
-  CSS.make("css-tjsoaq", []);
-  CSS.make("css-9an52v", []);
-  CSS.make("css-9gb0kb", []);
+  CSS.make("css-ivpcbv0", []);
+  CSS.make("css-ivpcvv1", []);
+  CSS.make("css-ivpcyvl", []);
   
-  CSS.make("css-1d2ga4", []);
-  CSS.make("css-9lk53a", []);
-  CSS.make("css-1hwm8mm", []);
-  CSS.make("css-1dfmtix", []);
-  CSS.make("css-2jhocq", []);
+  CSS.make("css-ivpc11c", []);
+  CSS.make("css-ivpcnzl", []);
+  CSS.make("css-ivpcbuj", []);
+  CSS.make("css-ivpcrxl", []);
+  CSS.make("css-ivpcmhb", []);
   
   CSS.make(
-    "css-z1xaab",
-    [
-      ("--lineAlpha-14x2350", CSS.Types.Color.toString(Color.Border.lineAlpha)),
-    ],
+    "css-ivpc5ot",
+    [("--ivpcmq8", CSS.Types.Color.toString(Color.Border.lineAlpha))],
   );
   CSS.make(
-    "css-k42oj0",
-    [("--line-16iaxxw", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpcrx5",
+    [("--ivpckrm", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-jfxwmt",
-    [
-      (
-        "--selectedMuted-coapl4",
-        CSS.Types.Color.toString(Color.Background.selectedMuted),
-      ),
-    ],
+    "css-ivpcprd",
+    [("--ivpcz7s", CSS.Types.Color.toString(Color.Background.selectedMuted))],
   );
   CSS.make(
-    "css-lirt76",
-    [("--flag-r97mq", CSS.Types.Color.toString(Color.Shadow.flag))],
+    "css-ivpc5s8",
+    [("--ivpcrqa", CSS.Types.Color.toString(Color.Shadow.flag))],
   );
   
   CSS.make(
-    "css-1iayzvr",
+    "css-ivpcxmb",
     [
-      (
-        "--elevation1-10w4q1l",
-        CSS.Types.Color.toString(Color.Shadow.elevation1),
-      ),
-      (
-        "--elevation1Bottom-1jgyvpw",
-        CSS.Types.Color.toString(Color.Shadow.elevation1Bottom),
-      ),
+      ("--ivpcmx2", CSS.Types.Color.toString(Color.Shadow.elevation1)),
+      ("--ivpceiz", CSS.Types.Color.toString(Color.Shadow.elevation1Bottom)),
     ],
   );
   CSS.make(
-    "css-13ydyrw",
+    "css-ivpcyf9",
     [
-      ("--border-16e6nb4", CSS.Types.Color.toString(Color.Shadow.border)),
-      (
-        "--elevation2-a9z6ve",
-        CSS.Types.Color.toString(Color.Shadow.elevation2),
-      ),
+      ("--ivpctxg", CSS.Types.Color.toString(Color.Shadow.border)),
+      ("--ivpclnm", CSS.Types.Color.toString(Color.Shadow.elevation2)),
     ],
   );
   CSS.make(
-    "css-1ga3v0v",
+    "css-ivpckzx",
     [
-      ("--border-1pvcfai", CSS.Types.Color.toString(Color.Shadow.border)),
-      (
-        "--elevation3-u89uz4",
-        CSS.Types.Color.toString(Color.Shadow.elevation3),
-      ),
+      ("--ivpcyen", CSS.Types.Color.toString(Color.Shadow.border)),
+      ("--ivpc1rl", CSS.Types.Color.toString(Color.Shadow.elevation3)),
     ],
   );
   
   CSS.make(
-    "css-w2f2bw",
+    "css-ivpc064",
     [
-      ("--line-1fm6v6v_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-1fm6v6v_2", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-1fm6v6v_3", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpcy75", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpcrck", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpcaem", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   CSS.make(
-    "css-uatfq",
+    "css-ivpcu3e",
     [
-      ("--line-110y8m6_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-110y8m6_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpcuw0", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpcxu5", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-k4sr4i", []);
-  CSS.make("css-2ptrw", []);
-  CSS.make("css-itknjr", []);
+  CSS.make("css-ivpc3un", []);
+  CSS.make("css-ivpclks", []);
+  CSS.make("css-ivpcenj", []);
   CSS.make(
-    "css-x09jpc",
+    "css-ivpcnj6",
     [
-      (
-        "--elevation1-s7j1om",
-        CSS.Types.Color.toString(Color.Shadow.elevation1),
-      ),
-      (
-        "--elevation3-1tt1uog",
-        CSS.Types.Color.toString(Color.Shadow.elevation3),
-      ),
+      ("--ivpcy31", CSS.Types.Color.toString(Color.Shadow.elevation1)),
+      ("--ivpcbdj", CSS.Types.Color.toString(Color.Shadow.elevation3)),
     ],
   );
   
   CSS.make(
-    "css-1q2o3yi",
-    [("--line-10u4hbk", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpcnz3",
+    [("--ivpcl48", CSS.Types.Color.toString(Color.Border.line))],
   );
-  CSS.make("css-192yc9x", []);
+  CSS.make("css-ivpcpxx", []);
   CSS.make(
-    "css-11h9vd4",
-    [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
-  );
-  CSS.make(
-    "css-pkcjyn",
-    [("--line-jfym6t", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpcgnd",
+    [("--ivpc8c6", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-1ry65jw",
-    [("--line-2dnuub", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpcotz",
+    [("--ivpc5mm", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-ypjvaq",
-    [("--line-doha9t", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpc1uc",
+    [("--ivpcthc", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-1ismcmj",
-    [("--line-uf1ggy", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpc78o",
+    [("--ivpcoai", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-150towz",
-    [("--line-1i61so0", CSS.Types.Color.toString(Color.Border.line))],
-  );
-  
-  CSS.make(
-    "css-188ct1l",
-    [("--line-18cgk19", CSS.Types.Color.toString(Color.Border.line))],
+    "css-ivpccf5",
+    [("--ivpc3eq", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "css-1xnyi32",
-    [("--accent-1w0inj7", CSS.Types.Color.toString(Color.Border.accent))],
+    "css-ivpcts7",
+    [("--ivpcj6z", CSS.Types.Color.toString(Color.Border.line))],
   );
   
-  CSS.make("css-w1ep28", []);
-  CSS.make("css-d9hwlt", []);
-  
-  CSS.make("css-1ir9788", []);
-  CSS.make("css-fwdrfx", []);
-  
-  CSS.make("css-t2slgw", []);
-  CSS.make("css-2se9zy", []);
   CSS.make(
-    "css-1rh80o9",
+    "css-ivpcx95",
+    [("--ivpcss5", CSS.Types.Color.toString(Color.Border.line))],
+  );
+  CSS.make(
+    "css-ivpc25d",
+    [("--ivpcbgj", CSS.Types.Color.toString(Color.Border.accent))],
+  );
+  
+  CSS.make("css-ivpc00i", []);
+  CSS.make("css-ivpcud4", []);
+  
+  CSS.make("css-ivpcxqb", []);
+  CSS.make("css-ivpcnco", []);
+  
+  CSS.make("css-ivpc3xi", []);
+  CSS.make("css-ivpc0ud", []);
+  CSS.make(
+    "css-ivpc7wb",
     [
-      ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpc3pw", CSS.Types.Color.toString(Color.Border.line)),
+      ("--ivpchkf", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-keq5th", []);
+  CSS.make("css-ivpcxeb", []);
   
   let _shadow1: CSS.Shadow.box =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

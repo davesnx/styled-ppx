@@ -10,5 +10,5 @@ module's file isn't in that set, the reference is by definition cross-library.
   Error: cross-library [%css] selector references are not supported.
   The reference `OtherLib.marker` resolves to module `OtherLib` which is not part of the
   current library. Move the [%css] binding into the current library, or
-  inline the class chain literally.
+  inline the class name literally.
   [1]

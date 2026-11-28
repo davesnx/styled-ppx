@@ -19,7 +19,6 @@ registered because their value is not known at PPX time.
   Error: Selector interpolation `$(marker)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `marker` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `marker` is a computed string, inline the class name literally.
-  - Otherwise, use [%cx] for runtime substitution.
 
   $ dune build
   File "input.re", line 5, characters 6-12:
@@ -28,5 +27,4 @@ registered because their value is not known at PPX time.
   Error: Selector interpolation `$(marker)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `marker` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `marker` is a computed string, inline the class name literally.
-  - Otherwise, use [%cx] for runtime substitution.
   [1]

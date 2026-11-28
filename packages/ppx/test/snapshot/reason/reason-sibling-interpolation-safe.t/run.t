@@ -4,43 +4,59 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --color-17hzlne{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-4fgdvo{syntax:\"*\";inherits:false;}"];
-  [@css
-    ".css-3pj70v-selfSibling + .css-3pj70v-selfSibling{color:var(--color-17hzlne);}"
+  [@css "@property --vdivwdw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivedv{syntax:\"*\";inherits:false;}"];
+  [@css ".css-vdivzjo + .css-vdivzjo{color:var(--vdivwdw);}"];
+  [@css ".x + .css-vdivlfd{color:var(--vdivedv);}"];
+  [@css ".css-vdivqlq > * + *{color:var(--vdivkus);}"];
+  [@css ".css-vdivq47 .child{border-color:var(--vdiv4u1);}"];
+  [@css ".css-vdivu6w + .x{color:red;}"];
+  [@css.classes
+    [
+      ("css-vdivzjo", 2, "Output.selfSibling", "output.ml", 3, 2, 6, 0),
+      (
+        "css-vdivlfd",
+        3,
+        "Output.siblingBeforeAmpersand",
+        "output.ml",
+        8,
+        2,
+        11,
+        0,
+      ),
+      ("css-vdivqlq", 4, "Output.childThenSibling", "output.ml", 13, 2, 16, 0),
+      ("css-vdivq47", 5, "Output.descendant", "output.ml", 18, 2, 21, 0),
+      ("css-vdivu6w", 6, "Output.literalSibling", "output.ml", 23, 2, 26, 0),
+    ]
   ];
-  [@css ".x + .css-c001uz-siblingBeforeAmpersand{color:var(--color-4fgdvo);}"];
-  [@css ".css-zcel0e-childThenSibling > * + *{color:var(--color-tqid89);}"];
-  [@css ".css-v0ydxg-descendant .child{border-color:var(--color-133cflr);}"];
-  [@css ".css-1w5oqj4-literalSibling + .x{color:red;}"];
   [@css.bindings
     [
-      ("Output.selfSibling", "css-3pj70v-selfSibling"),
-      ("Output.siblingBeforeAmpersand", "css-c001uz-siblingBeforeAmpersand"),
-      ("Output.childThenSibling", "css-zcel0e-childThenSibling"),
-      ("Output.descendant", "css-v0ydxg-descendant"),
-      ("Output.literalSibling", "css-1w5oqj4-literalSibling"),
+      ("Output.selfSibling", "css-vdivzjo"),
+      ("Output.siblingBeforeAmpersand", "css-vdivlfd"),
+      ("Output.childThenSibling", "css-vdivqlq"),
+      ("Output.descendant", "css-vdivq47"),
+      ("Output.literalSibling", "css-vdivu6w"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let selfSibling =
     CSS.make(
-      "css-3pj70v-selfSibling",
-      [("--color-17hzlne", CSS.Types.Color.toString(color))],
+      "css-vdivzjo",
+      [("--vdivwdw", CSS.Types.Color.toString(color))],
     );
   let siblingBeforeAmpersand =
     CSS.make(
-      "css-c001uz-siblingBeforeAmpersand",
-      [("--color-4fgdvo", CSS.Types.Color.toString(color))],
+      "css-vdivlfd",
+      [("--vdivedv", CSS.Types.Color.toString(color))],
     );
   let childThenSibling =
     CSS.make(
-      "css-zcel0e-childThenSibling",
-      [("--color-tqid89", CSS.Types.Color.toString(color))],
+      "css-vdivqlq",
+      [("--vdivkus", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "css-v0ydxg-descendant",
-      [("--color-133cflr", CSS.Types.Color.toString(color))],
+      "css-vdivq47",
+      [("--vdiv4u1", CSS.Types.Color.toString(color))],
     );
-  let literalSibling = CSS.make("css-1w5oqj4-literalSibling", []);
+  let literalSibling = CSS.make("css-vdivu6w", []);

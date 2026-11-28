@@ -15,57 +15,88 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1g6dwvy{-webkit-column-width:10em;column-width:10em;}"];
-  [@css ".css-tt22l4{-webkit-column-width:auto;column-width:auto;}"];
-  [@css ".css-xm7yc3{-webkit-column-count:2;column-count:2;}"];
-  [@css ".css-64yhyp{-webkit-column-count:auto;column-count:auto;}"];
-  [@css ".css-1x0rbi4{-webkit-columns:100px;columns:100px;}"];
-  [@css ".css-1shjrzp{-webkit-columns:3;columns:3;}"];
-  [@css ".css-1ussapk{-webkit-columns:10em 2;columns:10em 2;}"];
-  [@css ".css-19fadp1{-webkit-columns:auto auto;columns:auto auto;}"];
-  [@css ".css-1b4umhd{-webkit-columns:2 10em;columns:2 10em;}"];
-  [@css ".css-yyak2{-webkit-columns:auto 10em;columns:auto 10em;}"];
-  [@css ".css-1bp29w9{-webkit-columns:2 auto;columns:2 auto;}"];
-  [@css ".css-6w0lyg{-webkit-column-rule-color:red;column-rule-color:red;}"];
-  [@css ".css-10twiag{-webkit-column-rule-style:none;column-rule-style:none;}"];
+  [@css ".css-ivpcj54{-webkit-column-width:10em;column-width:10em;}"];
+  [@css ".css-ivpcfge{-webkit-column-width:auto;column-width:auto;}"];
+  [@css ".css-ivpcpwz{-webkit-column-count:2;column-count:2;}"];
+  [@css ".css-ivpco9a{-webkit-column-count:auto;column-count:auto;}"];
+  [@css ".css-ivpc9p1{-webkit-columns:100px;columns:100px;}"];
+  [@css ".css-ivpcnbn{-webkit-columns:3;columns:3;}"];
+  [@css ".css-ivpcj1i{-webkit-columns:10em 2;columns:10em 2;}"];
+  [@css ".css-ivpc32n{-webkit-columns:auto auto;columns:auto auto;}"];
+  [@css ".css-ivpc8z8{-webkit-columns:2 10em;columns:2 10em;}"];
+  [@css ".css-ivpcspp{-webkit-columns:auto 10em;columns:auto 10em;}"];
+  [@css ".css-ivpczhq{-webkit-columns:2 auto;columns:2 auto;}"];
+  [@css ".css-ivpcxqc{-webkit-column-rule-color:red;column-rule-color:red;}"];
+  [@css ".css-ivpc780{-webkit-column-rule-style:none;column-rule-style:none;}"];
   [@css
-    ".css-13q2g8z{-webkit-column-rule-style:solid;column-rule-style:solid;}"
+    ".css-ivpcpaa{-webkit-column-rule-style:solid;column-rule-style:solid;}"
   ];
   [@css
-    ".css-1wyszib{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
+    ".css-ivpccdq{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
   ];
-  [@css ".css-1ro8iyd{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
-  [@css ".css-6dy1fb{-webkit-column-rule:transparent;column-rule:transparent;}"];
+  [@css ".css-ivpcwi2{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
   [@css
-    ".css-peh5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
+    ".css-ivpcw2f{-webkit-column-rule:transparent;column-rule:transparent;}"
   ];
-  [@css ".css-1i0zc18{-webkit-column-span:none;column-span:none;}"];
-  [@css ".css-ooe1k2{-webkit-column-span:all;column-span:all;}"];
-  [@css ".css-35ub2p{-webkit-column-fill:auto;column-fill:auto;}"];
-  [@css ".css-l1o7d8{-webkit-column-fill:balance;column-fill:balance;}"];
-  [@css ".css-9s58g2{-webkit-column-fill:balance-all;column-fill:balance-all;}"];
+  [@css
+    ".css-ivpccy4{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
+  ];
+  [@css ".css-ivpcouy{-webkit-column-span:none;column-span:none;}"];
+  [@css ".css-ivpclg8{-webkit-column-span:all;column-span:all;}"];
+  [@css ".css-ivpckhi{-webkit-column-fill:auto;column-fill:auto;}"];
+  [@css ".css-ivpcse4{-webkit-column-fill:balance;column-fill:balance;}"];
+  [@css
+    ".css-ivpcg8o{-webkit-column-fill:balance-all;column-fill:balance-all;}"
+  ];
+  [@css.classes
+    [
+      ("css-ivpcj54", 0, "", "input.re", 2, 8, 2, 26),
+      ("css-ivpcfge", 1, "", "input.re", 3, 8, 3, 26),
+      ("css-ivpcpwz", 2, "", "input.re", 4, 8, 4, 23),
+      ("css-ivpco9a", 3, "", "input.re", 5, 8, 5, 26),
+      ("css-ivpc9p1", 4, "", "input.re", 6, 8, 6, 22),
+      ("css-ivpcnbn", 5, "", "input.re", 7, 8, 7, 18),
+      ("css-ivpcj1i", 6, "", "input.re", 8, 8, 8, 23),
+      ("css-ivpc32n", 7, "", "input.re", 11, 8, 11, 26),
+      ("css-ivpc8z8", 8, "", "input.re", 12, 8, 12, 23),
+      ("css-ivpcspp", 9, "", "input.re", 13, 8, 13, 26),
+      ("css-ivpczhq", 10, "", "input.re", 14, 8, 14, 23),
+      ("css-ivpcxqc", 11, "", "input.re", 15, 8, 15, 30),
+      ("css-ivpc780", 12, "", "input.re", 16, 8, 16, 31),
+      ("css-ivpcpaa", 13, "", "input.re", 17, 8, 17, 32),
+      ("css-ivpccdq", 14, "", "input.re", 18, 8, 18, 33),
+      ("css-ivpcwi2", 15, "", "input.re", 19, 8, 19, 30),
+      ("css-ivpcw2f", 16, "", "input.re", 20, 8, 20, 32),
+      ("css-ivpccy4", 17, "", "input.re", 21, 8, 21, 36),
+      ("css-ivpcouy", 18, "", "input.re", 22, 8, 22, 25),
+      ("css-ivpclg8", 19, "", "input.re", 23, 8, 23, 24),
+      ("css-ivpckhi", 20, "", "input.re", 24, 8, 24, 25),
+      ("css-ivpcse4", 21, "", "input.re", 25, 8, 25, 28),
+      ("css-ivpcg8o", 22, "", "input.re", 26, 8, 26, 32),
+    ]
+  ];
   
-  CSS.make("css-1g6dwvy", []);
-  CSS.make("css-tt22l4", []);
-  CSS.make("css-xm7yc3", []);
-  CSS.make("css-64yhyp", []);
-  CSS.make("css-1x0rbi4", []);
-  CSS.make("css-1shjrzp", []);
-  CSS.make("css-1ussapk", []);
+  CSS.make("css-ivpcj54", []);
+  CSS.make("css-ivpcfge", []);
+  CSS.make("css-ivpcpwz", []);
+  CSS.make("css-ivpco9a", []);
+  CSS.make("css-ivpc9p1", []);
+  CSS.make("css-ivpcnbn", []);
+  CSS.make("css-ivpcj1i", []);
   
-  CSS.make("css-19fadp1", []);
-  CSS.make("css-1b4umhd", []);
-  CSS.make("css-yyak2", []);
-  CSS.make("css-1bp29w9", []);
-  CSS.make("css-6w0lyg", []);
-  CSS.make("css-10twiag", []);
-  CSS.make("css-13q2g8z", []);
-  CSS.make("css-1wyszib", []);
-  CSS.make("css-1ro8iyd", []);
-  CSS.make("css-6dy1fb", []);
-  CSS.make("css-peh5u6", []);
-  CSS.make("css-1i0zc18", []);
-  CSS.make("css-ooe1k2", []);
-  CSS.make("css-35ub2p", []);
-  CSS.make("css-l1o7d8", []);
-  CSS.make("css-9s58g2", []);
+  CSS.make("css-ivpc32n", []);
+  CSS.make("css-ivpc8z8", []);
+  CSS.make("css-ivpcspp", []);
+  CSS.make("css-ivpczhq", []);
+  CSS.make("css-ivpcxqc", []);
+  CSS.make("css-ivpc780", []);
+  CSS.make("css-ivpcpaa", []);
+  CSS.make("css-ivpccdq", []);
+  CSS.make("css-ivpcwi2", []);
+  CSS.make("css-ivpcw2f", []);
+  CSS.make("css-ivpccy4", []);
+  CSS.make("css-ivpcouy", []);
+  CSS.make("css-ivpclg8", []);
+  CSS.make("css-ivpckhi", []);
+  CSS.make("css-ivpcse4", []);
+  CSS.make("css-ivpcg8o", []);

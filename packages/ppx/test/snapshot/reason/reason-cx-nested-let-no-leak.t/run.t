@@ -5,13 +5,13 @@ function args, and other inner expressions stay private.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "@property --active-f7rv17{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-tokvmb-inner{color:red;}"]
-  [@@@css ".css-ythpkc-make_button{color:var(--active-f7rv17);}"]
-  [@@@css.bindings
-    [("Input.outer", "css-tokvmb-inner");
-    ("Input.make_button", "css-ythpkc-make_button")]]
-  let outer = let inner = CSS.make "css-tokvmb-inner" [] in inner
+  [@@@css "@property --ivpc29y{syntax:\"*\";inherits:false;}"]
+  [@@@css ".css-ivpcvso{color:red;}"]
+  [@@@css ".css-ivpcs77{color:var(--ivpc29y);}"]
+  [@@@css.classes
+    [("css-ivpcvso", 1, "Input.outer.inner", "input.ml", 10, 23, 10, 35);
+    ("css-ivpcs77", 2, "Input.make_button", "input.ml", 15, 34, 15, 52)]]
+  [@@@css.bindings [("Input.outer", "css-ivpcvso"); ("Input.make_button", "")]]
+  let outer = let inner = CSS.make "css-ivpcvso" [] in inner
   let make_button active =
-    CSS.make "css-ythpkc-make_button"
-      [("--active-f7rv17", (CSS.Types.Color.toString active))]
+    CSS.make "css-ivpcs77" [("--ivpc29y", (CSS.Types.Color.toString active))]

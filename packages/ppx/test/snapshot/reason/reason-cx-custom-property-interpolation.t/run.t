@@ -4,27 +4,33 @@ verbatim - no Cascading.toString wrap.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --colorStr-t58soe{syntax:\"*\";inherits:false;}"];
-  [@css "@property --colorStr-11d7je1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --plainStr-1cgr13y{syntax:\"*\";inherits:false;}"];
-  [@css "@property --value-13tu4ef{syntax:\"*\";inherits:false;}"];
-  [@css ".css-14o54yy-row{--color-link:var(--colorStr-t58soe);}"];
-  [@css ".css-10nqctf-theme{--color-link:var(--colorStr-11d7je1);}"];
-  [@css ".css-10nqctf-theme{--spacing:var(--plainStr-1cgr13y);}"];
-  [@css ".css-zwwqpt-dyn{--token:var(--value-13tu4ef);}"];
+  [@css "@property --vdivtdd{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdiv54z{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdiv670{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivffp{syntax:\"*\";inherits:false;}"];
+  [@css ".css-vdiv0jt{--color-link:var(--vdivtdd);}"];
+  [@css ".css-vdivfxx{--color-link:var(--vdiv54z);--spacing:var(--vdiv670);}"];
+  [@css ".css-vdiv7aj{--token:var(--vdivffp);}"];
+  [@css.classes
+    [
+      ("css-vdiv0jt", 4, "Output.row", "output.ml", 4, 2, 5, 0),
+      ("css-vdivfxx", 5, "Output.theme", "output.ml", 8, 2, 10, 0),
+      ("css-vdiv7aj", 6, "Output.dyn", "output.ml", 12, 2, 13, 0),
+    ]
+  ];
   [@css.bindings
     [
-      ("Output.row", "css-14o54yy-row"),
-      ("Output.theme", "css-10nqctf-theme"),
-      ("Output.dyn", "css-zwwqpt-dyn"),
+      ("Output.row", "css-vdiv0jt"),
+      ("Output.theme", "css-vdivfxx"),
+      ("Output.dyn", ""),
     ]
   ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
   let plainStr = "10px";
-  let row = CSS.make("css-14o54yy-row", [("--colorStr-t58soe", colorStr)]);
+  let row = CSS.make("css-vdiv0jt", [("--vdivtdd", colorStr)]);
   let theme =
     CSS.make(
-      "css-10nqctf-theme",
-      [("--colorStr-11d7je1", colorStr), ("--plainStr-1cgr13y", plainStr)],
+      "css-vdivfxx",
+      [("--vdiv54z", colorStr), ("--vdiv670", plainStr)],
     );
-  let dyn = value => CSS.make("css-zwwqpt-dyn", [("--value-13tu4ef", value)]);
+  let dyn = value => CSS.make("css-vdiv7aj", [("--vdivffp", value)]);

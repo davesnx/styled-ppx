@@ -1,61 +1,70 @@
-Plan 3b: a block's interpolating declarations share one bundle class and one
-var per (source-path, runtime-type) across base / :hover / @media variants.
+Interpolations in a block: the block has one var per (source path, runtime
+type), shared by its base, :hover and @media rules. Two blocks of one module
+share a var when their interpolated declarations, with their selectors and
+at-rules, are the same (the last two blocks), as on main.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --color-3f9mj1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-13vjntp{syntax:\"*\";inherits:false;}"];
-  [@css "@property --width-1v9ua{syntax:\"*\";inherits:false;}"];
-  [@css "@property --width-c62vcf{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}"];
-  [@css ".css-1kbzua4-multiVariant:hover{color:var(--color-3f9mj1);}"];
+  [@css "@property --vdiv3ty{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdiv1p6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivni8{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivid8{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivxz4{syntax:\"*\";inherits:false;}"];
   [@css
-    "@media (max-width: 768px) {.css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}}"
+    ".css-vdivf2y{color:var(--vdiv3ty);}.css-vdivf2y:hover{color:var(--vdiv3ty);}@media (max-width: 768px) {.css-vdivf2y{color:var(--vdiv3ty);}}"
   ];
-  [@css ".css-k008qs-mixed{display:flex;}"];
-  [@css ".css-1upqar2-mixed{color:var(--color-13vjntp);}"];
-  [@css ".css-1upqar2-mixed:hover{color:var(--color-13vjntp);}"];
-  [@css ".css-e286e6-twoTypes{width:var(--width-1v9ua);}"];
-  [@css ".css-e286e6-twoTypes:hover{height:var(--width-c62vcf);}"];
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-lfbwy0:hover{color:var(--color-4uzv5u);}"];
-  [@css ".css-k008qs{display:flex;}"];
+  [@css
+    ".css-vdiv05j{display:flex;color:var(--vdiv1p6);}.css-vdiv05j:hover{color:var(--vdiv1p6);}"
+  ];
+  [@css
+    ".css-vdivlev{width:var(--vdivni8);}.css-vdivlev:hover{height:var(--vdivid8);}"
+  ];
+  [@css ".css-vdivsdn{color:red;}.css-vdivsdn:hover{color:var(--vdivxz4);}"];
+  [@css ".css-vdivfyz{display:flex;}.css-vdivfyz:hover{color:var(--vdivxz4);}"];
+  [@css.classes
+    [
+      ("css-vdivf2y", 5, "Output.multiVariant", "output.ml", 6, 2, 13, 0),
+      ("css-vdiv05j", 6, "Output.mixed", "output.ml", 17, 2, 22, 0),
+      ("css-vdivlev", 7, "Output.twoTypes", "output.ml", 25, 2, 29, 0),
+      ("css-vdivsdn", 8, "", "output.ml", 31, 2, 35, 0),
+      ("css-vdivfyz", 9, "", "output.ml", 37, 2, 41, 0),
+    ]
+  ];
   [@css.bindings
     [
-      ("Output.multiVariant", "css-1kbzua4-multiVariant"),
-      ("Output.mixed", "css-k008qs-mixed css-1upqar2-mixed"),
-      ("Output.twoTypes", "css-e286e6-twoTypes"),
+      ("Output.multiVariant", "css-vdivf2y"),
+      ("Output.mixed", "css-vdiv05j"),
+      ("Output.twoTypes", "css-vdivlev"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let multiVariant =
     CSS.make(
-      "css-1kbzua4-multiVariant",
-      [("--color-3f9mj1", CSS.Types.Color.toString(color))],
+      "css-vdivf2y",
+      [("--vdiv3ty", CSS.Types.Color.toString(color))],
     );
   let mixed =
     CSS.make(
-      "css-k008qs-mixed css-1upqar2-mixed",
-      [("--color-13vjntp", CSS.Types.Color.toString(color))],
+      "css-vdiv05j",
+      [("--vdiv1p6", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
     CSS.make(
-      "css-e286e6-twoTypes",
+      "css-vdivlev",
       [
-        ("--width-1v9ua", CSS.Types.Width.toString(width)),
-        ("--width-c62vcf", CSS.Types.Height.toString(width)),
+        ("--vdivni8", CSS.Types.Width.toString(width)),
+        ("--vdivid8", CSS.Types.Height.toString(width)),
       ],
     );
   let _ =
     CSS.make(
-      "css-tokvmb css-lfbwy0",
-      [("--color-4uzv5u", CSS.Types.Color.toString(color))],
+      "css-vdivsdn",
+      [("--vdivxz4", CSS.Types.Color.toString(color))],
     );
   let _ =
     CSS.make(
-      "css-k008qs css-lfbwy0",
-      [("--color-4uzv5u", CSS.Types.Color.toString(color))],
+      "css-vdivfyz",
+      [("--vdivxz4", CSS.Types.Color.toString(color))],
     );

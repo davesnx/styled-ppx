@@ -1,19 +1,15 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-1uix7by{syntax:\"*\";inherits:false;}"];
-  [@css "@property --id-1ks2xuv{syntax:\"*\";inherits:false;}"];
-  [@css ".css-fhnx1u-DynamicComponent{color:var(--var-1uix7by);}"];
-  [@css ".css-k008qs-DynamicComponent{display:flex;}"];
-  [@css ".css-fhnx1u-DynamicComponent{background-color:var(--id-1ks2xuv);}"];
-  [@css.bindings
-    [
-      (
-        "Output.DynamicComponent",
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
-      ),
-    ]
+  [@css "@property --vdiv81r{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivbkt{syntax:\"*\";inherits:false;}"];
+  [@css
+    ".css-vdivxht{color:var(--vdiv81r);display:flex;background-color:var(--vdivbkt);}"
   ];
+  [@css.classes
+    [("css-vdivxht", 2, "Output.DynamicComponent", "output.ml", 6, 2, 9, 0)]
+  ];
+  [@css.bindings [("Output.DynamicComponent", "css-vdivxht")]];
   module DynamicComponent: {
     type makeProps('id, 'var);
     let make: makeProps(_, _) => React.element;
@@ -973,10 +969,10 @@
       };
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
+        "css-vdivxht",
         [
-          ("--var-1uix7by", CSS.Types.Color.toString(var)),
-          ("--id-1ks2xuv", CSS.Types.Color.toString(id)),
+          ("--vdiv81r", CSS.Types.Color.toString(var)),
+          ("--vdivbkt", CSS.Types.Color.toString(id)),
         ],
       );
     let make = (props: makeProps('id, 'var)) => {

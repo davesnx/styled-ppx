@@ -70,7 +70,7 @@ The supported syntax includes the usual selector building blocks:
 
 ## Class references in selectors
 
-Interpolating a **binding** in selector position references another `[%css]` value's generated classes. The reference is resolved statically: the actual class names are substituted into the extracted stylesheet:
+Interpolating a **binding** in selector position references another `[%css]` value's class. The reference is resolved statically: the class is substituted into the extracted stylesheet:
 
 ```reason
 let outlined = [%css "border: 1px solid"];
@@ -100,7 +100,11 @@ let button = [%css {|
 |}]
 ```
 
-- `.$(name)` splices the binding's classes as a compound (`.cssA.cssB` when the binding has several atoms). Bare `$(name)` (no leading `.`) is accepted only when the binding has a single atom. Otherwise the ppx raises ``Bare `$(name)` selector interpolation expanded to N class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(name)`.``
+- `.$(name)` and bare `$(name)` both become a class selector for the binding's class.
+- `name` must hold exactly one `[%css]` block (or empty marker) anywhere in its body and not be a function, or be a string (used as a class name). `.$(name)` is that block's class, also when the block is merged with a class that is not a block (`[%css "..."] +++ other`) or sits inside `let ... in`. A function is an error: ``Selector interpolation `$(name)` refers to a function. ...``. A binding with two or more blocks (for example `let name = flag ? [%css "..."] : [%css "..."]`) has no single class: `` `$(name)` names a binding with 2 [%css] blocks. ...``. Bind the block you mean to its own name and reference that. Aliases (`let z = a`) are not followed: reference `$(a)` itself. Across modules, `styled-ppx.generate` reports a function or a binding with several blocks at the reference.
+- Known limit: the check counts blocks and does not follow names, so `let x = flag ? a : [%css "..."]` holds one block and `.$(x)` resolves to that inline block only, missing elements styled by `a`.
+- A binding can reference the earlier binding of the same name: in `let a = [%css "& .$(a) { ... }"]`, `$(a)` is the previous `a`. A block cannot reference a binding of its own `let rec` group.
+- A reference adds the specificity of one class. To make a rule with a reference lose to a plain override, see [Defaults that must lose: `:where()`](./runtime#defaults-that-must-lose-where).
 - References work inside combinators, pseudo-classes (`:not(&.$(other))`, `:has(.$(other))`), comma lists, and inside nested `@media` / `@supports` bodies.
 - Same-file bindings resolve during ppx expansion; **cross-module** references (`$(Card.container)`) resolve when [the stylesheet is generated](/how-it-works#class-references-in-selectors). Referencing a binding that doesn't exist is a compile error; references across *library* boundaries are unsupported (see the [build errors](/getting-started/dune-setup#troubleshooting) they produce).
 

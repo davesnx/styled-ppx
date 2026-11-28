@@ -1,17 +1,11 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "body .css-k008qs-multi.css-tokvmb-multi.css-eaeacs-multi{font-weight:bold;}"
-  ];
-  [@css ".css-k008qs-multi{display:flex;}"];
-  [@css ".css-tokvmb-multi{color:red;}"];
-  [@css ".css-eaeacs-multi{margin:10px;}"];
-  [@css.bindings
-    [("Output.multi", "css-k008qs-multi css-tokvmb-multi css-eaeacs-multi")]
-  ];
-  let multi =
-    CSS.make("css-k008qs-multi css-tokvmb-multi css-eaeacs-multi", []);
+  [@css "body .css-vdivynv{font-weight:bold;}"];
+  [@css ".css-vdivynv{display:flex;color:red;margin:10px;}"];
+  [@css.classes [("css-vdivynv", 1, "Output.multi", "output.ml", 2, 2, 5, 0)]];
+  [@css.bindings [("Output.multi", "css-vdivynv")]];
+  let multi = CSS.make("css-vdivynv", []);
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]

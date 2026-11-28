@@ -20,5 +20,5 @@ error message.
   Error: cross-library [%css] selector references are not supported.
   The reference `Foreign.lib.thing` resolves to module `Foreign` which is not part of the
   current library. Move the [%css] binding into the current library, or
-  inline the class chain literally.
+  inline the class name literally.
   [1]

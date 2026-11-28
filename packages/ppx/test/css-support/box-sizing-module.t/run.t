@@ -16,100 +16,131 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".css-cf3le8{width:-webkit-max-content;width:-moz-max-content;width:max-content;}"
+    ".css-ivpc374{width:-webkit-max-content;width:-moz-max-content;width:max-content;}"
   ];
   [@css
-    ".css-17hckkm{width:-webkit-min-content;width:-moz-min-content;width:min-content;}"
+    ".css-ivpchpb{width:-webkit-min-content;width:-moz-min-content;width:min-content;}"
   ];
-  [@css ".css-muccy6{width:fit-content(10%);}"];
+  [@css ".css-ivpcyg4{width:fit-content(10%);}"];
   [@css
-    ".css-106ktvk{min-width:-webkit-max-content;min-width:-moz-max-content;min-width:max-content;}"
-  ];
-  [@css
-    ".css-vlreoz{min-width:-webkit-min-content;min-width:-moz-min-content;min-width:min-content;}"
-  ];
-  [@css ".css-gikswh{min-width:fit-content(10%);}"];
-  [@css
-    ".css-13sc9a0{max-width:-webkit-max-content;max-width:-moz-max-content;max-width:max-content;}"
+    ".css-ivpcblc{min-width:-webkit-max-content;min-width:-moz-max-content;min-width:max-content;}"
   ];
   [@css
-    ".css-1jonlwm{max-width:-webkit-min-content;max-width:-moz-min-content;max-width:min-content;}"
+    ".css-ivpc3hy{min-width:-webkit-min-content;min-width:-moz-min-content;min-width:min-content;}"
   ];
-  [@css ".css-gszzeg{max-width:fit-content(10%);}"];
+  [@css ".css-ivpcutz{min-width:fit-content(10%);}"];
   [@css
-    ".css-14x27ji{height:-webkit-max-content;height:-moz-max-content;height:max-content;}"
-  ];
-  [@css
-    ".css-uvzl7o{height:-webkit-min-content;height:-moz-min-content;height:min-content;}"
-  ];
-  [@css ".css-giv2pj{height:fit-content(10%);}"];
-  [@css
-    ".css-ezyx8i{min-height:-webkit-max-content;min-height:-moz-max-content;min-height:max-content;}"
+    ".css-ivpc28a{max-width:-webkit-max-content;max-width:-moz-max-content;max-width:max-content;}"
   ];
   [@css
-    ".css-14fp2tk{min-height:-webkit-min-content;min-height:-moz-min-content;min-height:min-content;}"
+    ".css-ivpc7m0{max-width:-webkit-min-content;max-width:-moz-min-content;max-width:min-content;}"
   ];
-  [@css ".css-1iubza9{min-height:fit-content(10%);}"];
+  [@css ".css-ivpczio{max-width:fit-content(10%);}"];
   [@css
-    ".css-1smyxes{max-height:-webkit-max-content;max-height:-moz-max-content;max-height:max-content;}"
-  ];
-  [@css
-    ".css-rl4hk2{max-height:-webkit-min-content;max-height:-moz-min-content;max-height:min-content;}"
-  ];
-  [@css ".css-drct3b{max-height:fit-content(10%);}"];
-  [@css ".css-1gqcmp3{aspect-ratio:auto;}"];
-  [@css ".css-kpqo31{aspect-ratio:2;}"];
-  [@css ".css-1amvr3s{aspect-ratio:16 / 9;}"];
-  [@css
-    ".css-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
+    ".css-ivpcosm{height:-webkit-max-content;height:-moz-max-content;height:max-content;}"
   ];
   [@css
-    ".css-1344rbf{min-width:-webkit-fit-content;min-width:-moz-fit-content;min-width:fit-content;}"
+    ".css-ivpcldk{height:-webkit-min-content;height:-moz-min-content;height:min-content;}"
+  ];
+  [@css ".css-ivpcbv7{height:fit-content(10%);}"];
+  [@css
+    ".css-ivpcq69{min-height:-webkit-max-content;min-height:-moz-max-content;min-height:max-content;}"
   ];
   [@css
-    ".css-1fuhjh6{max-width:-webkit-fit-content;max-width:-moz-fit-content;max-width:fit-content;}"
+    ".css-ivpceqj{min-height:-webkit-min-content;min-height:-moz-min-content;min-height:min-content;}"
+  ];
+  [@css ".css-ivpcm1z{min-height:fit-content(10%);}"];
+  [@css
+    ".css-ivpci9x{max-height:-webkit-max-content;max-height:-moz-max-content;max-height:max-content;}"
   ];
   [@css
-    ".css-1sy0xge{height:-webkit-fit-content;height:-moz-fit-content;height:fit-content;}"
+    ".css-ivpcvdk{max-height:-webkit-min-content;max-height:-moz-min-content;max-height:min-content;}"
+  ];
+  [@css ".css-ivpc1sl{max-height:fit-content(10%);}"];
+  [@css ".css-ivpcgbo{aspect-ratio:auto;}"];
+  [@css ".css-ivpc2fv{aspect-ratio:2;}"];
+  [@css ".css-ivpci16{aspect-ratio:16 / 9;}"];
+  [@css
+    ".css-ivpc7kc{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
   ];
   [@css
-    ".css-ewx31z{min-height:-webkit-fit-content;min-height:-moz-fit-content;min-height:fit-content;}"
+    ".css-ivpc7tn{min-width:-webkit-fit-content;min-width:-moz-fit-content;min-width:fit-content;}"
   ];
   [@css
-    ".css-hse59j{max-height:-webkit-fit-content;max-height:-moz-fit-content;max-height:fit-content;}"
+    ".css-ivpcnfq{max-width:-webkit-fit-content;max-width:-moz-fit-content;max-width:fit-content;}"
+  ];
+  [@css
+    ".css-ivpcb28{height:-webkit-fit-content;height:-moz-fit-content;height:fit-content;}"
+  ];
+  [@css
+    ".css-ivpcyps{min-height:-webkit-fit-content;min-height:-moz-fit-content;min-height:fit-content;}"
+  ];
+  [@css
+    ".css-ivpcugr{max-height:-webkit-fit-content;max-height:-moz-fit-content;max-height:fit-content;}"
+  ];
+  [@css.classes
+    [
+      ("css-ivpc374", 0, "", "input.re", 2, 8, 2, 26),
+      ("css-ivpchpb", 1, "", "input.re", 3, 8, 3, 26),
+      ("css-ivpcyg4", 2, "", "input.re", 4, 8, 4, 31),
+      ("css-ivpcblc", 3, "", "input.re", 5, 8, 5, 30),
+      ("css-ivpc3hy", 4, "", "input.re", 6, 8, 6, 30),
+      ("css-ivpcutz", 5, "", "input.re", 7, 8, 7, 35),
+      ("css-ivpc28a", 6, "", "input.re", 8, 8, 8, 30),
+      ("css-ivpc7m0", 7, "", "input.re", 9, 8, 9, 30),
+      ("css-ivpczio", 8, "", "input.re", 10, 8, 10, 35),
+      ("css-ivpcosm", 9, "", "input.re", 11, 8, 11, 27),
+      ("css-ivpcldk", 10, "", "input.re", 12, 8, 12, 27),
+      ("css-ivpcbv7", 11, "", "input.re", 13, 8, 13, 32),
+      ("css-ivpcq69", 12, "", "input.re", 14, 8, 14, 31),
+      ("css-ivpceqj", 13, "", "input.re", 15, 8, 15, 31),
+      ("css-ivpcm1z", 14, "", "input.re", 16, 8, 16, 36),
+      ("css-ivpci9x", 15, "", "input.re", 17, 8, 17, 31),
+      ("css-ivpcvdk", 16, "", "input.re", 18, 8, 18, 31),
+      ("css-ivpc1sl", 17, "", "input.re", 19, 8, 19, 36),
+      ("css-ivpcgbo", 18, "", "input.re", 25, 8, 25, 26),
+      ("css-ivpc2fv", 19, "", "input.re", 26, 8, 26, 23),
+      ("css-ivpci16", 20, "", "input.re", 27, 8, 27, 28),
+      ("css-ivpc7kc", 21, "", "input.re", 41, 8, 41, 26),
+      ("css-ivpc7tn", 22, "", "input.re", 44, 8, 44, 30),
+      ("css-ivpcnfq", 23, "", "input.re", 47, 8, 47, 30),
+      ("css-ivpcb28", 24, "", "input.re", 50, 8, 50, 27),
+      ("css-ivpcyps", 25, "", "input.re", 53, 8, 53, 31),
+      ("css-ivpcugr", 26, "", "input.re", 56, 8, 56, 31),
+    ]
   ];
   
-  CSS.make("css-cf3le8", []);
-  CSS.make("css-17hckkm", []);
-  CSS.make("css-muccy6", []);
-  CSS.make("css-106ktvk", []);
-  CSS.make("css-vlreoz", []);
-  CSS.make("css-gikswh", []);
-  CSS.make("css-13sc9a0", []);
-  CSS.make("css-1jonlwm", []);
-  CSS.make("css-gszzeg", []);
-  CSS.make("css-14x27ji", []);
-  CSS.make("css-uvzl7o", []);
-  CSS.make("css-giv2pj", []);
-  CSS.make("css-ezyx8i", []);
-  CSS.make("css-14fp2tk", []);
-  CSS.make("css-1iubza9", []);
-  CSS.make("css-1smyxes", []);
-  CSS.make("css-rl4hk2", []);
-  CSS.make("css-drct3b", []);
+  CSS.make("css-ivpc374", []);
+  CSS.make("css-ivpchpb", []);
+  CSS.make("css-ivpcyg4", []);
+  CSS.make("css-ivpcblc", []);
+  CSS.make("css-ivpc3hy", []);
+  CSS.make("css-ivpcutz", []);
+  CSS.make("css-ivpc28a", []);
+  CSS.make("css-ivpc7m0", []);
+  CSS.make("css-ivpczio", []);
+  CSS.make("css-ivpcosm", []);
+  CSS.make("css-ivpcldk", []);
+  CSS.make("css-ivpcbv7", []);
+  CSS.make("css-ivpcq69", []);
+  CSS.make("css-ivpceqj", []);
+  CSS.make("css-ivpcm1z", []);
+  CSS.make("css-ivpci9x", []);
+  CSS.make("css-ivpcvdk", []);
+  CSS.make("css-ivpc1sl", []);
   
-  CSS.make("css-1gqcmp3", []);
-  CSS.make("css-kpqo31", []);
-  CSS.make("css-1amvr3s", []);
+  CSS.make("css-ivpcgbo", []);
+  CSS.make("css-ivpc2fv", []);
+  CSS.make("css-ivpci16", []);
   
-  CSS.make("css-1gtanqs", []);
+  CSS.make("css-ivpc7kc", []);
   
-  CSS.make("css-1344rbf", []);
+  CSS.make("css-ivpc7tn", []);
   
-  CSS.make("css-1fuhjh6", []);
+  CSS.make("css-ivpcnfq", []);
   
-  CSS.make("css-1sy0xge", []);
+  CSS.make("css-ivpcb28", []);
   
-  CSS.make("css-ewx31z", []);
+  CSS.make("css-ivpcyps", []);
   
-  CSS.make("css-hse59j", []);
+  CSS.make("css-ivpcugr", []);

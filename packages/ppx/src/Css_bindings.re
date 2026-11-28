@@ -11,6 +11,9 @@ type entry = {
 let entries: ref(list(entry)) = ref([]);
 let seen: Hashtbl.t(string, unit) = Hashtbl.create(16);
 
+let longident = (~module_name, ~scope, ~name) =>
+  String.concat(".", [module_name, ...scope] @ [name]);
+
 let reset = () => {
   entries := [];
   Hashtbl.clear(seen);
@@ -43,6 +46,12 @@ let record = (~longident: string, ~class_string: string) =>
           ...entries^,
         ];
     };
+  };
+
+let remove = (~longident: string) =>
+  if (Hashtbl.mem(seen, longident)) {
+    Hashtbl.remove(seen, longident);
+    entries := List.filter(e => e.longident != longident, entries^);
   };
 
 let drain = (): list(entry) => {

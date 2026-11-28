@@ -154,20 +154,30 @@ let make_synthetic_dep = ((longident_str: string, loc: Ppxlib.Location.t)) => {
         loc,
       },
     );
-  /* `let _ = M.Css.marker` â purely for ocamldep + early type errors.
-     Carrying the original [%css] location through here means
-     "Unbound module" / "Unbound value" errors point at the user's
-     selector ref rather than at [_none_]. */
+  /* ocamldep sees the dependency on M only through a use of M; the type
+     constraint also makes the compiler reject a function at this location. */
+  let pat =
+    switch (Ppxlib.Longident.last_exn(lid).[0]) {
+    | 'a' .. 'z'
+    | '_' =>
+      Builder.ppat_constraint(
+        ~loc,
+        Builder.ppat_any(~loc),
+        Builder.ptyp_constr(
+          ~loc,
+          {
+            Ppxlib.Location.txt: Ppxlib.Longident.parse("CSS.styles"),
+            loc,
+          },
+          [],
+        ),
+      )
+    | _ => Builder.ppat_any(~loc)
+    };
   Builder.pstr_value(
     ~loc,
     Nonrecursive,
-    [
-      Builder.value_binding(
-        ~loc,
-        ~pat=Builder.ppat_any(~loc),
-        ~expr=ident_expr,
-      ),
-    ],
+    [Builder.value_binding(~loc, ~pat, ~expr=ident_expr)],
   );
 };
 
@@ -208,11 +218,24 @@ let css_error_expr = (~payload_loc) => {
   );
 };
 
+let binding_longident = (~main_module, ~scope, ~name) =>
+  Css_bindings.longident(~module_name=main_module, ~scope, ~name);
+
 let record_css_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
-  Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
-  let longident = String.concat(".", [main_module, ...scope] @ [name]);
-  let class_string = String.concat(" ", classNames);
-  Css_bindings.record(~longident, ~class_string);
+  Local_selector_environment.set_binding(
+    ~file,
+    ~scope,
+    ~name,
+    switch (classNames) {
+    | [] => Not_css
+    | [class_name] => Block(class_name)
+    | classes => Several(List.length(classes))
+    },
+  );
+  Css_bindings.record(
+    ~longident=binding_longident(~main_module, ~scope, ~name),
+    ~class_string=String.concat(" ", classNames),
+  );
 };
 
 let expand_css_expression =
@@ -221,13 +244,13 @@ let expand_css_expression =
       ~main_module,
       ~scope,
       ~opens,
-      ~label_name,
-      ~registry_name,
+      ~top_binding,
+      ~binding_path,
+      ~on_block,
       payload,
     ) => {
   open Ppxlib;
   File.set(file);
-  let label = Settings.Get.minify() ? None : label_name;
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
     let source_position_start =
@@ -253,16 +276,17 @@ let expand_css_expression =
             ~scope,
             ~opens,
             ~source_position_start,
-            ~binding_name=?label_name,
-            ~label?,
+            ~binding_name=?top_binding,
+            ~binding_display=?Option.map(String.concat("."), binding_path),
             rule_list,
           );
-        switch (registry_name) {
-        | Some(name) =>
-          record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
-        | None => ()
-        };
-        let marker = Dev_mode.marker(label_name);
+        on_block(classNames);
+        let innermost_binding =
+          Option.map(
+            path => List.nth(path, List.length(path) - 1),
+            binding_path,
+          );
+        let marker = Dev_mode.marker(innermost_binding);
         Css_to_runtime.render_make_call(
           ~loc=stringLoc,
           ~marker,
@@ -529,7 +553,6 @@ let expand_styled_module =
             ~opens,
             ~source_position_start,
             ~binding_name=name,
-            ~label=name,
             rule_list,
           );
         record_component_binding(classNames);
@@ -606,21 +629,36 @@ let binding_name_from_pat = (pat: Ppxlib.pattern): option(string) =>
   | _ => None
   };
 
-let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
+let rec is_function = (expr: Ppxlib.expression) =>
   switch (expr.pexp_desc) {
-  | Pexp_constant(Pconst_string(value, _, _)) =>
-    Local_selector_environment.register(
-      ~file,
-      ~scope,
-      ~name,
-      ~classNames=[value],
-    )
-  | _ => ()
+  | Pexp_function(_) => true
+  | Pexp_constraint(inner, _)
+  | Pexp_coerce(inner, _, _)
+  | Pexp_newtype(_, inner)
+  | Pexp_open(_, inner)
+  | Pexp_let(_, _, inner)
+  | Pexp_letmodule(_, _, inner)
+  | Pexp_sequence(_, inner) => is_function(inner)
+  | _ => false
+  };
+
+let classify_binding =
+    (~blocks, expr: Ppxlib.expression): Local_selector_environment.binding =>
+  switch (blocks, expr.pexp_desc) {
+  | ([], Pexp_constant(Pconst_string(value, _, _))) => Literal(value)
+  | ([], Pexp_ident(_)) => Alias
+  | ([], _) => Not_css
+  | (_, _) when is_function(expr) => Function
+  | ([class_name], _) => Block(class_name)
+  | (classes, _) => Several(List.length(classes))
   };
 
 let map_css_expressions =
-    (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
-  let rec map_with_label = (~label_name, expr) => {
+    (~file, ~main_module, ~scope, ~opens, ~top_binding, ~on_block, expr) => {
+  /* [binding_path] is the chain of `let` names from [top_binding] (or `_`
+     when the block has no top-level name) to the innermost one around the
+     expression. */
+  let rec map_with_binding = (~binding_path, expr) => {
     let mapper = {
       as self;
       inherit class Ppxlib.Ast_traverse.map as super;
@@ -636,48 +674,59 @@ let map_css_expressions =
             pexp_desc: Pexp_apply(fn, args),
           });
         | Pexp_extension(({ txt: "css", _ }, payload)) =>
-          switch (payload_expr(payload)) {
-          | Some(payload) =>
-            expand_css_expression(
-              ~file,
-              ~main_module,
-              ~scope,
-              ~opens,
-              ~label_name,
-              ~registry_name=top_binding,
-              payload,
-            )
-          | None => css_error_expr(~payload_loc=expr.pexp_loc)
-          }
+          Css_file.Naming.guard(~fallback=expr, () =>
+            switch (payload_expr(payload)) {
+            | Some(payload) =>
+              expand_css_expression(
+                ~file,
+                ~main_module,
+                ~scope,
+                ~opens,
+                ~top_binding,
+                ~binding_path,
+                ~on_block,
+                payload,
+              )
+            | None => css_error_expr(~payload_loc=expr.pexp_loc)
+            }
+          )
         | Pexp_extension(({ txt: "keyframe", _ }, payload)) =>
-          switch (payload_expr(payload)) {
-          | Some(payload) =>
-            expand_keyframe_expression(
-              ~file,
-              ~main_module,
-              ~scope,
-              ~opens,
-              payload,
-            )
-          | None =>
-            Error.raise(
-              ~loc=expr.pexp_loc,
-              ~examples=[
-                "[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
-              ],
-              ~link="https://styled-ppx.vercel.app/reference/keyframe",
-              "[%keyframe] expects a string of CSS with keyframe definitions.",
-            )
-          }
+          Css_file.Naming.guard(~fallback=expr, () =>
+            switch (payload_expr(payload)) {
+            | Some(payload) =>
+              expand_keyframe_expression(
+                ~file,
+                ~main_module,
+                ~scope,
+                ~opens,
+                payload,
+              )
+            | None =>
+              Error.raise(
+                ~loc=expr.pexp_loc,
+                ~examples=[
+                  "[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
+                ],
+                ~link="https://styled-ppx.vercel.app/reference/keyframe",
+                "[%keyframe] expects a string of CSS with keyframe definitions.",
+              )
+            }
+          )
         | Pexp_let(rec_flag, bindings, body) =>
           let bindings =
             List.map(
               (binding: Ppxlib.value_binding) => {
-                let label_name = binding_name_from_pat(binding.pvb_pat);
                 let expr =
-                  switch (label_name) {
+                  switch (binding_name_from_pat(binding.pvb_pat)) {
                   | Some(name) =>
-                    map_with_label(~label_name=Some(name), binding.pvb_expr)
+                    map_with_binding(
+                      ~binding_path=
+                        Some(
+                          Option.value(binding_path, ~default=["_"])
+                          @ [name],
+                        ),
+                      binding.pvb_expr,
+                    )
                   | None => self#expression(binding.pvb_expr)
                   };
                 {
@@ -696,7 +745,10 @@ let map_css_expressions =
     };
     mapper#expression(expr);
   };
-  map_with_label(~label_name=top_binding, expr);
+  map_with_binding(
+    ~binding_path=Option.map(name => [name], top_binding),
+    expr,
+  );
 };
 
 let module_path_from_expr = (expr: Ppxlib.module_expr): option(list(string)) =>
@@ -729,18 +781,20 @@ let rec map_ordered_module_expr =
       pmod_desc: Pmod_functor(param, body),
     };
   | Pmod_extension(({ txt: "styled.global", _ }, payload)) =>
-    switch (payload_expr(payload)) {
-    | Some(payload) =>
-      expand_global_module(~file, ~main_module, ~scope, ~opens, payload)
-    | None =>
-      Builder.pmod_extension(
-        ~loc=expr.pmod_loc,
-        Ppxlib.Location.error_extensionf(
+    Css_file.Naming.guard(~fallback=expr, () =>
+      switch (payload_expr(payload)) {
+      | Some(payload) =>
+        expand_global_module(~file, ~main_module, ~scope, ~opens, payload)
+      | None =>
+        Builder.pmod_extension(
           ~loc=expr.pmod_loc,
-          "[%%styled.global] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global \"body { margin: 0; }\"]",
-        ),
-      )
-    }
+          Ppxlib.Location.error_extensionf(
+            ~loc=expr.pmod_loc,
+            "[%%styled.global] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global \"body { margin: 0; }\"]",
+          ),
+        )
+      }
+    )
   | _ => expr
   };
 }
@@ -750,10 +804,38 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
   let map_item = (item: Ppxlib.structure_item) =>
     switch (item.pstr_desc) {
     | Pstr_value(rec_flag, bindings) =>
-      let bindings =
+      let named =
         List.map(
-          (binding: Ppxlib.value_binding) => {
-            let name = binding_name_from_pat(binding.pvb_pat);
+          (binding: Ppxlib.value_binding) =>
+            (binding, binding_name_from_pat(binding.pvb_pat)),
+          bindings,
+        );
+      let set = (~name, ~export, binding) => {
+        Local_selector_environment.set_binding(~file, ~scope, ~name, binding);
+        let longident = binding_longident(~main_module, ~scope, ~name);
+        Css_bindings.remove(~longident);
+        Option.iter(
+          class_string => Css_bindings.record(~longident, ~class_string),
+          export,
+        );
+      };
+      if (rec_flag == Recursive) {
+        List.iter(
+          ((_, name)) =>
+            Option.iter(
+              name => set(~name, ~export=None, In_rec_group),
+              name,
+            ),
+          named,
+        );
+      };
+      let mapped =
+        List.map(
+          ((binding: Ppxlib.value_binding, name)) => {
+            let blocks = ref([]);
+            let on_block = classNames =>
+              blocks :=
+                blocks^ @ List.filter(c => !List.mem(c, blocks^), classNames);
             let expr =
               map_css_expressions(
                 ~file,
@@ -761,19 +843,51 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
                 ~scope,
                 ~opens=opens^,
                 ~top_binding=name,
+                ~on_block,
                 binding.pvb_expr,
               );
-            switch (name) {
-            | Some(name) =>
-              register_string_binding(~file, ~scope, ~name, binding.pvb_expr)
-            | None => ()
-            };
+            (binding, name, blocks^, expr);
+          },
+          named,
+        );
+      let classified =
+        List.map(
+          ((binding: Ppxlib.value_binding, name, blocks, _)) =>
+            Option.map(
+              name =>
+                (name, blocks, classify_binding(~blocks, binding.pvb_expr)),
+              name,
+            ),
+          mapped,
+        );
+      List.iter(
+        Option.iter(((name, _, classified)) =>
+          set(
+            ~name,
+            ~export=
+              switch (classified) {
+              | Local_selector_environment.Block(class_name) =>
+                Some(class_name)
+              | Function
+              | Several(_) => Some("")
+              | Not_css
+              | Literal(_)
+              | Alias
+              | In_rec_group => None
+              },
+            classified,
+          )
+        ),
+        classified,
+      );
+      let bindings =
+        List.map(
+          ((binding: Ppxlib.value_binding, _, _, expr)) =>
             {
               ...binding,
               pvb_expr: expr,
-            };
-          },
-          bindings,
+            },
+          mapped,
         );
       {
         ...item,
@@ -786,14 +900,16 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
         let expr =
           switch (styled_payload(binding.pmb_expr)) {
           | Some((htmlTag, payload)) =>
-            expand_styled_module(
-              ~file,
-              ~main_module,
-              ~scope,
-              ~opens=opens^,
-              ~name,
-              ~htmlTag,
-              payload,
+            Css_file.Naming.guard(~fallback=binding.pmb_expr, () =>
+              expand_styled_module(
+                ~file,
+                ~main_module,
+                ~scope,
+                ~opens=opens^,
+                ~name,
+                ~htmlTag,
+                payload,
+              )
             )
           | None =>
             switch (module_path_from_expr(binding.pmb_expr)) {
@@ -925,6 +1041,7 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
           ~scope,
           ~opens=opens^,
           ~top_binding=None,
+          ~on_block=ignore,
           expr,
         );
       {
@@ -934,6 +1051,35 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
     | _ => item
     };
   List.map(map_item, items);
+};
+
+let file_of_structure = (str: Ppxlib.structure) =>
+  switch (str) {
+  | [first, ..._] => first.pstr_loc.loc_start.pos_fname
+  | [] => ""
+  };
+
+/* The naming pass (see [Css_file.Naming]): expand the native and the client
+   view of the module, keep only the names. */
+let name_blocks = str => {
+  let file = file_of_structure(str);
+  let main_module = module_name_of_file(file);
+  Css_file.Naming.reset();
+  List.iter(
+    platform => {
+      Css_file.Naming.collect();
+      let view = Platform_view.structure(platform, str);
+      switch (map_ordered_structure(~file, ~main_module, ~scope=[], view)) {
+      | _ => ()
+      | exception _ => ()
+      };
+      Css_file.discard_view();
+      ignore(Css_bindings.drain());
+      ignore(Cross_module_refs.drain());
+    },
+    [Platform_view.Native, Platform_view.Js],
+  );
+  Css_file.Naming.finish();
 };
 
 let () = {
@@ -966,16 +1112,26 @@ let () = {
     ),
   );
 
+  /* dune passes the name of the library being preprocessed as the
+     `library-name` cookie. Handlers run before every file, with [None] when
+     the cookie is absent (the ppx run outside dune, or an executable). */
+  let library_name = ref(None);
+  Ppxlib.Driver.Cookies.add_simple_handler(
+    "library-name", Ppxlib.Ast_pattern.(estring(__)), ~f=name =>
+    library_name := name
+  );
+
   let impl = (_ctx, str: Ppxlib.structure) => {
-    let file =
-      switch (str) {
-      | [first, ..._] => first.pstr_loc.loc_start.pos_fname
-      | [] => ""
-      };
+    let file = file_of_structure(str);
     let main_module = module_name_of_file(file);
     let str = map_ordered_structure(~file, ~main_module, ~scope=[], str);
-    let rules = Css_file.get();
+    let (rules, classes) = Css_file.get();
     let rule_items = List.map(Css_extraction.css_attribute, rules);
+    let classes_items =
+      switch (classes) {
+      | [] => []
+      | _ => [Css_extraction.classes_attribute(classes)]
+      };
     let binding_entries = Css_bindings.drain();
     let bindings_items =
       switch (binding_entries) {
@@ -991,26 +1147,59 @@ let () = {
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
     /* Declares production mode in the wire protocol so the aggregator can
-       minify without a flag of its own; absence means development. */
-    let config_items =
+       minify without a flag of its own; absence means development. The
+       library name lets the aggregator name the sheet's libraries. */
+    let env_entries =
       switch (rule_items, bindings_items) {
       | ([], []) => []
       | _ when Settings.Get.minify() => [
-          Css_extraction.config_attribute([("env", "production")]),
+          (
+            Css_extraction.config_env_key,
+            Css_extraction.config_env_production,
+          ),
         ]
       | _ => []
+      };
+    let library_entries =
+      switch (library_name^) {
+      | Some(name) => [(Css_extraction.config_library_key, name)]
+      | None => []
+      };
+    let config_items =
+      switch (env_entries @ library_entries) {
+      | [] => []
+      | entries => [Css_extraction.config_attribute(entries)]
       };
     /* Order:
        - extraction config (production marker)
        - extracted CSS rules
+       - block classes
        - binding exports
        - cross-module refs descriptor
        - dep-tracking synthetic lets
        - user's source. */
-    config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
+    config_items
+    @ rule_items
+    @ classes_items
+    @ bindings_items
+    @ refs_items
+    @ dep_items
+    @ str;
   };
 
+  /* Before every rule and every whole-file pass of the driver: the code is
+     as written, with both builds' blocks. */
+  let instrument =
+    Ppxlib.Driver.Instrument.V2.make(
+      (_ctx, str) => {
+        name_blocks(str);
+        str;
+      },
+      ~position=Before,
+    );
+
   Ppxlib.Driver.V2.register_transformation(
+    ~instrument,
     ~impl,
     ~rules=[
       Ppxlib.Context_free.Rule.extension(

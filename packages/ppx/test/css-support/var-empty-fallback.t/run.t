@@ -17,14 +17,23 @@ rejecting nothing where a comma isn't present at all.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-9e8w5r{color:var(--x);}"];
-  [@css ".css-dy0bz1{color:var(--x,);}"];
-  [@css ".css-13rxf5k{color:var(--x, );}"];
-  [@css ".css-1lvcyrh{margin:var(--m, 1px 2px);}"];
-  [@css ".css-fjens4{color:var(--x, var(--y,));}"];
+  [@css ".css-ivpcts1{color:var(--x);}"];
+  [@css ".css-ivpchya{color:var(--x,);}"];
+  [@css ".css-ivpcysg{color:var(--x, );}"];
+  [@css ".css-ivpcc3q{margin:var(--m, 1px 2px);}"];
+  [@css ".css-ivpc794{color:var(--x, var(--y,));}"];
+  [@css.classes
+    [
+      ("css-ivpcts1", 0, "", "input.re", 3, 8, 3, 23),
+      ("css-ivpchya", 1, "", "input.re", 4, 8, 4, 24),
+      ("css-ivpcysg", 2, "", "input.re", 5, 8, 5, 25),
+      ("css-ivpcc3q", 3, "", "input.re", 6, 8, 6, 33),
+      ("css-ivpc794", 4, "", "input.re", 7, 8, 7, 34),
+    ]
+  ];
   
-  CSS.make("css-9e8w5r", []);
-  CSS.make("css-dy0bz1", []);
-  CSS.make("css-13rxf5k", []);
-  CSS.make("css-1lvcyrh", []);
-  CSS.make("css-fjens4", []);
+  CSS.make("css-ivpcts1", []);
+  CSS.make("css-ivpchya", []);
+  CSS.make("css-ivpcysg", []);
+  CSS.make("css-ivpcc3q", []);
+  CSS.make("css-ivpc794", []);

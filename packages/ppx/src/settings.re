@@ -28,14 +28,14 @@ let minify = {
 
 let dev = {
   flag: "--dev",
-  doc: "Emit dev-mode marker classes (e.g. cx-layout) on [%css] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes.",
+  doc: "Emit dev-mode marker classes (e.g. cx-layout) next to each [%css] class, to find a binding's class in DOM inspectors. No effect on extracted CSS or class names.",
   value: None,
   defaultValue: false,
 };
 
 let env = {
   flag: "--env",
-  doc: " Preset over the individual flags: \"development\" enables --dev marker classes and keeps the readable -<label> suffix on class names; \"production\" enables --minify (drops label suffixes and minifies CSS) and disables dev markers.",
+  doc: " Preset over the individual flags: \"development\" enables --dev marker classes; \"production\" enables --minify (minifies CSS) and disables dev markers.",
   value: None,
   defaultValue: "development",
 };

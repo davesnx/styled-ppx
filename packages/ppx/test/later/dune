@@ -1,0 +1,10 @@
+(library
+ (name later_ppx)
+ (modules later_ppx)
+ (libraries ppxlib))
+
+(executables
+ (names standalone_later)
+ (modules standalone_later)
+ (link_flags -linkall)
+ (libraries later_ppx styled-ppx ppxlib))

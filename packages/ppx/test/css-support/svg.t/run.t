@@ -15,25 +15,39 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-12m0k8p{pointer-events:auto;}"];
-  [@css ".css-1k273s1{pointer-events:visiblePainted;}"];
-  [@css ".css-1z0le2q{pointer-events:visibleFill;}"];
-  [@css ".css-1e64ebn{pointer-events:visibleStroke;}"];
-  [@css ".css-1ttsh4e{pointer-events:visible;}"];
-  [@css ".css-nw29yp{pointer-events:painted;}"];
-  [@css ".css-1olh5dc{pointer-events:fill;}"];
-  [@css ".css-k8ii8d{pointer-events:stroke;}"];
-  [@css ".css-uw7k7s{pointer-events:all;}"];
-  [@css ".css-1ixbp0l{pointer-events:none;}"];
+  [@css ".css-ivpc5km{pointer-events:auto;}"];
+  [@css ".css-ivpc3um{pointer-events:visiblePainted;}"];
+  [@css ".css-ivpcq8k{pointer-events:visibleFill;}"];
+  [@css ".css-ivpc1be{pointer-events:visibleStroke;}"];
+  [@css ".css-ivpc8j1{pointer-events:visible;}"];
+  [@css ".css-ivpcsk6{pointer-events:painted;}"];
+  [@css ".css-ivpcd81{pointer-events:fill;}"];
+  [@css ".css-ivpcb42{pointer-events:stroke;}"];
+  [@css ".css-ivpc5is{pointer-events:all;}"];
+  [@css ".css-ivpcdzt{pointer-events:none;}"];
+  [@css.classes
+    [
+      ("css-ivpc5km", 0, "", "input.re", 67, 8, 67, 28),
+      ("css-ivpc3um", 1, "", "input.re", 69, 8, 69, 38),
+      ("css-ivpcq8k", 2, "", "input.re", 70, 8, 70, 35),
+      ("css-ivpc1be", 3, "", "input.re", 71, 8, 71, 37),
+      ("css-ivpc8j1", 4, "", "input.re", 72, 8, 72, 31),
+      ("css-ivpcsk6", 5, "", "input.re", 73, 8, 73, 31),
+      ("css-ivpcd81", 6, "", "input.re", 74, 8, 74, 28),
+      ("css-ivpcb42", 7, "", "input.re", 75, 8, 75, 30),
+      ("css-ivpc5is", 8, "", "input.re", 76, 8, 76, 27),
+      ("css-ivpcdzt", 9, "", "input.re", 77, 8, 77, 28),
+    ]
+  ];
   
-  CSS.make("css-12m0k8p", []);
+  CSS.make("css-ivpc5km", []);
   
-  CSS.make("css-1k273s1", []);
-  CSS.make("css-1z0le2q", []);
-  CSS.make("css-1e64ebn", []);
-  CSS.make("css-1ttsh4e", []);
-  CSS.make("css-nw29yp", []);
-  CSS.make("css-1olh5dc", []);
-  CSS.make("css-k8ii8d", []);
-  CSS.make("css-uw7k7s", []);
-  CSS.make("css-1ixbp0l", []);
+  CSS.make("css-ivpc3um", []);
+  CSS.make("css-ivpcq8k", []);
+  CSS.make("css-ivpc1be", []);
+  CSS.make("css-ivpc8j1", []);
+  CSS.make("css-ivpcsk6", []);
+  CSS.make("css-ivpcd81", []);
+  CSS.make("css-ivpcb42", []);
+  CSS.make("css-ivpc5is", []);
+  CSS.make("css-ivpcdzt", []);

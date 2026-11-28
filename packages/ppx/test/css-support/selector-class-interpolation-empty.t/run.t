@@ -2,11 +2,10 @@ Empty `[%css {||}]` bindings are minted as a unique className handle
 with no extracted CSS rule. Consumer `&.$(name)` and `& .$(name)`
 selectors must resolve to that handle, not silently drop.
 
-Without this, the bug shape is: `let m = [%css {||}]` registers `m -> []`
-in the per-file class registry, then `&.$(m) { ... }` resolves to an
-empty class chain (`List.map(_, []) = []`), the `&.$(m)` qualifier is
-gone from the extracted selector, and the rule applies unconditionally
-to every consumer.
+Without this, the bug shape is: `let m = [%css {||}]` registers no class,
+then `&.$(m) { ... }` resolves to nothing, the `&.$(m)` qualifier is gone
+from the extracted selector, and the rule applies unconditionally to every
+consumer.
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -19,45 +18,56 @@ to every consumer.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-The empty binding `active` mints `css-babivq-active` (hash of module, scope
-and binding name, then the label).
+The empty binding `active` has the class `css-zlnhoy` (a hash of module,
+scope and binding name).
 No `[@@@css ...]` is emitted for it — there's nothing to write. The
-consumer `container`'s nested rule keeps the `.css-babivq-active` qualifier,
+consumer `container`'s nested rule keeps the `.css-zlnhoy` qualifier,
 so `background: blue` only applies when the class is actually present
 on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1443u2l-container{background:red;}"];
-  [@css ".css-g57662-container.css-babivq-active{background:blue;}"];
-  [@css ".css-q5fqw0-card{padding:1rem;}"];
-  [@css ".css-19ehxda-card.css-2v8kj1-selected{border-color:blue;}"];
-  [@css ".css-17nqvvb-card.css-1fl51yv-highlighted{background:yellow;}"];
-  [@css ".css-k008qs-panel{display:flex;}"];
-  [@css ".css-62yfsj-panel .css-1azu0vx-actionButton{color:black;}"];
+  [@css
+    ".css-ivpcxxf{background:red;}.css-ivpcxxf.css-ivpchoy{background:blue;}"
+  ];
+  [@css
+    ".css-ivpcdxl{padding:1rem;}.css-ivpcdxl.css-ivpcpdb{border-color:blue;}.css-ivpcdxl.css-ivpc4wc{background:yellow;}"
+  ];
+  [@css ".css-ivpcc39{display:flex;}.css-ivpcc39 .css-ivpcc2i{color:black;}"];
+  [@css.classes
+    [
+      ("css-ivpchoy", (-1), "Input.active", "input.re", 15, 21, 15, 21),
+      ("css-ivpcxxf", 0, "Input.container", "input.re", 19, 2, 24, 0),
+      ("css-ivpcpdb", (-1), "Input.selected", "input.re", 30, 23, 30, 23),
+      ("css-ivpc4wc", (-1), "Input.highlighted", "input.re", 31, 26, 31, 26),
+      ("css-ivpcdxl", 1, "Input.card", "input.re", 35, 2, 44, 0),
+      ("css-ivpcc2i", (-1), "Input.actionButton", "input.re", 50, 27, 50, 27),
+      ("css-ivpcc39", 2, "Input.panel", "input.re", 54, 2, 59, 0),
+    ]
+  ];
   [@css.bindings
     [
-      ("Input.active", "css-babivq-active"),
-      ("Input.container", "css-1443u2l-container css-g57662-container"),
-      ("Input.selected", "css-2v8kj1-selected"),
-      ("Input.highlighted", "css-1fl51yv-highlighted"),
-      ("Input.card", "css-q5fqw0-card css-19ehxda-card css-17nqvvb-card"),
-      ("Input.actionButton", "css-1azu0vx-actionButton"),
-      ("Input.panel", "css-k008qs-panel css-62yfsj-panel"),
+      ("Input.active", "css-ivpchoy"),
+      ("Input.container", "css-ivpcxxf"),
+      ("Input.selected", "css-ivpcpdb"),
+      ("Input.highlighted", "css-ivpc4wc"),
+      ("Input.card", "css-ivpcdxl"),
+      ("Input.actionButton", "css-ivpcc2i"),
+      ("Input.panel", "css-ivpcc39"),
     ]
   ];
   
-  let active = CSS.make("css-babivq-active", []);
+  let active = CSS.make("css-ivpchoy", []);
   
-  let container = CSS.make("css-1443u2l-container css-g57662-container", []);
+  let container = CSS.make("css-ivpcxxf", []);
   
-  let selected = CSS.make("css-2v8kj1-selected", []);
-  let highlighted = CSS.make("css-1fl51yv-highlighted", []);
+  let selected = CSS.make("css-ivpcpdb", []);
+  let highlighted = CSS.make("css-ivpc4wc", []);
   
-  let card = CSS.make("css-q5fqw0-card css-19ehxda-card css-17nqvvb-card", []);
+  let card = CSS.make("css-ivpcdxl", []);
   
-  let actionButton = CSS.make("css-1azu0vx-actionButton", []);
+  let actionButton = CSS.make("css-ivpcc2i", []);
   
-  let panel = CSS.make("css-k008qs-panel css-62yfsj-panel", []);
+  let panel = CSS.make("css-ivpcc39", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 

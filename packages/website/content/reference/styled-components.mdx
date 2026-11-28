@@ -107,10 +107,10 @@ let app =
   />
 ```
 
-The resultant HTML contains the generated atomic class names (one per declaration) plus the className passed by props:
+The resultant HTML contains the component's one generated class plus the className passed by props:
 
 ```html
-<input class="css-1qbcma3-Input css-tokvmb-Input css-8i02mp-Input css-1ru12dh-Input extra-classname" maxlength="255" placeholder="Enter your name...">
+<input class="css-<hash> extra-classname" maxlength="255" placeholder="Enter your name...">
 ```
 
 ### Derive styles from props
