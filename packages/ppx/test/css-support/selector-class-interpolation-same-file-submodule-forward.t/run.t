@@ -14,21 +14,24 @@ referenced submodule binding above the selector interpolation.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-59bkuc-wrapper.\000Css.marker\000{color:blue;}"];
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css.bindings
+  [@css ".css-ivpccho.\000Css.marker\000{color:blue;}"];
+  [@css ".css-ivpcirv{color:red;}"];
+  [@css.classes
     [
-      ("Input.wrapper", "css-59bkuc-wrapper"),
-      ("Input.Css.marker", "css-tokvmb-marker"),
+      ("css-ivpccho", 0, "Input.wrapper", "input.re", 2, 2, 3, 0),
+      ("css-ivpcirv", 1, "Input.Css.marker", "input.re", 6, 24, 6, 36),
     ]
+  ];
+  [@css.bindings
+    [("Input.wrapper", "css-ivpccho"), ("Input.Css.marker", "css-ivpcirv")]
   ];
   [@css.refs [("Css.marker", "input.re", 2, 6, 16)]];
   
-  let _ = Css.marker;
-  let wrapper = CSS.make("css-59bkuc-wrapper", []);
+  let _: CSS.styles = Css.marker;
+  let wrapper = CSS.make("css-ivpccho", []);
   
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("css-ivpcirv", []);
   };
   
   let _ = (wrapper, Css.marker);

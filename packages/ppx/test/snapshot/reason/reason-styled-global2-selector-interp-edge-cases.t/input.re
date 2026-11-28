@@ -1,7 +1,7 @@
 /* Probe: edge cases of selector interpolation in styled.global.
       - Bare $(name) (no leading dot) in type selector position
       - Class interp inside :not(...)
-      - Multi-class binding fanning into a chain
+      - Two references in one compound (.$(a).$(b))
       - Combined with value interpolation
       - Nested style rules with interpolated selector
    */
@@ -22,7 +22,7 @@ module CardGlobals = [%styled.global
     background: $(bg);
   }
 
-  /* Multi-class chained: . prefix expands to chain */
+  /* Two references in one compound: both classes on one element */
   .$(active).$(card) {
     color: white;
   }

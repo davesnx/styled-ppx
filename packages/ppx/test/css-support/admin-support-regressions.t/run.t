@@ -11,33 +11,32 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --line-17j5in5{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lineAlpha-1tmd8aq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lineAlpha-k1tpqj{syntax:\"*\";inherits:false;}"];
-  [@css
-    "@property --deprecated__elevation1-1jpikyl{syntax:\"*\";inherits:false;}"
-  ];
-  [@css "@property --topMenuHeight-10ob2p1{syntax:\"*\";inherits:false;}"];
-  [@css ".css-11h9vd4-_borderTop{border-top:1px solid var(--line-17j5in5);}"];
-  [@css
-    ".css-epkb5g-_borderBottom{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}"
-  ];
-  [@css
-    ".css-ob4w3j-_borderLeft{border-left:1px solid var(--lineAlpha-k1tpqj);}"
-  ];
-  [@css
-    ".css-1070dz6-_boxShadow1{box-shadow:var(--deprecated__elevation1-1jpikyl);}"
-  ];
-  [@css
-    ".css-1y8ttxg-_heightPlus{height:calc(100vh + var(--topMenuHeight-10ob2p1));}"
+  [@css "@property --ivpc8c6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcqav{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcl1r{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc1dk{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcdo3{syntax:\"*\";inherits:false;}"];
+  [@css ".css-ivpcngi{border-top:1px solid var(--ivpc8c6);}"];
+  [@css ".css-ivpcf04{border-bottom:1px solid var(--ivpcqav);}"];
+  [@css ".css-ivpc8bn{border-left:1px solid var(--ivpcl1r);}"];
+  [@css ".css-ivpcbi6{box-shadow:var(--ivpc1dk);}"];
+  [@css ".css-ivpcj45{height:calc(100vh + var(--ivpcdo3));}"];
+  [@css.classes
+    [
+      ("css-ivpcngi", 5, "Input._borderTop", "input.re", 35, 25, 35, 67),
+      ("css-ivpcf04", 6, "Input._borderBottom", "input.re", 37, 4, 37, 54),
+      ("css-ivpc8bn", 7, "Input._borderLeft", "input.re", 39, 26, 39, 74),
+      ("css-ivpcbi6", 8, "Input._boxShadow1", "input.re", 41, 26, 41, 73),
+      ("css-ivpcj45", 9, "Input._heightPlus", "input.re", 43, 26, 43, 64),
+    ]
   ];
   [@css.bindings
     [
-      ("Input._borderTop", "css-11h9vd4-_borderTop"),
-      ("Input._borderBottom", "css-epkb5g-_borderBottom"),
-      ("Input._borderLeft", "css-ob4w3j-_borderLeft"),
-      ("Input._boxShadow1", "css-1070dz6-_boxShadow1"),
-      ("Input._heightPlus", "css-1y8ttxg-_heightPlus"),
+      ("Input._borderTop", "css-ivpcngi"),
+      ("Input._borderBottom", "css-ivpcf04"),
+      ("Input._borderLeft", "css-ivpc8bn"),
+      ("Input._boxShadow1", "css-ivpcbi6"),
+      ("Input._heightPlus", "css-ivpcj45"),
     ]
   ];
   module Alias = {
@@ -76,36 +75,26 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _borderTop =
     CSS.make(
-      "css-11h9vd4-_borderTop",
-      [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
+      "css-ivpcngi",
+      [("--ivpc8c6", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
     CSS.make(
-      "css-epkb5g-_borderBottom",
-      [
-        (
-          "--lineAlpha-1tmd8aq",
-          CSS.Types.Color.toString(Color.Border.lineAlpha),
-        ),
-      ],
+      "css-ivpcf04",
+      [("--ivpcqav", CSS.Types.Color.toString(Color.Border.lineAlpha))],
     );
   let _borderLeft =
     CSS.make(
-      "css-ob4w3j-_borderLeft",
-      [
-        (
-          "--lineAlpha-k1tpqj",
-          CSS.Types.Color.toString(Color.Border.lineAlpha),
-        ),
-      ],
+      "css-ivpc8bn",
+      [("--ivpcl1r", CSS.Types.Color.toString(Color.Border.lineAlpha))],
     );
   
   let _boxShadow1 =
     CSS.make(
-      "css-1070dz6-_boxShadow1",
+      "css-ivpcbi6",
       [
         (
-          "--deprecated__elevation1-1jpikyl",
+          "--ivpc1dk",
           CSS.Types.BoxShadows.toString(BoxShadow.deprecated__elevation1),
         ),
       ],
@@ -113,8 +102,8 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _heightPlus =
     CSS.make(
-      "css-1y8ttxg-_heightPlus",
-      [("--topMenuHeight-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
+      "css-ivpcj45",
+      [("--ivpcdo3", CSS.Types.Length.toString(topMenuHeight))],
     );
 
   $ dune build

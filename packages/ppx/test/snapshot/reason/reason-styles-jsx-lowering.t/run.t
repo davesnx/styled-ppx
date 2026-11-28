@@ -1,9 +1,13 @@
 Default mode expands `styles` on lowercase JSX and leaves other calls alone.
+The ppx reads refmt's binary AST, so the locations in [@@@css.classes]
+point into input.re: refmt's OCaml printer lays out output.ml differently
+on each OCaml version.
 
-  $ refmt --parse re --print ml input.re > output.ml
-  $ ../../../standalone.exe --impl output.ml -o output.ml
+  $ refmt --parse re --print binary input.re > input.bin
+  $ ../../../standalone.exe --impl input.bin -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".css-ivpc8ui{margin-top:32px;}"];
+  [@css.classes [("css-ivpc8ui", 0, "", "input.re", 21, 47, 21, 65)]];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -26,9 +30,9 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   let _ =
     <p
       className={CSS.className(
-        Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])),
+        Cn2.(Css.bodyLg +++ CSS.make("css-ivpc8ui", [])),
       )}
-      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-ivpc8ui", [])))}
     />;
   let _ =
     <div
@@ -40,10 +44,11 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
 
 Native mode keeps the same `styles` expansion contract before native JSX lowering.
 
-  $ refmt --parse re --print ml input.re > output.ml
-  $ ../../../standalone.exe --native --impl output.ml -o output.ml
+  $ refmt --parse re --print binary input.re > input.bin
+  $ ../../../standalone.exe --native --impl input.bin -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".css-ivpc8ui{margin-top:32px;}"];
+  [@css.classes [("css-ivpc8ui", 0, "", "input.re", 21, 47, 21, 65)]];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -66,9 +71,9 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   let _ =
     <p
       className={CSS.className(
-        Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])),
+        Cn2.(Css.bodyLg +++ CSS.make("css-ivpc8ui", [])),
       )}
-      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-ivpc8ui", [])))}
     />;
   let _ =
     <div

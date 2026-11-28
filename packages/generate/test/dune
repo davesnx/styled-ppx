@@ -1,4 +1,7 @@
 (cram
  (alias test-generate)
  (deps
+  %{exe:../../ppx/test/standalone.exe}
+  %{exe:../../ppx/test/standalone_platform.exe}
+  %{exe:../../ppx/test/later/standalone_later.exe}
   (package styled-ppx)))

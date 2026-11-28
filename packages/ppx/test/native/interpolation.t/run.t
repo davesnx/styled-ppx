@@ -14,88 +14,121 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --mono100-mn2jt5{syntax:\"*\";inherits:false;}"];
-  [@css "@property --big-1c1caa8{syntax:\"*\";inherits:false;}"];
-  [@css "@property --small-1tsw5sh{syntax:\"*\";inherits:false;}"];
-  [@css "@property --small-1d5k27v{syntax:\"*\";inherits:false;}"];
-  [@css "@property --alpha-vlpuld{syntax:\"*\";inherits:false;}"];
-  [@css "@property --alpha-1ftvcb4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --alpha-1y5ijmp{syntax:\"*\";inherits:false;}"];
-  [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
-  [@css "@property --max-1yrxnfd{syntax:\"*\";inherits:false;}"];
-  [@css "@property --height-1n9troi{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-8yt3ey{syntax:\"*\";inherits:false;}"];
-  [@css "@property --font-10lt5gt{syntax:\"*\";inherits:false;}"];
-  [@css "@property --mono-e5legw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --lh-uai7u3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --zLevel-vut76j{syntax:\"*\";inherits:false;}"];
-  [@css "@property --left-1s2hr3z{syntax:\"*\";inherits:false;}"];
-  [@css "@property --decorationColor-seqvqc{syntax:\"*\";inherits:false;}"];
-  [@css "@property --wat-tevp0f{syntax:\"*\";inherits:false;}"];
-  [@css "@property --externalImageUrl-75mq6y{syntax:\"*\";inherits:false;}"];
-  [@css "@property --h-ulszyz{syntax:\"*\";inherits:false;}"];
-  [@css "@property --v-1rucg2y{syntax:\"*\";inherits:false;}"];
-  [@css "@property --blur-n5ddfa{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-1jwocqc{syntax:\"*\";inherits:false;}"];
-  [@css "@property --blue-uz6p3q{syntax:\"*\";inherits:false;}"];
-  [@css "@property --h-1cxj5q6{syntax:\"*\";inherits:false;}"];
-  [@css "@property --v-1p9ysn0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --blur-1rsz8mu{syntax:\"*\";inherits:false;}"];
-  [@css "@property --spread-1icix4c{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-1eos5hw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --spread-wd13u2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-3xubcm{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation-jhhehb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --clip-1go0jdu{syntax:\"*\";inherits:false;}"];
-  [@css "@property --duration-i5tvzn{syntax:\"*\";inherits:false;}"];
-  [@css "@property --state-1yj1w6c{syntax:\"*\";inherits:false;}"];
-  [@css "@property --px30-cc29mn{syntax:\"*\";inherits:false;}"];
-  [@css "@property --red-w69rb9{syntax:\"*\";inherits:false;}"];
-  [@css ".css-vtnh4f{color:var(--mono100-mn2jt5);}"];
-  [@css ".css-j1itjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}"];
-  [@css ".css-pupp3j{padding:var(--small-1d5k27v) 0px;}"];
-  [@css ".css-11f97be{border:1px solid var(--alpha-vlpuld);}"];
-  [@css ".css-upyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
-  [@css ".css-19ww55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
-  [@css ".css-1dfkyy8{width:var(--width-18c1xss);}"];
-  [@css ".css-1cgnebp{max-width:var(--max-1yrxnfd);}"];
-  [@css ".css-q0vooa{height:var(--height-1n9troi);}"];
-  [@css ".css-cd0d4{border-radius:var(--border-8yt3ey);}"];
-  [@css ".css-gdu0qi{font-size:var(--font-10lt5gt);}"];
-  [@css ".css-16nszir{font-family:var(--mono-e5legw);}"];
-  [@css ".css-1vyfd7x{line-height:var(--lh-uai7u3);}"];
-  [@css ".css-53fgx3{z-index:var(--zLevel-vut76j);}"];
-  [@css ".css-1jcegw0{left:var(--left-1s2hr3z);}"];
-  [@css ".css-1p58kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
-  [@css ".css-1t9o5gx{background-image:var(--wat-tevp0f);}"];
+  [@css "@property --ivpcipf{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc6rn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc85e{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcegk{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcxfj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpctcz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcawq{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpclur{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpceau{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc4j1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc9qc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcmj7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcm4m{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcq7c{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpceab{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcr5a{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc4cc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpckm4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc8es{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcgax{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpccf9{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcqb7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcvro{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcaet{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcq3e{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpch4h{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc7pw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc4bc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcy50{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcy7j{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcehe{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcxzg{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcjlo{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcih1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcnw2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcdjr{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpch0q{syntax:\"*\";inherits:false;}"];
+  [@css ".css-ivpcbiv{color:var(--ivpcipf);}"];
+  [@css ".css-ivpccz1{margin:var(--ivpc6rn) var(--ivpc85e);}"];
+  [@css ".css-ivpchb6{padding:var(--ivpcegk) 0px;}"];
+  [@css ".css-ivpcs46{border:1px solid var(--ivpcxfj);}"];
+  [@css ".css-ivpcat8{outline:1px solid var(--ivpctcz);}"];
+  [@css ".css-ivpc570{border-bottom:0px solid var(--ivpcawq);}"];
+  [@css ".css-ivpcc09{width:var(--ivpclur);}"];
+  [@css ".css-ivpcnlv{max-width:var(--ivpceau);}"];
+  [@css ".css-ivpc0is{height:var(--ivpc4j1);}"];
+  [@css ".css-ivpcjog{border-radius:var(--ivpc9qc);}"];
+  [@css ".css-ivpcbg8{font-size:var(--ivpcmj7);}"];
+  [@css ".css-ivpc7s5{font-family:var(--ivpcm4m);}"];
+  [@css ".css-ivpcci4{line-height:var(--ivpcq7c);}"];
+  [@css ".css-ivpcirk{z-index:var(--ivpceab);}"];
+  [@css ".css-ivpcy8w{left:var(--ivpcr5a);}"];
+  [@css ".css-ivpch3p{text-decoration-color:var(--ivpc4cc);}"];
+  [@css ".css-ivpc9gr{background-image:var(--ivpckm4);}"];
   [@css
-    ".css-15xnm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
+    ".css-ivpcagu{-webkit-mask-image:var(--ivpc8es);mask-image:var(--ivpc8es);}"
   ];
   [@css
-    ".css-1a150p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}"
+    ".css-ivpcgku{text-shadow:var(--ivpcgax) var(--ivpccf9) var(--ivpcqb7) var(--ivpcvro);}"
   ];
-  [@css ".css-pc2giy{color:var(--blue-uz6p3q);}"];
+  [@css ".css-ivpc7fz{color:var(--ivpcaet);}"];
   [@css
-    ".css-ixihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw);}"
+    ".css-ivpcpfc{box-shadow:var(--ivpcq3e) var(--ivpch4h) var(--ivpc7pw) var(--ivpc4bc) var(--ivpcy50);}"
   ];
+  [@css ".css-ivpcdvi{box-shadow:10px 10px 0px var(--ivpcy7j) var(--ivpcehe);}"];
+  [@css ".css-ivpcrps{box-shadow:var(--ivpcxzg);}"];
+  [@css ".css-ivpc71f{box-shadow:none;}"];
+  [@css ".css-ivpcsua{text-overflow:var(--ivpcjlo);}"];
+  [@css ".css-ivpcpnw{transition-duration:500ms;}"];
+  [@css ".css-ivpcdwi{transition-duration:var(--ivpcih1);}"];
   [@css
-    ".css-13ts4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}"
-  ];
-  [@css ".css-lxl5g5{box-shadow:var(--elevation-jhhehb);}"];
-  [@css ".css-gokeqi{box-shadow:none;}"];
-  [@css ".css-l3baal{text-overflow:var(--clip-1go0jdu);}"];
-  [@css ".css-fv8edy{transition-duration:500ms;}"];
-  [@css ".css-s36hu1{transition-duration:var(--duration-i5tvzn);}"];
-  [@css
-    ".css-1bien0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
+    ".css-ivpcxsv{-webkit-animation-play-state:var(--ivpcnw2);animation-play-state:var(--ivpcnw2);}"
   ];
   [@css
-    ".css-1i5bnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    ".css-ivpcj99{-webkit-animation-play-state:paused;animation-play-state:paused;}"
   ];
   [@css
-    ".css-x7nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
+    ".css-ivpcc4w{-webkit-column-gap:var(--ivpcdjr);column-gap:var(--ivpcdjr);}"
   ];
-  [@css ".css-829yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
+  [@css ".css-ivpcj93{-webkit-text-fill-color:var(--ivpch0q);}"];
+  [@css.classes
+    [
+      ("css-ivpcbiv", 37, "", "input.re", 52, 15, 52, 32),
+      ("css-ivpccz1", 38, "", "input.re", 53, 15, 53, 48),
+      ("css-ivpchb6", 39, "", "input.re", 55, 15, 55, 41),
+      ("css-ivpcs46", 40, "", "input.re", 56, 15, 56, 54),
+      ("css-ivpcat8", 41, "", "input.re", 57, 15, 57, 55),
+      ("css-ivpc570", 42, "", "input.re", 58, 15, 58, 61),
+      ("css-ivpcc09", 43, "", "input.re", 59, 15, 59, 30),
+      ("css-ivpcnlv", 44, "", "input.re", 60, 15, 60, 32),
+      ("css-ivpc0is", 45, "", "input.re", 61, 15, 61, 32),
+      ("css-ivpcjog", 46, "", "input.re", 62, 15, 62, 39),
+      ("css-ivpcbg8", 47, "", "input.re", 63, 15, 63, 33),
+      ("css-ivpc7s5", 48, "", "input.re", 64, 15, 64, 35),
+      ("css-ivpcci4", 49, "", "input.re", 65, 15, 65, 33),
+      ("css-ivpcirk", 50, "", "input.re", 66, 15, 66, 33),
+      ("css-ivpcy8w", 51, "", "input.re", 67, 15, 67, 28),
+      ("css-ivpch3p", 52, "", "input.re", 68, 15, 68, 56),
+      ("css-ivpc9gr", 53, "", "input.re", 69, 15, 69, 40),
+      ("css-ivpcagu", 54, "", "input.re", 70, 15, 70, 47),
+      ("css-ivpcgku", 55, "", "input.re", 71, 15, 71, 54),
+      ("css-ivpc7fz", 56, "", "input.re", 72, 15, 72, 35),
+      ("css-ivpcpfc", 57, "", "input.re", 73, 15, 73, 63),
+      ("css-ivpcdvi", 58, "", "input.re", 74, 15, 74, 59),
+      ("css-ivpcrps", 59, "", "input.re", 75, 15, 75, 49),
+      ("css-ivpc71f", 60, "", "input.re", 76, 15, 76, 31),
+      ("css-ivpcsua", 61, "", "input.re", 77, 15, 77, 37),
+      ("css-ivpcpnw", 62, "", "input.re", 78, 15, 78, 41),
+      ("css-ivpcdwi", 63, "", "input.re", 79, 15, 79, 47),
+      ("css-ivpcxsv", 64, "", "input.re", 80, 15, 80, 45),
+      ("css-ivpcj99", 65, "", "input.re", 81, 15, 81, 43),
+      ("css-ivpcc4w", 66, "", "input.re", 82, 15, 82, 39),
+      ("css-ivpcj93", 67, "", "input.re", 83, 15, 83, 52),
+    ]
+  ];
   module Size = {
     let big = `px(24);
     let small = `px(8);
@@ -144,180 +177,163 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   
   let _ =
     CSS.make(
-      "css-vtnh4f",
-      [("--mono100-mn2jt5", CSS.Types.Color.toString(mono100))],
+      "css-ivpcbiv",
+      [("--ivpcipf", CSS.Types.Color.toString(mono100))],
     );
   let _ =
     CSS.make(
-      "css-j1itjj",
+      "css-ivpccz1",
       [
-        ("--big-1c1caa8", CSS.Types.Margin.toString(Size.big)),
-        ("--small-1tsw5sh", CSS.Types.Margin.toString(Size.small)),
+        ("--ivpc6rn", CSS.Types.Margin.toString(Size.big)),
+        ("--ivpc85e", CSS.Types.Margin.toString(Size.small)),
       ],
     );
   let _ =
     CSS.make(
-      "css-vtnh4f",
-      [("--mono100-mn2jt5", CSS.Types.Color.toString(mono100))],
+      "css-ivpcbiv",
+      [("--ivpcipf", CSS.Types.Color.toString(mono100))],
     );
   let _ =
     CSS.make(
-      "css-pupp3j",
-      [("--small-1d5k27v", CSS.Types.Padding.toString(Size.small))],
+      "css-ivpchb6",
+      [("--ivpcegk", CSS.Types.Padding.toString(Size.small))],
     );
   let _ =
     CSS.make(
-      "css-11f97be",
-      [("--alpha-vlpuld", CSS.Types.Color.toString(Color.Border.alpha))],
+      "css-ivpcs46",
+      [("--ivpcxfj", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
     CSS.make(
-      "css-upyj1z",
-      [("--alpha-1ftvcb4", CSS.Types.Color.toString(Color.Border.alpha))],
+      "css-ivpcat8",
+      [("--ivpctcz", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
     CSS.make(
-      "css-19ww55u",
-      [("--alpha-1y5ijmp", CSS.Types.Color.toString(Color.Border.alpha))],
+      "css-ivpc570",
+      [("--ivpcawq", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
     CSS.make(
-      "css-1dfkyy8",
-      [("--width-18c1xss", CSS.Types.Width.toString(width))],
+      "css-ivpcc09",
+      [("--ivpclur", CSS.Types.Width.toString(width))],
     );
   let _ =
     CSS.make(
-      "css-1cgnebp",
-      [("--max-1yrxnfd", CSS.Types.MaxWidth.toString(max))],
+      "css-ivpcnlv",
+      [("--ivpceau", CSS.Types.MaxWidth.toString(max))],
     );
   let _ =
     CSS.make(
-      "css-q0vooa",
-      [("--height-1n9troi", CSS.Types.Height.toString(height))],
+      "css-ivpc0is",
+      [("--ivpc4j1", CSS.Types.Height.toString(height))],
     );
   let _ =
     CSS.make(
-      "css-cd0d4",
-      [("--border-8yt3ey", CSS.Types.BorderRadius.toString(border))],
+      "css-ivpcjog",
+      [("--ivpc9qc", CSS.Types.BorderRadius.toString(border))],
     );
   let _ =
     CSS.make(
-      "css-gdu0qi",
-      [("--font-10lt5gt", CSS.Types.FontSize.toString(font))],
+      "css-ivpcbg8",
+      [("--ivpcmj7", CSS.Types.FontSize.toString(font))],
     );
   let _ =
     CSS.make(
-      "css-16nszir",
-      [("--mono-e5legw", CSS.Types.FontFamilies.toString(mono))],
+      "css-ivpc7s5",
+      [("--ivpcm4m", CSS.Types.FontFamilies.toString(mono))],
     );
   let _ =
     CSS.make(
-      "css-1vyfd7x",
-      [("--lh-uai7u3", CSS.Types.LineHeight.toString(lh))],
+      "css-ivpcci4",
+      [("--ivpcq7c", CSS.Types.LineHeight.toString(lh))],
     );
   let _ =
     CSS.make(
-      "css-53fgx3",
-      [("--zLevel-vut76j", CSS.Types.ZIndex.toString(zLevel))],
+      "css-ivpcirk",
+      [("--ivpceab", CSS.Types.ZIndex.toString(zLevel))],
+    );
+  let _ =
+    CSS.make("css-ivpcy8w", [("--ivpcr5a", CSS.Types.Left.toString(left))]);
+  let _ =
+    CSS.make(
+      "css-ivpch3p",
+      [("--ivpc4cc", CSS.Types.Color.toString(decorationColor))],
     );
   let _ =
     CSS.make(
-      "css-1jcegw0",
-      [("--left-1s2hr3z", CSS.Types.Left.toString(left))],
+      "css-ivpc9gr",
+      [("--ivpckm4", CSS.Types.BackgroundImage.toString(wat))],
     );
   let _ =
     CSS.make(
-      "css-1p58kmj",
+      "css-ivpcagu",
+      [("--ivpc8es", CSS.Types.MaskImage.toString(externalImageUrl))],
+    );
+  let _ =
+    CSS.make(
+      "css-ivpcgku",
       [
-        ("--decorationColor-seqvqc", CSS.Types.Color.toString(decorationColor)),
+        ("--ivpcgax", CSS.Types.Length.toString(h)),
+        ("--ivpccf9", CSS.Types.Length.toString(v)),
+        ("--ivpcqb7", CSS.Types.Length.toString(blur)),
+        ("--ivpcvro", CSS.Types.Color.toString(color)),
       ],
     );
   let _ =
     CSS.make(
-      "css-1t9o5gx",
-      [("--wat-tevp0f", CSS.Types.BackgroundImage.toString(wat))],
+      "css-ivpc7fz",
+      [("--ivpcaet", CSS.Types.Color.toString(Theme.blue))],
     );
   let _ =
     CSS.make(
-      "css-15xnm6u",
+      "css-ivpcpfc",
       [
-        (
-          "--externalImageUrl-75mq6y",
-          CSS.Types.MaskImage.toString(externalImageUrl),
-        ),
+        ("--ivpcq3e", CSS.Types.Length.toString(h)),
+        ("--ivpch4h", CSS.Types.Length.toString(v)),
+        ("--ivpc7pw", CSS.Types.Length.toString(blur)),
+        ("--ivpc4bc", CSS.Types.Length.toString(spread)),
+        ("--ivpcy50", CSS.Types.Color.toString(color)),
       ],
     );
   let _ =
     CSS.make(
-      "css-1a150p4",
+      "css-ivpcdvi",
       [
-        ("--h-ulszyz", CSS.Types.Length.toString(h)),
-        ("--v-1rucg2y", CSS.Types.Length.toString(v)),
-        ("--blur-n5ddfa", CSS.Types.Length.toString(blur)),
-        ("--color-1jwocqc", CSS.Types.Color.toString(color)),
+        ("--ivpcy7j", CSS.Types.Length.toString(spread)),
+        ("--ivpcehe", CSS.Types.Color.toString(color)),
       ],
     );
   let _ =
     CSS.make(
-      "css-pc2giy",
-      [("--blue-uz6p3q", CSS.Types.Color.toString(Theme.blue))],
+      "css-ivpcrps",
+      [("--ivpcxzg", CSS.Types.BoxShadows.toString(BoxShadow.elevation))],
+    );
+  let _ = CSS.make("css-ivpc71f", []);
+  let _ =
+    CSS.make(
+      "css-ivpcsua",
+      [("--ivpcjlo", CSS.Types.TextOverflow.toString(clip))],
+    );
+  let _ = CSS.make("css-ivpcpnw", []);
+  let _ =
+    CSS.make(
+      "css-ivpcdwi",
+      [("--ivpcih1", CSS.Types.TransitionDuration.toString(duration))],
     );
   let _ =
     CSS.make(
-      "css-ixihb6",
-      [
-        ("--h-1cxj5q6", CSS.Types.Length.toString(h)),
-        ("--v-1p9ysn0", CSS.Types.Length.toString(v)),
-        ("--blur-1rsz8mu", CSS.Types.Length.toString(blur)),
-        ("--spread-1icix4c", CSS.Types.Length.toString(spread)),
-        ("--color-1eos5hw", CSS.Types.Color.toString(color)),
-      ],
+      "css-ivpcxsv",
+      [("--ivpcnw2", CSS.Types.AnimationPlayState.toString(state))],
+    );
+  let _ = CSS.make("css-ivpcj99", []);
+  let _ =
+    CSS.make(
+      "css-ivpcc4w",
+      [("--ivpcdjr", CSS.Types.Gap.toString(Size.px30))],
     );
   let _ =
     CSS.make(
-      "css-13ts4zv",
-      [
-        ("--spread-wd13u2", CSS.Types.Length.toString(spread)),
-        ("--color-3xubcm", CSS.Types.Color.toString(color)),
-      ],
-    );
-  let _ =
-    CSS.make(
-      "css-lxl5g5",
-      [
-        (
-          "--elevation-jhhehb",
-          CSS.Types.BoxShadows.toString(BoxShadow.elevation),
-        ),
-      ],
-    );
-  let _ = CSS.make("css-gokeqi", []);
-  let _ =
-    CSS.make(
-      "css-l3baal",
-      [("--clip-1go0jdu", CSS.Types.TextOverflow.toString(clip))],
-    );
-  let _ = CSS.make("css-fv8edy", []);
-  let _ =
-    CSS.make(
-      "css-s36hu1",
-      [
-        ("--duration-i5tvzn", CSS.Types.TransitionDuration.toString(duration)),
-      ],
-    );
-  let _ =
-    CSS.make(
-      "css-1bien0s",
-      [("--state-1yj1w6c", CSS.Types.AnimationPlayState.toString(state))],
-    );
-  let _ = CSS.make("css-1i5bnre", []);
-  let _ =
-    CSS.make(
-      "css-x7nyl9",
-      [("--px30-cc29mn", CSS.Types.Gap.toString(Size.px30))],
-    );
-  let _ =
-    CSS.make(
-      "css-829yln",
-      [("--red-w69rb9", CSS.Types.WebkitTextFillColor.toString(Color.red))],
+      "css-ivpcj93",
+      [("--ivpch0q", CSS.Types.WebkitTextFillColor.toString(Color.red))],
     );

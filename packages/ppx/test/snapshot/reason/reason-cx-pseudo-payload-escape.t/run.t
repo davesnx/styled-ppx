@@ -25,8 +25,9 @@ subject is outside `&`'s subtree — slipped through and shipped a dead
   [1]
   $ ../../../standalone.exe --impl input_is_ok.ml -o output.ml
   $ cat output.ml
-  [@@@css ":is(.css-1ptjfl7-ok div){color:var(--c-qdrabr);}"]
-  [@@@css.bindings [("Input_is_ok.ok", "css-1ptjfl7-ok")]]
+  [@@@css ":is(.css-lhfo23c div){color:var(--lhfoi37);}"]
+  [@@@css.classes
+    [("css-lhfo23c", 0, "Input_is_ok.ok", "input_is_ok.ml", 4, 16, 4, 43)]]
+  [@@@css.bindings [("Input_is_ok.ok", "css-lhfo23c")]]
   let c = "red"
-  let ok =
-    CSS.make "css-1ptjfl7-ok" [("--c-qdrabr", (CSS.Types.Color.toString c))]
+  let ok = CSS.make "css-lhfo23c" [("--lhfoi37", (CSS.Types.Color.toString c))]

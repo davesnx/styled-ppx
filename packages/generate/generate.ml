@@ -4,25 +4,31 @@
     of [%css] bindings, and emit the final stylesheet.
 
     The generator runs once per `dune build` invocation, after the PPX has
-    produced the post-PPX [.ml] files for every module in the library.
+    produced the post-PPX [.ml] files for every module in the library. When
+    [.cmt] files are among its arguments, it first orders the modules by their
+    imports ({!Module_order}), so a module's rules come after the rules of the
+    modules it imports.
 
     Two-pass design:
 
     Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
     global index mapping [longident -> class_string]. The PPX itself populates
     these payloads with the fully-qualified longident ([["M.Css.marker"]]) and
-    the space-separated class names it minted, so the generator only has to read
-    them — it does not re-derive module names from filenames or pattern-match
-    [CSS.make] calls.
+    the binding's classes: one class per [%css] block, space-separated when the
+    binding holds several blocks. The generator only has to read them — it does
+    not re-derive module names from filenames or pattern-match [CSS.make] calls.
 
     Pass 2 — For each rule string in [[\@\@\@css ...]], scan for NUL-delimited
     sentinels [\x00LONGIDENT\x00]. Look the longident up in the index and
-    substitute its class chain (multi-class bindings produce a dot-chain like
-    [cssA.cssB], a valid CSS compound selector). Resolution failures emit a hard
-    error pointing at the original [.re]/[.ml] source via the location
-    descriptors in [[\@\@\@css.refs ...]] attributes.
+    substitute its one class. A binding with several blocks has no single class
+    and is an error. Resolution failures emit a hard error pointing at the
+    original [.re]/[.ml] source via the location descriptors in
+    [[\@\@\@css.refs ...]] attributes.
 
-    See [documents/cross-module-selector-interpolation.md]. *)
+    Then check [[\@\@\@css.classes ...]]: two different blocks with the same
+    class are an error that names both blocks.
+
+    See [documents/css-extraction.md]. *)
 
 (** All generator diagnostics go through this module. Every message is written
     to stderr prefixed with ["styled-ppx:"] and gated on the current log level:
@@ -103,21 +109,26 @@ end
 
 (** Per-file harvest: rules with potential sentinels, all cross-module ref
     descriptors seen in this file, and the file's declared environment from
-    [[@@@css.config]] ([None] when absent, i.e. development). The bindings
+    [[@@@css.config]] ([None] when absent, i.e. development) and its dune
+    library ([None] without dune's [library-name] cookie). The bindings
     attribute is consumed directly into the global [Index] during the same walk.
 *)
 type harvest = {
   filename : string;
   rules : string list;
+  classes : Css_extraction.class_entry list;
   refs : Refs.ref_loc list;
   env : string option;
+  library : string option;
   protocol_errors : string list;
 }
 
 let harvest_structure ~filename ~idx structure : harvest =
   let rules = ref [] in
+  let classes = ref [] in
   let refs = ref [] in
   let env = ref None in
+  let library = ref None in
   let protocol_errors = ref [] in
   let add_protocol_error attribute msg =
     protocol_errors :=
@@ -131,6 +142,11 @@ let harvest_structure ~filename ~idx structure : harvest =
         (match Css_extraction.decode_css_payload value with
         | Ok v -> rules := v :: !rules
         | Error msg -> add_protocol_error Css_extraction.css_attribute_name msg)
+      | [%stri [@@@css.classes [%e? value]]] ->
+        (match Css_extraction.decode_classes_payload value with
+        | Ok entries -> classes := entries @ !classes
+        | Error msg ->
+          add_protocol_error Css_extraction.classes_attribute_name msg)
       | [%stri [@@@css.refs [%e? value]]] ->
         (match Refs.of_list_expr value with
         | Ok entries -> refs := entries @ !refs
@@ -145,6 +161,9 @@ let harvest_structure ~filename ~idx structure : harvest =
         | Ok entries ->
           (match List.assoc_opt Css_extraction.config_env_key entries with
           | Some _ as declared -> env := declared
+          | None -> ());
+          (match List.assoc_opt Css_extraction.config_library_key entries with
+          | Some _ as declared -> library := declared
           | None -> ())
         | Error msg ->
           add_protocol_error Css_extraction.config_attribute_name msg)
@@ -153,8 +172,10 @@ let harvest_structure ~filename ~idx structure : harvest =
   {
     filename;
     rules = List.rev !rules;
+    classes = !classes;
     refs = List.rev !refs;
     env = !env;
+    library = !library;
     protocol_errors = List.rev !protocol_errors;
   }
 
@@ -230,7 +251,7 @@ let cross_library_message ~longident ~head ~ref_loc =
      Error: cross-library [%%css] selector references are not supported.\n\
      The reference `%s` resolves to module `%s` which is not part of the\n\
      current library. Move the [%%css] binding into the current library, or\n\
-     inline the class chain literally."
+     inline the class name literally."
     (format_location ref_loc) longident head
 
 let unresolved_message ~longident ~ref_loc ~in_library_modules =
@@ -275,10 +296,111 @@ let production_mode harvests =
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
 
+let format_block_location (entry : Css_extraction.class_entry) =
+  if entry.start_line = entry.end_line then
+    Printf.sprintf "File %S, line %d, characters %d-%d" entry.file
+      entry.start_line entry.start_col entry.end_col
+  else
+    Printf.sprintf "File %S, lines %d-%d, characters %d-%d" entry.file
+      entry.start_line entry.end_line entry.start_col entry.end_col
+
+let describe_block (entry : Css_extraction.class_entry) =
+  match entry.binding with
+  | "" -> "an anonymous block"
+  | binding -> Printf.sprintf "the block of `%s`" binding
+
+let rule_text harvest ~attribute = function
+  | None -> Ok ""
+  | Some index ->
+    (match List.nth_opt harvest.rules index with
+    | Some text -> Ok text
+    | None ->
+      Error
+        (Printf.sprintf "%s: malformed [@@@%s]: rule index %d out of range"
+           harvest.filename attribute index))
+
+let check_class_collisions harvests =
+  let seen = Hashtbl.create 256 in
+  List.concat_map
+    (fun harvest ->
+      List.filter_map
+        (fun (entry : Css_extraction.class_entry) ->
+          match
+            rule_text harvest ~attribute:Css_extraction.classes_attribute_name
+              entry.rule_index
+          with
+          | Error message -> Some message
+          | Ok text ->
+            (match Hashtbl.find_opt seen entry.class_name with
+            | Some (other_text, (other : Css_extraction.class_entry))
+              when other_text <> text ->
+              Some
+                (Printf.sprintf
+                   "%s:\n\
+                    Error: class %s is used by two different blocks: %s here, \
+                    and %s at %s.\n\
+                    Change the content of one of the blocks, or bind one of \
+                    them to a different name."
+                   (format_block_location entry)
+                   entry.class_name (describe_block entry)
+                   (describe_block other)
+                   (format_block_location other))
+            | Some _ -> None
+            | None ->
+              Hashtbl.add seen entry.class_name (text, entry);
+              None))
+        harvest.classes)
+    harvests
+
+let order_inputs ~input_files ~cmt_files =
+  match Module_order.read_cmts cmt_files with
+  | Error path ->
+    Logger.warning
+      "cannot read %s as a .cmt file of this OCaml version; keeping the path \
+       order of the modules"
+      path;
+    List.sort_uniq compare input_files
+  | Ok cmts ->
+    let pairing, ambiguous = Module_order.pair ~inputs:input_files cmts in
+    List.iter
+      (fun ({ cmt; candidates } : Module_order.ambiguous) ->
+        Logger.warning
+          "%s (compiled from %s) matches two inputs, %s; ignoring it" cmt.path
+          cmt.sourcefile
+          (String.concat " and " candidates))
+      ambiguous;
+    (match Module_order.order pairing with
+    | Ok order -> order
+    | Error members ->
+      Logger.error "the .cmt imports of these modules form a cycle: %s"
+        (String.concat ", "
+           (List.map
+              (fun (modname, input) -> Printf.sprintf "%s (%s)" modname input)
+              members));
+      exit 1)
+
+let header harvests =
+  let libraries =
+    List.sort_uniq String.compare
+      (List.filter_map (fun harvest -> harvest.library) harvests)
+  in
+  let libraries =
+    match libraries with
+    | [] -> ""
+    | names -> "; libraries: " ^ String.concat " " names
+  in
+  Printf.sprintf
+    "/* This file is generated by styled-ppx, do not edit manually%s */\n"
+    libraries
+
 (** Collect, index, resolve, dedup, output. *)
-let run ~output_file input_files =
+let run ~output_file files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
+  let cmt_files, input_files =
+    List.partition (fun file -> Filename.check_suffix file ".cmt") files
+  in
+  let input_files = order_inputs ~input_files ~cmt_files in
   let idx = Index.create () in
   let in_library_modules = List.map module_of_filename input_files in
   let harvests =
@@ -297,40 +419,83 @@ let run ~output_file input_files =
     ref (List.concat_map (fun harvest -> harvest.protocol_errors) harvests)
   in
   let resolved_rules = ref [] in
+  let reported_multi_block = Hashtbl.create 16 in
   List.iter
     (fun harvest ->
-      List.iter
-        (fun rule ->
-          let on_error longident =
-            let ref_loc =
-              match
-                List.find_opt
-                  (fun (r : Refs.ref_loc) -> r.longident = longident)
-                  harvest.refs
-              with
-              | Some r -> r
-              | None ->
-                Css_extraction.ref_loc ~longident ~file:harvest.filename
-                  ~start_line:1 ~start_col:0 ~end_col:0
+      let find_ref_loc longident =
+        match
+          List.find_opt
+            (fun (r : Refs.ref_loc) -> r.longident = longident)
+            harvest.refs
+        with
+        | Some r -> r
+        | None ->
+          Css_extraction.ref_loc ~longident ~file:harvest.filename ~start_line:1
+            ~start_col:0 ~end_col:0
+      in
+      let resolved =
+        List.map
+          (fun rule ->
+            let on_error longident (error : Css_extraction.lookup_error) =
+              match error with
+              | Unresolved ->
+                let ref_loc = find_ref_loc longident in
+                errors :=
+                  unresolved_message ~longident ~ref_loc ~in_library_modules
+                  :: !errors
+              | Not_one_block ->
+                let key = harvest.filename, longident in
+                if not (Hashtbl.mem reported_multi_block key) then begin
+                  Hashtbl.add reported_multi_block key ();
+                  errors :=
+                    Printf.sprintf
+                      "%s\n\
+                       Error: Selector interpolation `$(%s)` refers to a \
+                       function or to a binding with several [%%css] blocks, \
+                       so it has no single class. Bind the block you mean to \
+                       its own name and reference that."
+                      (format_location (find_ref_loc longident))
+                      longident
+                    :: !errors
+                end
+              | Several_blocks blocks ->
+                let key = harvest.filename, longident in
+                if not (Hashtbl.mem reported_multi_block key) then begin
+                  Hashtbl.add reported_multi_block key ();
+                  errors :=
+                    Printf.sprintf "%s\nError: %s"
+                      (format_location (find_ref_loc longident))
+                      (Css_extraction.several_blocks_message ~longident ~blocks)
+                    :: !errors
+                end
             in
-            let msg =
-              unresolved_message ~longident ~ref_loc ~in_library_modules
+            let on_malformed msg =
+              errors :=
+                Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename
+                  Css_extraction.css_attribute_name msg
+                :: !errors
             in
-            errors := msg :: !errors
-          in
-          let on_malformed msg =
-            errors :=
-              Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename
-                Css_extraction.css_attribute_name msg
-              :: !errors
-          in
-          let resolved =
-            Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
-              ~on_unresolved:on_error ~on_malformed rule
-          in
-          resolved_rules := resolved :: !resolved_rules)
-        harvest.rules)
+            let lookup longident =
+              match Hashtbl.find_opt idx longident with
+              | None -> Error Css_extraction.Unresolved
+              | Some class_string ->
+                (match
+                   List.filter
+                     (fun s -> s <> "")
+                     (String.split_on_char ' ' class_string)
+                 with
+                | [ class_name ] -> Ok class_name
+                | [] -> Error Css_extraction.Not_one_block
+                | classes ->
+                  Error (Css_extraction.Several_blocks (List.length classes)))
+            in
+            Css_extraction.resolve_sentinels ~lookup ~on_error ~on_malformed
+              rule)
+          harvest.rules
+      in
+      resolved_rules := List.rev_append resolved !resolved_rules)
     harvests;
+  errors := List.rev_append (check_class_collisions harvests) !errors;
 
   (match !errors with
   | [] -> ()
@@ -340,13 +505,12 @@ let run ~output_file input_files =
 
   (* Dedup the resolved CSS rules while preserving source order.
 
-     Source order matters because every atomized rule shares the same
-     specificity (one class, no qualifiers). The cascade tiebreaker is
-     "later in stylesheet wins", so a longhand override written after a
-     shorthand (`margin: 10px; margin-top: 20px`) must appear *after* the
-     shorthand in the emitted stylesheet to survive. Earlier versions
-     deduped through `Set.Make(String)`, which sorted by murmur2-prefixed
-     rule text and silently destroyed declaration order.
+     Source order matters because block rules share the same specificity
+     (one class) unless their selectors add more. The cascade tiebreaker is
+     "later in stylesheet wins", so when two merged blocks set the same
+     property, the block written later in the stylesheet wins. Earlier
+     versions deduped through `Set.Make(String)`, which sorted by
+     murmur2-prefixed rule text and silently destroyed declaration order.
 
      [resolved_rules] is in reverse traversal order (rules pushed via
      `r :: !resolved_rules`); reverse once to walk forward, then keep
@@ -372,8 +536,7 @@ let run ~output_file input_files =
   let stylesheet =
     let separator = if minify then "" else "\n" in
     let buffer = Buffer.create 1024 in
-    Buffer.add_string buffer
-      "/* This file is generated by styled-ppx, do not edit manually */\n";
+    Buffer.add_string buffer (header harvests);
     List.iter
       (fun rule ->
         Buffer.add_string buffer rule;
@@ -420,6 +583,6 @@ let parse_args args =
   parse [] ~output_file:None ~log_level:Logger.Warning tail
 
 let () =
-  let input_files, output_file, log_level = parse_args Sys.argv in
+  let files, output_file, log_level = parse_args Sys.argv in
   Logger.set_level log_level;
-  run ~output_file input_files
+  run ~output_file files

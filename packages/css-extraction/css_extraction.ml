@@ -14,21 +14,29 @@ type ref_loc = {
   end_col : int;
 }
 
+type class_entry = {
+  class_name : string;
+  rule_index : int option;
+  binding : string;
+  file : string;
+  start_line : int;
+  start_col : int;
+  end_line : int;
+  end_col : int;
+}
+
 let css_attribute_name = "css"
 let bindings_attribute_name = "css.bindings"
 let refs_attribute_name = "css.refs"
 let config_attribute_name = "css.config"
+let classes_attribute_name = "css.classes"
 let config_env_key = "env"
 let config_env_production = "production"
+let config_library_key = "library"
 let sentinel_byte = '\x00'
 
 let sentinel longident =
   String.make 1 sentinel_byte ^ longident ^ String.make 1 sentinel_byte
-
-let class_chain_of_class_string class_string =
-  String.split_on_char ' ' class_string
-  |> List.filter (fun s -> s <> "")
-  |> String.concat "."
 
 let binding ~longident ~class_string = { longident; class_string }
 
@@ -45,6 +53,23 @@ let ref_loc_of_location ~longident (loc : Ppxlib.Location.t) =
     start_col = pos_start.pos_cnum - pos_start.pos_bol;
     end_col = pos_end.pos_cnum - pos_end.pos_bol;
   }
+
+let class_entry ~class_name ~rule_index ~binding (loc : Ppxlib.Location.t) =
+  let pos_start = loc.loc_start in
+  let pos_end = loc.loc_end in
+  {
+    class_name;
+    rule_index;
+    binding;
+    file = pos_start.pos_fname;
+    start_line = pos_start.pos_lnum;
+    start_col = pos_start.pos_cnum - pos_start.pos_bol;
+    end_line = pos_end.pos_lnum;
+    end_col = pos_end.pos_cnum - pos_end.pos_bol;
+  }
+
+let no_rule = -1
+let encode_rule_index = Option.value ~default:no_rule
 
 let make_list_attribute ~name expr =
   let loc = Ppxlib.Location.none in
@@ -77,6 +102,24 @@ let config_attribute entries =
       [ Builder.estring ~loc key; Builder.estring ~loc value ]
   in
   make_list_attribute ~name:config_attribute_name
+    (Builder.elist ~loc (List.map entry_to_expr entries))
+
+let classes_attribute entries =
+  let loc = Ppxlib.Location.none in
+  let entry_to_expr (entry : class_entry) =
+    Builder.pexp_tuple ~loc
+      [
+        Builder.estring ~loc entry.class_name;
+        Builder.eint ~loc (encode_rule_index entry.rule_index);
+        Builder.estring ~loc entry.binding;
+        Builder.estring ~loc entry.file;
+        Builder.eint ~loc entry.start_line;
+        Builder.eint ~loc entry.start_col;
+        Builder.eint ~loc entry.end_line;
+        Builder.eint ~loc entry.end_col;
+      ]
+  in
+  make_list_attribute ~name:classes_attribute_name
     (Builder.elist ~loc (List.map entry_to_expr entries))
 
 let refs_attribute entries =
@@ -161,6 +204,52 @@ let decode_config_entry (e : Ppxlib.expression) =
     | _ -> Error "expected (key, value) string tuple")
   | _ -> Error "expected (key, value) tuple"
 
+let decode_rule_index index =
+  if index = no_rule then Ok None
+  else if index >= 0 then Ok (Some index)
+  else
+    Error
+      (Printf.sprintf "expected a rule index of 0 or more, or %d, got %d"
+         no_rule index)
+
+let decode_class_entry (e : Ppxlib.expression) =
+  let shape =
+    "expected (class, rule_index, binding, file, start_line, start_col, \
+     end_line, end_col) tuple"
+  in
+  match e.pexp_desc with
+  | Pexp_tuple [ class_e; index_e; binding_e; file_e; sl_e; sc_e; el_e; ec_e ]
+    ->
+    (match
+       ( string_of_const_expr class_e,
+         Option.map decode_rule_index (int_of_const_expr index_e),
+         string_of_const_expr binding_e,
+         string_of_const_expr file_e,
+         List.map int_of_const_expr [ sl_e; sc_e; el_e; ec_e ] )
+     with
+    | Some _, Some (Error _ as error), _, _, _ -> error
+    | ( Some class_name,
+        Some (Ok rule_index),
+        Some binding,
+        Some file,
+        [ Some start_line; Some start_col; Some end_line; Some end_col ] ) ->
+      Ok
+        {
+          class_name;
+          rule_index;
+          binding;
+          file;
+          start_line;
+          start_col;
+          end_line;
+          end_col;
+        }
+    | _ -> Error shape)
+  | _ -> Error shape
+
+let decode_classes_payload =
+  decode_list ~attribute:classes_attribute_name ~decode:decode_class_entry
+
 let decode_bindings_payload =
   decode_list ~attribute:bindings_attribute_name ~decode:decode_binding
 
@@ -170,8 +259,19 @@ let decode_config_payload =
 let decode_refs_payload =
   decode_list ~attribute:refs_attribute_name ~decode:decode_ref
 
-let resolve_sentinels ~lookup ~on_unresolved ~on_malformed (rule : string) :
-  string =
+let several_blocks_message ~longident ~blocks =
+  Printf.sprintf
+    "`$(%s)` names a binding with %d [%%css] blocks. A selector can only \
+     reference a binding with one block; bind the block you mean to its own \
+     name, or use an empty marker binding."
+    longident blocks
+
+type lookup_error =
+  | Unresolved
+  | Several_blocks of int
+  | Not_one_block
+
+let resolve_sentinels ~lookup ~on_error ~on_malformed (rule : string) : string =
   let buf = Buffer.create (String.length rule) in
   let len = String.length rule in
   let i = ref 0 in
@@ -195,10 +295,9 @@ let resolve_sentinels ~lookup ~on_unresolved ~on_malformed (rule : string) :
       | Some j ->
         let longident = String.sub rule start (j - start) in
         (match lookup longident with
-        | Some class_string ->
-          Buffer.add_string buf (class_chain_of_class_string class_string)
-        | None ->
-          on_unresolved longident;
+        | Ok class_name -> Buffer.add_string buf class_name
+        | Error error ->
+          on_error longident error;
           Buffer.add_char buf c;
           Buffer.add_string buf longident;
           Buffer.add_char buf c);

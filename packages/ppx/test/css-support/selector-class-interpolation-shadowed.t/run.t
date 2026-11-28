@@ -13,19 +13,26 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-14ksm7b-foo{color:blue;}"];
-  [@css ".css-191lhl1-bar.css-14ksm7b-foo{font-weight:bold;}"];
+  [@css ".css-ivpcv01{color:red;}"];
+  [@css ".css-ivpc5t6{color:blue;}"];
+  [@css ".css-ivpc1fg.css-ivpc5t6{font-weight:bold;}"];
+  [@css.classes
+    [
+      ("css-ivpcv01", 0, "Input.foo", "input.re", 5, 19, 5, 31),
+      ("css-ivpc5t6", 1, "Input.foo", "input.re", 8, 19, 8, 32),
+      ("css-ivpc1fg", 2, "Input.bar", "input.re", 11, 2, 12, 0),
+    ]
+  ];
   [@css.bindings
-    [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
+    [("Input.foo", "css-ivpc5t6"), ("Input.bar", "css-ivpc1fg")]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("css-ivpcv01", []);
   let _ = foo;
   
-  let foo = CSS.make("css-14ksm7b-foo", []);
+  let foo = CSS.make("css-ivpc5t6", []);
   
-  let bar = CSS.make("css-191lhl1-bar", []);
+  let bar = CSS.make("css-ivpc1fg", []);
   
   let _ = (foo, bar);
 

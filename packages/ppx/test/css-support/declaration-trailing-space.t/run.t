@@ -20,20 +20,28 @@ with no trailing space.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs{display:flex;}"];
-  [@css ".css-1d33txl > *{min-height:0;}"];
-  [@css "@media (min-width: 100px) {.css-oi5e8m{display:flex;}}"];
-  [@css ".css-ehba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css ".css-ivpcu5d{display:flex;}"];
+  [@css ".css-ivpczkv > *{min-height:0;}"];
+  [@css "@media (min-width: 100px) {.css-ivpc8tz{display:flex;}}"];
+  [@css ".css-ivpcupi{cursor:-webkit-grab;cursor:grab;}"];
+  [@css.classes
+    [
+      ("css-ivpcu5d", 0, "", "input.re", 3, 9, 3, 24),
+      ("css-ivpczkv", 1, "", "input.re", 11, 9, 11, 34),
+      ("css-ivpc8tz", 2, "", "input.re", 15, 9, 15, 54),
+      ("css-ivpcupi", 3, "", "input.re", 20, 9, 20, 23),
+    ]
+  ];
   
-  CSS.make("css-k008qs", []);
+  CSS.make("css-ivpcu5d", []);
   
-  CSS.make("css-k008qs", []);
+  CSS.make("css-ivpcu5d", []);
   
-  CSS.make("css-1d33txl", []);
-  CSS.make("css-1d33txl", []);
+  CSS.make("css-ivpczkv", []);
+  CSS.make("css-ivpczkv", []);
   
-  CSS.make("css-oi5e8m", []);
-  CSS.make("css-oi5e8m", []);
+  CSS.make("css-ivpc8tz", []);
+  CSS.make("css-ivpc8tz", []);
   
-  CSS.make("css-ehba41", []);
-  CSS.make("css-ehba41", []);
+  CSS.make("css-ivpcupi", []);
+  CSS.make("css-ivpcupi", []);

@@ -1,20 +1,23 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body:not(.css-nk32ej-card){margin:0;}"];
-  [@css ".css-nk32ej-card{background:var(--bg-1rdts9a);}"];
-  [@css ".css-b7rhyr-active.css-nk32ej-card{color:white;}"];
-  [@css ".container .css-nk32ej-card{color:var(--bg-raax3p);}"];
-  [@css ".css-nk32ej-card{padding:10px;}"];
-  [@css ".css-b7rhyr-active{border:1px solid;}"];
-  [@css.bindings
+  [@css "body:not(.css-vdiv8w1){margin:0;}"];
+  [@css ".css-vdiv8w1{background:var(--bg-1rdts9a);}"];
+  [@css ".css-vdiv76b.css-vdiv8w1{color:white;}"];
+  [@css ".container .css-vdiv8w1{color:var(--bg-raax3p);}"];
+  [@css ".css-vdiv8w1{padding:10px;}"];
+  [@css ".css-vdiv76b{border:1px solid;}"];
+  [@css.classes
     [
-      ("Output.card", "css-nk32ej-card"),
-      ("Output.active", "css-b7rhyr-active"),
+      ("css-vdiv8w1", 4, "Output.card", "output.ml", 1, 18, 1, 32),
+      ("css-vdiv76b", 5, "Output.active", "output.ml", 2, 20, 2, 38),
     ]
   ];
-  let card = CSS.make("css-nk32ej-card", []);
-  let active = CSS.make("css-b7rhyr-active", []);
+  [@css.bindings
+    [("Output.card", "css-vdiv8w1"), ("Output.active", "css-vdiv76b")]
+  ];
+  let card = CSS.make("css-vdiv8w1", []);
+  let active = CSS.make("css-vdiv76b", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>

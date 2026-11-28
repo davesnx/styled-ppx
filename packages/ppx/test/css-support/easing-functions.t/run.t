@@ -15,12 +15,20 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-duudp6{transition-timing-function:steps(2, jump-start);}"];
-  [@css ".css-2tegan{transition-timing-function:steps(2, jump-end);}"];
-  [@css ".css-1qfsz2c{transition-timing-function:steps(1, jump-both);}"];
-  [@css ".css-1m48w8e{transition-timing-function:steps(2, jump-none);}"];
+  [@css ".css-ivpcpkp{transition-timing-function:steps(2, jump-start);}"];
+  [@css ".css-ivpc0eg{transition-timing-function:steps(2, jump-end);}"];
+  [@css ".css-ivpc648{transition-timing-function:steps(1, jump-both);}"];
+  [@css ".css-ivpcj9w{transition-timing-function:steps(2, jump-none);}"];
+  [@css.classes
+    [
+      ("css-ivpcpkp", 0, "", "input.re", 2, 8, 2, 56),
+      ("css-ivpc0eg", 1, "", "input.re", 3, 8, 3, 54),
+      ("css-ivpc648", 2, "", "input.re", 4, 8, 4, 55),
+      ("css-ivpcj9w", 3, "", "input.re", 5, 8, 5, 55),
+    ]
+  ];
   
-  CSS.make("css-duudp6", []);
-  CSS.make("css-2tegan", []);
-  CSS.make("css-1qfsz2c", []);
-  CSS.make("css-1m48w8e", []);
+  CSS.make("css-ivpcpkp", []);
+  CSS.make("css-ivpc0eg", []);
+  CSS.make("css-ivpc648", []);
+  CSS.make("css-ivpcj9w", []);

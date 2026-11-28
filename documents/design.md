@@ -66,30 +66,38 @@ extraction:
 
 1. Parse declaration lists with `packages/parser`
 2. Type-check declarations against `packages/css-grammar`
-3. Atomize declarations in `packages/ppx/src/Css_file.re` (`Css_file.push`)
+3. Give the block one class in `packages/ppx/src/Css_file.re` (`Css_file.push`)
 4. Lower value interpolation `$(expr)` to CSS custom properties,
    collecting `dynamic_vars`
 5. Resolve class-name interpolation in selectors against the per-file
    `Local_selector_environment` so `$(name)` is
-   replaced with the actual minted class names before the CSS AST is rendered
+   replaced with the referenced binding's class before the CSS AST is rendered
 6. Generate `CSS.make(...)` calls (carrying the class names and the
    dynamic vars) and record the extracted rules for the end-of-CU
    `[@@@css ...]` attributes
 
 `Local_selector_environment` is populated as each `[%css]` extension expands:
 the enclosing `let`-binding name (recovered by the ordered structure pass in
-`ppx.re`, which walks bindings in source order) is mapped to the list of class
-names that atomization produced. Later `[%css]` blocks in the same file resolve
-`&.$(name)` and similar selector interpolations against that environment,
-fanning a multi-declaration source binding into a chained compound selector
-(`&.cssA.cssB`). Unresolved local references (undefined or forward) raise a
+`ppx.re`, which walks bindings in source order) is mapped to the block's class.
+Later `[%css]` blocks in the same file resolve `&.$(name)` and similar selector
+interpolations against that environment. A reference to a function, or to a
+binding with several blocks, is an error: a selector needs one class.
+Aliases (`let x = a`) are not followed.
+Unresolved local references (undefined or forward) raise a
 clear PPX error; cross-module references are recorded in `Cross_module_refs`
 and resolved by the aggregator (see `documents/css-extraction.md`).
+
+The cascade between two merged blocks is decided by sheet order, because
+`CSS.merge` concatenates classes. The aggregator orders a library's modules
+by the imports in their `.cmt` files, so a module's blocks come after the
+blocks of the modules it uses. An app that loads one sheet per library
+loads them in library dependency order, from dune's library graph
+(`documents/css-extraction.md`, "Order" and "Several library sheets").
 
 ### `[%styled.<tag>]`
 
 `module Button = [%styled.button "..."]` runs the same extraction path as
-`[%css]` (`Css_file.push`, same atomization and interpolation lowering) and
+`[%css]` (`Css_file.push`, one class per block, same interpolation lowering) and
 wraps the resulting `CSS.make` call in a generated React component for the
 given HTML tag (`Generate.staticComponent`). Function payloads
 (`[%styled.div (~color) => "color: $(color)"]`) also extract: the CSS string
@@ -112,7 +120,7 @@ selector-interpolation walks. Differs from `[%css]` in two ways:
   left unexpanded (no dedicated migration diagnostic exists today).
 - Splits each interpolated rule into two complementary outputs:
   the static rule with `var(--<prefix>-<hash>)` substituted in value
-  positions and resolved class chains substituted in selector
+  positions and resolved classes substituted in selector
   positions (extracted via `Buffer.add_global_rule` like a static
   global) plus a generated module containing
   `to_string`/`makeProps`/`make` that emit a single
@@ -257,8 +265,7 @@ module Theme = [%styled.global {|
   /* Bare $(name) - resolves to a class type-selector */
   body $(card) { line-height: 1.5; }
 
-  /* .$(name) - class-position; multi-decl bindings fan out into a
-     compound chain (.atom1.atom2). */
+  /* .$(name) - class-position; each binding is one class. */
   .$(card).$(active) { color: white; }
 
   /* Combinators, pseudo, attribute selectors, comma lists, nesting,
@@ -267,7 +274,7 @@ module Theme = [%styled.global {|
 
   /* Cross-module $(M.binding) emits a NUL-delimited sentinel that
      the post-build aggregator (styled-ppx.generate) substitutes
-     using the index it harvests from M's post-PPX file. */
+     using the index it reads from M's post-PPX file. */
   body .$(OtherModule.marker) { background: red; }
 
   /* Selector interp inside @media / @supports works the same way -
@@ -295,8 +302,11 @@ Resolution rules (identical to `[%css]`):
   location (via the synthetic `let _ = M.binding` line the PPX emits
   alongside `[@@@css.refs ...]`).
 - Bare `$(name)` (no leading dot) in selector position resolves the
-  binding and emits a `.classname` type-selector. Multi-class bindings
-  are rejected here (use `.$(name)` for the chain instead).
+  binding and emits a `.classname` class selector, like `.$(name)`.
+- A binding with several blocks (for example a conditional with two
+  inline blocks) has no single class: a reference to it is an error, in
+  the PPX for a same-module reference and in the aggregator for a
+  cross-module one. A reference to a function is an error too.
 
 Selector interpolation has no effect on the generated module's
 `to_string`: `dynamic_vars` only collects value-position
@@ -331,7 +341,7 @@ module ThemeStyles = [%styled.global {|
 | Interpolation in an at-rule prelude (e.g. `@media (max-width: $(bp))`)   | `raise_errorf` pointing at the interpolation.                                                                                             |
 | Parentless `&` (top level, or under an at-rule with no style rule above)  | `raise_errorf`: `&` has no parent selector to resolve against.                                                                            |
 | Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Local_selector_environment.resolve_selector_class_ref` pointing at the interpolation.                                                  |
-| Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
+| Selector interp `$(name)` references a function or a binding with several blocks | `raise_errorf`: a selector needs one class. Across modules, the aggregator reports both (they are exported with an empty class string), and the compiler also rejects a function through the typed `let _: CSS.styles = M.x`. |
 | Cross-module `$(M.x)` where `M.x` doesn't exist at link time              | `Unbound module` / `Unbound value` from OCaml typechecker via the synthetic `let _ = M.x`; aggregator also reports a missing-binding error using the location stored in `[@@@css.refs ...]`. |
 
 #### Code map

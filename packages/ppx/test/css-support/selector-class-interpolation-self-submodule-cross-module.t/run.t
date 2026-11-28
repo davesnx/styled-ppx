@@ -14,21 +14,27 @@ as an external path unless another enclosing `Css` module exists.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-59bkuc-wrapper.\000Css.marker\000{color:blue;}"];
+  [@css ".css-ivpcirv{color:red;}"];
+  [@css ".css-ivpcmak.\000Css.marker\000{color:blue;}"];
+  [@css.classes
+    [
+      ("css-ivpcirv", 0, "Input.Css.marker", "input.re", 2, 24, 2, 36),
+      ("css-ivpcmak", 1, "Input.Css.wrapper", "input.re", 5, 4, 6, 2),
+    ]
+  ];
   [@css.bindings
     [
-      ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.Css.wrapper", "css-59bkuc-wrapper"),
+      ("Input.Css.marker", "css-ivpcirv"),
+      ("Input.Css.wrapper", "css-ivpcmak"),
     ]
   ];
   [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
-  let _ = Css.marker;
+  let _: CSS.styles = Css.marker;
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("css-ivpcirv", []);
   
-    let wrapper = CSS.make("css-59bkuc-wrapper", []);
+    let wrapper = CSS.make("css-ivpcmak", []);
   };
   
   let _ = (Css.marker, Css.wrapper);

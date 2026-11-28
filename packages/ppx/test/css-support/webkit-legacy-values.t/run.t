@@ -21,20 +21,28 @@ and "Rule not found in registry: webkit-mask-box-repeat".
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".css-oh9l4c{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}"
+    ".css-ivpcixn{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}"
   ];
   [@css
-    ".css-1kr95w2{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}"
+    ".css-ivpcozv{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}"
   ];
   [@css
-    ".css-vnsa3w{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}"
+    ".css-ivpch3b{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}"
   ];
   [@css
-    ".css-1dg3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
+    ".css-ivpcmqg{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
+  ];
+  [@css.classes
+    [
+      ("css-ivpcixn", 0, "", "input.re", 5, 4, 5, 84),
+      ("css-ivpcozv", 1, "", "input.re", 8, 4, 8, 103),
+      ("css-ivpch3b", 2, "", "input.re", 12, 8, 12, 81),
+      ("css-ivpcmqg", 3, "", "input.re", 13, 8, 13, 70),
+    ]
   ];
   
-  CSS.make("css-oh9l4c", []);
-  CSS.make("css-1kr95w2", []);
+  CSS.make("css-ivpcixn", []);
+  CSS.make("css-ivpcozv", []);
   
-  CSS.make("css-vnsa3w", []);
-  CSS.make("css-1dg3brk", []);
+  CSS.make("css-ivpch3b", []);
+  CSS.make("css-ivpcmqg", []);

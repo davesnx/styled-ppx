@@ -19,7 +19,6 @@ current site) error cleanly. Users can fix by reordering bindings.
   Error: Selector interpolation `$(b)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `b` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `b` is a computed string, inline the class name literally.
-  - Otherwise, use [%cx] for runtime substitution.
 
   $ dune build
   File "input.re", line 8, characters 6-7:
@@ -28,5 +27,4 @@ current site) error cleanly. Users can fix by reordering bindings.
   Error: Selector interpolation `$(b)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `b` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `b` is a computed string, inline the class name literally.
-  - Otherwise, use [%cx] for runtime substitution.
   [1]

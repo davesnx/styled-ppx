@@ -15,64 +15,67 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --tertiary-1cttnp6{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-9kmuhm_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-9kmuhm_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1rsudnc_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1rsudnc_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --secondary-16kletf{syntax:\"*\";inherits:false;}"];
-  [@css "@property --box_-vdb5xj{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-e0dy15_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-e0dy15_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-e0dy15_3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-34k09d-_spaceBeforeColon{width:30px;}"];
-  [@css ".css-1cx090v-_spaceBeforeColon{color:var(--tertiary-1cttnp6);}"];
+  [@css "@property --ivpceve{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc3pw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpchkf{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpc1yc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcbgi{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcqsn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcgn9{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcfql{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcx4u{syntax:\"*\";inherits:false;}"];
+  [@css "@property --ivpcvu4{syntax:\"*\";inherits:false;}"];
+  [@css ".css-ivpctav{width:30px;color:var(--ivpceve);}"];
+  [@css ".css-ivpc3yg{box-shadow:inset 1px 0 0 0 transparent !important;}"];
   [@css
-    ".css-t2slgw-_tabInnerFirst{box-shadow:inset 1px 0 0 0 transparent !important;}"
+    ".css-ivpc5k4{box-shadow:1px 0 0 0 var(--ivpc3pw), inset 0 -1px 0 0 var(--ivpchkf) !important;}"
   ];
   [@css
-    ".css-1rh80o9-_multiShadowImportant{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
+    ".css-ivpclc4{box-shadow:inset 0 0 0 0 transparent;}.css-ivpclc4:hover{box-shadow:1px 0 0 0 var(--ivpc1yc), inset 0 -1px 0 0 var(--ivpcbgi) !important;}"
   ];
-  [@css ".css-1mx0ppg-_tabTextFirst{box-shadow:inset 0 0 0 0 transparent;}"];
   [@css
-    ".css-1bp0v5z-_tabTextFirst:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
+    ".css-ivpcf9k{color:var(--ivpcqsn);}.css-ivpcf9k:hover{background-color:var(--ivpcgn9);box-shadow:1px 0 0 0 var(--ivpcfql), inset 1px 0 0 0 var(--ivpcx4u), inset 0 -1px 0 0 var(--ivpcvu4);}"
   ];
-  [@css ".css-1nzxk4v-_tabText{color:var(--secondary-16kletf);}"];
-  [@css ".css-1nzxk4v-_tabText:hover{background-color:var(--box_-vdb5xj);}"];
   [@css
-    ".css-1nzxk4v-_tabText:hover{box-shadow:1px 0 0 0 var(--line-e0dy15_1), inset 1px 0 0 0 var(--line-e0dy15_2), inset 0 -1px 0 0 var(--line-e0dy15_3);}"
+    ".css-ivpcm6e{flex-grow:1;z-index:1;transition:all 200ms ease 0ms;}.css-ivpcm6e.css-ivpccse{min-width:0;max-width:0;opacity:0;overflow:hidden;}"
   ];
-  [@css ".css-i9gxme-_sidebar{flex-grow:1;}"];
-  [@css ".css-r6z5ec-_sidebar{z-index:1;}"];
-  [@css ".css-tjsoaq-_sidebar{transition:all 200ms ease 0ms;}"];
-  [@css ".css-145l4ca-_sidebar.css-148lz04-_sidebarClosed{min-width:0;}"];
-  [@css ".css-1oluo0q-_sidebar.css-148lz04-_sidebarClosed{max-width:0;}"];
-  [@css ".css-2io1ml-_sidebar.css-148lz04-_sidebarClosed{opacity:0;}"];
-  [@css ".css-1k938xr-_sidebar.css-148lz04-_sidebarClosed{overflow:hidden;}"];
-  [@css ".css-keq5th-_checkbox{transition:transform 0.3s !important;}"];
+  [@css ".css-ivpc59i{transition:transform 0.3s !important;}"];
   [@css
-    ".css-1hwm8mm-_transitions{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+    ".css-ivpc1rf{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+  ];
+  [@css.classes
+    [
+      ("css-ivpctav", 10, "Input._spaceBeforeColon", "input.re", 17, 2, 19, 0),
+      ("css-ivpc3yg", 11, "Input._tabInnerFirst", "input.re", 24, 2, 25, 0),
+      (
+        "css-ivpc5k4",
+        12,
+        "Input._multiShadowImportant",
+        "input.re",
+        29,
+        2,
+        30,
+        0,
+      ),
+      ("css-ivpclc4", 13, "Input._tabTextFirst", "input.re", 35, 2, 42, 0),
+      ("css-ivpcf9k", 14, "Input._tabText", "input.re", 48, 2, 57, 0),
+      ("css-ivpccse", (-1), "Input._sidebarClosed", "input.re", 61, 28, 61, 28),
+      ("css-ivpcm6e", 15, "Input._sidebar", "input.re", 65, 2, 75, 0),
+      ("css-ivpc59i", 16, "Input._checkbox", "input.re", 79, 24, 79, 62),
+      ("css-ivpc1rf", 17, "Input._transitions", "input.re", 84, 2, 85, 0),
+    ]
   ];
   [@css.bindings
     [
-      (
-        "Input._spaceBeforeColon",
-        "css-34k09d-_spaceBeforeColon css-1cx090v-_spaceBeforeColon",
-      ),
-      ("Input._tabInnerFirst", "css-t2slgw-_tabInnerFirst"),
-      ("Input._multiShadowImportant", "css-1rh80o9-_multiShadowImportant"),
-      (
-        "Input._tabTextFirst",
-        "css-1mx0ppg-_tabTextFirst css-1bp0v5z-_tabTextFirst",
-      ),
-      ("Input._tabText", "css-1nzxk4v-_tabText"),
-      ("Input._sidebarClosed", "css-148lz04-_sidebarClosed"),
-      (
-        "Input._sidebar",
-        "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-145l4ca-_sidebar css-1oluo0q-_sidebar css-2io1ml-_sidebar css-1k938xr-_sidebar",
-      ),
-      ("Input._checkbox", "css-keq5th-_checkbox"),
-      ("Input._transitions", "css-1hwm8mm-_transitions"),
+      ("Input._spaceBeforeColon", "css-ivpctav"),
+      ("Input._tabInnerFirst", "css-ivpc3yg"),
+      ("Input._multiShadowImportant", "css-ivpc5k4"),
+      ("Input._tabTextFirst", "css-ivpclc4"),
+      ("Input._tabText", "css-ivpcf9k"),
+      ("Input._sidebarClosed", "css-ivpccse"),
+      ("Input._sidebar", "css-ivpcm6e"),
+      ("Input._checkbox", "css-ivpc59i"),
+      ("Input._transitions", "css-ivpc1rf"),
     ]
   ];
   module Color = {
@@ -90,53 +93,49 @@ If this test fail means that the module is not in sync with the ppx
   
   let _spaceBeforeColon =
     CSS.make(
-      "css-34k09d-_spaceBeforeColon css-1cx090v-_spaceBeforeColon",
-      [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
+      "css-ivpctav",
+      [("--ivpceve", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
-  let _tabInnerFirst = CSS.make("css-t2slgw-_tabInnerFirst", []);
+  let _tabInnerFirst = CSS.make("css-ivpc3yg", []);
   
   let _multiShadowImportant =
     CSS.make(
-      "css-1rh80o9-_multiShadowImportant",
+      "css-ivpc5k4",
       [
-        ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpc3pw", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpchkf", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
   let _tabTextFirst =
     CSS.make(
-      "css-1mx0ppg-_tabTextFirst css-1bp0v5z-_tabTextFirst",
+      "css-ivpclc4",
       [
-        ("--line-1rsudnc_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-1rsudnc_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpc1yc", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpcbgi", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
   let _tabText =
     CSS.make(
-      "css-1nzxk4v-_tabText",
+      "css-ivpcf9k",
       [
-        ("--secondary-16kletf", CSS.Types.Color.toString(Color.Text.secondary)),
-        ("--box_-vdb5xj", CSS.Types.Color.toString(Color.Background.box_)),
-        ("--line-e0dy15_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-e0dy15_2", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-e0dy15_3", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpcqsn", CSS.Types.Color.toString(Color.Text.secondary)),
+        ("--ivpcgn9", CSS.Types.Color.toString(Color.Background.box_)),
+        ("--ivpcfql", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpcx4u", CSS.Types.Color.toString(Color.Border.line)),
+        ("--ivpcvu4", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
-  let _sidebarClosed = CSS.make("css-148lz04-_sidebarClosed", []);
+  let _sidebarClosed = CSS.make("css-ivpccse", []);
   
-  let _sidebar =
-    CSS.make(
-      "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-145l4ca-_sidebar css-1oluo0q-_sidebar css-2io1ml-_sidebar css-1k938xr-_sidebar",
-      [],
-    );
+  let _sidebar = CSS.make("css-ivpcm6e", []);
   
-  let _checkbox = CSS.make("css-keq5th-_checkbox", []);
+  let _checkbox = CSS.make("css-ivpc59i", []);
   
-  let _transitions = CSS.make("css-1hwm8mm-_transitions", []);
+  let _transitions = CSS.make("css-ivpc1rf", []);
   
   let _shadow1: CSS.Shadow.t =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

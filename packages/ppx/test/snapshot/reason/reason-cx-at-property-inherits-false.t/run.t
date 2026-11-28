@@ -4,87 +4,116 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-km0lr0{syntax:\"*\";inherits:false;}"];
-  [@css "@property --str-vye19e{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-f5c7x{syntax:\"*\";inherits:false;}"];
-  [@css ".css-kusjgz-topLevel{color:var(--color-1a279q8);}"];
-  [@css ".css-lfbwy0-hover:hover{color:var(--color-4uzv5u);}"];
+  [@css "@property --vdiv5yh{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivxz4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivuab{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivwoc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --vdivik3{syntax:\"*\";inherits:false;}"];
+  [@css ".css-vdiv5va{color:var(--vdiv5yh);}"];
+  [@css ".css-vdiv1m4:hover{color:var(--vdivxz4);}"];
+  [@css "@media (max-width: 768px) {.css-vdiv8qx{color:var(--vdivuab);}}"];
+  [@css ".css-vdiv0ye .child{color:var(--vdiv4aa);}"];
   [@css
-    "@media (max-width: 768px) {.css-19xpxeg-media{color:var(--color-km0lr0);}}"
+    ".css-vdivorz{color:var(--vdivdce);}.css-vdivorz .child{color:var(--vdivdce);}"
   ];
-  [@css ".css-1g3cfa1-descendant .child{color:var(--color-ump0qt);}"];
-  [@css ".css-1d8si03-bundleSpan{color:var(--color-7srqv7);}"];
-  [@css ".css-1d8si03-bundleSpan .child{color:var(--color-7srqv7);}"];
-  [@css ".css-1l36lcw-customFeeder{--brand:var(--str-vye19e);}"];
-  [@css ".css-1vdqaxy-pseudoElement::placeholder{color:var(--color-12r6fyr);}"];
-  [@css ".css-yfluo3-legacyPseudoElement:before{color:var(--color-e7n16g);}"];
-  [@css ".css-i81g8d-mixedPseudo{color:var(--color-xrtge);}"];
-  [@css ".css-i81g8d-mixedPseudo::before{color:var(--color-xrtge);}"];
+  [@css ".css-vdivnay{--brand:var(--vdivwoc);}"];
+  [@css ".css-vdiv1ea::placeholder{color:var(--vdivdpb);}"];
+  [@css ".css-vdivprh:before{color:var(--vdivbcs);}"];
   [@css
-    ".css-11o9ny0-pseudoClassOnly:focus-visible:not(:disabled){color:var(--color-f5c7x);}"
+    ".css-vdiv24y{color:var(--vdiv3g0);}.css-vdiv24y::before{color:var(--vdiv3g0);}"
+  ];
+  [@css ".css-vdiv5cb:focus-visible:not(:disabled){color:var(--vdivik3);}"];
+  [@css.classes
+    [
+      ("css-vdiv5va", 5, "Output.topLevel", "output.ml", 3, 24, 3, 40),
+      ("css-vdiv1m4", 6, "Output.hover", "output.ml", 4, 21, 4, 49),
+      ("css-vdiv8qx", 7, "Output.media", "output.ml", 5, 21, 5, 67),
+      ("css-vdiv0ye", 8, "Output.descendant", "output.ml", 6, 26, 6, 55),
+      ("css-vdivorz", 9, "Output.bundleSpan", "output.ml", 7, 26, 7, 72),
+      ("css-vdivnay", 10, "Output.customFeeder", "output.ml", 8, 28, 8, 44),
+      ("css-vdiv1ea", 11, "Output.pseudoElement", "output.ml", 9, 29, 9, 64),
+      (
+        "css-vdivprh",
+        12,
+        "Output.legacyPseudoElement",
+        "output.ml",
+        10,
+        35,
+        10,
+        64,
+      ),
+      ("css-vdiv24y", 13, "Output.mixedPseudo", "output.ml", 11, 27, 11, 74),
+      (
+        "css-vdiv5cb",
+        14,
+        "Output.pseudoClassOnly",
+        "output.ml",
+        13,
+        11,
+        13,
+        62,
+      ),
+    ]
   ];
   [@css.bindings
     [
-      ("Output.topLevel", "css-kusjgz-topLevel"),
-      ("Output.hover", "css-lfbwy0-hover"),
-      ("Output.media", "css-19xpxeg-media"),
-      ("Output.descendant", "css-1g3cfa1-descendant"),
-      ("Output.bundleSpan", "css-1d8si03-bundleSpan"),
-      ("Output.customFeeder", "css-1l36lcw-customFeeder"),
-      ("Output.pseudoElement", "css-1vdqaxy-pseudoElement"),
-      ("Output.legacyPseudoElement", "css-yfluo3-legacyPseudoElement"),
-      ("Output.mixedPseudo", "css-i81g8d-mixedPseudo"),
-      ("Output.pseudoClassOnly", "css-11o9ny0-pseudoClassOnly"),
+      ("Output.topLevel", "css-vdiv5va"),
+      ("Output.hover", "css-vdiv1m4"),
+      ("Output.media", "css-vdiv8qx"),
+      ("Output.descendant", "css-vdiv0ye"),
+      ("Output.bundleSpan", "css-vdivorz"),
+      ("Output.customFeeder", "css-vdivnay"),
+      ("Output.pseudoElement", "css-vdiv1ea"),
+      ("Output.legacyPseudoElement", "css-vdivprh"),
+      ("Output.mixedPseudo", "css-vdiv24y"),
+      ("Output.pseudoClassOnly", "css-vdiv5cb"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let str = "literal";
   let topLevel =
     CSS.make(
-      "css-kusjgz-topLevel",
-      [("--color-1a279q8", CSS.Types.Color.toString(color))],
+      "css-vdiv5va",
+      [("--vdiv5yh", CSS.Types.Color.toString(color))],
     );
   let hover =
     CSS.make(
-      "css-lfbwy0-hover",
-      [("--color-4uzv5u", CSS.Types.Color.toString(color))],
+      "css-vdiv1m4",
+      [("--vdivxz4", CSS.Types.Color.toString(color))],
     );
   let media =
     CSS.make(
-      "css-19xpxeg-media",
-      [("--color-km0lr0", CSS.Types.Color.toString(color))],
+      "css-vdiv8qx",
+      [("--vdivuab", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "css-1g3cfa1-descendant",
-      [("--color-ump0qt", CSS.Types.Color.toString(color))],
+      "css-vdiv0ye",
+      [("--vdiv4aa", CSS.Types.Color.toString(color))],
     );
   let bundleSpan =
     CSS.make(
-      "css-1d8si03-bundleSpan",
-      [("--color-7srqv7", CSS.Types.Color.toString(color))],
+      "css-vdivorz",
+      [("--vdivdce", CSS.Types.Color.toString(color))],
     );
-  let customFeeder =
-    CSS.make("css-1l36lcw-customFeeder", [("--str-vye19e", str)]);
+  let customFeeder = CSS.make("css-vdivnay", [("--vdivwoc", str)]);
   let pseudoElement =
     CSS.make(
-      "css-1vdqaxy-pseudoElement",
-      [("--color-12r6fyr", CSS.Types.Color.toString(color))],
+      "css-vdiv1ea",
+      [("--vdivdpb", CSS.Types.Color.toString(color))],
     );
   let legacyPseudoElement =
     CSS.make(
-      "css-yfluo3-legacyPseudoElement",
-      [("--color-e7n16g", CSS.Types.Color.toString(color))],
+      "css-vdivprh",
+      [("--vdivbcs", CSS.Types.Color.toString(color))],
     );
   let mixedPseudo =
     CSS.make(
-      "css-i81g8d-mixedPseudo",
-      [("--color-xrtge", CSS.Types.Color.toString(color))],
+      "css-vdiv24y",
+      [("--vdiv3g0", CSS.Types.Color.toString(color))],
     );
   let pseudoClassOnly =
     CSS.make(
-      "css-11o9ny0-pseudoClassOnly",
-      [("--color-f5c7x", CSS.Types.Color.toString(color))],
+      "css-vdiv5cb",
+      [("--vdivik3", CSS.Types.Color.toString(color))],
     );
