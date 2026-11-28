@@ -44,9 +44,6 @@ module Buffer = {
       target.rules = [(className, cssText), ...target.rules];
     };
 
-  /* Every block's class, in push order: the class, its rule ([None] for
-     an empty marker), its binding path ("" if anonymous) and its
-     location. */
   let block_classes:
     ref(list((string, option(int), string, Ppxlib.Location.t))) =
     ref([]);
@@ -70,19 +67,6 @@ module Buffer = {
   };
 };
 
-/* A block class or variable is a module prefix and a suffix of
-   [Hash_class.min_suffix_width] characters, so two different keys of one
-   module can get the same name. The later key widens its own suffix, one
-   character at a time, until the name is free or already its own (the same
-   key claimed twice). Earlier keys keep their names.
-
-   Which keys come earlier must not depend on the build: a block under
-   `switch%platform` exists in one build only, and would widen a later block
-   in that build alone. So the ppx names blocks in two passes. The naming
-   pass ([Collect]) runs before any other ppx expands the module, on its
-   native and then its client view ([Platform_view]), and claims every key in
-   that order. Expansion ([Lookup]) then takes each key's name from the
-   naming pass, so both builds name a block alike. */
 module Naming = {
   type mode =
     | Off
@@ -90,12 +74,8 @@ module Naming = {
     | Lookup;
 
   type t('info) = {
-    /* Collect: name -> (key, info) */
     owners: Hashtbl.t(string, (string, 'info)),
-    /* Lookup: key -> name */
     names: Hashtbl.t(string, string),
-    /* key -> (the name it clashes on, past the widest suffix; the info of
-       that name's owner) */
     clashes: Hashtbl.t(string, (string, 'info)),
   };
 
@@ -133,8 +113,6 @@ module Naming = {
     mode := Lookup;
   };
 
-  /* Errors of the naming pass are dropped: expansion reports them, for the
-     blocks its build has. */
   let guard = (f, ~fallback) =>
     switch (mode^) {
     | Collect =>
@@ -146,8 +124,6 @@ module Naming = {
     };
 };
 
-/* Past [Hash_class.max_suffix_width], [on_clash(name, other_info)] reports
-   the clash. */
 let claim = (naming: Naming.t(_), ~loc, ~module_name, ~key, ~info, ~on_clash) =>
   switch (Naming.mode^) {
   | Collect =>
@@ -225,12 +201,8 @@ let claim_variable = (~module_name, ~loc, key) =>
     )
   );
 
-/* The `@property` rule of a block variable, and its key in the global
-   rules. */
 let property_rule_key = var_name => "@property --" ++ var_name;
 
-/* A block is rendered with this byte in place of its own class, hashed,
-   and then given its class. */
 let self_placeholder_char = '\001';
 let self_placeholder = String.make(1, self_placeholder_char);
 
@@ -976,8 +948,6 @@ module Css_transform = {
       };
     };
 
-  /* A block's interpolation seed: each interpolated declaration, after the
-     selectors and at-rules around it. */
   let rec interpolated_declarations = (~context="", rule) =>
     switch (rule) {
     | Declaration(decl) when declaration_has_value_interpolation(decl) => [
@@ -1141,8 +1111,6 @@ let push =
         ],
       ),
     );
-  /* The path shown in messages: the nested `let` path when the block is
-     inside one, else the top-level binding. */
   let binding =
     switch (binding_display, binding_name) {
     | (Some(name), _)
@@ -1247,16 +1215,6 @@ let push_keyframe =
   (keyframe_name, List.rev(ctx.dynamic_vars^));
 };
 
-/* Walk every rule in a [%styled.global] block, replace each `$(expr)`
-   interpolation with `var(--<readable path>-<hash>)` (see
-   [Hash_class.variable]), and return the interpolations as dynamic_vars.
-
-   Each rule, with or without interpolations, is pushed to
-   `Buffer.add_global_rule` and ships in a `[@@@css ...]` item. The
-   generated module's `to_string` renders the dynamic_vars as one
-   `:root { --<name>: <value>; ... }` block, one declaration per dynamic_var
-   (deduplicated by `Css_transform.add_dynamic_var`); a static block has no
-   dynamic_vars, and `to_string` returns `""`. */
 let push_global =
     (
       ~file,
@@ -1319,11 +1277,7 @@ let push_global =
       ~rendered_rules=List.map(render_rule, flattened_rules),
     );
 
-  /* transform_rule replaces every Variable(path) in declaration values with
-     the variable [name_var] gives it (scoped by the block's namespace and the
-     value's type) and appends the dynamic_var to the context accumulator.
-
-     The caller in [ppx.re] pre-checks the rule list for top-level
+  /* The caller in [ppx.re] pre-checks the rule list for top-level
      Declaration nodes and bails before invoking this function, so the
      Declaration arm here is unreachable in practice. We keep it as a
      defensive no-op rather than partial-matching, so a future caller
@@ -1350,7 +1304,6 @@ let push_global =
   List.rev(ctx.dynamic_vars^);
 };
 
-/* The file's rules and its [@@@css.classes] entries. */
 let get = () => {
   let rules = Buffer.get_rules();
   let offset = Hashtbl.length(Buffer.global_rules.seen);
@@ -1378,7 +1331,6 @@ let get = () => {
   (rules, classes);
 };
 
-/* Forgets what one view of the naming pass pushed, but not the names. */
 let discard_view = () => {
   Buffer.clear();
   Local_selector_environment.clear();

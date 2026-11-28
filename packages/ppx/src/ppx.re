@@ -655,9 +655,6 @@ let classify_binding =
 
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, ~on_block, expr) => {
-  /* [binding_path] is the chain of `let` names from [top_binding] (or `_`
-     when the block has no top-level name) to the innermost one around the
-     expression. */
   let rec map_with_binding = (~binding_path, expr) => {
     let mapper = {
       as self;
@@ -1059,8 +1056,6 @@ let file_of_structure = (str: Ppxlib.structure) =>
   | [] => ""
   };
 
-/* The naming pass (see [Css_file.Naming]): expand the native and the client
-   view of the module, keep only the names. */
 let name_blocks = str => {
   let file = file_of_structure(str);
   let main_module = module_name_of_file(file);
@@ -1147,8 +1142,7 @@ let () = {
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
     /* Declares production mode in the wire protocol so the aggregator can
-       minify without a flag of its own; absence means development. The
-       library name lets the aggregator name the sheet's libraries. */
+       minify without a flag of its own; absence means development. */
     let env_entries =
       switch (rule_items, bindings_items) {
       | ([], []) => []

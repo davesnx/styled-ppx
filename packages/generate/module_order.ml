@@ -36,8 +36,6 @@ let read_cmt path =
   | _ -> Ok None
   | exception _ -> Error path
 
-(** The [.cmt]s at [paths] that come from a source file, or [Error path] for the
-    first one that cannot be read. *)
 let read_cmts paths =
   let rec read_all acc = function
     | [] -> Ok (List.rev acc)
@@ -50,8 +48,6 @@ let read_cmts paths =
   in
   read_all [] paths
 
-(* The components of a path, last first, so a suffix of a path is a prefix of
-   its components. *)
 let components path =
   let parts =
     String.split_on_char '/' path |> List.concat_map (String.split_on_char '\\')
@@ -76,20 +72,14 @@ let absolute path =
 
 type pairing = {
   inputs : string list;
-  paired : (string * cmt) list;  (** input, one of its [.cmt]s *)
+  paired : (string * cmt) list;
 }
 
-(** A [.cmt] that is the best match of several inputs: it is ignored. *)
 type ambiguous = {
   cmt : cmt;
   candidates : string list;
 }
 
-(* A [.cmt] belongs to an input when its source file is a component suffix
-   of the input's absolute path. Each input takes the [.cmt]s with the
-   longest such source file (several when one source file was compiled
-   twice, for two modes); a [.cmt] that is the best match of two inputs
-   belongs to neither. Every other [.cmt] is ignored. *)
 let pair ~inputs cmts =
   let inputs = List.sort_uniq compare inputs in
   let sources = List.map (fun cmt -> cmt, components cmt.sourcefile) cmts in
@@ -137,10 +127,6 @@ let cmts_of pairing input =
     (fun (owner, cmt) -> if owner = input then Some cmt else None)
     pairing.paired
 
-(* The inputs that [input] imports: each import names the paired [.cmt]s
-   with that module name, preferring those in the importer's own object
-   directory (a [copy_files] twin compiled next to it), else all of them. A
-   [.cmt] lists its own unit among its imports; that is not an edge. *)
 let dependencies pairing =
   let by_modname = Hashtbl.create 64 in
   List.iter
@@ -166,11 +152,6 @@ let dependencies pairing =
           List.map fst (if local = [] then candidates else local))
         (List.filter (fun name -> name <> importer.modname) importer.imports))
 
-(* Kahn's algorithm: each path after the paths it depends on. Among the
-   ready paths the smallest comes first, so the result depends neither on
-   the order of [paths] nor on that of the dependencies. Dependencies outside
-   [paths], and on itself, are ignored. On a cycle, [Error cycle] lists its
-   paths in path order, without the paths that only depend on it. *)
 module Paths = Set.Make (String)
 
 let toposort ~dependencies paths =
@@ -208,8 +189,6 @@ let toposort ~dependencies paths =
       kahn (path :: acc) ready
     | None when Hashtbl.length waiting = 0 -> Ok (List.rev acc)
     | None ->
-      (* What is left is a cycle and the paths after it; drop the paths that
-         nothing left depends on until only the cycle remains. *)
       let rec peel left =
         let kept =
           List.filter
@@ -228,8 +207,6 @@ let toposort ~dependencies paths =
   in
   kahn [] ready
 
-(** The inputs in dependency order, ties by path, or [Error cycle] with the
-    module name and path of each input of the cycle. *)
 let order pairing =
   toposort ~dependencies:(dependencies pairing) pairing.inputs
   |> Result.map_error

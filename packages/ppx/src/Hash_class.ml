@@ -1,32 +1,9 @@
-(* Every hashed name that the static extraction emits.
-
-     block class     `css-<prefix><suffix>`
-     block variable  `--<prefix><suffix>`
-     keyframes       `keyframe-<hash(body)>`
-     global key      `global-<hash(rule)>`
-     scoped variable `--<readable path>-<hash(namespace, path, type)>`
-                     (keyframes and [%styled.global])
-
-   [prefix] is [module_prefix_width] base36 characters of murmur2 of the
-   module name (the source file's basename), so every block name of one
-   module shares it, and a `copy_files` twin of the module (same basename,
-   same text) gets the same names. [suffix] is [min_suffix_width] base36
-   characters of murmur2 of the block's key (or the variable's key);
-   [Css_file] widens it, up to [max_suffix_width], when two different keys of
-   one module meet on one name.
-
-   Composite inputs are joined with NUL, which no CSS text or OCaml path
-   contains, so ["a"; "bc"] and ["ab"; "c"] differ. *)
-
 let hash = Murmur2.default
 let nul_join parts = String.concat "\000" parts
 let module_prefix_width = 4
 let min_suffix_width = 3
 let max_suffix_width = 6
 
-(* Two blocks with the same key are the same block pushed twice. [content]
-   is the block's rendered rules with its own class left out, and the paths
-   and types of its variables. *)
 let block_key ~module_name ~scope ~binding content =
   nul_join [ module_name; String.concat "." scope; binding; content ]
 
@@ -37,11 +14,6 @@ let block_hash ~width ~module_name key =
   Murmur2.base36 ~width:module_prefix_width (Murmur2.murmur2 module_name)
   ^ Murmur2.base36 ~width (Murmur2.murmur2 key)
 
-(* A block variable's key: the module, the block's interpolation seed (a
-   hash of its interpolated declarations with their selectors and
-   at-rules), the path, its type, and the occurrence when one declaration
-   reads the path more than once. Blocks of one module with the same key
-   share the variable; other modules never do. *)
 let variable_key ~module_name ~interpolation_seed ~type_key ~occurrence ~total
   path =
   nul_join
@@ -53,10 +25,6 @@ let variable_key ~module_name ~interpolation_seed ~type_key ~occurrence ~total
       (if total > 1 then string_of_int occurrence else "");
     ]
 
-(* A readable prefix for a keyframes or [%styled.global] variable: the
-   interpolated path without its leading module segments, `[A-Za-z0-9_]`
-   runs joined by `-`, at most 40 characters, "var" when nothing is left.
-   The hash after it owns uniqueness. *)
 let interpolation_name_prefix path =
   let path =
     let rec drop = function
@@ -97,8 +65,6 @@ let variable_for_occurrence ~namespace ~type_key ~occurrence ~total path =
   let name = variable ~namespace ~type_key path in
   if total > 1 then Printf.sprintf "%s_%d" name occurrence else name
 
-(* The variable namespace of a keyframes or [%styled.global] block: its
-   kind, module, scope and rendered rules. *)
 let scoped_namespace ~kind ~module_name ~scope ~rendered_rules =
   let scope_key = String.concat "." scope in
   let rules_key = String.concat "\n" rendered_rules in

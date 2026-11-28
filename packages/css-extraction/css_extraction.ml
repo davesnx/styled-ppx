@@ -68,7 +68,6 @@ let class_entry ~class_name ~rule_index ~binding (loc : Ppxlib.Location.t) =
     end_col = pos_end.pos_cnum - pos_end.pos_bol;
   }
 
-(* An absent rule index is written as -1. *)
 let no_rule = -1
 let encode_rule_index = Option.value ~default:no_rule
 

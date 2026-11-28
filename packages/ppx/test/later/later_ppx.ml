@@ -1,5 +1,3 @@
-(* A ppx that writes [%css] during expansion, after styled-ppx's naming
-   pass: [%css_later "..."] becomes [%css "..."]. *)
 open Ppxlib
 
 let () =

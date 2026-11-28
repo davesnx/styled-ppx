@@ -77,7 +77,6 @@ let base36 ~width n =
   fill (width - 1) n;
   Bytes.to_string digits
 
-(* The number of base36 digits of [n], at least one. *)
 let rec digit_count n = if n < 36 then 1 else 1 + digit_count (n / 36)
 
 let default str =
