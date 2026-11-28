@@ -1129,7 +1129,12 @@ let push =
   let classNames =
     switch (rendered, binding_name) {
     | ("", Some(name)) when name != "_" =>
-      let key = Hash_class.marker_key(~module_name=main_module, ~scope, name);
+      let key =
+        Hash_class.marker_key(
+          ~module_name=main_module,
+          ~scope,
+          Option.value(binding_display, ~default=name),
+        );
       let hash =
         claim_block_hash(~module_name=main_module, ~key, ~binding, loc);
       [record_class(~rule_index=None, hash)];
